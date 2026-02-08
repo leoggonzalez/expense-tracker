@@ -1,5 +1,5 @@
-import React from 'react';
-import './Checkbox.scss';
+import React from "react";
+import "./Checkbox.scss";
 
 export interface CheckboxProps {
   checked: boolean;
@@ -12,7 +12,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   checked,
   onChange,
   label,
-  className = '',
+  className = "",
 }) => {
   return (
     <label className={`checkbox ${className}`.trim()}>

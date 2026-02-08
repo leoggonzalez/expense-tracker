@@ -1,8 +1,8 @@
-import React from 'react';
-import './Input.scss';
+import React from "react";
+import "./Input.scss";
 
 export interface InputProps {
-  type?: 'text' | 'number' | 'date' | 'month';
+  type?: "text" | "number" | "date" | "month";
   value: string | number;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -15,7 +15,7 @@ export interface InputProps {
 }
 
 export const Input: React.FC<InputProps> = ({
-  type = 'text',
+  type = "text",
   value,
   onChange,
   placeholder,
@@ -24,7 +24,7 @@ export const Input: React.FC<InputProps> = ({
   min,
   max,
   step,
-  className = '',
+  className = "",
 }) => {
   return (
     <div className={`input ${className}`.trim()}>

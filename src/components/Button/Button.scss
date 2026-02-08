@@ -1,4 +1,4 @@
-@import '../../styles/variables.scss';
+@import "../../styles/variables.scss";
 
 .button {
   display: inline-flex;
@@ -9,7 +9,7 @@
   font-weight: var(--font-weight-medium);
   transition: all var(--transition-base);
   cursor: pointer;
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;

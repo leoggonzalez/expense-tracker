@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Container } from '../Container/Container';
-import './Navigation.scss';
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Container } from "../Container/Container";
+import "./Navigation.scss";
 
 export const Navigation: React.FC = () => {
   const pathname = usePathname();
 
   const links = [
-    { href: '/', label: 'Dashboard' },
-    { href: '/projection', label: 'Projection' },
-    { href: '/entries', label: 'Manage Entries' },
-    { href: '/entries/all', label: 'All Entries' },
+    { href: "/", label: "Dashboard" },
+    { href: "/projection", label: "Projection" },
+    { href: "/entries", label: "Manage Entries" },
+    { href: "/entries/all", label: "All Entries" },
   ];
 
   return (
@@ -29,7 +29,7 @@ export const Navigation: React.FC = () => {
                 <Link
                   href={link.href}
                   className={`navigation__link ${
-                    pathname === link.href ? 'navigation__link--active' : ''
+                    pathname === link.href ? "navigation__link--active" : ""
                   }`}
                 >
                   {link.label}

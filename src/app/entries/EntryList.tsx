@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import './EntryList.scss';
+import "./EntryList.scss";
 
-import { Stack, Text } from '@/elements';
+import { Stack, Text } from "@/elements";
 
-import { Button } from '@/components';
-import { Entry } from '@/model';
-import React from 'react';
-import { deleteEntry } from '@/actions/entries';
-import { describe } from 'node:test';
-import { format } from 'date-fns';
-import { group } from 'console';
+import { Button } from "@/components";
+import { Entry } from "@/model";
+import React from "react";
+import { deleteEntry } from "@/actions/entries";
+import { describe } from "node:test";
+import { format } from "date-fns";
+import { group } from "console";
 
 export interface EntryListProps {
   entries: Array<{
@@ -27,24 +27,26 @@ export interface EntryListProps {
   showEdit?: boolean;
 }
 
-export const EntryList: React.FC<EntryListProps> = ({ entries: plainEntries, showEdit = false }) => {
+export const EntryList: React.FC<EntryListProps> = ({
+  entries: plainEntries,
+  showEdit = false,
+}) => {
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this entry?')) {
+    if (confirm("Are you sure you want to delete this entry?")) {
       await deleteEntry(id);
     }
   };
 
   // Convert plain objects to Entry instances
-  const entries = plainEntries.map((entry) => Entry.fromJSON({
-    ...entry,
-    beginDate: new Date(entry.beginDate),
-    endDate: entry.endDate ? new Date(entry.endDate) : null,
-    createdAt: new Date(entry.createdAt),
-    updatedAt: new Date(entry.updatedAt),
-  }));
-
-  console.log(plainEntries[0])
-  console.log(entries[0])
+  const entries = plainEntries.map((entry) =>
+    Entry.fromJSON({
+      ...entry,
+      beginDate: new Date(entry.beginDate),
+      endDate: entry.endDate ? new Date(entry.endDate) : null,
+      createdAt: new Date(entry.createdAt),
+      updatedAt: new Date(entry.updatedAt),
+    }),
+  );
 
   if (entries.length === 0) {
     return (
@@ -72,13 +74,14 @@ export const EntryList: React.FC<EntryListProps> = ({ entries: plainEntries, sho
                 <Text
                   size="sm"
                   weight="bold"
-                  color={entry.isIncome() ? 'success' : 'danger'}
+                  color={entry.isIncome() ? "success" : "danger"}
                 >
                   {entry.getFormattedAmount()}
                 </Text>
                 <Text size="xs" color="secondary">
-                  {format(entry.beginDate, 'MMM dd, yyyy')}
-                  {entry.endDate && ` - ${format(entry.endDate, 'MMM dd, yyyy')}`}
+                  {format(entry.beginDate, "MMM dd, yyyy")}
+                  {entry.endDate &&
+                    ` - ${format(entry.endDate, "MMM dd, yyyy")}`}
                 </Text>
               </div>
             </div>

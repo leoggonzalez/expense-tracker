@@ -1,6 +1,6 @@
-import { Stack } from '@/elements';
-import { Dashboard, Container } from '@/components';
-import { getEntries } from '@/actions/entries';
+import { Stack } from "@/elements";
+import { Dashboard, Container } from "@/components";
+import { getEntries } from "@/actions/entries";
 
 export default async function HomePage() {
   const entriesData = await getEntries();

@@ -1,12 +1,12 @@
-import React from 'react';
-import './Button.scss';
+import React from "react";
+import "./Button.scss";
 
 export interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary' | 'danger' | 'success';
-  size?: 'sm' | 'md' | 'lg';
+  type?: "button" | "submit" | "reset";
+  variant?: "primary" | "secondary" | "danger" | "success";
+  size?: "sm" | "md" | "lg";
   disabled?: boolean;
   fullWidth?: boolean;
   className?: string;
@@ -15,22 +15,22 @@ export interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
-  type = 'button',
-  variant = 'primary',
-  size = 'md',
+  type = "button",
+  variant = "primary",
+  size = "md",
   disabled = false,
   fullWidth = false,
-  className = '',
+  className = "",
 }) => {
   const classes = [
-    'button',
+    "button",
     `button--variant-${variant}`,
     `button--size-${size}`,
-    fullWidth && 'button--full-width',
+    fullWidth && "button--full-width",
     className,
   ]
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 
   return (
     <button

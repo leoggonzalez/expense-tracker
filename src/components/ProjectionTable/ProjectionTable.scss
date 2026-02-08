@@ -1,4 +1,4 @@
-@import '../../styles/variables.scss';
+@import "../../styles/variables.scss";
 
 .projection-table {
   width: 100%;
@@ -114,12 +114,11 @@
     &--breakdown {
       background-color: var(--color-background-tertiary);
     }
-  
 
-  &__entry {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
+    &__entry {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
   }
-}
 }

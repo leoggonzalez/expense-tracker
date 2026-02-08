@@ -1,5 +1,5 @@
-import React from 'react';
-import './Select.scss';
+import React from "react";
+import "./Select.scss";
 
 export interface SelectOption {
   value: string;
@@ -23,7 +23,7 @@ export const Select: React.FC<SelectProps> = ({
   label,
   placeholder,
   required = false,
-  className = '',
+  className = "",
 }) => {
   return (
     <div className={`select ${className}`.trim()}>

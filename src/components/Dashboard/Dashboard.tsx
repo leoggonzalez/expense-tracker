@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import './Dashboard.scss';
+import "./Dashboard.scss";
 
-import { Box, Stack, Text } from '@/elements';
-import { Entry, EntryCollection, IEntry } from '@/model';
+import { Box, Stack, Text } from "@/elements";
+import { Entry, EntryCollection, IEntry } from "@/model";
 
-import React from 'react';
-import { startOfMonth } from 'date-fns';
+import React from "react";
+import { startOfMonth } from "date-fns";
 
 export interface DashboardProps {
   entries: Array<{
@@ -22,26 +22,30 @@ export interface DashboardProps {
   }>;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ entries: plainEntries }) => {
+export const Dashboard: React.FC<DashboardProps> = ({
+  entries: plainEntries,
+}) => {
   // Convert plain objects to Entry instances
-  const entries = plainEntries.map((entry) => Entry.fromJSON({
-    ...entry,
-    beginDate: new Date(entry.beginDate),
-    endDate: entry.endDate ? new Date(entry.endDate) : null,
-    createdAt: new Date(entry.createdAt),
-    updatedAt: new Date(entry.updatedAt),
-  }));
+  const entries = plainEntries.map((entry) =>
+    Entry.fromJSON({
+      ...entry,
+      beginDate: new Date(entry.beginDate),
+      endDate: entry.endDate ? new Date(entry.endDate) : null,
+      createdAt: new Date(entry.createdAt),
+      updatedAt: new Date(entry.updatedAt),
+    }),
+  );
 
   const collection = new EntryCollection(entries);
   const currentMonth = startOfMonth(new Date());
 
-  const income = collection.getTotalForMonth(currentMonth, 'income');
-  const expense = collection.getTotalForMonth(currentMonth, 'expense');
+  const income = collection.getTotalForMonth(currentMonth, "income");
+  const expense = collection.getTotalForMonth(currentMonth, "expense");
   const net = income + expense; // expense is negative
 
   const formatCurrency = (amount: number): string => {
     const absAmount = Math.abs(amount);
-    const sign = amount < 0 ? '-' : '';
+    const sign = amount < 0 ? "-" : "";
     return `${sign}${absAmount.toFixed(2)} €`;
   };
 
@@ -78,7 +82,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ entries: plainEntries }) =
             <Text
               size="2xl"
               weight="bold"
-              color={net >= 0 ? 'success' : 'danger'}
+              color={net >= 0 ? "success" : "danger"}
             >
               {formatCurrency(net)}
             </Text>
@@ -90,7 +94,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ entries: plainEntries }) =
             Active Entries
           </Text>
           <Text size="lg" color="secondary">
-            {collection.getActiveInMonth(currentMonth).length} entries active this month
+            {collection.getActiveInMonth(currentMonth).length} entries active
+            this month
           </Text>
         </div>
       </Stack>

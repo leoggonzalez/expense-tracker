@@ -1,18 +1,22 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Stack, Text } from '@/elements';
-import { Button } from '../Button/Button';
-import { Input } from '../Input/Input';
-import { Select } from '../Select/Select';
-import { Checkbox } from '../Checkbox/Checkbox';
-import { Autocomplete } from '../Autocomplete/Autocomplete';
-import { createMultipleEntries, CreateEntryInput, getGroups } from '@/actions/entries';
-import './BulkEntryForm.scss';
+import React, { useState, useEffect } from "react";
+import { Stack, Text } from "@/elements";
+import { Button } from "../Button/Button";
+import { Input } from "../Input/Input";
+import { Select } from "../Select/Select";
+import { Checkbox } from "../Checkbox/Checkbox";
+import { Autocomplete } from "../Autocomplete/Autocomplete";
+import {
+  createMultipleEntries,
+  CreateEntryInput,
+  getGroups,
+} from "@/actions/entries";
+import "./BulkEntryForm.scss";
 
 interface BulkEntryItem {
   id: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   description: string;
   amount: number;
 }
@@ -22,12 +26,12 @@ export interface BulkEntryFormProps {
 }
 
 export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
-  const [groupName, setGroupName] = useState('');
+  const [groupName, setGroupName] = useState("");
   const [beginDate, setBeginDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [isRecurring, setIsRecurring] = useState(false);
   const [entries, setEntries] = useState<BulkEntryItem[]>([
-    { id: '1', type: 'expense', description: '', amount: 0 },
+    { id: "1", type: "expense", description: "", amount: 0 },
   ]);
   const [loading, setLoading] = useState(false);
   const [groups, setGroups] = useState<string[]>([]);
@@ -35,24 +39,31 @@ export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
   useEffect(() => {
     async function fetchGroups() {
       const groupsData = await getGroups();
-      setGroups(groupsData.map(g => g.name));
+      setGroups(groupsData.map((g) => g.name));
     }
     fetchGroups();
   }, []);
 
   const addEntry = () => {
-    const newId = (Math.max(...entries.map(e => parseInt(e.id))) + 1).toString();
-    setEntries([...entries, { id: newId, type: 'expense', description: '', amount: 0 }]);
+    const newId = (
+      Math.max(...entries.map((e) => parseInt(e.id))) + 1
+    ).toString();
+    setEntries([
+      ...entries,
+      { id: newId, type: "expense", description: "", amount: 0 },
+    ]);
   };
 
   const removeEntry = (id: string) => {
     if (entries.length > 1) {
-      setEntries(entries.filter(e => e.id !== id));
+      setEntries(entries.filter((e) => e.id !== id));
     }
   };
 
   const updateEntry = (id: string, field: keyof BulkEntryItem, value: any) => {
-    setEntries(entries.map(e => (e.id === id ? { ...e, [field]: value } : e)));
+    setEntries(
+      entries.map((e) => (e.id === id ? { ...e, [field]: value } : e)),
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,7 +71,7 @@ export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
     setLoading(true);
 
     try {
-      const inputs: CreateEntryInput[] = entries.map(entry => ({
+      const inputs: CreateEntryInput[] = entries.map((entry) => ({
         type: entry.type,
         groupName,
         description: entry.description,
@@ -70,28 +81,28 @@ export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
       }));
 
       const result = await createMultipleEntries(inputs);
-      
+
       if (result.success) {
         // Reset form
-        setGroupName('');
+        setGroupName("");
         setBeginDate(new Date());
         setEndDate(new Date());
         setIsRecurring(false);
-        setEntries([{ id: '1', type: 'expense', description: '', amount: 0 }]);
-        
+        setEntries([{ id: "1", type: "expense", description: "", amount: 0 }]);
+
         if (onSuccess) {
           onSuccess();
         }
       }
     } catch (error) {
-      console.error('Error submitting bulk entries:', error);
+      console.error("Error submitting bulk entries:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const formatDateForInput = (date: Date): string => {
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split("T")[0];
   };
 
   return (
@@ -147,16 +158,18 @@ export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
                 <div className="bulk-entry-form__entry-fields">
                   <Select
                     value={entry.type}
-                    onChange={(value) => updateEntry(entry.id, 'type', value)}
+                    onChange={(value) => updateEntry(entry.id, "type", value)}
                     options={[
-                      { value: 'income', label: 'Income' },
-                      { value: 'expense', label: 'Expense' },
+                      { value: "income", label: "Income" },
+                      { value: "expense", label: "Expense" },
                     ]}
                   />
 
                   <Input
                     value={entry.description}
-                    onChange={(value) => updateEntry(entry.id, 'description', value)}
+                    onChange={(value) =>
+                      updateEntry(entry.id, "description", value)
+                    }
                     placeholder="Description"
                     required
                   />
@@ -164,7 +177,9 @@ export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
                   <Input
                     type="number"
                     value={entry.amount}
-                    onChange={(value) => updateEntry(entry.id, 'amount', parseFloat(value) || 0)}
+                    onChange={(value) =>
+                      updateEntry(entry.id, "amount", parseFloat(value) || 0)
+                    }
                     step="0.01"
                     placeholder="Amount"
                     required
@@ -191,7 +206,9 @@ export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
         </div>
 
         <Button type="submit" disabled={loading} fullWidth>
-          {loading ? 'Adding Entries...' : `Add ${entries.length} ${entries.length === 1 ? 'Entry' : 'Entries'}`}
+          {loading
+            ? "Adding Entries..."
+            : `Add ${entries.length} ${entries.length === 1 ? "Entry" : "Entries"}`}
         </Button>
       </Stack>
     </form>

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Stack, Text } from '@/elements';
-import { Container, Input, Button, Autocomplete } from '@/components';
-import { Pagination } from '@/components/Pagination/Pagination';
-import { getEntriesWithFilters, getGroups } from '@/actions/entries';
-import { EntryList } from '../EntryList';
-import './AllEntriesPage.scss';
+import React, { useState, useEffect } from "react";
+import { Stack, Text } from "@/elements";
+import { Container, Input, Button, Autocomplete } from "@/components";
+import { Pagination } from "@/components/Pagination/Pagination";
+import { getEntriesWithFilters, getGroups } from "@/actions/entries";
+import { EntryList } from "../EntryList";
+import "./AllEntriesPage.scss";
 
 export function AllEntriesPage() {
   const [entries, setEntries] = useState<any[]>([]);
@@ -16,14 +16,14 @@ export function AllEntriesPage() {
     total: 0,
     totalPages: 0,
   });
-  
+
   const [filters, setFilters] = useState({
-    groupId: '',
-    description: '',
-    startDate: '',
-    endDate: '',
+    groupId: "",
+    description: "",
+    startDate: "",
+    endDate: "",
   });
-  
+
   const [groups, setGroups] = useState<Array<{ id: string; name: string }>>([]);
   const [loading, setLoading] = useState(false);
 
@@ -74,15 +74,16 @@ export function AllEntriesPage() {
 
   function handleClearFilters() {
     setFilters({
-      groupId: '',
-      description: '',
-      startDate: '',
-      endDate: '',
+      groupId: "",
+      description: "",
+      startDate: "",
+      endDate: "",
     });
     setPagination({ ...pagination, page: 1 });
   }
 
-  const selectedGroupName = groups.find(g => g.id === filters.groupId)?.name || '';
+  const selectedGroupName =
+    groups.find((g) => g.id === filters.groupId)?.name || "";
 
   return (
     <Container>
@@ -100,17 +101,17 @@ export function AllEntriesPage() {
               label="Group"
               value={selectedGroupName}
               onChange={(name) => {
-                const group = groups.find(g => g.name === name);
-                handleFilterChange('groupId', group?.id || '');
+                const group = groups.find((g) => g.name === name);
+                handleFilterChange("groupId", group?.id || "");
               }}
-              options={groups.map(g => g.name)}
+              options={groups.map((g) => g.name)}
               placeholder="All groups"
             />
 
             <Input
               label="Description"
               value={filters.description}
-              onChange={(value) => handleFilterChange('description', value)}
+              onChange={(value) => handleFilterChange("description", value)}
               placeholder="Search description..."
             />
 
@@ -118,14 +119,14 @@ export function AllEntriesPage() {
               label="Start Date"
               type="date"
               value={filters.startDate}
-              onChange={(value) => handleFilterChange('startDate', value)}
+              onChange={(value) => handleFilterChange("startDate", value)}
             />
 
             <Input
               label="End Date"
               type="date"
               value={filters.endDate}
-              onChange={(value) => handleFilterChange('endDate', value)}
+              onChange={(value) => handleFilterChange("endDate", value)}
             />
           </div>
 
@@ -137,7 +138,9 @@ export function AllEntriesPage() {
         <div>
           <div className="all-entries-page__results-header">
             <Text size="md" color="secondary">
-              {loading ? 'Loading...' : `Showing ${entries.length} of ${pagination.total} entries`}
+              {loading
+                ? "Loading..."
+                : `Showing ${entries.length} of ${pagination.total} entries`}
             </Text>
           </div>
 
@@ -148,12 +151,14 @@ export function AllEntriesPage() {
           ) : (
             <>
               <EntryList entries={entries} />
-              
+
               {pagination.totalPages > 1 && (
                 <Pagination
                   currentPage={pagination.page}
                   totalPages={pagination.totalPages}
-                  onPageChange={(page) => setPagination({ ...pagination, page })}
+                  onPageChange={(page) =>
+                    setPagination({ ...pagination, page })
+                  }
                 />
               )}
             </>

@@ -1,8 +1,13 @@
-import { addMonths, endOfMonth, isWithinInterval, startOfMonth } from 'date-fns';
+import {
+  addMonths,
+  endOfMonth,
+  isWithinInterval,
+  startOfMonth,
+} from "date-fns";
 
 export interface IEntry {
   id: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   group: string;
   groupName: string;
   description: string;
@@ -24,7 +29,7 @@ export class Entry {
     return this.data.id;
   }
 
-  get type(): 'income' | 'expense' {
+  get type(): "income" | "expense" {
     return this.data.type;
   }
 
@@ -41,7 +46,7 @@ export class Entry {
   }
 
   get amount(): number {
-    if (this.type === 'expense' && this.data.amount > 0) {
+    if (this.type === "expense" && this.data.amount > 0) {
       return -this.data.amount; // Ensure expenses are negative
     }
     return this.data.amount;
@@ -91,7 +96,7 @@ export class Entry {
    */
   getFormattedAmount(): string {
     const absAmount = Math.abs(this.amount);
-    const sign = this.amount < 0 ? '-' : '';
+    const sign = this.amount < 0 ? "-" : "";
     return `${sign}${absAmount.toFixed(2)} €`;
   }
 
@@ -99,14 +104,14 @@ export class Entry {
    * Check if entry is an income
    */
   isIncome(): boolean {
-    return this.type === 'income';
+    return this.type === "income";
   }
 
   /**
    * Check if entry is an expense
    */
   isExpense(): boolean {
-    return this.type === 'expense';
+    return this.type === "expense";
   }
 
   /**

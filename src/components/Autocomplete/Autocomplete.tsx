@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import './Autocomplete.scss';
+import React, { useState, useRef, useEffect } from "react";
+import "./Autocomplete.scss";
 
 export interface AutocompleteProps {
   value: string;
@@ -20,7 +20,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
   label,
   placeholder,
   required = false,
-  className = '',
+  className = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [filteredOptions, setFilteredOptions] = useState<string[]>(options);
@@ -28,20 +28,23 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
 
   useEffect(() => {
     const filtered = options.filter((option) =>
-      option.toLowerCase().includes(value.toLowerCase())
+      option.toLowerCase().includes(value.toLowerCase()),
     );
     setFilteredOptions(filtered);
   }, [value, options]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSelect = (option: string) => {

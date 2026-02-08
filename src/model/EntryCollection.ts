@@ -1,6 +1,6 @@
-import { format, startOfMonth } from 'date-fns';
+import { format, startOfMonth } from "date-fns";
 
-import { Entry } from './Entry';
+import { Entry } from "./Entry";
 
 export interface MonthlyData {
   month: Date;
@@ -32,7 +32,7 @@ export class EntryCollection {
   /**
    * Get entries filtered by type
    */
-  getByType(type: 'income' | 'expense'): Entry[] {
+  getByType(type: "income" | "expense"): Entry[] {
     return this.entries.filter((entry) => entry.type === type);
   }
 
@@ -46,7 +46,7 @@ export class EntryCollection {
   /**
    * Get total for a specific month and type
    */
-  getTotalForMonth(targetDate: Date, type?: 'income' | 'expense'): number {
+  getTotalForMonth(targetDate: Date, type?: "income" | "expense"): number {
     let filtered = this.getActiveInMonth(targetDate);
 
     if (type) {
@@ -67,8 +67,8 @@ export class EntryCollection {
       month.setMonth(startDate.getMonth() + i);
       const monthStart = startOfMonth(month);
 
-      const income = this.getTotalForMonth(monthStart, 'income');
-      const expense = this.getTotalForMonth(monthStart, 'expense');
+      const income = this.getTotalForMonth(monthStart, "income");
+      const expense = this.getTotalForMonth(monthStart, "expense");
 
       result.push({
         month: monthStart,
@@ -97,7 +97,9 @@ export class EntryCollection {
     const groups = this.getGroups();
 
     return groups.map((group) => {
-      const groupEntries = this.entries.filter((entry) => entry.group === group);
+      const groupEntries = this.entries.filter(
+        (entry) => entry.group === group,
+      );
 
       return {
         group,
@@ -110,9 +112,15 @@ export class EntryCollection {
   /**
    * Get grouped entries with monthly totals for projection
    */
-  getProjectionData(startDate: Date, monthCount: number): {
+  getProjectionData(
+    startDate: Date,
+    monthCount: number,
+  ): {
     groups: GroupedEntry[];
-    monthlyTotals: Map<string, { income: number; expense: number; net: number }>;
+    monthlyTotals: Map<
+      string,
+      { income: number; expense: number; net: number }
+    >;
     months: Date[];
   } {
     const months: Date[] = [];
@@ -127,7 +135,7 @@ export class EntryCollection {
     // Calculate monthly totals for each group
     groups.forEach((group) => {
       months.forEach((month) => {
-        const monthKey = format(month, 'yyyy-MM');
+        const monthKey = format(month, "yyyy-MM");
         const total = group.entries.reduce((sum, entry) => {
           return sum + entry.getAmountForMonth(month);
         }, 0);
@@ -136,11 +144,14 @@ export class EntryCollection {
     });
 
     // Calculate overall monthly totals
-    const monthlyTotals = new Map<string, { income: number; expense: number; net: number }>();
+    const monthlyTotals = new Map<
+      string,
+      { income: number; expense: number; net: number }
+    >();
     months.forEach((month) => {
-      const monthKey = format(month, 'yyyy-MM');
-      const income = this.getTotalForMonth(month, 'income');
-      const expense = this.getTotalForMonth(month, 'expense');
+      const monthKey = format(month, "yyyy-MM");
+      const income = this.getTotalForMonth(month, "income");
+      const expense = this.getTotalForMonth(month, "expense");
       monthlyTotals.set(monthKey, {
         income,
         expense,

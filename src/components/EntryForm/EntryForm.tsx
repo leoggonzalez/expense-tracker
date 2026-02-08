@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Stack } from '@/elements';
-import { Button } from '../Button/Button';
-import { Input } from '../Input/Input';
-import { Select } from '../Select/Select';
-import { Checkbox } from '../Checkbox/Checkbox';
-import { Autocomplete } from '../Autocomplete/Autocomplete';
-import { createEntry, CreateEntryInput, getGroups } from '@/actions/entries';
-import './EntryForm.scss';
+import React, { useState, useEffect } from "react";
+import { Stack } from "@/elements";
+import { Button } from "../Button/Button";
+import { Input } from "../Input/Input";
+import { Select } from "../Select/Select";
+import { Checkbox } from "../Checkbox/Checkbox";
+import { Autocomplete } from "../Autocomplete/Autocomplete";
+import { createEntry, CreateEntryInput, getGroups } from "@/actions/entries";
+import "./EntryForm.scss";
 
 export interface EntryFormProps {
   onSuccess?: () => void;
@@ -24,26 +24,34 @@ export interface EntryFormProps {
   isEdit?: boolean;
 }
 
-export const EntryForm: React.FC<EntryFormProps> = ({ onSuccess, initialData, isEdit = false }) => {
-  const today = new Date().toISOString().split('T')[0];
-  
+export const EntryForm: React.FC<EntryFormProps> = ({
+  onSuccess,
+  initialData,
+  isEdit = false,
+}) => {
+  const today = new Date().toISOString().split("T")[0];
+
   const [formData, setFormData] = useState<Partial<CreateEntryInput>>({
-    type: initialData?.type as 'income' | 'expense' || 'expense',
-    groupName: initialData?.groupName || '',
-    description: initialData?.description || '',
+    type: (initialData?.type as "income" | "expense") || "expense",
+    groupName: initialData?.groupName || "",
+    description: initialData?.description || "",
     amount: initialData?.amount || 0,
-    beginDate: initialData?.beginDate ? new Date(initialData.beginDate) : new Date(),
+    beginDate: initialData?.beginDate
+      ? new Date(initialData.beginDate)
+      : new Date(),
     endDate: initialData?.endDate ? new Date(initialData.endDate) : new Date(),
   });
 
-  const [isRecurring, setIsRecurring] = useState(initialData ? !initialData.endDate : false);
+  const [isRecurring, setIsRecurring] = useState(
+    initialData ? !initialData.endDate : false,
+  );
   const [loading, setLoading] = useState(false);
   const [groups, setGroups] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchGroups() {
       const groupsData = await getGroups();
-      setGroups(groupsData.map(g => g.name));
+      setGroups(groupsData.map((g) => g.name));
     }
     fetchGroups();
   }, []);
@@ -62,33 +70,33 @@ export const EntryForm: React.FC<EntryFormProps> = ({ onSuccess, initialData, is
 
     try {
       const result = await createEntry(formData as CreateEntryInput);
-      
+
       if (result.success) {
         // Reset form
         setFormData({
-          type: 'expense',
-          groupName: '',
-          description: '',
+          type: "expense",
+          groupName: "",
+          description: "",
           amount: 0,
           beginDate: new Date(),
           endDate: new Date(),
         });
         setIsRecurring(false);
-        
+
         if (onSuccess) {
           onSuccess();
         }
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const formatDateForInput = (date: Date | null | undefined): string => {
-    if (!date) return '';
-    return date.toISOString().split('T')[0];
+    if (!date) return "";
+    return date.toISOString().split("T")[0];
   };
 
   return (
@@ -96,18 +104,20 @@ export const EntryForm: React.FC<EntryFormProps> = ({ onSuccess, initialData, is
       <Stack gap={16}>
         <Select
           label="Type"
-          value={formData.type || ''}
-          onChange={(value) => setFormData({ ...formData, type: value as 'income' | 'expense' })}
+          value={formData.type || ""}
+          onChange={(value) =>
+            setFormData({ ...formData, type: value as "income" | "expense" })
+          }
           options={[
-            { value: 'income', label: 'Income' },
-            { value: 'expense', label: 'Expense' },
+            { value: "income", label: "Income" },
+            { value: "expense", label: "Expense" },
           ]}
           required
         />
 
         <Autocomplete
           label="Group"
-          value={formData.groupName || ''}
+          value={formData.groupName || ""}
           onChange={(value) => setFormData({ ...formData, groupName: value })}
           options={groups}
           placeholder="e.g., income, Various, Investment"
@@ -116,7 +126,7 @@ export const EntryForm: React.FC<EntryFormProps> = ({ onSuccess, initialData, is
 
         <Input
           label="Description"
-          value={formData.description || ''}
+          value={formData.description || ""}
           onChange={(value) => setFormData({ ...formData, description: value })}
           placeholder="e.g., Salary, Rent"
           required
@@ -126,7 +136,9 @@ export const EntryForm: React.FC<EntryFormProps> = ({ onSuccess, initialData, is
           label="Amount"
           type="number"
           value={formData.amount || 0}
-          onChange={(value) => setFormData({ ...formData, amount: parseFloat(value) || 0 })}
+          onChange={(value) =>
+            setFormData({ ...formData, amount: parseFloat(value) || 0 })
+          }
           step="0.01"
           placeholder="0.00"
           required
@@ -136,7 +148,9 @@ export const EntryForm: React.FC<EntryFormProps> = ({ onSuccess, initialData, is
           label="Begin Date"
           type="date"
           value={formatDateForInput(formData.beginDate)}
-          onChange={(value) => setFormData({ ...formData, beginDate: new Date(value) })}
+          onChange={(value) =>
+            setFormData({ ...formData, beginDate: new Date(value) })
+          }
           required
         />
 
@@ -151,12 +165,20 @@ export const EntryForm: React.FC<EntryFormProps> = ({ onSuccess, initialData, is
             label="End Date"
             type="date"
             value={formatDateForInput(formData.endDate)}
-            onChange={(value) => setFormData({ ...formData, endDate: new Date(value) })}
+            onChange={(value) =>
+              setFormData({ ...formData, endDate: new Date(value) })
+            }
           />
         )}
 
         <Button type="submit" disabled={loading} fullWidth>
-          {loading ? (isEdit ? 'Updating...' : 'Adding...') : (isEdit ? 'Update Entry' : 'Add Entry')}
+          {loading
+            ? isEdit
+              ? "Updating..."
+              : "Adding..."
+            : isEdit
+              ? "Update Entry"
+              : "Add Entry"}
         </Button>
       </Stack>
     </form>

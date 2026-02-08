@@ -1,30 +1,24 @@
-import React from 'react';
-import './Container.scss';
+import React from "react";
+import "./Container.scss";
 
 export interface ContainerProps {
   children: React.ReactNode;
-  maxWidth?: 'content' | 'wide' | 'full';
+  maxWidth?: "content" | "wide" | "full";
   className?: string;
 }
 
 export const Container: React.FC<ContainerProps> = ({
   children,
-  maxWidth = 'content',
-  className = '',
+  maxWidth = "content",
+  className = "",
 }) => {
-  const classes = [
-    'container',
-    `container--${maxWidth}`,
-    className,
-  ]
+  const classes = ["container", `container--${maxWidth}`, className]
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 
   return (
     <div className={classes}>
-      <div className="container__content">
-        {children}
-      </div>
+      <div className="container__content">{children}</div>
     </div>
   );
 };

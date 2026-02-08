@@ -1,5 +1,5 @@
-import { ProjectionTable, Container } from '@/components';
-import { getEntries } from '@/actions/entries';
+import { ProjectionTable, Container } from "@/components";
+import { getEntries } from "@/actions/entries";
 
 export default async function ProjectionPage() {
   const entriesData = await getEntries();

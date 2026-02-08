@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { Stack, Text } from '@/elements';
-import { EntryForm, BulkEntryForm, Container } from '@/components';
-import { getRecentEntries } from '@/actions/entries';
-import { EntryList } from './EntryList';
+import Link from "next/link";
+import { Stack, Text } from "@/elements";
+import { EntryForm, BulkEntryForm, Container } from "@/components";
+import { getRecentEntries } from "@/actions/entries";
+import { EntryList } from "./EntryList";
 
 export default async function EntriesPage() {
   const entriesData = await getRecentEntries(10);
@@ -26,16 +26,32 @@ export default async function EntriesPage() {
           Manage Entries
         </Text>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "32px",
+          }}
+        >
           <div>
-            <Text size="h4" as="h3" weight="semibold" style={{ marginBottom: '16px' }}>
+            <Text
+              size="h4"
+              as="h3"
+              weight="semibold"
+              style={{ marginBottom: "16px" }}
+            >
               Add New Entry
             </Text>
             <EntryForm />
           </div>
 
           <div>
-            <Text size="h4" as="h3" weight="semibold" style={{ marginBottom: '16px' }}>
+            <Text
+              size="h4"
+              as="h3"
+              weight="semibold"
+              style={{ marginBottom: "16px" }}
+            >
               Add Multiple Entries
             </Text>
             <BulkEntryForm />
@@ -43,11 +59,21 @@ export default async function EntriesPage() {
         </div>
 
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "16px",
+            }}
+          >
             <Text size="h4" as="h3" weight="semibold">
               Recent Entries (10 most recent)
             </Text>
-            <Link href="/entries/all" style={{ color: 'var(--color-primary)', fontWeight: 500 }}>
+            <Link
+              href="/entries/all"
+              style={{ color: "var(--color-primary)", fontWeight: 500 }}
+            >
               See all entries →
             </Link>
           </div>

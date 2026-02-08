@@ -1,5 +1,5 @@
-import React from 'react';
-import './Box.scss';
+import React from "react";
+import "./Box.scss";
 
 export interface BoxPadding {
   paddingTop?: number;
@@ -19,17 +19,21 @@ export const Box: React.FC<BoxProps> = ({
   children,
   padding,
   maxWidth,
-  className = '',
+  className = "",
 }) => {
   const style: React.CSSProperties = {};
 
-  if (typeof padding === 'number') {
+  if (typeof padding === "number") {
     style.padding = `${padding}px`;
   } else if (padding) {
-    if (padding.paddingTop !== undefined) style.paddingTop = `${padding.paddingTop}px`;
-    if (padding.paddingRight !== undefined) style.paddingRight = `${padding.paddingRight}px`;
-    if (padding.paddingBottom !== undefined) style.paddingBottom = `${padding.paddingBottom}px`;
-    if (padding.paddingLeft !== undefined) style.paddingLeft = `${padding.paddingLeft}px`;
+    if (padding.paddingTop !== undefined)
+      style.paddingTop = `${padding.paddingTop}px`;
+    if (padding.paddingRight !== undefined)
+      style.paddingRight = `${padding.paddingRight}px`;
+    if (padding.paddingBottom !== undefined)
+      style.paddingBottom = `${padding.paddingBottom}px`;
+    if (padding.paddingLeft !== undefined)
+      style.paddingLeft = `${padding.paddingLeft}px`;
   }
 
   if (maxWidth !== undefined) {

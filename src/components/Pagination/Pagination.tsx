@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Button } from '../Button/Button';
-import { Text } from '@/elements';
-import './Pagination.scss';
+import React from "react";
+import { Button } from "../Button/Button";
+import { Text } from "@/elements";
+import "./Pagination.scss";
 
 export interface PaginationProps {
   currentPage: number;
@@ -18,10 +18,10 @@ export const Pagination: React.FC<PaginationProps> = ({
 }) => {
   const pages = [];
   const maxVisible = 5;
-  
+
   let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
   let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-  
+
   if (endPage - startPage + 1 < maxVisible) {
     startPage = Math.max(1, endPage - maxVisible + 1);
   }
@@ -59,7 +59,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <button
             key={page}
             className={`pagination__page ${
-              page === currentPage ? 'pagination__page--active' : ''
+              page === currentPage ? "pagination__page--active" : ""
             }`}
             onClick={() => onPageChange(page)}
           >
@@ -69,7 +69,9 @@ export const Pagination: React.FC<PaginationProps> = ({
 
         {endPage < totalPages && (
           <>
-            {endPage < totalPages - 1 && <span className="pagination__ellipsis">...</span>}
+            {endPage < totalPages - 1 && (
+              <span className="pagination__ellipsis">...</span>
+            )}
             <button
               className="pagination__page"
               onClick={() => onPageChange(totalPages)}

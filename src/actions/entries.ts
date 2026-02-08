@@ -1,10 +1,10 @@
-'use server';
+"use server";
 
-import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export interface CreateEntryInput {
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   groupName: string;
   description: string;
   amount: number;
@@ -39,21 +39,21 @@ export async function createEntry(input: CreateEntryInput) {
       },
     });
 
-    revalidatePath('/');
-    revalidatePath('/projection');
-    revalidatePath('/entries');
-    
+    revalidatePath("/");
+    revalidatePath("/projection");
+    revalidatePath("/entries");
+
     return { success: true, entry };
   } catch (error) {
-    console.error('Error creating entry:', error);
-    return { success: false, error: 'Failed to create entry' };
+    console.error("Error creating entry:", error);
+    return { success: false, error: "Failed to create entry" };
   }
 }
 
 export async function createMultipleEntries(inputs: CreateEntryInput[]) {
   try {
     const results = [];
-    
+
     for (const input of inputs) {
       const result = await createEntry(input);
       if (!result.success) {
@@ -64,8 +64,8 @@ export async function createMultipleEntries(inputs: CreateEntryInput[]) {
 
     return { success: true, entries: results };
   } catch (error) {
-    console.error('Error creating multiple entries:', error);
-    return { success: false, error: 'Failed to create entries' };
+    console.error("Error creating multiple entries:", error);
+    return { success: false, error: "Failed to create entries" };
   }
 }
 
@@ -75,15 +75,12 @@ export async function getEntries() {
       include: {
         group: true,
       },
-      orderBy: [
-        { group: { name: 'asc' } },
-        { beginDate: 'asc' },
-      ],
+      orderBy: [{ group: { name: "asc" } }, { beginDate: "asc" }],
     });
 
     return entries;
   } catch (error) {
-    console.error('Error fetching entries:', error);
+    console.error("Error fetching entries:", error);
     return [];
   }
 }
@@ -95,14 +92,14 @@ export async function getRecentEntries(limit: number = 10) {
         group: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: limit,
     });
 
     return entries;
   } catch (error) {
-    console.error('Error fetching recent entries:', error);
+    console.error("Error fetching recent entries:", error);
     return [];
   }
 }
@@ -121,18 +118,18 @@ export async function getEntriesWithFilters(filters: {
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    
+
     if (filters.groupId) {
       where.groupId = filters.groupId;
     }
-    
+
     if (filters.description) {
       where.description = {
         contains: filters.description,
-        mode: 'insensitive',
+        mode: "insensitive",
       };
     }
-    
+
     if (filters.startDate || filters.endDate) {
       where.beginDate = {};
       if (filters.startDate) {
@@ -150,7 +147,7 @@ export async function getEntriesWithFilters(filters: {
           group: true,
         },
         orderBy: {
-          beginDate: 'desc',
+          beginDate: "desc",
         },
         skip,
         take: limit,
@@ -168,7 +165,7 @@ export async function getEntriesWithFilters(filters: {
       },
     };
   } catch (error) {
-    console.error('Error fetching filtered entries:', error);
+    console.error("Error fetching filtered entries:", error);
     return {
       entries: [],
       pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
@@ -180,13 +177,13 @@ export async function getGroups() {
   try {
     const groups = await prisma.group.findMany({
       orderBy: {
-        name: 'asc',
+        name: "asc",
       },
     });
 
     return groups;
   } catch (error) {
-    console.error('Error fetching groups:', error);
+    console.error("Error fetching groups:", error);
     return [];
   }
 }
@@ -202,12 +199,15 @@ export async function getEntryById(id: string) {
 
     return entry;
   } catch (error) {
-    console.error('Error fetching entry:', error);
+    console.error("Error fetching entry:", error);
     return null;
   }
 }
 
-export async function updateEntry(id: string, input: Partial<CreateEntryInput>) {
+export async function updateEntry(
+  id: string,
+  input: Partial<CreateEntryInput>,
+) {
   try {
     let groupId: string | undefined;
 
@@ -221,7 +221,7 @@ export async function updateEntry(id: string, input: Partial<CreateEntryInput>) 
           data: { name: input.groupName },
         });
       }
-      
+
       groupId = group.id;
     }
 
@@ -240,14 +240,14 @@ export async function updateEntry(id: string, input: Partial<CreateEntryInput>) 
       },
     });
 
-    revalidatePath('/');
-    revalidatePath('/projection');
-    revalidatePath('/entries');
-    
+    revalidatePath("/");
+    revalidatePath("/projection");
+    revalidatePath("/entries");
+
     return { success: true, entry };
   } catch (error) {
-    console.error('Error updating entry:', error);
-    return { success: false, error: 'Failed to update entry' };
+    console.error("Error updating entry:", error);
+    return { success: false, error: "Failed to update entry" };
   }
 }
 
@@ -257,13 +257,13 @@ export async function deleteEntry(id: string) {
       where: { id },
     });
 
-    revalidatePath('/');
-    revalidatePath('/projection');
-    revalidatePath('/entries');
-    
+    revalidatePath("/");
+    revalidatePath("/projection");
+    revalidatePath("/entries");
+
     return { success: true };
   } catch (error) {
-    console.error('Error deleting entry:', error);
-    return { success: false, error: 'Failed to delete entry' };
+    console.error("Error deleting entry:", error);
+    return { success: false, error: "Failed to delete entry" };
   }
 }
