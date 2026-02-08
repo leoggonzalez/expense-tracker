@@ -114,11 +114,12 @@
     &--breakdown {
       background-color: var(--color-background-tertiary);
     }
-  }
+  
 
   &__entry {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
   }
+}
 }
