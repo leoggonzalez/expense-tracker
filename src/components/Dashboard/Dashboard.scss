@@ -1,0 +1,48 @@
+@import '../../styles/variables.scss';
+
+.dashboard {
+  width: 100%;
+
+  &__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  &__card {
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-background-secondary);
+    border: var(--border-width) solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    transition: all var(--transition-base);
+
+    &:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    &--income {
+      border-left: 4px solid var(--color-success);
+    }
+
+    &--expense {
+      border-left: 4px solid var(--color-danger);
+    }
+
+    &--net {
+      border-left: 4px solid var(--color-primary);
+    }
+  }
+
+  &__summary {
+    padding: var(--spacing-lg);
+    background-color: var(--color-background-tertiary);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+}

@@ -1,0 +1,54 @@
+@import '../../styles/variables.scss';
+
+.entry-list {
+  &--empty {
+    padding: var(--spacing-2xl);
+    text-align: center;
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    border: var(--border-width) dashed var(--color-border);
+  }
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: var(--color-background);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    transition: all var(--transition-base);
+
+    &:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-border-dark);
+    }
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    align-items: flex-end;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+}
