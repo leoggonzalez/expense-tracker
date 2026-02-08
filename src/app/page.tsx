@@ -1,5 +1,5 @@
-import { Box, Stack } from '@/elements';
-import { Dashboard } from '@/components';
+import { Stack } from '@/elements';
+import { Dashboard, Container } from '@/components';
 import { getEntries } from '@/actions/entries';
 
 export default async function HomePage() {
@@ -8,7 +8,7 @@ export default async function HomePage() {
   const entries = entriesData.map((entry) => ({
     id: entry.id,
     type: entry.type,
-    group: entry.group,
+    group: entry.group.name,
     description: entry.description,
     amount: entry.amount,
     beginDate: entry.beginDate.toISOString(),
@@ -18,10 +18,10 @@ export default async function HomePage() {
   }));
 
   return (
-    <Box padding={32} maxWidth={1200}>
+    <Container>
       <Stack gap={32}>
         <Dashboard entries={entries} />
       </Stack>
-    </Box>
+    </Container>
   );
 }

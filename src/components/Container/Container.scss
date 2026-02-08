@@ -1,0 +1,29 @@
+@import '../../styles/variables.scss';
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr min(var(--max-width-content), 100%) 1fr;
+  width: 100%;
+
+  &--content {
+    grid-template-columns: 1fr min(var(--max-width-content), 100%) 1fr;
+  }
+
+  &--wide {
+    grid-template-columns: 1fr min(var(--max-width-wide), 100%) 1fr;
+  }
+
+  &--full {
+    grid-template-columns: 1fr;
+  }
+
+  &__content {
+    grid-column: 2;
+    padding: 0 var(--spacing-lg);
+  }
+
+  &--full &__content {
+    grid-column: 1;
+    max-width: 100%;
+  }
+}

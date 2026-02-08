@@ -13,6 +13,17 @@ body {
   font-family: var(--font-family);
   color: var(--color-text-primary);
   background-color: var(--color-background);
+  height: 100%;
+}
+
+.app-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+.app-main {
+  padding: var(--spacing-xl) 0;
 }
 
 a {

@@ -1,18 +1,22 @@
 'use client';
 
-import React from 'react';
+import './EntryList.scss';
+
 import { Stack, Text } from '@/elements';
+
 import { Button } from '@/components';
 import { Entry } from '@/model';
+import React from 'react';
 import { deleteEntry } from '@/actions/entries';
+import { describe } from 'node:test';
 import { format } from 'date-fns';
-import './EntryList.scss';
+import { group } from 'console';
 
 export interface EntryListProps {
   entries: Array<{
     id: string;
     type: string;
-    group: string;
+    groupName: string;
     description: string;
     amount: number;
     beginDate: string;
@@ -20,9 +24,10 @@ export interface EntryListProps {
     createdAt: string;
     updatedAt: string;
   }>;
+  showEdit?: boolean;
 }
 
-export const EntryList: React.FC<EntryListProps> = ({ entries: plainEntries }) => {
+export const EntryList: React.FC<EntryListProps> = ({ entries: plainEntries, showEdit = false }) => {
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this entry?')) {
       await deleteEntry(id);
@@ -37,6 +42,9 @@ export const EntryList: React.FC<EntryListProps> = ({ entries: plainEntries }) =
     createdAt: new Date(entry.createdAt),
     updatedAt: new Date(entry.updatedAt),
   }));
+
+  console.log(plainEntries[0])
+  console.log(entries[0])
 
   if (entries.length === 0) {
     return (
@@ -54,7 +62,7 @@ export const EntryList: React.FC<EntryListProps> = ({ entries: plainEntries }) =
             <div className="entry-list__content">
               <div className="entry-list__main">
                 <Text size="sm" weight="semibold">
-                  {entry.group}
+                  {entry.groupName}
                 </Text>
                 <Text size="xs" color="secondary">
                   {entry.description}

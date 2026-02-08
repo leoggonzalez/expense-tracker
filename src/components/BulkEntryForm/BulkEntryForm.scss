@@ -1,0 +1,35 @@
+@import '../../styles/variables.scss';
+
+.bulk-entry-form {
+  width: 100%;
+
+  &__shared {
+    padding: var(--spacing-lg);
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+  }
+
+  &__entries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  &__entry {
+    padding: var(--spacing-md);
+    background-color: var(--color-background);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+  }
+
+  &__entry-fields {
+    display: grid;
+    grid-template-columns: 120px 1fr 150px auto;
+    gap: var(--spacing-md);
+    align-items: end;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}

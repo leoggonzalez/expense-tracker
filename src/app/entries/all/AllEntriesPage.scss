@@ -1,0 +1,27 @@
+@import '../../../styles/variables.scss';
+
+.all-entries-page {
+  &__filters {
+    padding: var(--spacing-lg);
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  &__filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  &__results-header {
+    margin-bottom: var(--spacing-md);
+  }
+
+  &__loading {
+    padding: var(--spacing-2xl);
+    text-align: center;
+  }
+}

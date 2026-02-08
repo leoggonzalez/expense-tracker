@@ -4,6 +4,7 @@ export interface IEntry {
   id: string;
   type: 'income' | 'expense';
   group: string;
+  groupName: string;
   description: string;
   amount: number;
   beginDate: Date;
@@ -29,6 +30,10 @@ export class Entry {
 
   get group(): string {
     return this.data.group;
+  }
+
+  get groupName(): string {
+    return this.data.groupName;
   }
 
   get description(): string {

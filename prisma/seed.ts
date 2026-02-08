@@ -57,28 +57,47 @@ async function main() {
 
   // Clear existing data
   await prisma.entry.deleteMany();
-  console.log('Cleared existing entries');
+  await prisma.group.deleteMany();
+  console.log('Cleared existing entries and groups');
 
-  // Insert new data
+  // Get unique group names
+  const groupNames = [...new Set(entries.map(e => e.group))];
+  
+  // Create groups
+  const groupMap = new Map<string, string>();
+  for (const groupName of groupNames) {
+    const group = await prisma.group.create({
+      data: { name: groupName },
+    });
+    groupMap.set(groupName, group.id);
+  }
+  console.log(`Created ${groupNames.length} groups`);
+
+  // Insert entries
+  let createdCount = 0;
   for (const entry of entries) {
     const beginDate = parseDate(entry.beginDate);
     const endDate = parseDate(entry.endDate);
     
     if (!beginDate) continue; // Skip entries without a begin date
 
+    const groupId = groupMap.get(entry.group);
+    if (!groupId) continue; // Skip if group not found
+
     await prisma.entry.create({
       data: {
         type: entry.type as 'income' | 'expense',
-        group: entry.group,
+        groupId: groupId,
         description: entry.description,
         amount: parseEuroAmount(entry.amount),
         beginDate: beginDate,
         endDate: endDate,
       },
     });
+    createdCount++;
   }
 
-  console.log(`Seeded ${entries.length} entries`);
+  console.log(`Seeded ${createdCount} entries`);
 }
 
 main()

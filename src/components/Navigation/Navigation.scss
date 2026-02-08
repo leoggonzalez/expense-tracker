@@ -7,14 +7,12 @@
   top: 0;
   z-index: var(--z-index-dropdown);
 
-  &__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--spacing-md) var(--spacing-lg);
+  &__inner {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: var(--spacing-lg);
+    padding: var(--spacing-md) 0;
   }
 
   &__brand {

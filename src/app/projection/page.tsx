@@ -1,5 +1,4 @@
-import { Box } from '@/elements';
-import { ProjectionTable } from '@/components';
+import { ProjectionTable, Container } from '@/components';
 import { getEntries } from '@/actions/entries';
 
 export default async function ProjectionPage() {
@@ -8,7 +7,7 @@ export default async function ProjectionPage() {
   const entries = entriesData.map((entry) => ({
     id: entry.id,
     type: entry.type,
-    group: entry.group,
+    group: entry.group.name,
     description: entry.description,
     amount: entry.amount,
     beginDate: entry.beginDate.toISOString(),
@@ -18,8 +17,8 @@ export default async function ProjectionPage() {
   }));
 
   return (
-    <Box padding={32} maxWidth={1600}>
+    <Container maxWidth="wide">
       <ProjectionTable entries={entries} />
-    </Box>
+    </Container>
   );
 }
