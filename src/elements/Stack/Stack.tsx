@@ -1,6 +1,8 @@
 import React from "react";
 import "./stack.scss";
 
+type StackStyle = React.CSSProperties & Record<`--${string}`, string>;
+
 export interface StackProps {
   children: React.ReactNode;
   direction?: "row" | "column";
@@ -25,13 +27,19 @@ export function Stack({
   wrap = false,
   className = "",
 }: StackProps): React.ReactElement {
-  const style: React.CSSProperties = {
-    flexDirection: direction,
-    gap: `${gap}px`,
-    ...(align && { alignItems: align }),
-    ...(justify && { justifyContent: justify }),
-    ...(wrap && { flexWrap: "wrap" }),
+  const style: StackStyle = {
+    "--stack-direction": direction,
+    "--stack-gap": `${gap}px`,
+    "--stack-wrap": wrap ? "wrap" : "nowrap",
   };
+
+  if (align) {
+    style["--stack-align"] = align;
+  }
+
+  if (justify) {
+    style["--stack-justify"] = justify;
+  }
 
   return (
     <div className={`stack ${className}`.trim()} style={style}>

@@ -2,4 +2,10 @@
 
 .box {
   display: block;
+  padding: var(--box-padding, 0);
+  padding-top: var(--box-padding-top, var(--box-padding, 0));
+  padding-right: var(--box-padding-right, var(--box-padding, 0));
+  padding-bottom: var(--box-padding-bottom, var(--box-padding, 0));
+  padding-left: var(--box-padding-left, var(--box-padding, 0));
+  max-width: var(--box-max-width, none);
 }

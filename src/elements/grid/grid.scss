@@ -1,0 +1,12 @@
+@import "../../styles/variables.scss";
+
+.grid {
+  display: grid;
+  grid-template-columns: var(--grid-template-columns, 1fr);
+  grid-template-rows: var(--grid-template-rows, auto);
+  gap: var(--grid-gap, 0);
+  column-gap: var(--grid-column-gap, var(--grid-gap, 0));
+  row-gap: var(--grid-row-gap, var(--grid-gap, 0));
+  align-items: var(--grid-align, stretch);
+  justify-items: var(--grid-justify, stretch);
+}

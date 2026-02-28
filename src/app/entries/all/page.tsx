@@ -1,4 +1,4 @@
-import { AllEntriesPage } from "@/app/entries/all/all_entries_page";
+import { AllEntriesPage } from "@/components";
 
 export default function Page(): React.ReactElement {
   return <AllEntriesPage />;

@@ -1,6 +1,8 @@
 import React from "react";
 import "./box.scss";
 
+type BoxStyle = React.CSSProperties & Record<`--${string}`, string>;
+
 export interface BoxPadding {
   paddingTop?: number;
   paddingRight?: number;
@@ -21,23 +23,23 @@ export function Box({
   maxWidth,
   className = "",
 }: BoxProps): React.ReactElement {
-  const style: React.CSSProperties = {};
+  const style: BoxStyle = {};
 
   if (typeof padding === "number") {
-    style.padding = `${padding}px`;
+    style["--box-padding"] = `${padding}px`;
   } else if (padding) {
     if (padding.paddingTop !== undefined)
-      style.paddingTop = `${padding.paddingTop}px`;
+      style["--box-padding-top"] = `${padding.paddingTop}px`;
     if (padding.paddingRight !== undefined)
-      style.paddingRight = `${padding.paddingRight}px`;
+      style["--box-padding-right"] = `${padding.paddingRight}px`;
     if (padding.paddingBottom !== undefined)
-      style.paddingBottom = `${padding.paddingBottom}px`;
+      style["--box-padding-bottom"] = `${padding.paddingBottom}px`;
     if (padding.paddingLeft !== undefined)
-      style.paddingLeft = `${padding.paddingLeft}px`;
+      style["--box-padding-left"] = `${padding.paddingLeft}px`;
   }
 
   if (maxWidth !== undefined) {
-    style.maxWidth = `${maxWidth}px`;
+    style["--box-max-width"] = `${maxWidth}px`;
   }
 
   return (

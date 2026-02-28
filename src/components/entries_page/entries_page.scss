@@ -1,0 +1,22 @@
+@import "../../styles/variables.scss";
+
+.entries-page {
+  &__section-heading {
+    margin-bottom: var(--spacing-md);
+  }
+
+  &__header {
+    margin-bottom: var(--spacing-md);
+  }
+
+  &__link {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+
+    &:hover {
+      color: var(--color-primary-dark);
+    }
+  }
+}

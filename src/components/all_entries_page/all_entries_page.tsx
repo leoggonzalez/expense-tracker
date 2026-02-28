@@ -1,25 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Stack, Text } from "@/elements";
-import { Container, Input, Button, Autocomplete } from "@/components";
-import { Pagination } from "@/components/pagination/pagination";
-import { i18n } from "@/model/i18n";
-import { getEntriesWithFilters, getGroups } from "@/actions/entries";
-import { EntryList } from "@/app/entries/entry_list";
 import "./all_entries_page.scss";
 
-type EntryListItem = {
-  id: string;
-  type: string;
-  groupName: string;
-  description: string;
-  amount: number;
-  beginDate: string;
-  endDate: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
+import {
+  Autocomplete,
+  Button,
+  Container,
+  Input,
+  Pagination,
+} from "@/components";
+import { EntryList, EntryListItem } from "@/components/entry_list/entry_list";
+import { Stack, Text } from "@/elements";
+import { getEntriesWithFilters, getGroups } from "@/actions/entries";
+import { i18n } from "@/model/i18n";
+import React, { useEffect, useState } from "react";
 
 export function AllEntriesPage(): React.ReactElement {
   const [entries, setEntries] = useState<EntryListItem[]>([]);
@@ -29,14 +23,12 @@ export function AllEntriesPage(): React.ReactElement {
     total: 0,
     totalPages: 0,
   });
-
   const [filters, setFilters] = useState({
     groupId: "",
     description: "",
     startDate: "",
     endDate: "",
   });
-
   const [groups, setGroups] = useState<Array<{ id: string; name: string }>>([]);
   const [loading, setLoading] = useState(false);
 
@@ -45,6 +37,7 @@ export function AllEntriesPage(): React.ReactElement {
       const groupsData = await getGroups();
       setGroups(groupsData);
     }
+
     fetchGroups();
   }, []);
 
@@ -96,7 +89,7 @@ export function AllEntriesPage(): React.ReactElement {
   }
 
   const selectedGroupName =
-    groups.find((g) => g.id === filters.groupId)?.name || "";
+    groups.find((group) => group.id === filters.groupId)?.name || "";
 
   return (
     <Container>
@@ -114,10 +107,10 @@ export function AllEntriesPage(): React.ReactElement {
               label={String(i18n.t("all_entries_page.group"))}
               value={selectedGroupName}
               onChange={(name) => {
-                const group = groups.find((g) => g.name === name);
+                const group = groups.find((item) => item.name === name);
                 handleFilterChange("groupId", group?.id || "");
               }}
-              options={groups.map((g) => g.name)}
+              options={groups.map((group) => group.name)}
               placeholder={String(i18n.t("all_entries_page.group_placeholder"))}
             />
 
@@ -179,7 +172,10 @@ export function AllEntriesPage(): React.ReactElement {
                   currentPage={pagination.page}
                   totalPages={pagination.totalPages}
                   onPageChange={(page) =>
-                    setPagination({ ...pagination, page })
+                    setPagination((currentPagination) => ({
+                      ...currentPagination,
+                      page,
+                    }))
                   }
                 />
               )}

@@ -2,27 +2,28 @@
 
 import "./entry_list.scss";
 
-import { Stack, Text } from "@/elements";
-
 import { Button } from "@/components";
+import { Stack, Text } from "@/elements";
+import { deleteEntry } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
 import { Entry } from "@/model";
-import React from "react";
-import { deleteEntry } from "@/actions/entries";
 import { format } from "date-fns";
+import React from "react";
+
+export type EntryListItem = {
+  id: string;
+  type: string;
+  groupName: string;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export interface EntryListProps {
-  entries: Array<{
-    id: string;
-    type: string;
-    groupName: string;
-    description: string;
-    amount: number;
-    beginDate: string;
-    endDate: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
+  entries: EntryListItem[];
   showEdit?: boolean;
 }
 
@@ -35,7 +36,6 @@ export function EntryList({
     }
   };
 
-  // Convert plain objects to Entry instances
   const entries = plainEntries.map((entry) =>
     Entry.fromJSON({
       ...entry,

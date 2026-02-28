@@ -53,18 +53,79 @@ type NavigationProps = {
   // props here
 };
 
-export function Navigation(
-  props: NavigationProps,
-): React.ReactElement {
+export function Navigation(props: NavigationProps): React.ReactElement {
   return <nav />;
 }
 ```
 
+## Styling And Composition Conventions
+
+- Do not use inline styling in JSX or TSX. Avoid patterns such as `style={{ ... }}` and other inline style props.
+- The only allowed inline-style exception is declaring CSS custom properties inside shared layout primitives. This exception is for primitives such as `Stack`, `Box`, and `Grid`, not for page or feature components.
+- If layout, spacing, or presentation is needed, express it through component markup and SCSS classes, not inline style objects or page-local wrapper styling.
+- Use the shared layout primitives for general layout work:
+  - `Stack` for flex layout and wrapping
+  - `Box` for box layout with padding and max-width controls
+  - `Grid` for CSS grid layout
+- Prefer component-owned SCSS files paired with the component that owns the markup.
+- `src/app` is for route entrypoints, data loading, and composition. Route files such as `page.tsx` and `layout.tsx` should compose components instead of owning presentational UI sections.
+- Reusable or rendered UI sections with their own markup and styling must live under `src/components`, even when they are currently used by only one route.
+- Do not add new `.scss` files under `src/app`. Non-global styling belongs in `src/components/<component>/<component>.scss`.
+- Global application styles imported from `src/styles` remain valid. The prohibition applies to page-local SCSS under `src/app`, not shared global styles.
+
+Examples:
+
+Preferred:
+
+```tsx
+// src/app/entries/all/page.tsx
+import { AllEntriesPage } from "@/components/all_entries_page/all_entries_page";
+
+export default function Page(): React.ReactElement {
+  return <AllEntriesPage />;
+}
+```
+
+```text
+src/components/entry_list/entry_list.tsx
+src/components/entry_list/entry_list.scss
+src/components/all_entries_page/all_entries_page.tsx
+src/components/all_entries_page/all_entries_page.scss
+```
+
+Not preferred:
+
+```tsx
+<div style={{ display: "grid", gap: "32px" }} />
+```
+
+```tsx
+function EntriesPage(): React.ReactElement {
+  return (
+    <Grid minColumnWidth={320} gap={32}>
+      <Box className="entries-page__section">
+        <EntryForm />
+      </Box>
+      <Box className="entries-page__section">
+        <BulkEntryForm />
+      </Box>
+    </Grid>
+  );
+}
+```
+
+```text
+src/app/entries/entry_list.tsx
+src/app/entries/entry_list.scss
+src/app/entries/all/all_entries_page.tsx
+src/app/entries/all/all_entries_page.scss
+```
+
 ## Localization Conventions
 
-- `locales/en.json` is the canonical source for English UI copy.
+- `src/locales/en.json` is the canonical source for English UI copy.
 - All user-facing text must come from locale messages instead of hardcoded JSX strings, page metadata strings, or other inline literals.
-- New features must add their strings to `locales/en.json` before using them.
+- New features must add their strings to `src/locales/en.json` before using them.
 - The repository will adopt a formal i18n runtime later, but new hardcoded UI strings are already prohibited.
 
 Message key rules:
@@ -75,7 +136,7 @@ Message key rules:
 
 Future localization contract:
 
-- Source message file: `locales/en.json`
+- Source message file: `src/locales/en.json`
 - Message key style: feature-based `lower_snake_case`
 - Future runtime integration must read from that file or a compatible structure
 
@@ -92,6 +153,8 @@ Recommended migration groupings:
 - import normalization
 - component signature normalization
 - localization rollout
+- styling normalization
+- app-to-components extraction
 
 Known gaps in the current codebase:
 
@@ -100,6 +163,12 @@ Known gaps in the current codebase:
 - Many components use `React.FC` and arrow-function exports.
 - UI copy and metadata strings are currently hardcoded.
 - No i18n runtime is present today.
+- Some route files still use inline JSX `style` props.
+- Some presentational UI and SCSS still live under `src/app`.
+- `entry_list` and `all_entries_page` should be extracted into `src/components` when touched for related work.
+- `src/app/entries/page.tsx` currently uses inline styles and should move that presentation into component classes.
+- `src/app/entries/entry_list.tsx` and `src/app/entries/all/all_entries_page.tsx` currently behave like components and should not remain under `src/app`.
+- `src/elements/stack/stack.tsx` and `src/elements/box/box.tsx` still rely on inline styles internally and should be normalized to CSS custom properties only.
 
 ## Exceptions and Framework Constraints
 
@@ -113,13 +182,17 @@ Use these scenarios when reviewing future changes against this document:
 
 - A new component author should be able to determine the correct filename, import style, and component signature without making additional decisions.
 - A contributor touching an old PascalCase component should be able to determine whether to rename it in the same change or defer it into a dedicated migration.
-- A contributor adding new UI text should be able to determine that hardcoded strings are disallowed and that the English source belongs in `locales/en.json`.
+- A contributor adding new UI text should be able to determine that hardcoded strings are disallowed and that the English source belongs in `src/locales/en.json`.
 - A contributor working in `src/app/layout.tsx` should be able to distinguish between a framework exception such as `layout.tsx` and a non-exception such as hardcoded metadata strings.
+- A contributor adding spacing or layout to a page should be able to determine that inline `style` props are disallowed and that layout belongs in component classes.
+- A contributor creating a rendered UI block under `src/app` should be able to determine that it belongs in `src/components`.
+- A reviewer should be able to reject a page-local `.scss` file under `src/app` unless it is a documented framework exception.
+- A contributor needing flex, box, or grid layout should be able to choose `Stack`, `Box`, or `Grid` instead of adding ad hoc inline styles.
 
 ## Assumptions and Defaults
 
 - This file is the canonical repo-level standard instead of `CODE_GUIDELINES.md` or `docs/code_guidelines.md`.
 - This phase defines both the rules and the migration policy.
-- `locales/en.json` is standardized now, but the i18n runtime choice is intentionally deferred.
+- `src/locales/en.json` is standardized now, but the i18n runtime choice is intentionally deferred.
 - The function-over-arrow preference applies to exported components and shared helpers, not every inline callback.
 - Full compliance is phased through touched-file migration and dedicated cleanup changes.
