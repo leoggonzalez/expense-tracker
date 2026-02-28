@@ -15,7 +15,7 @@ export interface IEntry {
 
 type EntryJSON = {
   id: string;
-  type: "income" | "expense";
+  type: string;
   group?: string;
   groupName?: string;
   description: string;
@@ -135,6 +135,7 @@ export class Entry {
   static fromJSON(data: EntryJSON): Entry {
     return new Entry({
       ...data,
+      type: data.type as IEntry["type"],
       group: data.group ?? data.groupName ?? "",
       groupName: data.groupName ?? data.group ?? "",
       beginDate: new Date(data.beginDate),

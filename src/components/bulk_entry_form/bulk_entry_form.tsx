@@ -163,7 +163,13 @@ export function BulkEntryForm({
                 <div className="bulk-entry-form__entry-fields">
                   <Select
                     value={entry.type}
-                    onChange={(value) => updateEntry(entry.id, "type", value)}
+                    onChange={(value) =>
+                      updateEntry(
+                        entry.id,
+                        "type",
+                        value as BulkEntryItem["type"],
+                      )
+                    }
                     options={[
                       {
                         value: "income",

@@ -35,26 +35,20 @@ export default async function EntriesPage(): Promise<React.ReactElement> {
           }}
         >
           <div>
-            <Text
-              size="h4"
-              as="h3"
-              weight="semibold"
-              style={{ marginBottom: "16px" }}
-            >
-              {String(i18n.t("entries_page.add_new_entry"))}
-            </Text>
+            <div style={{ marginBottom: "16px" }}>
+              <Text size="h4" as="h3" weight="semibold">
+                {String(i18n.t("entries_page.add_new_entry"))}
+              </Text>
+            </div>
             <EntryForm />
           </div>
 
           <div>
-            <Text
-              size="h4"
-              as="h3"
-              weight="semibold"
-              style={{ marginBottom: "16px" }}
-            >
-              {String(i18n.t("entries_page.add_multiple_entries"))}
-            </Text>
+            <div style={{ marginBottom: "16px" }}>
+              <Text size="h4" as="h3" weight="semibold">
+                {String(i18n.t("entries_page.add_multiple_entries"))}
+              </Text>
+            </div>
             <BulkEntryForm />
           </div>
         </div>
