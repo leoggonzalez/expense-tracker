@@ -107,49 +107,49 @@ export function EntryForm({
     <form onSubmit={handleSubmit} className="entry-form">
       <Stack gap={16}>
         <Select
-          label={String(i18n.t("entry_form.type"))}
+          label={i18n.t("entry_form.type")}
           value={formData.type || ""}
           onChange={(value) =>
             setFormData({ ...formData, type: value as "income" | "expense" })
           }
           options={[
-            { value: "income", label: String(i18n.t("common.income")) },
-            { value: "expense", label: String(i18n.t("common.expense")) },
+            { value: "income", label: i18n.t("common.income") },
+            { value: "expense", label: i18n.t("common.expense") },
           ]}
           required
         />
 
         <Autocomplete
-          label={String(i18n.t("entry_form.group"))}
+          label={i18n.t("entry_form.group")}
           value={formData.groupName || ""}
           onChange={(value) => setFormData({ ...formData, groupName: value })}
           options={groups}
-          placeholder={String(i18n.t("entry_form.group_placeholder"))}
+          placeholder={i18n.t("entry_form.group_placeholder") as string}
           required
         />
 
         <Input
-          label={String(i18n.t("entry_form.description"))}
+          label={i18n.t("entry_form.description")}
           value={formData.description || ""}
           onChange={(value) => setFormData({ ...formData, description: value })}
-          placeholder={String(i18n.t("entry_form.description_placeholder"))}
+          placeholder={i18n.t("entry_form.description_placeholder") as string}
           required
         />
 
         <Input
-          label={String(i18n.t("entry_form.amount"))}
+          label={i18n.t("entry_form.amount")}
           type="number"
           value={formData.amount || 0}
           onChange={(value) =>
             setFormData({ ...formData, amount: parseFloat(value) || 0 })
           }
           step="0.01"
-          placeholder={String(i18n.t("entry_form.amount_placeholder"))}
+          placeholder={i18n.t("entry_form.amount_placeholder") as string}
           required
         />
 
         <Input
-          label={String(i18n.t("entry_form.begin_date"))}
+          label={i18n.t("entry_form.begin_date")}
           type="date"
           value={formatDateForInput(formData.beginDate)}
           onChange={(value) =>
@@ -161,12 +161,12 @@ export function EntryForm({
         <Checkbox
           checked={isRecurring}
           onChange={setIsRecurring}
-          label={String(i18n.t("entry_form.recurring"))}
+          label={i18n.t("entry_form.recurring")}
         />
 
         {!isRecurring && (
           <Input
-            label={String(i18n.t("entry_form.end_date"))}
+            label={i18n.t("entry_form.end_date")}
             type="date"
             value={formatDateForInput(formData.endDate)}
             onChange={(value) =>
@@ -178,11 +178,11 @@ export function EntryForm({
         <Button type="submit" disabled={loading} fullWidth>
           {loading
             ? isEdit
-              ? String(i18n.t("entry_form.updating"))
-              : String(i18n.t("entry_form.adding"))
+              ? i18n.t("entry_form.updating")
+              : i18n.t("entry_form.adding")
             : isEdit
-              ? String(i18n.t("entry_form.update_entry"))
-              : String(i18n.t("entry_form.add_entry"))}
+              ? i18n.t("entry_form.update_entry")
+              : i18n.t("entry_form.add_entry")}
         </Button>
       </Stack>
     </form>

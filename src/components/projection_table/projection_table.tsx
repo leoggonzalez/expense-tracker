@@ -73,12 +73,12 @@ export function ProjectionTable({
       <Stack gap={24}>
         <div className="projection-table__header">
           <Text size="h2" as="h2" weight="bold">
-            {String(i18n.t("projection_table.title"))}
+            {i18n.t("projection_table.title")}
           </Text>
           <div className="projection-table__date-selector">
             <Input
               type="month"
-              label={String(i18n.t("projection_table.display_until"))}
+              label={i18n.t("projection_table.display_until")}
               value={endDate}
               onChange={setEndDate}
               min={format(currentDate, "yyyy-MM")}
@@ -91,7 +91,7 @@ export function ProjectionTable({
             <thead className="projection-table__thead">
               <tr className="projection-table__row">
                 <th className="projection-table__cell projection-table__cell--header projection-table__cell--sticky">
-                  {String(i18n.t("projection_table.group_description"))}
+                  {i18n.t("projection_table.group_description")}
                 </th>
                 {months.map((month) => (
                   <th
@@ -149,11 +149,9 @@ export function ProjectionTable({
                     <tr className="projection-table__row projection-table__row--group-total">
                       <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--total">
                         <Text size="sm" weight="bold">
-                          {String(
-                            i18n.t("projection_table.group_total", {
-                              group: group.group,
-                            }),
-                          )}
+                          {i18n.t("projection_table.group_total", {
+                            group: group.group,
+                          })}
                         </Text>
                       </td>
                       {months.map((month) => {
@@ -183,7 +181,7 @@ export function ProjectionTable({
               <tr className="projection-table__row projection-table__row--breakdown">
                 <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--breakdown">
                   <Text size="sm" color="success" weight="medium">
-                    {String(i18n.t("projection_table.total_income"))}
+                    {i18n.t("projection_table.total_income")}
                   </Text>
                 </td>
                 {months.map((month) => {
@@ -205,7 +203,7 @@ export function ProjectionTable({
               <tr className="projection-table__row projection-table__row--breakdown">
                 <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--breakdown">
                   <Text size="sm" color="danger" weight="medium">
-                    {String(i18n.t("projection_table.total_expenses"))}
+                    {i18n.t("projection_table.total_expenses")}
                   </Text>
                 </td>
                 {months.map((month) => {
@@ -228,7 +226,7 @@ export function ProjectionTable({
               <tr className="projection-table__row projection-table__row--grand-total">
                 <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--grand-total">
                   <Text size="md" weight="bold">
-                    {String(i18n.t("projection_table.total"))}
+                    {i18n.t("projection_table.total")}
                   </Text>
                 </td>
                 {months.map((month) => {

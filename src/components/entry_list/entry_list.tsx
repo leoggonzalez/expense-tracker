@@ -31,7 +31,7 @@ export function EntryList({
   entries: plainEntries,
 }: EntryListProps): React.ReactElement {
   const handleDelete = async (id: string) => {
-    if (confirm(String(i18n.t("entry_list.delete_confirm")))) {
+    if (confirm(i18n.t("entry_list.delete_confirm") as string)) {
       await deleteEntry(id);
     }
   };
@@ -49,9 +49,7 @@ export function EntryList({
   if (entries.length === 0) {
     return (
       <div className="entry-list entry-list--empty">
-        <Text color="secondary">
-          {String(i18n.t("entry_list.empty_state"))}
-        </Text>
+        <Text color="secondary">{i18n.t("entry_list.empty_state")}</Text>
       </div>
     );
   }
@@ -91,7 +89,7 @@ export function EntryList({
                 variant="danger"
                 onClick={() => handleDelete(entry.id)}
               >
-                {String(i18n.t("entry_list.delete"))}
+                {i18n.t("entry_list.delete")}
               </Button>
             </div>
           </div>

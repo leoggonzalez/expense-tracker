@@ -4,7 +4,7 @@ import "./checkbox.scss";
 export interface CheckboxProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
-  label?: string;
+  label?: React.ReactNode;
   className?: string;
 }
 

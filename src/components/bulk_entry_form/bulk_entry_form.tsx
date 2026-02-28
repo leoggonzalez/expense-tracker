@@ -112,24 +112,24 @@ export function BulkEntryForm({
     <form onSubmit={handleSubmit} className="bulk-entry-form">
       <Stack gap={24}>
         <Text size="h4" weight="semibold">
-          {String(i18n.t("bulk_entry_form.title"))}
+          {i18n.t("bulk_entry_form.title")}
         </Text>
 
         <div className="bulk-entry-form__shared">
           <Stack gap={16}>
             <Autocomplete
-              label={String(i18n.t("bulk_entry_form.shared_group"))}
+              label={i18n.t("bulk_entry_form.shared_group")}
               value={groupName}
               onChange={setGroupName}
               options={groups}
-              placeholder={String(
-                i18n.t("bulk_entry_form.shared_group_placeholder"),
-              )}
+              placeholder={
+                i18n.t("bulk_entry_form.shared_group_placeholder") as string
+              }
               required
             />
 
             <Input
-              label={String(i18n.t("bulk_entry_form.shared_begin_date"))}
+              label={i18n.t("bulk_entry_form.shared_begin_date")}
               type="date"
               value={formatDateForInput(beginDate)}
               onChange={(value) => setBeginDate(new Date(value))}
@@ -139,12 +139,12 @@ export function BulkEntryForm({
             <Checkbox
               checked={isRecurring}
               onChange={setIsRecurring}
-              label={String(i18n.t("bulk_entry_form.recurring"))}
+              label={i18n.t("bulk_entry_form.recurring")}
             />
 
             {!isRecurring && (
               <Input
-                label={String(i18n.t("bulk_entry_form.shared_end_date"))}
+                label={i18n.t("bulk_entry_form.shared_end_date")}
                 type="date"
                 value={formatDateForInput(endDate)}
                 onChange={(value) => setEndDate(new Date(value))}
@@ -155,7 +155,7 @@ export function BulkEntryForm({
 
         <div className="bulk-entry-form__entries">
           <Text size="sm" weight="semibold" color="secondary">
-            {String(i18n.t("bulk_entry_form.entries"))}
+            {i18n.t("bulk_entry_form.entries")}
           </Text>
           <Stack gap={12}>
             {entries.map((entry) => (
@@ -173,11 +173,11 @@ export function BulkEntryForm({
                     options={[
                       {
                         value: "income",
-                        label: String(i18n.t("common.income")),
+                        label: i18n.t("common.income"),
                       },
                       {
                         value: "expense",
-                        label: String(i18n.t("common.expense")),
+                        label: i18n.t("common.expense"),
                       },
                     ]}
                   />
@@ -187,9 +187,11 @@ export function BulkEntryForm({
                     onChange={(value) =>
                       updateEntry(entry.id, "description", value)
                     }
-                    placeholder={String(
-                      i18n.t("bulk_entry_form.description_placeholder"),
-                    )}
+                    placeholder={
+                      i18n.t(
+                        "bulk_entry_form.description_placeholder",
+                      ) as string
+                    }
                     required
                   />
 
@@ -200,9 +202,9 @@ export function BulkEntryForm({
                       updateEntry(entry.id, "amount", parseFloat(value) || 0)
                     }
                     step="0.01"
-                    placeholder={String(
-                      i18n.t("bulk_entry_form.amount_placeholder"),
-                    )}
+                    placeholder={
+                      i18n.t("bulk_entry_form.amount_placeholder") as string
+                    }
                     required
                   />
 
@@ -213,7 +215,7 @@ export function BulkEntryForm({
                       size="sm"
                       onClick={() => removeEntry(entry.id)}
                     >
-                      {String(i18n.t("bulk_entry_form.remove"))}
+                      {i18n.t("bulk_entry_form.remove")}
                     </Button>
                   )}
                 </div>
@@ -222,20 +224,18 @@ export function BulkEntryForm({
           </Stack>
 
           <Button type="button" variant="secondary" onClick={addEntry}>
-            {String(i18n.t("bulk_entry_form.add_another_entry"))}
+            {i18n.t("bulk_entry_form.add_another_entry")}
           </Button>
         </div>
 
         <Button type="submit" disabled={loading} fullWidth>
           {loading
-            ? String(i18n.t("bulk_entry_form.add_entries_loading"))
-            : String(
-                i18n.t(
-                  entries.length === 1
-                    ? "bulk_entry_form.add_entries_one"
-                    : "bulk_entry_form.add_entries_other",
-                  { count: entries.length },
-                ),
+            ? i18n.t("bulk_entry_form.add_entries_loading")
+            : i18n.t(
+                entries.length === 1
+                  ? "bulk_entry_form.add_entries_one"
+                  : "bulk_entry_form.add_entries_other",
+                { count: entries.length },
               )}
         </Button>
       </Stack>

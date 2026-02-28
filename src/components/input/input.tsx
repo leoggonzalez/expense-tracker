@@ -6,7 +6,7 @@ export interface InputProps {
   value: string | number;
   onChange: (value: string) => void;
   placeholder?: string;
-  label?: string;
+  label?: React.ReactNode;
   required?: boolean;
   min?: string | number;
   max?: string | number;

@@ -7,7 +7,7 @@ export interface AutocompleteProps {
   value: string;
   onChange: (value: string) => void;
   options: string[];
-  label?: string;
+  label?: React.ReactNode;
   placeholder?: string;
   required?: boolean;
   className?: string;

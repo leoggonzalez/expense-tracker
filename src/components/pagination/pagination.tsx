@@ -39,7 +39,7 @@ export function Pagination({
         disabled={currentPage === 1}
         size="sm"
       >
-        {String(i18n.t("pagination.previous"))}
+        {i18n.t("pagination.previous")}
       </Button>
 
       <div className="pagination__pages">
@@ -87,7 +87,7 @@ export function Pagination({
         disabled={currentPage === totalPages}
         size="sm"
       >
-        {String(i18n.t("pagination.next"))}
+        {i18n.t("pagination.next")}
       </Button>
     </div>
   );

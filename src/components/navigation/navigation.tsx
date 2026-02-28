@@ -12,10 +12,10 @@ export function Navigation(): React.ReactElement {
   const pathname = usePathname();
 
   const links = [
-    { href: "/", label: String(i18n.t("navigation.dashboard")) },
-    { href: "/projection", label: String(i18n.t("navigation.projection")) },
-    { href: "/entries", label: String(i18n.t("navigation.manage_entries")) },
-    { href: "/entries/all", label: String(i18n.t("navigation.all_entries")) },
+    { href: "/", label: i18n.t("navigation.dashboard") },
+    { href: "/projection", label: i18n.t("navigation.projection") },
+    { href: "/entries", label: i18n.t("navigation.manage_entries") },
+    { href: "/entries/all", label: i18n.t("navigation.all_entries") },
   ];
 
   return (
@@ -23,7 +23,7 @@ export function Navigation(): React.ReactElement {
       <Container maxWidth="full">
         <div className="navigation__inner">
           <div className="navigation__brand">
-            <Link href="/">{String(i18n.t("navigation.brand"))}</Link>
+            <Link href="/">{i18n.t("navigation.brand")}</Link>
           </div>
           <ul className="navigation__links">
             {links.map((link) => (

@@ -2,11 +2,11 @@
 
 import "./dashboard.scss";
 
-import { Stack, Text } from "@/elements";
-import { i18n } from "@/model/i18n";
 import { Entry, EntryCollection } from "@/model";
+import { Stack, Text } from "@/elements";
 
 import React from "react";
+import { i18n } from "@/model/i18n";
 import { startOfMonth } from "date-fns";
 
 export interface DashboardProps {
@@ -59,13 +59,13 @@ export function Dashboard({
     <div className="dashboard">
       <Stack gap={24}>
         <Text size="h2" as="h2" weight="bold">
-          {String(i18n.t("dashboard.current_month_overview"))}
+          {i18n.t("dashboard.current_month_overview")}
         </Text>
 
         <div className="dashboard__cards">
           <div className="dashboard__card dashboard__card--income">
             <Text size="sm" color="secondary" weight="medium">
-              {String(i18n.t("dashboard.income"))}
+              {i18n.t("dashboard.income")}
             </Text>
             <Text size="2xl" weight="bold" color="success">
               {formatCurrency(income)}
@@ -74,7 +74,7 @@ export function Dashboard({
 
           <div className="dashboard__card dashboard__card--expense">
             <Text size="sm" color="secondary" weight="medium">
-              {String(i18n.t("dashboard.expenses"))}
+              {i18n.t("dashboard.expenses")}
             </Text>
             <Text size="2xl" weight="bold" color="danger">
               {formatCurrency(expense)}
@@ -83,7 +83,7 @@ export function Dashboard({
 
           <div className="dashboard__card dashboard__card--net">
             <Text size="sm" color="secondary" weight="medium">
-              {String(i18n.t("dashboard.net"))}
+              {i18n.t("dashboard.net")}
             </Text>
             <Text
               size="2xl"
@@ -97,12 +97,10 @@ export function Dashboard({
 
         <div className="dashboard__summary">
           <Text size="h4" as="h3" weight="semibold">
-            {String(i18n.t("dashboard.active_entries"))}
+            {i18n.t("dashboard.active_entries")}
           </Text>
           <Text size="lg" color="secondary">
-            {String(
-              i18n.t(activeEntriesTextKey, { count: activeEntriesCount }),
-            )}
+            {i18n.t(activeEntriesTextKey, { count: activeEntriesCount })}
           </Text>
         </div>
       </Stack>

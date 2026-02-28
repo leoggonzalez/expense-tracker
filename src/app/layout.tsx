@@ -4,8 +4,8 @@ import { i18n } from "@/model/i18n";
 import "@/styles/globals.scss";
 
 export const metadata: Metadata = {
-  title: String(i18n.t("metadata.title")),
-  description: String(i18n.t("metadata.description")),
+  title: i18n.t("metadata.title") as string,
+  description: i18n.t("metadata.description") as string,
 };
 
 export default function RootLayout({

@@ -3,14 +3,14 @@ import "./select.scss";
 
 export interface SelectOption {
   value: string;
-  label: string;
+  label: React.ReactNode;
 }
 
 export interface SelectProps {
   value: string;
   onChange: (value: string) => void;
   options: SelectOption[];
-  label?: string;
+  label?: React.ReactNode;
   placeholder?: string;
   required?: boolean;
   className?: string;
