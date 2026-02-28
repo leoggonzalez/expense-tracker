@@ -11,11 +11,11 @@ export interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export const Pagination: React.FC<PaginationProps> = ({
+export function Pagination({
   currentPage,
   totalPages,
   onPageChange,
-}) => {
+}: PaginationProps): React.ReactElement {
   const pages = [];
   const maxVisible = 5;
 
@@ -91,4 +91,4 @@ export const Pagination: React.FC<PaginationProps> = ({
       </Button>
     </div>
   );
-};
+}

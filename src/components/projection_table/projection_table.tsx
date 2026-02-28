@@ -23,9 +23,9 @@ export interface ProjectionTableProps {
   }>;
 }
 
-export const ProjectionTable: React.FC<ProjectionTableProps> = ({
+export function ProjectionTable({
   entries: plainEntries,
-}) => {
+}: ProjectionTableProps): React.ReactElement {
   const currentDate = new Date();
   const [endDate, setEndDate] = useState<string>(
     format(addMonths(currentDate, 6), "yyyy-MM"),
@@ -257,4 +257,4 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = ({
       </Stack>
     </div>
   );
-};
+}

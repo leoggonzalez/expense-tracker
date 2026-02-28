@@ -8,12 +8,12 @@ export interface CheckboxProps {
   className?: string;
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({
+export function Checkbox({
   checked,
   onChange,
   label,
   className = "",
-}) => {
+}: CheckboxProps): React.ReactElement {
   return (
     <label className={`checkbox ${className}`.trim()}>
       <input
@@ -25,4 +25,4 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       {label && <span className="checkbox__label">{label}</span>}
     </label>
   );
-};
+}

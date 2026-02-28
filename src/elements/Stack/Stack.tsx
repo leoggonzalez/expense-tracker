@@ -16,7 +16,7 @@ export interface StackProps {
   className?: string;
 }
 
-export const Stack: React.FC<StackProps> = ({
+export function Stack({
   children,
   direction = "column",
   gap = 0,
@@ -24,7 +24,7 @@ export const Stack: React.FC<StackProps> = ({
   justify,
   wrap = false,
   className = "",
-}) => {
+}: StackProps): React.ReactElement {
   const style: React.CSSProperties = {
     flexDirection: direction,
     gap: `${gap}px`,
@@ -38,4 +38,4 @@ export const Stack: React.FC<StackProps> = ({
       {children}
     </div>
   );
-};
+}

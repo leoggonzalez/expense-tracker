@@ -20,11 +20,11 @@ export interface EntryFormProps {
   isEdit?: boolean;
 }
 
-export const EntryForm: React.FC<EntryFormProps> = ({
+export function EntryForm({
   onSuccess,
   initialData,
   isEdit = false,
-}) => {
+}: EntryFormProps): React.ReactElement {
   const today = new Date().toISOString().split("T")[0];
 
   const [formData, setFormData] = useState<Partial<CreateEntryInput>>({
@@ -179,4 +179,4 @@ export const EntryForm: React.FC<EntryFormProps> = ({
       </Stack>
     </form>
   );
-};
+}

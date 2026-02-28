@@ -27,10 +27,10 @@ export interface EntryListProps {
   showEdit?: boolean;
 }
 
-export const EntryList: React.FC<EntryListProps> = ({
+export function EntryList({
   entries: plainEntries,
   showEdit = false,
-}) => {
+}: EntryListProps): React.ReactElement {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this entry?")) {
       await deleteEntry(id);
@@ -99,4 +99,4 @@ export const EntryList: React.FC<EntryListProps> = ({
       </Stack>
     </div>
   );
-};
+}

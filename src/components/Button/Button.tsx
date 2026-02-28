@@ -12,7 +12,7 @@ export interface ButtonProps {
   className?: string;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+export function Button({
   children,
   onClick,
   type = "button",
@@ -21,7 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   fullWidth = false,
   className = "",
-}) => {
+}: ButtonProps): React.ReactElement {
   const classes = [
     "button",
     `button--variant-${variant}`,
@@ -42,4 +42,4 @@ export const Button: React.FC<ButtonProps> = ({
       {children}
     </button>
   );
-};
+}

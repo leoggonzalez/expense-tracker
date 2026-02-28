@@ -15,12 +15,12 @@ export interface BoxProps {
   className?: string;
 }
 
-export const Box: React.FC<BoxProps> = ({
+export function Box({
   children,
   padding,
   maxWidth,
   className = "",
-}) => {
+}: BoxProps): React.ReactElement {
   const style: React.CSSProperties = {};
 
   if (typeof padding === "number") {
@@ -45,4 +45,4 @@ export const Box: React.FC<BoxProps> = ({
       {children}
     </div>
   );
-};
+}

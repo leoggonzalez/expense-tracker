@@ -21,14 +21,14 @@ export interface TextProps {
   className?: string;
 }
 
-export const Text: React.FC<TextProps> = ({
+export function Text({
   children,
   size = "md",
   color = "primary",
   weight = "normal",
   as: Component = "p",
   className = "",
-}) => {
+}: TextProps): React.ReactElement {
   const classes = [
     "text",
     `text--size-${size}`,
@@ -40,4 +40,4 @@ export const Text: React.FC<TextProps> = ({
     .join(" ");
 
   return <Component className={classes}>{children}</Component>;
-};
+}

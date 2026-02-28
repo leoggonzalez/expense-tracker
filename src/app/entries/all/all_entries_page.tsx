@@ -8,7 +8,7 @@ import { getEntriesWithFilters, getGroups } from "@/actions/entries";
 import { EntryList } from "@/app/entries/entry_list";
 import "./all_entries_page.scss";
 
-export function AllEntriesPage() {
+export function AllEntriesPage(): React.ReactElement {
   const [entries, setEntries] = useState<any[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,

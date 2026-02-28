@@ -16,7 +16,7 @@ export interface SelectProps {
   className?: string;
 }
 
-export const Select: React.FC<SelectProps> = ({
+export function Select({
   value,
   onChange,
   options,
@@ -24,7 +24,7 @@ export const Select: React.FC<SelectProps> = ({
   placeholder,
   required = false,
   className = "",
-}) => {
+}: SelectProps): React.ReactElement {
   return (
     <div className={`select ${className}`.trim()}>
       {label && (
@@ -52,4 +52,4 @@ export const Select: React.FC<SelectProps> = ({
       </select>
     </div>
   );
-};
+}

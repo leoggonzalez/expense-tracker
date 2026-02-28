@@ -1,7 +1,7 @@
 import { ProjectionTable, Container } from "@/components";
 import { getEntries } from "@/actions/entries";
 
-export default async function ProjectionPage() {
+export default async function ProjectionPage(): Promise<React.ReactElement> {
   const entriesData = await getEntries();
   // Convert to plain objects for client components
   const entries = entriesData.map((entry) => ({

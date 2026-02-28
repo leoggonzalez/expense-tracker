@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Container } from "@/components";
 import "./navigation.scss";
 
-export const Navigation: React.FC = () => {
+export function Navigation(): React.ReactElement {
   const pathname = usePathname();
 
   const links = [
@@ -41,4 +41,4 @@ export const Navigation: React.FC = () => {
       </Container>
     </nav>
   );
-};
+}

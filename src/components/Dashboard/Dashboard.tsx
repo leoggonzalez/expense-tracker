@@ -22,9 +22,9 @@ export interface DashboardProps {
   }>;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({
+export function Dashboard({
   entries: plainEntries,
-}) => {
+}: DashboardProps): React.ReactElement {
   // Convert plain objects to Entry instances
   const entries = plainEntries.map((entry) =>
     Entry.fromJSON({
@@ -101,4 +101,4 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </Stack>
     </div>
   );
-};
+}

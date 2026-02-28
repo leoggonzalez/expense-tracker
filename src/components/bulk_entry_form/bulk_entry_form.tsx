@@ -21,7 +21,9 @@ export interface BulkEntryFormProps {
   onSuccess?: () => void;
 }
 
-export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
+export function BulkEntryForm({
+  onSuccess,
+}: BulkEntryFormProps): React.ReactElement {
   const [groupName, setGroupName] = useState("");
   const [beginDate, setBeginDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -209,4 +211,4 @@ export const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess }) => {
       </Stack>
     </form>
   );
-};
+}

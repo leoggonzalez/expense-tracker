@@ -2,7 +2,7 @@ import { Stack } from "@/elements";
 import { Dashboard, Container } from "@/components";
 import { getEntries } from "@/actions/entries";
 
-export default async function HomePage() {
+export default async function HomePage(): Promise<React.ReactElement> {
   const entriesData = await getEntries();
   // Convert to plain objects for client components
   const entries = entriesData.map((entry) => ({

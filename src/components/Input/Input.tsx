@@ -14,7 +14,7 @@ export interface InputProps {
   className?: string;
 }
 
-export const Input: React.FC<InputProps> = ({
+export function Input({
   type = "text",
   value,
   onChange,
@@ -25,7 +25,7 @@ export const Input: React.FC<InputProps> = ({
   max,
   step,
   className = "",
-}) => {
+}: InputProps): React.ReactElement {
   return (
     <div className={`input ${className}`.trim()}>
       {label && (
@@ -47,4 +47,4 @@ export const Input: React.FC<InputProps> = ({
       />
     </div>
   );
-};
+}

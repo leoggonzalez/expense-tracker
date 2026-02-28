@@ -13,7 +13,7 @@ export interface AutocompleteProps {
   className?: string;
 }
 
-export const Autocomplete: React.FC<AutocompleteProps> = ({
+export function Autocomplete({
   value,
   onChange,
   options,
@@ -21,7 +21,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
   placeholder,
   required = false,
   className = "",
-}) => {
+}: AutocompleteProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
   const [filteredOptions, setFilteredOptions] = useState<string[]>(options);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -87,4 +87,4 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
       </div>
     </div>
   );
-};
+}

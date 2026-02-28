@@ -4,7 +4,7 @@ import { EntryForm, BulkEntryForm, Container } from "@/components";
 import { getRecentEntries } from "@/actions/entries";
 import { EntryList } from "@/app/entries/entry_list";
 
-export default async function EntriesPage() {
+export default async function EntriesPage(): Promise<React.ReactElement> {
   const entriesData = await getRecentEntries(10);
   // Convert to plain objects for client components
   const entries = entriesData.map((entry) => ({
