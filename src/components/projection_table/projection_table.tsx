@@ -3,6 +3,7 @@
 import "./projection_table.scss";
 
 import { Entry, EntryCollection } from "@/model";
+import { i18n } from "@/model/i18n";
 import React, { useState } from "react";
 import { Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
@@ -72,12 +73,12 @@ export function ProjectionTable({
       <Stack gap={24}>
         <div className="projection-table__header">
           <Text size="h2" as="h2" weight="bold">
-            Projected Expenses
+            {String(i18n.t("projection_table.title"))}
           </Text>
           <div className="projection-table__date-selector">
             <Input
               type="month"
-              label="Display until"
+              label={String(i18n.t("projection_table.display_until"))}
               value={endDate}
               onChange={setEndDate}
               min={format(currentDate, "yyyy-MM")}
@@ -90,7 +91,7 @@ export function ProjectionTable({
             <thead className="projection-table__thead">
               <tr className="projection-table__row">
                 <th className="projection-table__cell projection-table__cell--header projection-table__cell--sticky">
-                  Group / Description
+                  {String(i18n.t("projection_table.group_description"))}
                 </th>
                 {months.map((month) => (
                   <th
@@ -104,11 +105,6 @@ export function ProjectionTable({
             </thead>
             <tbody className="projection-table__tbody">
               {groups.map((group) => {
-                const groupTotal = months.reduce((sum, month) => {
-                  const monthKey = format(month, "yyyy-MM");
-                  return sum + (group.monthlyTotals.get(monthKey) || 0);
-                }, 0);
-
                 return (
                   <React.Fragment key={group.group}>
                     <tr className="projection-table__row projection-table__row--group-header">
@@ -153,7 +149,11 @@ export function ProjectionTable({
                     <tr className="projection-table__row projection-table__row--group-total">
                       <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--total">
                         <Text size="sm" weight="bold">
-                          {group.group} Total
+                          {String(
+                            i18n.t("projection_table.group_total", {
+                              group: group.group,
+                            }),
+                          )}
                         </Text>
                       </td>
                       {months.map((month) => {
@@ -183,7 +183,7 @@ export function ProjectionTable({
               <tr className="projection-table__row projection-table__row--breakdown">
                 <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--breakdown">
                   <Text size="sm" color="success" weight="medium">
-                    Total Income
+                    {String(i18n.t("projection_table.total_income"))}
                   </Text>
                 </td>
                 {months.map((month) => {
@@ -205,7 +205,7 @@ export function ProjectionTable({
               <tr className="projection-table__row projection-table__row--breakdown">
                 <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--breakdown">
                   <Text size="sm" color="danger" weight="medium">
-                    Total Expenses
+                    {String(i18n.t("projection_table.total_expenses"))}
                   </Text>
                 </td>
                 {months.map((month) => {
@@ -228,7 +228,7 @@ export function ProjectionTable({
               <tr className="projection-table__row projection-table__row--grand-total">
                 <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--grand-total">
                   <Text size="md" weight="bold">
-                    Total
+                    {String(i18n.t("projection_table.total"))}
                   </Text>
                 </td>
                 {months.map((month) => {

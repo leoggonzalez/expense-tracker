@@ -5,12 +5,11 @@ import "./entry_list.scss";
 import { Stack, Text } from "@/elements";
 
 import { Button } from "@/components";
+import { i18n } from "@/model/i18n";
 import { Entry } from "@/model";
 import React from "react";
 import { deleteEntry } from "@/actions/entries";
-import { describe } from "node:test";
 import { format } from "date-fns";
-import { group } from "console";
 
 export interface EntryListProps {
   entries: Array<{
@@ -29,10 +28,9 @@ export interface EntryListProps {
 
 export function EntryList({
   entries: plainEntries,
-  showEdit = false,
 }: EntryListProps): React.ReactElement {
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this entry?")) {
+    if (confirm(String(i18n.t("entry_list.delete_confirm")))) {
       await deleteEntry(id);
     }
   };
@@ -51,7 +49,9 @@ export function EntryList({
   if (entries.length === 0) {
     return (
       <div className="entry-list entry-list--empty">
-        <Text color="secondary">No entries yet. Add your first entry!</Text>
+        <Text color="secondary">
+          {String(i18n.t("entry_list.empty_state"))}
+        </Text>
       </div>
     );
   }
@@ -91,7 +91,7 @@ export function EntryList({
                 variant="danger"
                 onClick={() => handleDelete(entry.id)}
               >
-                Delete
+                {String(i18n.t("entry_list.delete"))}
               </Button>
             </div>
           </div>

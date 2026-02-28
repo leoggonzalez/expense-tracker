@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "title": "Expense Tracker",
+    "description": "Track your income and expenses"
+  },
+  "navigation": {
+    "brand": "Expense Tracker",
+    "dashboard": "Dashboard",
+    "projection": "Projection",
+    "manage_entries": "Manage Entries",
+    "all_entries": "All Entries"
+  },
+  "dashboard": {
+    "current_month_overview": "Current Month Overview",
+    "income": "Income",
+    "expenses": "Expenses",
+    "net": "Net",
+    "active_entries": "Active Entries",
+    "entries_active_this_month_one": "%{count} entry active this month",
+    "entries_active_this_month_other": "%{count} entries active this month"
+  },
+  "entry_form": {
+    "type": "Type",
+    "group": "Group",
+    "group_placeholder": "e.g., income, Various, Investment",
+    "description": "Description",
+    "description_placeholder": "e.g., Salary, Rent",
+    "amount": "Amount",
+    "amount_placeholder": "0.00",
+    "begin_date": "Begin Date",
+    "recurring": "Recurring",
+    "end_date": "End Date",
+    "add_entry": "Add Entry",
+    "adding": "Adding...",
+    "update_entry": "Update Entry",
+    "updating": "Updating..."
+  },
+  "bulk_entry_form": {
+    "title": "Add Multiple Entries",
+    "shared_group": "Group (shared for all entries)",
+    "shared_group_placeholder": "e.g., Various, Investment",
+    "shared_begin_date": "Begin Date (shared)",
+    "recurring": "Recurring",
+    "shared_end_date": "End Date (shared)",
+    "entries": "Entries",
+    "description_placeholder": "Description",
+    "amount_placeholder": "Amount",
+    "remove": "Remove",
+    "add_another_entry": "+ Add Another Entry",
+    "add_entries_loading": "Adding Entries...",
+    "add_entries_one": "Add %{count} Entry",
+    "add_entries_other": "Add %{count} Entries"
+  },
+  "entries_page": {
+    "title": "Manage Entries",
+    "add_new_entry": "Add New Entry",
+    "add_multiple_entries": "Add Multiple Entries",
+    "recent_entries": "Recent Entries (%{count} most recent)",
+    "see_all_entries": "See all entries"
+  },
+  "entry_list": {
+    "empty_state": "No entries yet. Add your first entry!",
+    "delete": "Delete",
+    "delete_confirm": "Are you sure you want to delete this entry?"
+  },
+  "all_entries_page": {
+    "title": "All Entries",
+    "filters": "Filters",
+    "group": "Group",
+    "group_placeholder": "All groups",
+    "description": "Description",
+    "description_placeholder": "Search description...",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "clear_filters": "Clear Filters",
+    "loading": "Loading...",
+    "loading_entries": "Loading entries...",
+    "showing_results": "Showing %{count} of %{total} entries"
+  },
+  "projection_table": {
+    "title": "Projected Expenses",
+    "display_until": "Display until",
+    "group_description": "Group / Description",
+    "group_total": "%{group} Total",
+    "total_income": "Total Income",
+    "total_expenses": "Total Expenses",
+    "total": "Total"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "common": {
+    "income": "Income",
+    "expense": "Expense"
+  },
+  "errors": {
+    "failed_to_create_entry": "Failed to create entry",
+    "failed_to_create_entries": "Failed to create entries",
+    "failed_to_update_entry": "Failed to update entry",
+    "failed_to_delete_entry": "Failed to delete entry"
+  }
+}

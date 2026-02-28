@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components";
-import { Text } from "@/elements";
+import { i18n } from "@/model/i18n";
 import "./pagination.scss";
 
 export interface PaginationProps {
@@ -20,7 +20,7 @@ export function Pagination({
   const maxVisible = 5;
 
   let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-  let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+  const endPage = Math.min(totalPages, startPage + maxVisible - 1);
 
   if (endPage - startPage + 1 < maxVisible) {
     startPage = Math.max(1, endPage - maxVisible + 1);
@@ -30,7 +30,7 @@ export function Pagination({
     pages.push(i);
   }
 
-  if (totalPages === 0) return null;
+  if (totalPages === 0) return <></>;
 
   return (
     <div className="pagination">
@@ -39,7 +39,7 @@ export function Pagination({
         disabled={currentPage === 1}
         size="sm"
       >
-        Previous
+        {String(i18n.t("pagination.previous"))}
       </Button>
 
       <div className="pagination__pages">
@@ -87,7 +87,7 @@ export function Pagination({
         disabled={currentPage === totalPages}
         size="sm"
       >
-        Next
+        {String(i18n.t("pagination.next"))}
       </Button>
     </div>
   );

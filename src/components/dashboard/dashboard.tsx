@@ -2,8 +2,9 @@
 
 import "./dashboard.scss";
 
-import { Box, Stack, Text } from "@/elements";
-import { Entry, EntryCollection, IEntry } from "@/model";
+import { Stack, Text } from "@/elements";
+import { i18n } from "@/model/i18n";
+import { Entry, EntryCollection } from "@/model";
 
 import React from "react";
 import { startOfMonth } from "date-fns";
@@ -42,6 +43,11 @@ export function Dashboard({
   const income = collection.getTotalForMonth(currentMonth, "income");
   const expense = collection.getTotalForMonth(currentMonth, "expense");
   const net = income + expense; // expense is negative
+  const activeEntriesCount = collection.getActiveInMonth(currentMonth).length;
+  const activeEntriesTextKey =
+    activeEntriesCount === 1
+      ? "dashboard.entries_active_this_month_one"
+      : "dashboard.entries_active_this_month_other";
 
   const formatCurrency = (amount: number): string => {
     const absAmount = Math.abs(amount);
@@ -53,13 +59,13 @@ export function Dashboard({
     <div className="dashboard">
       <Stack gap={24}>
         <Text size="h2" as="h2" weight="bold">
-          Current Month Overview
+          {String(i18n.t("dashboard.current_month_overview"))}
         </Text>
 
         <div className="dashboard__cards">
           <div className="dashboard__card dashboard__card--income">
             <Text size="sm" color="secondary" weight="medium">
-              Income
+              {String(i18n.t("dashboard.income"))}
             </Text>
             <Text size="2xl" weight="bold" color="success">
               {formatCurrency(income)}
@@ -68,7 +74,7 @@ export function Dashboard({
 
           <div className="dashboard__card dashboard__card--expense">
             <Text size="sm" color="secondary" weight="medium">
-              Expenses
+              {String(i18n.t("dashboard.expenses"))}
             </Text>
             <Text size="2xl" weight="bold" color="danger">
               {formatCurrency(expense)}
@@ -77,7 +83,7 @@ export function Dashboard({
 
           <div className="dashboard__card dashboard__card--net">
             <Text size="sm" color="secondary" weight="medium">
-              Net
+              {String(i18n.t("dashboard.net"))}
             </Text>
             <Text
               size="2xl"
@@ -91,11 +97,12 @@ export function Dashboard({
 
         <div className="dashboard__summary">
           <Text size="h4" as="h3" weight="semibold">
-            Active Entries
+            {String(i18n.t("dashboard.active_entries"))}
           </Text>
           <Text size="lg" color="secondary">
-            {collection.getActiveInMonth(currentMonth).length} entries active
-            this month
+            {String(
+              i18n.t(activeEntriesTextKey, { count: activeEntriesCount }),
+            )}
           </Text>
         </div>
       </Stack>

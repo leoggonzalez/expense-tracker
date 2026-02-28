@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Stack } from "@/elements";
 import { Button, Input, Select, Checkbox, Autocomplete } from "@/components";
+import { i18n } from "@/model/i18n";
 import { createEntry, CreateEntryInput, getGroups } from "@/actions/entries";
 import "./entry_form.scss";
 
@@ -25,8 +26,6 @@ export function EntryForm({
   initialData,
   isEdit = false,
 }: EntryFormProps): React.ReactElement {
-  const today = new Date().toISOString().split("T")[0];
-
   const [formData, setFormData] = useState<Partial<CreateEntryInput>>({
     type: (initialData?.type as "income" | "expense") || "expense",
     groupName: initialData?.groupName || "",
@@ -54,10 +53,19 @@ export function EntryForm({
 
   useEffect(() => {
     if (isRecurring) {
-      setFormData({ ...formData, endDate: null });
-    } else if (!formData.endDate) {
-      setFormData({ ...formData, endDate: new Date() });
+      setFormData((currentFormData) =>
+        currentFormData.endDate === null
+          ? currentFormData
+          : { ...currentFormData, endDate: null },
+      );
+      return;
     }
+
+    setFormData((currentFormData) =>
+      currentFormData.endDate
+        ? currentFormData
+        : { ...currentFormData, endDate: new Date() },
+    );
   }, [isRecurring]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,49 +107,49 @@ export function EntryForm({
     <form onSubmit={handleSubmit} className="entry-form">
       <Stack gap={16}>
         <Select
-          label="Type"
+          label={String(i18n.t("entry_form.type"))}
           value={formData.type || ""}
           onChange={(value) =>
             setFormData({ ...formData, type: value as "income" | "expense" })
           }
           options={[
-            { value: "income", label: "Income" },
-            { value: "expense", label: "Expense" },
+            { value: "income", label: String(i18n.t("common.income")) },
+            { value: "expense", label: String(i18n.t("common.expense")) },
           ]}
           required
         />
 
         <Autocomplete
-          label="Group"
+          label={String(i18n.t("entry_form.group"))}
           value={formData.groupName || ""}
           onChange={(value) => setFormData({ ...formData, groupName: value })}
           options={groups}
-          placeholder="e.g., income, Various, Investment"
+          placeholder={String(i18n.t("entry_form.group_placeholder"))}
           required
         />
 
         <Input
-          label="Description"
+          label={String(i18n.t("entry_form.description"))}
           value={formData.description || ""}
           onChange={(value) => setFormData({ ...formData, description: value })}
-          placeholder="e.g., Salary, Rent"
+          placeholder={String(i18n.t("entry_form.description_placeholder"))}
           required
         />
 
         <Input
-          label="Amount"
+          label={String(i18n.t("entry_form.amount"))}
           type="number"
           value={formData.amount || 0}
           onChange={(value) =>
             setFormData({ ...formData, amount: parseFloat(value) || 0 })
           }
           step="0.01"
-          placeholder="0.00"
+          placeholder={String(i18n.t("entry_form.amount_placeholder"))}
           required
         />
 
         <Input
-          label="Begin Date"
+          label={String(i18n.t("entry_form.begin_date"))}
           type="date"
           value={formatDateForInput(formData.beginDate)}
           onChange={(value) =>
@@ -153,12 +161,12 @@ export function EntryForm({
         <Checkbox
           checked={isRecurring}
           onChange={setIsRecurring}
-          label="Recurring"
+          label={String(i18n.t("entry_form.recurring"))}
         />
 
         {!isRecurring && (
           <Input
-            label="End Date"
+            label={String(i18n.t("entry_form.end_date"))}
             type="date"
             value={formatDateForInput(formData.endDate)}
             onChange={(value) =>
@@ -170,11 +178,11 @@ export function EntryForm({
         <Button type="submit" disabled={loading} fullWidth>
           {loading
             ? isEdit
-              ? "Updating..."
-              : "Adding..."
+              ? String(i18n.t("entry_form.updating"))
+              : String(i18n.t("entry_form.adding"))
             : isEdit
-              ? "Update Entry"
-              : "Add Entry"}
+              ? String(i18n.t("entry_form.update_entry"))
+              : String(i18n.t("entry_form.add_entry"))}
         </Button>
       </Stack>
     </form>

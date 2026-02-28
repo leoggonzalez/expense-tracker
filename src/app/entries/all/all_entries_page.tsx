@@ -4,12 +4,25 @@ import React, { useState, useEffect } from "react";
 import { Stack, Text } from "@/elements";
 import { Container, Input, Button, Autocomplete } from "@/components";
 import { Pagination } from "@/components/pagination/pagination";
+import { i18n } from "@/model/i18n";
 import { getEntriesWithFilters, getGroups } from "@/actions/entries";
 import { EntryList } from "@/app/entries/entry_list";
 import "./all_entries_page.scss";
 
+type EntryListItem = {
+  id: string;
+  type: string;
+  groupName: string;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export function AllEntriesPage(): React.ReactElement {
-  const [entries, setEntries] = useState<any[]>([]);
+  const [entries, setEntries] = useState<EntryListItem[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -36,40 +49,40 @@ export function AllEntriesPage(): React.ReactElement {
   }, []);
 
   useEffect(() => {
+    async function fetchEntries() {
+      setLoading(true);
+      const result = await getEntriesWithFilters({
+        groupId: filters.groupId,
+        description: filters.description,
+        startDate: filters.startDate ? new Date(filters.startDate) : undefined,
+        endDate: filters.endDate ? new Date(filters.endDate) : undefined,
+        page: pagination.page,
+        limit: 20,
+      });
+
+      const mappedEntries: EntryListItem[] = result.entries.map((entry) => ({
+        id: entry.id,
+        type: entry.type,
+        groupName: entry.group.name,
+        description: entry.description,
+        amount: entry.amount,
+        beginDate: entry.beginDate.toISOString(),
+        endDate: entry.endDate?.toISOString() || null,
+        createdAt: entry.createdAt.toISOString(),
+        updatedAt: entry.updatedAt.toISOString(),
+      }));
+
+      setEntries(mappedEntries);
+      setPagination(result.pagination);
+      setLoading(false);
+    }
+
     fetchEntries();
-  }, [pagination.page, filters]);
-
-  async function fetchEntries() {
-    setLoading(true);
-    const result = await getEntriesWithFilters({
-      groupId: filters.groupId,
-      description: filters.description,
-      startDate: filters.startDate ? new Date(filters.startDate) : undefined,
-      endDate: filters.endDate ? new Date(filters.endDate) : undefined,
-      page: pagination.page,
-      limit: 20,
-    });
-
-    const mappedEntries = result.entries.map((entry) => ({
-      id: entry.id,
-      type: entry.type,
-      groupName: entry.group.name,
-      description: entry.description,
-      amount: entry.amount,
-      beginDate: entry.beginDate.toISOString(),
-      endDate: entry.endDate?.toISOString() || null,
-      createdAt: entry.createdAt.toISOString(),
-      updatedAt: entry.updatedAt.toISOString(),
-    }));
-
-    setEntries(mappedEntries);
-    setPagination(result.pagination);
-    setLoading(false);
-  }
+  }, [filters, pagination.page]);
 
   function handleFilterChange(key: string, value: string) {
-    setFilters({ ...filters, [key]: value });
-    setPagination({ ...pagination, page: 1 });
+    setFilters((currentFilters) => ({ ...currentFilters, [key]: value }));
+    setPagination((currentPagination) => ({ ...currentPagination, page: 1 }));
   }
 
   function handleClearFilters() {
@@ -79,7 +92,7 @@ export function AllEntriesPage(): React.ReactElement {
       startDate: "",
       endDate: "",
     });
-    setPagination({ ...pagination, page: 1 });
+    setPagination((currentPagination) => ({ ...currentPagination, page: 1 }));
   }
 
   const selectedGroupName =
@@ -89,41 +102,43 @@ export function AllEntriesPage(): React.ReactElement {
     <Container>
       <Stack gap={32}>
         <Text size="h2" as="h2" weight="bold">
-          All Entries
+          {String(i18n.t("all_entries_page.title"))}
         </Text>
 
         <div className="all-entries-page__filters">
           <Text size="h4" as="h3" weight="semibold">
-            Filters
+            {String(i18n.t("all_entries_page.filters"))}
           </Text>
           <div className="all-entries-page__filter-grid">
             <Autocomplete
-              label="Group"
+              label={String(i18n.t("all_entries_page.group"))}
               value={selectedGroupName}
               onChange={(name) => {
                 const group = groups.find((g) => g.name === name);
                 handleFilterChange("groupId", group?.id || "");
               }}
               options={groups.map((g) => g.name)}
-              placeholder="All groups"
+              placeholder={String(i18n.t("all_entries_page.group_placeholder"))}
             />
 
             <Input
-              label="Description"
+              label={String(i18n.t("all_entries_page.description"))}
               value={filters.description}
               onChange={(value) => handleFilterChange("description", value)}
-              placeholder="Search description..."
+              placeholder={String(
+                i18n.t("all_entries_page.description_placeholder"),
+              )}
             />
 
             <Input
-              label="Start Date"
+              label={String(i18n.t("all_entries_page.start_date"))}
               type="date"
               value={filters.startDate}
               onChange={(value) => handleFilterChange("startDate", value)}
             />
 
             <Input
-              label="End Date"
+              label={String(i18n.t("all_entries_page.end_date"))}
               type="date"
               value={filters.endDate}
               onChange={(value) => handleFilterChange("endDate", value)}
@@ -131,7 +146,7 @@ export function AllEntriesPage(): React.ReactElement {
           </div>
 
           <Button onClick={handleClearFilters} variant="secondary" size="sm">
-            Clear Filters
+            {String(i18n.t("all_entries_page.clear_filters"))}
           </Button>
         </div>
 
@@ -139,14 +154,21 @@ export function AllEntriesPage(): React.ReactElement {
           <div className="all-entries-page__results-header">
             <Text size="md" color="secondary">
               {loading
-                ? "Loading..."
-                : `Showing ${entries.length} of ${pagination.total} entries`}
+                ? String(i18n.t("all_entries_page.loading"))
+                : String(
+                    i18n.t("all_entries_page.showing_results", {
+                      count: entries.length,
+                      total: pagination.total,
+                    }),
+                  )}
             </Text>
           </div>
 
           {loading ? (
             <div className="all-entries-page__loading">
-              <Text color="secondary">Loading entries...</Text>
+              <Text color="secondary">
+                {String(i18n.t("all_entries_page.loading_entries"))}
+              </Text>
             </div>
           ) : (
             <>

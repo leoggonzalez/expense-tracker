@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -46,7 +47,7 @@ export async function createEntry(input: CreateEntryInput) {
     return { success: true, entry };
   } catch (error) {
     console.error("Error creating entry:", error);
-    return { success: false, error: "Failed to create entry" };
+    return { success: false, error: "failed_to_create_entry" };
   }
 }
 
@@ -65,7 +66,7 @@ export async function createMultipleEntries(inputs: CreateEntryInput[]) {
     return { success: true, entries: results };
   } catch (error) {
     console.error("Error creating multiple entries:", error);
-    return { success: false, error: "Failed to create entries" };
+    return { success: false, error: "failed_to_create_entries" };
   }
 }
 
@@ -117,7 +118,7 @@ export async function getEntriesWithFilters(filters: {
     const limit = filters.limit || 20;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.EntryWhereInput = {};
 
     if (filters.groupId) {
       where.groupId = filters.groupId;
@@ -247,7 +248,7 @@ export async function updateEntry(
     return { success: true, entry };
   } catch (error) {
     console.error("Error updating entry:", error);
-    return { success: false, error: "Failed to update entry" };
+    return { success: false, error: "failed_to_update_entry" };
   }
 }
 
@@ -264,6 +265,6 @@ export async function deleteEntry(id: string) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting entry:", error);
-    return { success: false, error: "Failed to delete entry" };
+    return { success: false, error: "failed_to_delete_entry" };
   }
 }

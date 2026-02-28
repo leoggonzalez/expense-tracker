@@ -3,6 +3,7 @@
 import "./navigation.scss";
 
 import { Container } from "@/components";
+import { i18n } from "@/model/i18n";
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
@@ -11,10 +12,10 @@ export function Navigation(): React.ReactElement {
   const pathname = usePathname();
 
   const links = [
-    { href: "/", label: "Dashboard" },
-    { href: "/projection", label: "Projection" },
-    { href: "/entries", label: "Manage Entries" },
-    { href: "/entries/all", label: "All Entries" },
+    { href: "/", label: String(i18n.t("navigation.dashboard")) },
+    { href: "/projection", label: String(i18n.t("navigation.projection")) },
+    { href: "/entries", label: String(i18n.t("navigation.manage_entries")) },
+    { href: "/entries/all", label: String(i18n.t("navigation.all_entries")) },
   ];
 
   return (
@@ -22,15 +23,16 @@ export function Navigation(): React.ReactElement {
       <Container maxWidth="full">
         <div className="navigation__inner">
           <div className="navigation__brand">
-            <Link href="/">Expense Tracker</Link>
+            <Link href="/">{String(i18n.t("navigation.brand"))}</Link>
           </div>
           <ul className="navigation__links">
             {links.map((link) => (
               <li key={link.href} className="navigation__item">
                 <Link
                   href={link.href}
-                  className={`navigation__link ${pathname === link.href ? "navigation__link--active" : ""
-                    }`}
+                  className={`navigation__link ${
+                    pathname === link.href ? "navigation__link--active" : ""
+                  }`}
                 >
                   {link.label}
                 </Link>

@@ -1,9 +1,4 @@
-import {
-  addMonths,
-  endOfMonth,
-  isWithinInterval,
-  startOfMonth,
-} from "date-fns";
+import { endOfMonth, startOfMonth } from "date-fns";
 
 export interface IEntry {
   id: string;
@@ -17,6 +12,19 @@ export interface IEntry {
   createdAt: Date;
   updatedAt: Date;
 }
+
+type EntryJSON = {
+  id: string;
+  type: "income" | "expense";
+  group?: string;
+  groupName?: string;
+  description: string;
+  amount: number;
+  beginDate: Date | string;
+  endDate: Date | string | null;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+};
 
 export class Entry {
   private data: IEntry;
@@ -124,9 +132,11 @@ export class Entry {
   /**
    * Create Entry instance from plain object
    */
-  static fromJSON(data: any): Entry {
+  static fromJSON(data: EntryJSON): Entry {
     return new Entry({
       ...data,
+      group: data.group ?? data.groupName ?? "",
+      groupName: data.groupName ?? data.group ?? "",
       beginDate: new Date(data.beginDate),
       endDate: data.endDate ? new Date(data.endDate) : null,
       createdAt: new Date(data.createdAt),

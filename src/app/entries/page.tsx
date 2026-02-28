@@ -3,6 +3,7 @@ import { Stack, Text } from "@/elements";
 import { EntryForm, BulkEntryForm, Container } from "@/components";
 import { getRecentEntries } from "@/actions/entries";
 import { EntryList } from "@/app/entries/entry_list";
+import { i18n } from "@/model/i18n";
 
 export default async function EntriesPage(): Promise<React.ReactElement> {
   const entriesData = await getRecentEntries(10);
@@ -23,7 +24,7 @@ export default async function EntriesPage(): Promise<React.ReactElement> {
     <Container>
       <Stack gap={32}>
         <Text size="h2" as="h2" weight="bold">
-          Manage Entries
+          {String(i18n.t("entries_page.title"))}
         </Text>
 
         <div
@@ -40,7 +41,7 @@ export default async function EntriesPage(): Promise<React.ReactElement> {
               weight="semibold"
               style={{ marginBottom: "16px" }}
             >
-              Add New Entry
+              {String(i18n.t("entries_page.add_new_entry"))}
             </Text>
             <EntryForm />
           </div>
@@ -52,7 +53,7 @@ export default async function EntriesPage(): Promise<React.ReactElement> {
               weight="semibold"
               style={{ marginBottom: "16px" }}
             >
-              Add Multiple Entries
+              {String(i18n.t("entries_page.add_multiple_entries"))}
             </Text>
             <BulkEntryForm />
           </div>
@@ -68,13 +69,13 @@ export default async function EntriesPage(): Promise<React.ReactElement> {
             }}
           >
             <Text size="h4" as="h3" weight="semibold">
-              Recent Entries (10 most recent)
+              {String(i18n.t("entries_page.recent_entries", { count: 10 }))}
             </Text>
             <Link
               href="/entries/all"
               style={{ color: "var(--color-primary)", fontWeight: 500 }}
             >
-              See all entries →
+              {`${String(i18n.t("entries_page.see_all_entries"))} →`}
             </Link>
           </div>
           <EntryList entries={entries} />

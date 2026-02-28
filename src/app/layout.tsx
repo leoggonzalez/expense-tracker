@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Navigation } from "@/components";
+import { i18n } from "@/model/i18n";
 import "@/styles/globals.scss";
 
 export const metadata: Metadata = {
-  title: "Expense Tracker",
-  description: "Track your income and expenses",
+  title: String(i18n.t("metadata.title")),
+  description: String(i18n.t("metadata.description")),
 };
 
 export default function RootLayout({

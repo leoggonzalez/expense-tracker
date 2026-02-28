@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Stack, Text } from "@/elements";
 import { Button, Input, Select, Checkbox, Autocomplete } from "@/components";
+import { i18n } from "@/model/i18n";
 import {
   createMultipleEntries,
   CreateEntryInput,
@@ -58,7 +59,11 @@ export function BulkEntryForm({
     }
   };
 
-  const updateEntry = (id: string, field: keyof BulkEntryItem, value: any) => {
+  const updateEntry = <Key extends keyof BulkEntryItem>(
+    id: string,
+    field: Key,
+    value: BulkEntryItem[Key],
+  ) => {
     setEntries(
       entries.map((e) => (e.id === id ? { ...e, [field]: value } : e)),
     );
@@ -107,22 +112,24 @@ export function BulkEntryForm({
     <form onSubmit={handleSubmit} className="bulk-entry-form">
       <Stack gap={24}>
         <Text size="h4" weight="semibold">
-          Add Multiple Entries
+          {String(i18n.t("bulk_entry_form.title"))}
         </Text>
 
         <div className="bulk-entry-form__shared">
           <Stack gap={16}>
             <Autocomplete
-              label="Group (shared for all entries)"
+              label={String(i18n.t("bulk_entry_form.shared_group"))}
               value={groupName}
               onChange={setGroupName}
               options={groups}
-              placeholder="e.g., Various, Investment"
+              placeholder={String(
+                i18n.t("bulk_entry_form.shared_group_placeholder"),
+              )}
               required
             />
 
             <Input
-              label="Begin Date (shared)"
+              label={String(i18n.t("bulk_entry_form.shared_begin_date"))}
               type="date"
               value={formatDateForInput(beginDate)}
               onChange={(value) => setBeginDate(new Date(value))}
@@ -132,12 +139,12 @@ export function BulkEntryForm({
             <Checkbox
               checked={isRecurring}
               onChange={setIsRecurring}
-              label="Recurring"
+              label={String(i18n.t("bulk_entry_form.recurring"))}
             />
 
             {!isRecurring && (
               <Input
-                label="End Date (shared)"
+                label={String(i18n.t("bulk_entry_form.shared_end_date"))}
                 type="date"
                 value={formatDateForInput(endDate)}
                 onChange={(value) => setEndDate(new Date(value))}
@@ -148,18 +155,24 @@ export function BulkEntryForm({
 
         <div className="bulk-entry-form__entries">
           <Text size="sm" weight="semibold" color="secondary">
-            Entries
+            {String(i18n.t("bulk_entry_form.entries"))}
           </Text>
           <Stack gap={12}>
-            {entries.map((entry, index) => (
+            {entries.map((entry) => (
               <div key={entry.id} className="bulk-entry-form__entry">
                 <div className="bulk-entry-form__entry-fields">
                   <Select
                     value={entry.type}
                     onChange={(value) => updateEntry(entry.id, "type", value)}
                     options={[
-                      { value: "income", label: "Income" },
-                      { value: "expense", label: "Expense" },
+                      {
+                        value: "income",
+                        label: String(i18n.t("common.income")),
+                      },
+                      {
+                        value: "expense",
+                        label: String(i18n.t("common.expense")),
+                      },
                     ]}
                   />
 
@@ -168,7 +181,9 @@ export function BulkEntryForm({
                     onChange={(value) =>
                       updateEntry(entry.id, "description", value)
                     }
-                    placeholder="Description"
+                    placeholder={String(
+                      i18n.t("bulk_entry_form.description_placeholder"),
+                    )}
                     required
                   />
 
@@ -179,7 +194,9 @@ export function BulkEntryForm({
                       updateEntry(entry.id, "amount", parseFloat(value) || 0)
                     }
                     step="0.01"
-                    placeholder="Amount"
+                    placeholder={String(
+                      i18n.t("bulk_entry_form.amount_placeholder"),
+                    )}
                     required
                   />
 
@@ -190,7 +207,7 @@ export function BulkEntryForm({
                       size="sm"
                       onClick={() => removeEntry(entry.id)}
                     >
-                      Remove
+                      {String(i18n.t("bulk_entry_form.remove"))}
                     </Button>
                   )}
                 </div>
@@ -199,14 +216,21 @@ export function BulkEntryForm({
           </Stack>
 
           <Button type="button" variant="secondary" onClick={addEntry}>
-            + Add Another Entry
+            {String(i18n.t("bulk_entry_form.add_another_entry"))}
           </Button>
         </div>
 
         <Button type="submit" disabled={loading} fullWidth>
           {loading
-            ? "Adding Entries..."
-            : `Add ${entries.length} ${entries.length === 1 ? "Entry" : "Entries"}`}
+            ? String(i18n.t("bulk_entry_form.add_entries_loading"))
+            : String(
+                i18n.t(
+                  entries.length === 1
+                    ? "bulk_entry_form.add_entries_one"
+                    : "bulk_entry_form.add_entries_other",
+                  { count: entries.length },
+                ),
+              )}
         </Button>
       </Stack>
     </form>
