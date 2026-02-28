@@ -1,5 +1,5 @@
 import React from "react";
-import "./Input.scss";
+import "./input.scss";
 
 export interface InputProps {
   type?: "text" | "number" | "date" | "month";

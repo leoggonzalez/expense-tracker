@@ -1,6 +1,6 @@
 "use client";
 
-import "./Dashboard.scss";
+import "./dashboard.scss";
 
 import { Box, Stack, Text } from "@/elements";
 import { Entry, EntryCollection, IEntry } from "@/model";

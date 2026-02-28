@@ -3,8 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Container } from "../Container/Container";
-import "./Navigation.scss";
+import { Container } from "@/components";
+import "./navigation.scss";
 
 export const Navigation: React.FC = () => {
   const pathname = usePathname();

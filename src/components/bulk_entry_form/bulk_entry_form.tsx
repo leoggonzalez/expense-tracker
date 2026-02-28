@@ -2,17 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Stack, Text } from "@/elements";
-import { Button } from "../Button/Button";
-import { Input } from "../Input/Input";
-import { Select } from "../Select/Select";
-import { Checkbox } from "../Checkbox/Checkbox";
-import { Autocomplete } from "../Autocomplete/Autocomplete";
+import { Button, Input, Select, Checkbox, Autocomplete } from "@/components";
 import {
   createMultipleEntries,
   CreateEntryInput,
   getGroups,
 } from "@/actions/entries";
-import "./BulkEntryForm.scss";
+import "./bulk_entry_form.scss";
 
 interface BulkEntryItem {
   id: string;

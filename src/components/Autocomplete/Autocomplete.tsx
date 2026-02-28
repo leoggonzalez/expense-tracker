@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import "./Autocomplete.scss";
+import "./autocomplete.scss";
 
 export interface AutocompleteProps {
   value: string;

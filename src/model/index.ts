@@ -1,5 +1,5 @@
-export { Entry } from "./Entry";
-export type { IEntry } from "./Entry";
+export { Entry } from "./entry";
+export type { IEntry } from "./entry";
 
-export { EntryCollection } from "./EntryCollection";
-export type { MonthlyData, GroupedEntry } from "./EntryCollection";
+export { EntryCollection } from "./entry_collection";
+export type { MonthlyData, GroupedEntry } from "./entry_collection";

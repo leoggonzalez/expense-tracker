@@ -1,13 +1,13 @@
 "use client";
 
-import "./ProjectionTable.scss";
+import "./projection_table.scss";
 
 import { Entry, EntryCollection } from "@/model";
 import React, { useState } from "react";
 import { Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
 
-import { Input } from "../Input/Input";
+import { Input } from "@/components";
 
 export interface ProjectionTableProps {
   entries: Array<{

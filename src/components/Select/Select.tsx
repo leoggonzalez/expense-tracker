@@ -1,5 +1,5 @@
 import React from "react";
-import "./Select.scss";
+import "./select.scss";
 
 export interface SelectOption {
   value: string;

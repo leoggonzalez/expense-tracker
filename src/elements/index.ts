@@ -1,8 +1,8 @@
-export { Stack } from "./Stack/Stack";
-export type { StackProps } from "./Stack/Stack";
+export { Stack } from "./stack/stack";
+export type { StackProps } from "./stack/stack";
 
-export { Box } from "./Box/Box";
-export type { BoxProps, BoxPadding } from "./Box/Box";
+export { Box } from "./box/box";
+export type { BoxProps, BoxPadding } from "./box/box";
 
-export { Text } from "./Text/Text";
-export type { TextProps } from "./Text/Text";
+export { Text } from "./text/text";
+export type { TextProps } from "./text/text";

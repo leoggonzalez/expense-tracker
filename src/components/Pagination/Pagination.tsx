@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Button } from "../Button/Button";
+import { Button } from "@/components";
 import { Text } from "@/elements";
-import "./Pagination.scss";
+import "./pagination.scss";
 
 export interface PaginationProps {
   currentPage: number;

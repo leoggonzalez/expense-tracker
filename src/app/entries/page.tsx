@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Stack, Text } from "@/elements";
 import { EntryForm, BulkEntryForm, Container } from "@/components";
 import { getRecentEntries } from "@/actions/entries";
-import { EntryList } from "./EntryList";
+import { EntryList } from "@/app/entries/entry_list";
 
 export default async function EntriesPage() {
   const entriesData = await getRecentEntries(10);

@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { Stack, Text } from "@/elements";
 import { Container, Input, Button, Autocomplete } from "@/components";
-import { Pagination } from "@/components/Pagination/Pagination";
+import { Pagination } from "@/components/pagination/pagination";
 import { getEntriesWithFilters, getGroups } from "@/actions/entries";
-import { EntryList } from "../EntryList";
-import "./AllEntriesPage.scss";
+import { EntryList } from "@/app/entries/entry_list";
+import "./all_entries_page.scss";
 
 export function AllEntriesPage() {
   const [entries, setEntries] = useState<any[]>([]);

@@ -1,5 +1,5 @@
 import React from "react";
-import "./Stack.scss";
+import "./stack.scss";
 
 export interface StackProps {
   children: React.ReactNode;

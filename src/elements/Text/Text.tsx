@@ -1,4 +1,4 @@
-import "./Text.scss";
+import "./text.scss";
 
 import React from "react";
 

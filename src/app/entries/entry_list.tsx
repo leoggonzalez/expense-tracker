@@ -1,6 +1,6 @@
 "use client";
 
-import "./EntryList.scss";
+import "./entry_list.scss";
 
 import { Stack, Text } from "@/elements";
 

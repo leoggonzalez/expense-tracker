@@ -2,13 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { Stack } from "@/elements";
-import { Button } from "../Button/Button";
-import { Input } from "../Input/Input";
-import { Select } from "../Select/Select";
-import { Checkbox } from "../Checkbox/Checkbox";
-import { Autocomplete } from "../Autocomplete/Autocomplete";
+import { Button, Input, Select, Checkbox, Autocomplete } from "@/components";
 import { createEntry, CreateEntryInput, getGroups } from "@/actions/entries";
-import "./EntryForm.scss";
+import "./entry_form.scss";
 
 export interface EntryFormProps {
   onSuccess?: () => void;
