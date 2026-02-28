@@ -1,0 +1,12 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projection": "Projection",
+    "manage_entries": "Manage Entries",
+    "all_entries": "All Entries",
+    "brand": "Expense Tracker"
+  },
+  "dashboard": {
+    "current_month_overview": "Current Month Overview"
+  }
+}
