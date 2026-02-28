@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Container } from "@/components";
 import "./navigation.scss";
+
+import { Container } from "@/components";
+import Link from "next/link";
+import React from "react";
+import { usePathname } from "next/navigation";
 
 export function Navigation(): React.ReactElement {
   const pathname = usePathname();
@@ -28,9 +29,8 @@ export function Navigation(): React.ReactElement {
               <li key={link.href} className="navigation__item">
                 <Link
                   href={link.href}
-                  className={`navigation__link ${
-                    pathname === link.href ? "navigation__link--active" : ""
-                  }`}
+                  className={`navigation__link ${pathname === link.href ? "navigation__link--active" : ""
+                    }`}
                 >
                   {link.label}
                 </Link>
