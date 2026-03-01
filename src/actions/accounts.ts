@@ -1,6 +1,5 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -57,6 +56,10 @@ type AccountDeleteCheckRecord = {
   };
 };
 
+type PrismaErrorWithCode = {
+  code: string;
+};
+
 function revalidateAccountPages(): void {
   revalidatePath("/");
   revalidatePath("/entries");
@@ -70,6 +73,15 @@ function getEntryNet(entry: { type: string; amount: number }): number {
   return entry.type === "expense" && entry.amount > 0
     ? -entry.amount
     : entry.amount;
+}
+
+function isPrismaErrorWithCode(error: unknown): error is PrismaErrorWithCode {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string"
+  );
 }
 
 async function findOwnedAccountOrNull(userId: string, id: string) {
@@ -140,10 +152,7 @@ export async function createAccount(input: {
 
     return { success: true };
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (isPrismaErrorWithCode(error) && error.code === "P2002") {
       return { success: false, error: "accounts_page.duplicate_name" };
     }
 
@@ -221,10 +230,7 @@ export async function updateAccount(
 
     return { success: true };
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (isPrismaErrorWithCode(error) && error.code === "P2002") {
       return { success: false, error: "account_detail_page.duplicate_name" };
     }
 
