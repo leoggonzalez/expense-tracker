@@ -1,0 +1,12 @@
+export const iconAssets = {
+  example: new URL("./icons/example.svg", import.meta.url).toString(),
+  "example-2": new URL("./icons/example-2.svg", import.meta.url).toString(),
+  dashboard: new URL("./icons/dashboard.svg", import.meta.url).toString(),
+  projection: new URL("./icons/projection.svg", import.meta.url).toString(),
+  entries: new URL("./icons/entries.svg", import.meta.url).toString(),
+  accounts: new URL("./icons/accounts.svg", import.meta.url).toString(),
+  settings: new URL("./icons/settings.svg", import.meta.url).toString(),
+  login: new URL("./icons/login.svg", import.meta.url).toString(),
+} as const;
+
+export type IconName = keyof typeof iconAssets;

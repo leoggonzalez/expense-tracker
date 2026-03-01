@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/session";
 import { i18n } from "@/model/i18n";
+import type { IconName } from "@/elements/icon/icon_assets";
 
 import { NavigationClient } from "./navigation_client";
 
@@ -9,13 +10,7 @@ export async function Navigation(): Promise<React.ReactElement> {
   type NavigationLink = {
     href: string;
     label: React.ReactNode;
-    icon:
-      | "dashboard"
-      | "projection"
-      | "entries"
-      | "accounts"
-      | "settings"
-      | "login";
+    icon: IconName;
   };
 
   const links: NavigationLink[] = currentUser

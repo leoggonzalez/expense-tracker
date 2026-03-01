@@ -7,5 +7,8 @@ export type { BoxProps, BoxPadding } from "./box/box";
 export { Grid } from "./grid/grid";
 export type { GridProps } from "./grid/grid";
 
+export { Icon } from "./icon/icon";
+export type { IconProps } from "./icon/icon";
+
 export { Text } from "./text/text";
 export type { TextProps } from "./text/text";
