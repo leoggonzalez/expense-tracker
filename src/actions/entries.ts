@@ -1,6 +1,5 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -14,6 +13,21 @@ export interface CreateEntryInput {
   beginDate: Date;
   endDate?: Date | null;
 }
+
+type EntryFiltersWhere = {
+  account: {
+    userId: string;
+  };
+  accountId?: string;
+  description?: {
+    contains: string;
+    mode: "insensitive";
+  };
+  beginDate?: {
+    gte?: Date;
+    lte?: Date;
+  };
+};
 
 async function findOrCreateAccount(userId: string, accountName: string) {
   let account = await prisma.account.findFirst({
@@ -154,7 +168,7 @@ export async function getEntriesWithFilters(filters: {
     const limit = filters.limit || 20;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.EntryWhereInput = {
+    const where: EntryFiltersWhere = {
       account: {
         userId: currentUser.id,
       },
