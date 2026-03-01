@@ -10,6 +10,8 @@ import React, {
   useState,
 } from "react";
 
+import { i18n } from "@/model/i18n";
+
 type ToastKind = "success" | "error";
 
 type ToastState = {
@@ -50,6 +52,25 @@ export function ToastProvider({
       }
     };
   }, []);
+
+  const dismissToast = () => {
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    if (clearTimerRef.current !== null) {
+      window.clearTimeout(clearTimerRef.current);
+      clearTimerRef.current = null;
+    }
+
+    setToast((currentToast) =>
+      currentToast ? { ...currentToast, visible: false } : currentToast,
+    );
+
+    clearTimerRef.current = window.setTimeout(() => {
+      setToast(null);
+    }, HIDE_DELAY_MS);
+  };
 
   const showToast = (kind: ToastKind, message: string) => {
     if (hideTimerRef.current !== null) {
@@ -95,7 +116,15 @@ export function ToastProvider({
               .join(" ")}
             role="status"
           >
-            {toast.message}
+            <span className="toast-provider__message">{toast.message}</span>
+            <button
+              type="button"
+              className="toast-provider__dismiss"
+              onClick={dismissToast}
+              aria-label={i18n.t("toast.dismiss") as string}
+            >
+              ×
+            </button>
           </div>
         )}
       </div>

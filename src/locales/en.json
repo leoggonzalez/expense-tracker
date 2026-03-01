@@ -208,7 +208,8 @@
     "entry_created": "Entry created.",
     "entries_created": "Entries created.",
     "entry_create_failed": "Unable to create the entry.",
-    "entries_create_failed": "Unable to create the entries."
+    "entries_create_failed": "Unable to create the entries.",
+    "dismiss": "Dismiss notification"
   },
   "errors": {
     "failed_to_create_entry": "Failed to create entry",

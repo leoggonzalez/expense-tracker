@@ -7,11 +7,9 @@ import { i18n } from "@/model/i18n";
 import { useToast } from "@/components/toast_provider/toast_provider";
 import {
   clearNewEntryDraft,
-  getLastPathname,
   loadNewEntryDraft,
   saveNewEntryDraft,
   setNewEntryFlowActive,
-  setLastPathname,
 } from "@/lib/new_entry_draft";
 import {
   createEntry,
@@ -72,14 +70,7 @@ export function EntryForm({
       return;
     }
 
-    const previousPathname = getLastPathname();
-
-    if (!previousPathname?.startsWith("/entries/new")) {
-      clearNewEntryDraft();
-    }
-
     setNewEntryFlowActive(true);
-    setLastPathname(`/entries/new/${entryType}`);
 
     const draft = loadNewEntryDraft();
 
@@ -96,7 +87,7 @@ export function EntryForm({
     }));
     setAmountInput(draft.amountInput);
     setIsRecurring(draft.isRecurring);
-  }, [entryType, initialData, isCreateFlow]);
+  }, [initialData, isCreateFlow]);
 
   useEffect(() => {
     async function fetchAccounts() {
