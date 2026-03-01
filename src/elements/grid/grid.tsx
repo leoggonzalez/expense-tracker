@@ -35,7 +35,7 @@ export function Grid({
     style["--grid-template-columns"] = columns;
   } else if (minColumnWidth !== undefined) {
     style["--grid-template-columns"] =
-      `repeat(auto-fit, minmax(${minColumnWidth}px, 1fr))`;
+      `repeat(auto-fit, minmax(min(100%, ${minColumnWidth}px), 1fr))`;
   }
 
   if (rows) {

@@ -78,6 +78,12 @@ export function Navigation(props: NavigationProps): React.ReactElement {
 - Do not add new `.scss` files under `src/app`. Non-global styling belongs in `src/components/<component>/<component>.scss`.
 - Global application styles imported from `src/styles` remain valid. The prohibition applies to page-local SCSS under `src/app`, not shared global styles.
 
+## Validation Conventions
+
+- Do not run a full production build after every change by default. Frequent `yarn build` runs interrupt the live development process and should be reserved for meaningful checkpoints.
+- Prefer validating with the smallest relevant check while iterating, then run broader validation once a coherent batch of work is ready.
+- Use `yarn build` for final verification before handoff, when changing routing/build-sensitive behavior, or when investigating a production-only issue.
+
 Examples:
 
 Preferred:

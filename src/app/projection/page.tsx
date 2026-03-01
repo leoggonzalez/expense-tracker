@@ -1,4 +1,5 @@
-import { ProjectionTable, Container } from "@/components";
+import { Container, ProjectionTable } from "@/components";
+
 import { getEntries } from "@/actions/entries";
 import { requireCurrentUser } from "@/lib/session";
 
@@ -19,7 +20,7 @@ export default async function ProjectionPage(): Promise<React.ReactElement> {
   }));
 
   return (
-    <Container maxWidth="wide">
+    <Container >
       <ProjectionTable entries={entries} />
     </Container>
   );
