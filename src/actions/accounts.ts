@@ -18,17 +18,15 @@ type AccountSummary = {
   allTimeNet: number;
 };
 
-type AccountSummaryRecord = Prisma.AccountGetPayload<{
-  include: {
-    entries: {
-      select: {
-        id: true;
-        type: true;
-        amount: true;
-      };
-    };
-  };
-}>;
+type AccountSummaryRecord = {
+  id: string;
+  name: string;
+  entries: Array<{
+    id: string;
+    type: string;
+    amount: number;
+  }>;
+};
 
 type AccountDetail = {
   id: string;
@@ -47,21 +45,17 @@ type AccountDetail = {
   }>;
 };
 
-type AccountDetailRecord = Prisma.AccountGetPayload<{
-  include: {
-    entries: true;
-  };
-}>;
+type AccountDetailRecord = {
+  id: string;
+  name: string;
+  entries: AccountDetail["entries"];
+};
 
-type AccountDeleteCheckRecord = Prisma.AccountGetPayload<{
-  include: {
-    _count: {
-      select: {
-        entries: true;
-      };
-    };
+type AccountDeleteCheckRecord = {
+  _count: {
+    entries: number;
   };
-}>;
+};
 
 function revalidateAccountPages(): void {
   revalidatePath("/");
