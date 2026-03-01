@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Navigation } from "@/components/navigation/navigation";
 import { AppShell } from "@/components/app_shell/app_shell";
 import { FloatingEntryButton } from "@/components/floating_entry_button/floating_entry_button";
+import { ToastProvider } from "@/components/toast_provider/toast_provider";
 import { i18n } from "@/model/i18n";
 import "@/styles/globals.scss";
 
@@ -18,12 +19,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AppShell
-          navigation={<Navigation />}
-          floatingEntryButton={<FloatingEntryButton />}
-        >
-          {children}
-        </AppShell>
+        <ToastProvider>
+          <AppShell
+            navigation={<Navigation />}
+            floatingEntryButton={<FloatingEntryButton />}
+          >
+            {children}
+          </AppShell>
+        </ToastProvider>
       </body>
     </html>
   );

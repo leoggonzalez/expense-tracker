@@ -16,7 +16,40 @@
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
 
+    &--income {
+      border-color: color-mix(in srgb, var(--color-success) 45%, white);
+      color: var(--color-success-dark);
+    }
+
+    &--expense {
+      border-color: color-mix(in srgb, var(--color-danger) 45%, white);
+      color: var(--color-danger-dark);
+    }
+
+    &--multiple {
+      border-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+    }
+
     &--active {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background-color: var(--color-background-secondary);
+    }
+
+    &--income.new-entry-page__tab--active {
+      border-color: var(--color-success);
+      color: var(--color-success-dark);
+      background-color: color-mix(in srgb, var(--color-success) 10%, white);
+    }
+
+    &--expense.new-entry-page__tab--active {
+      border-color: var(--color-danger);
+      color: var(--color-danger-dark);
+      background-color: color-mix(in srgb, var(--color-danger) 10%, white);
+    }
+
+    &--multiple.new-entry-page__tab--active {
       border-color: var(--color-primary);
       color: var(--color-primary);
       background-color: var(--color-background-secondary);

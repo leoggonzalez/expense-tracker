@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Stack } from "@/elements";
 import { AccountField, Button, Input, Select, Checkbox } from "@/components";
 import { i18n } from "@/model/i18n";
+import { useToast } from "@/components/toast_provider/toast_provider";
 import {
   createEntry,
   CreateEntryInput,
@@ -36,6 +37,7 @@ export function EntryForm({
   entryType,
   hideTypeField = false,
 }: EntryFormProps): React.ReactElement {
+  const { showError, showSuccess } = useToast();
   const [formData, setFormData] = useState<Partial<CreateEntryInput>>({
     type:
       entryType || (initialData?.type as "income" | "expense") || "expense",
@@ -98,6 +100,7 @@ export function EntryForm({
       const parsedAmount = parseAmountInput(amountInput);
 
       if (parsedAmount === null) {
+        showError(i18n.t("toast.entry_create_failed") as string);
         setLoading(false);
         return;
       }
@@ -115,6 +118,9 @@ export function EntryForm({
 
       if (result.success) {
         if (!isEdit) {
+          showSuccess(i18n.t("toast.entry_created") as string);
+        }
+        if (!isEdit) {
           setFormData({
             type: entryType || "expense",
             accountName: "",
@@ -130,9 +136,16 @@ export function EntryForm({
         if (onSuccess) {
           onSuccess();
         }
+      } else {
+        if (!isEdit) {
+          showError(i18n.t("toast.entry_create_failed") as string);
+        }
       }
     } catch (error) {
       console.error("Error submitting form:", error);
+      if (!isEdit) {
+        showError(i18n.t("toast.entry_create_failed") as string);
+      }
     } finally {
       setLoading(false);
     }

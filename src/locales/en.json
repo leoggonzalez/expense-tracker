@@ -26,7 +26,8 @@
     "account_net": "Net",
     "no_accounts_this_month": "No active accounts this month.",
     "entries_active_this_month_one": "%{count} entry active this month",
-    "entries_active_this_month_other": "%{count} entries active this month"
+    "entries_active_this_month_other": "%{count} entries active this month",
+    "see_all_entries": "See all entries"
   },
   "entry_form": {
     "type": "Type",
@@ -63,6 +64,20 @@
   "entries_page": {
     "title": "Entries",
     "add_entry": "Add Entry",
+    "account": "Account",
+    "details": "Details",
+    "amount": "Amount",
+    "date": "Date",
+    "filters": "Filters",
+    "type": "Type",
+    "date_exact": "Exact Date",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "account_placeholder": "All accounts",
+    "type_placeholder": "All types",
+    "clear_filters": "Clear Filters",
+    "showing_results": "Showing %{count} of %{total} entries",
+    "empty_state": "No entries match the current filters.",
     "add_new_entry": "Add New Entry",
     "add_multiple_entries": "Add Multiple Entries",
     "recent_entries": "Recent Entries (%{count} most recent)",
@@ -188,6 +203,12 @@
     "income": "Income",
     "expense": "Expense",
     "add_entry": "Add entry"
+  },
+  "toast": {
+    "entry_created": "Entry created.",
+    "entries_created": "Entries created.",
+    "entry_create_failed": "Unable to create the entry.",
+    "entries_create_failed": "Unable to create the entries."
   },
   "errors": {
     "failed_to_create_entry": "Failed to create entry",

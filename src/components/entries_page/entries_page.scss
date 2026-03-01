@@ -1,7 +1,13 @@
 @use "@/styles/variables.scss" as *;
 
 .entries-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+
   &__header {
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-md);
   }
 
@@ -21,5 +27,21 @@
     color: var(--color-text-inverse);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
+  }
+
+  &__results {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .entries-page {
+    &__header {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
   }
 }

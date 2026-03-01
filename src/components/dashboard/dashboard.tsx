@@ -7,8 +7,9 @@ import { Stack, Text } from "@/elements";
 
 import React from "react";
 import { i18n } from "@/model/i18n";
-import { startOfMonth } from "date-fns";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import { EntryList, EntryListItem } from "@/components";
+import Link from "next/link";
 
 export interface DashboardProps {
   entries: Array<{
@@ -42,15 +43,15 @@ export function Dashboard({
 
   const collection = new EntryCollection(entries);
   const currentMonth = startOfMonth(new Date());
+  const currentMonthEnd = endOfMonth(currentMonth);
 
   const income = collection.getTotalForMonth(currentMonth, "income");
   const expense = collection.getTotalForMonth(currentMonth, "expense");
   const net = income + expense; // expense is negative
-  const activeEntriesCount = collection.getActiveInMonth(currentMonth).length;
-  const activeEntriesTextKey =
-    activeEntriesCount === 1
-      ? "dashboard.entries_active_this_month_one"
-      : "dashboard.entries_active_this_month_other";
+  const currentMonthQuery = `start_date=${format(currentMonth, "yyyy-MM-dd")}&end_date=${format(
+    currentMonthEnd,
+    "yyyy-MM-dd",
+  )}`;
   const formatCurrency = (amount: number): string => {
     const absAmount = Math.abs(amount);
     const sign = amount < 0 ? "-" : "";
@@ -65,23 +66,33 @@ export function Dashboard({
         </Text>
 
         <div className="dashboard__cards">
-          <div className="dashboard__card dashboard__card--income">
-            <Text size="sm" color="secondary" weight="medium">
-              {i18n.t("dashboard.income")}
-            </Text>
-            <Text size="2xl" weight="bold" color="success">
-              {formatCurrency(income)}
-            </Text>
-          </div>
+          <Link
+            href={`/entries?${currentMonthQuery}&type=income`}
+            className="dashboard__card-link"
+          >
+            <div className="dashboard__card dashboard__card--income">
+              <Text size="sm" color="secondary" weight="medium">
+                {i18n.t("dashboard.income")}
+              </Text>
+              <Text size="2xl" weight="bold" color="success">
+                {formatCurrency(income)}
+              </Text>
+            </div>
+          </Link>
 
-          <div className="dashboard__card dashboard__card--expense">
-            <Text size="sm" color="secondary" weight="medium">
-              {i18n.t("dashboard.expenses")}
-            </Text>
-            <Text size="2xl" weight="bold" color="danger">
-              {formatCurrency(expense)}
-            </Text>
-          </div>
+          <Link
+            href={`/entries?${currentMonthQuery}&type=expense`}
+            className="dashboard__card-link"
+          >
+            <div className="dashboard__card dashboard__card--expense">
+              <Text size="sm" color="secondary" weight="medium">
+                {i18n.t("dashboard.expenses")}
+              </Text>
+              <Text size="2xl" weight="bold" color="danger">
+                {formatCurrency(expense)}
+              </Text>
+            </div>
+          </Link>
 
           <div className="dashboard__card dashboard__card--net">
             <Text size="sm" color="secondary" weight="medium">
@@ -97,19 +108,18 @@ export function Dashboard({
           </div>
         </div>
 
-        <div className="dashboard__summary">
-          <Text size="h4" as="h3" weight="semibold">
-            {i18n.t("dashboard.active_entries")}
-          </Text>
-          <Text size="lg" color="secondary">
-            {i18n.t(activeEntriesTextKey, { count: activeEntriesCount })}
-          </Text>
-        </div>
-
         <div className="dashboard__recent-section">
-          <Text size="h4" as="h3" weight="semibold">
-            {i18n.t("dashboard.recent_entries")}
-          </Text>
+          <div className="dashboard__recent-header">
+            <Text size="h4" as="h3" weight="semibold">
+              {i18n.t("dashboard.recent_entries")}
+            </Text>
+            <Link
+              href={`/entries?${currentMonthQuery}`}
+              className="dashboard__recent-link"
+            >
+              {i18n.t("dashboard.see_all_entries")}
+            </Link>
+          </div>
           <EntryList
             entries={recentEntries}
             showDelete={false}

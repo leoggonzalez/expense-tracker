@@ -30,6 +30,10 @@ export type { PaginationProps } from "./pagination/pagination";
 
 export { EntryList } from "./entry_list/entry_list";
 export type { EntryListItem, EntryListProps } from "./entry_list/entry_list";
+export { EntriesTable } from "./entries_table/entries_table";
+export type { EntriesTableItem } from "./entries_table/entries_table";
+export { EntriesFilters } from "./entries_filters/entries_filters";
+export { ToastProvider, useToast } from "./toast_provider/toast_provider";
 
 export { AllEntriesPage } from "./all_entries_page/all_entries_page";
 

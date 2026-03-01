@@ -84,6 +84,13 @@ export function Navigation(props: NavigationProps): React.ReactElement {
 - Prefer validating with the smallest relevant check while iterating, then run broader validation once a coherent batch of work is ready.
 - Use `yarn build` for final verification before handoff, when changing routing/build-sensitive behavior, or when investigating a production-only issue.
 
+## Routing And State Conventions
+
+- Page-level filter, search, sort, and pagination state that materially changes page content must live in the URL query string.
+- Pages with filterable content must read their initial state from the URL and update the URL when filters change.
+- Reload, bookmark, and browser back/forward navigation must preserve the same filtered result set.
+- “Clear filters” actions must reset both the visible controls and the related query parameters.
+
 Examples:
 
 Preferred:
