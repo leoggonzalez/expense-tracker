@@ -27,6 +27,11 @@
     gap: var(--spacing-sm);
   }
 
+  &__link {
+    display: block;
+    flex: 1;
+  }
+
   &__main {
     display: flex;
     flex-direction: column;

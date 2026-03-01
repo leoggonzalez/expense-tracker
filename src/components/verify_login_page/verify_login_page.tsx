@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, Input } from "@/components";
+import "./verify_login_page.scss";
+
+import { Button, Input, OtpInput } from "@/components";
 import { Container } from "@/components/container/container";
 import { verifyLoginCode } from "@/actions/auth";
 import { Box, Stack, Text } from "@/elements";
@@ -16,7 +18,7 @@ export function VerifyLoginPage({
   initialEmail,
 }: VerifyLoginPageProps): React.ReactElement {
   const router = useRouter();
-  const [email, setEmail] = useState(initialEmail);
+  const email = initialEmail;
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,8 +45,8 @@ export function VerifyLoginPage({
 
   return (
     <Container>
-      <Stack gap={24}>
-        <Box padding={24} maxWidth={480} className="verify-login-page">
+      <div className="verify-login-page">
+        <Box padding={24} maxWidth={480} className="verify-login-page__card">
           <form onSubmit={handleSubmit}>
             <Stack gap={16}>
               <Text size="h2" as="h1" weight="bold">
@@ -56,19 +58,19 @@ export function VerifyLoginPage({
 
               <Input
                 label={i18n.t("auth.email")}
+                type="email"
                 value={email}
-                onChange={setEmail}
+                onChange={() => undefined}
                 placeholder={i18n.t("auth.email_placeholder") as string}
+                disabled
+                readOnly
                 required
               />
 
-              <Input
-                label={i18n.t("auth.code")}
+              <OtpInput
+                label={i18n.t("auth.code_group_label")}
                 value={code}
-                onChange={(value) =>
-                  setCode(value.replace(/\D/g, "").slice(0, 6))
-                }
-                placeholder={i18n.t("auth.code_placeholder") as string}
+                onChange={setCode}
                 required
               />
 
@@ -82,7 +84,7 @@ export function VerifyLoginPage({
             </Stack>
           </form>
         </Box>
-      </Stack>
+      </div>
     </Container>
   );
 }

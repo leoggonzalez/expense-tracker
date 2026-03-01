@@ -1,10 +1,10 @@
 import { EntriesPage } from "@/components";
-import { getRecentEntries } from "@/actions/entries";
+import { getEntries } from "@/actions/entries";
 import { requireCurrentUser } from "@/lib/session";
 
 export default async function Page(): Promise<React.ReactElement> {
   await requireCurrentUser();
-  const entriesData = await getRecentEntries(10);
+  const entriesData = await getEntries();
   const entries = entriesData.map((entry) => ({
     id: entry.id,
     type: entry.type,

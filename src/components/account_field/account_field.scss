@@ -1,0 +1,26 @@
+@use "@/styles/variables.scss" as *;
+
+.account-field {
+  &__control {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--spacing-sm);
+    align-items: end;
+  }
+
+  &__input {
+    min-width: 0;
+  }
+
+  &__toggle {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--border-radius-md);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

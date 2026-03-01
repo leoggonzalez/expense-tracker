@@ -19,6 +19,7 @@
     "expenses": "Expenses",
     "net": "Net",
     "active_entries": "Active Entries",
+    "recent_entries": "Recent Entries",
     "accounts_this_month": "Accounts This Month",
     "account_income": "Income",
     "account_expenses": "Expenses",
@@ -60,7 +61,8 @@
     "add_entries_other": "Add %{count} Entries"
   },
   "entries_page": {
-    "title": "Manage Entries",
+    "title": "Entries",
+    "add_entry": "Add Entry",
     "add_new_entry": "Add New Entry",
     "add_multiple_entries": "Add Multiple Entries",
     "recent_entries": "Recent Entries (%{count} most recent)",
@@ -109,6 +111,8 @@
     "sending_code": "Sending code...",
     "verify_title": "Verify code",
     "verify_subtitle": "Insert the 6-digit code you received by email",
+    "code_group_label": "6-digit code",
+    "code_digit_label": "Code digit",
     "verify_code": "Verify code",
     "verifying_code": "Verifying code...",
     "code_sent": "We sent a login code to %{email}.",
@@ -164,9 +168,26 @@
     "name_required": "Account name is required.",
     "not_found": "Account not found."
   },
+  "new_entry_page": {
+    "title": "New Entry",
+    "income_tab": "Income",
+    "expense_tab": "Expense",
+    "multiple_tab": "Multiple"
+  },
+  "entry_detail_page": {
+    "title": "Edit Entry",
+    "delete": "Delete Entry",
+    "deleting": "Deleting...",
+    "delete_confirm": "Are you sure you want to delete this entry?"
+  },
+  "account_field": {
+    "add_new_account": "Add new account",
+    "use_existing_account": "Use existing account"
+  },
   "common": {
     "income": "Income",
-    "expense": "Expense"
+    "expense": "Expense",
+    "add_entry": "Add entry"
   },
   "errors": {
     "failed_to_create_entry": "Failed to create entry",

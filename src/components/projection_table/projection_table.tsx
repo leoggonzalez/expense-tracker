@@ -4,9 +4,10 @@ import "./projection_table.scss";
 
 import { Entry, EntryCollection } from "@/model";
 import { i18n } from "@/model/i18n";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
+import { useRouter } from "next/navigation";
 
 import { Input } from "@/components";
 
@@ -27,10 +28,17 @@ export interface ProjectionTableProps {
 export function ProjectionTable({
   entries: plainEntries,
 }: ProjectionTableProps): React.ReactElement {
+  const router = useRouter();
   const currentDate = new Date();
   const [endDate, setEndDate] = useState<string>(
     format(addMonths(currentDate, 1), "yyyy-MM"),
   );
+
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 1280px)").matches) {
+      setEndDate(format(addMonths(new Date(), 5), "yyyy-MM"));
+    }
+  }, []);
 
   // Convert plain objects to Entry instances
   const entries = plainEntries.map((entry) =>
@@ -115,7 +123,11 @@ export function ProjectionTable({
                       </td>
                     </tr>
                     {account.entries.map((entry) => (
-                      <tr key={entry.id} className="projection-table__row">
+                      <tr
+                        key={entry.id}
+                        className="projection-table__row projection-table__row--interactive"
+                        onClick={() => router.push(`/entries/${entry.id}`)}
+                      >
                         <td className="projection-table__cell projection-table__cell--sticky">
                           <div className="projection-table__entry">
                             <Text size="xs" color="secondary">

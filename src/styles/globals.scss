@@ -22,9 +22,18 @@ body {
   min-height: 100vh;
 }
 
+.app-container--auth {
+  display: block;
+}
+
 .app-main {
   padding: var(--spacing-lg) 0
     calc(var(--navigation-height-mobile) + 32px + env(safe-area-inset-bottom));
+}
+
+.app-main--auth {
+  min-height: 100vh;
+  padding: var(--spacing-lg) 0;
 }
 
 @media (min-width: $breakpoint-tablet) {
