@@ -1,5 +1,5 @@
-export { Entry } from "./entry";
-export type { IEntry } from "./entry";
+export { Entry } from "./entry_test";
+export type { IEntry } from "./entry_test";
 
 export { EntryCollection } from "./entry_collection";
 export type {

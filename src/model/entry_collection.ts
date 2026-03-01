@@ -1,6 +1,6 @@
 import { format, startOfMonth } from "date-fns";
 
-import { Entry } from "./entry";
+import { Entry } from "./entry_test";
 
 export interface MonthlyData {
   month: Date;
