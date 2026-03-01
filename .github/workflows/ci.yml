@@ -12,18 +12,18 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/expense_tracker?schema=public
-      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/expense_tracker?schema=public
-      AUTH_SECRET: ci-auth-secret
-      EMAIL_PROVIDER: smtp
-      EMAIL_FROM: ci@example.com
-      SMTP_HOST: smtp.gmail.com
-      SMTP_PORT: "465"
-      SMTP_SECURE: "true"
-      SMTP_USER: ci@example.com
-      SMTP_PASS: ci-password
-      DEV_ADMIN_EMAIL: admin@example.com
-      DEV_ADMIN_LOGIN_CODE: "999999"
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
+      EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+      SMTP_HOST: ${{ vars.SMTP_HOST }}
+      SMTP_PORT: ${{ vars.SMTP_PORT }}
+      SMTP_SECURE: ${{ vars.SMTP_SECURE }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      DEV_ADMIN_EMAIL: ${{ vars.DEV_ADMIN_EMAIL }}
+      DEV_ADMIN_LOGIN_CODE: ${{ secrets.DEV_ADMIN_LOGIN_CODE }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

@@ -18,6 +18,18 @@ type AccountSummary = {
   allTimeNet: number;
 };
 
+type AccountSummaryRecord = Prisma.AccountGetPayload<{
+  include: {
+    entries: {
+      select: {
+        id: true;
+        type: true;
+        amount: true;
+      };
+    };
+  };
+}>;
+
 type AccountDetail = {
   id: string;
   name: string;
@@ -34,6 +46,22 @@ type AccountDetail = {
     updatedAt: Date;
   }>;
 };
+
+type AccountDetailRecord = Prisma.AccountGetPayload<{
+  include: {
+    entries: true;
+  };
+}>;
+
+type AccountDeleteCheckRecord = Prisma.AccountGetPayload<{
+  include: {
+    _count: {
+      select: {
+        entries: true;
+      };
+    };
+  };
+}>;
 
 function revalidateAccountPages(): void {
   revalidatePath("/");
@@ -63,7 +91,7 @@ export async function getAccountsWithSummary(): Promise<AccountSummary[]> {
   const currentUser = await requireCurrentUser();
 
   try {
-    const accounts = await prisma.account.findMany({
+    const accounts: AccountSummaryRecord[] = await prisma.account.findMany({
       where: {
         userId: currentUser.id,
       },
@@ -134,7 +162,7 @@ export async function getAccountById(id: string): Promise<AccountDetail | null> 
   const currentUser = await requireCurrentUser();
 
   try {
-    const account = await prisma.account.findFirst({
+    const account: AccountDetailRecord | null = await prisma.account.findFirst({
       where: {
         id,
         userId: currentUser.id,
@@ -215,7 +243,8 @@ export async function deleteAccount(id: string): Promise<AccountActionResult> {
   const currentUser = await requireCurrentUser();
 
   try {
-    const account = await prisma.account.findFirst({
+    const account: AccountDeleteCheckRecord | null =
+      await prisma.account.findFirst({
       where: {
         id,
         userId: currentUser.id,
