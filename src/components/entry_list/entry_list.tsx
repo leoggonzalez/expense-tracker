@@ -25,10 +25,12 @@ export type EntryListItem = {
 export interface EntryListProps {
   entries: EntryListItem[];
   showEdit?: boolean;
+  showDelete?: boolean;
 }
 
 export function EntryList({
   entries: plainEntries,
+  showDelete = true,
 }: EntryListProps): React.ReactElement {
   const handleDelete = async (id: string) => {
     if (confirm(i18n.t("entry_list.delete_confirm") as string)) {
@@ -83,15 +85,17 @@ export function EntryList({
                 </Text>
               </div>
             </div>
-            <div className="entry-list__actions">
-              <Button
-                size="sm"
-                variant="danger"
-                onClick={() => handleDelete(entry.id)}
-              >
-                {i18n.t("entry_list.delete")}
-              </Button>
-            </div>
+            {showDelete && (
+              <div className="entry-list__actions">
+                <Button
+                  size="sm"
+                  variant="danger"
+                  onClick={() => handleDelete(entry.id)}
+                >
+                  {i18n.t("entry_list.delete")}
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </Stack>

@@ -5,14 +5,13 @@
 
   &__header {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg);
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
   }
 
   &__date-selector {
-    min-width: 200px;
+    min-width: 0;
   }
 
   &__scroll-container {
@@ -42,36 +41,19 @@
   &__row {
     border-bottom: var(--border-width) solid var(--color-border);
 
-    &:hover {
-      background-color: var(--color-background-tertiary);
-    }
-
     &--group-total {
       background-color: var(--color-background-secondary);
       border-top: var(--border-width-thick) solid var(--color-border-dark);
       border-bottom: var(--border-width-thick) solid var(--color-border-dark);
-
-      &:hover {
-        background-color: var(--color-background-secondary);
-      }
     }
 
     &--grand-total {
-      background-color: var(--color-primary);
-      color: var(--color-text-inverse);
-      border-top: var(--border-width-thick) solid var(--color-primary-dark);
-
-      &:hover {
-        background-color: var(--color-primary);
-      }
+      background-color: var(--color-background-tertiary);
+      border-top: var(--border-width-thick) solid var(--color-border-dark);
     }
 
     &--breakdown {
       background-color: var(--color-background-tertiary);
-
-      &:hover {
-        background-color: var(--color-background-tertiary);
-      }
     }
   }
 
@@ -92,7 +74,7 @@
       left: 0;
       background-color: inherit;
       z-index: 1;
-      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+      box-shadow: 1px 0 0 var(--color-border);
       min-width: 200px;
       max-width: 300px;
     }
@@ -107,8 +89,8 @@
     }
 
     &--grand-total {
-      background-color: var(--color-primary-dark);
-      color: var(--color-text-inverse);
+      background-color: var(--color-background-tertiary);
+      color: var(--color-text-primary);
     }
 
     &--breakdown {
@@ -119,6 +101,21 @@
       display: flex;
       flex-direction: column;
       gap: var(--spacing-xs);
+    }
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .projection-table {
+    &__header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--spacing-lg);
+    }
+
+    &__date-selector {
+      min-width: 220px;
     }
   }
 }

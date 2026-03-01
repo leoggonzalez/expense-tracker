@@ -6,15 +6,47 @@ import { NavigationClient } from "./navigation_client";
 export async function Navigation(): Promise<React.ReactElement> {
   const currentUser = await getCurrentUser();
 
-  const links = currentUser
+  type NavigationLink = {
+    href: string;
+    label: React.ReactNode;
+    icon:
+      | "dashboard"
+      | "projection"
+      | "entries"
+      | "accounts"
+      | "settings"
+      | "login";
+  };
+
+  const links: NavigationLink[] = currentUser
     ? [
-        { href: "/", label: i18n.t("navigation.dashboard") },
-        { href: "/projection", label: i18n.t("navigation.projection") },
-        { href: "/entries", label: i18n.t("navigation.manage_entries") },
-        { href: "/entries/all", label: i18n.t("navigation.all_entries") },
-        { href: "/account", label: i18n.t("navigation.account") },
+        {
+          href: "/",
+          label: i18n.t("navigation.dashboard"),
+          icon: "dashboard",
+        },
+        {
+          href: "/projection",
+          label: i18n.t("navigation.projection"),
+          icon: "projection",
+        },
+        {
+          href: "/entries",
+          label: i18n.t("navigation.entries"),
+          icon: "entries",
+        },
+        {
+          href: "/accounts",
+          label: i18n.t("navigation.accounts"),
+          icon: "accounts",
+        },
+        {
+          href: "/settings",
+          label: i18n.t("navigation.settings"),
+          icon: "settings",
+        },
       ]
-    : [{ href: "/login", label: i18n.t("navigation.login") }];
+    : [{ href: "/login", label: i18n.t("navigation.login"), icon: "login" }];
 
   return (
     <NavigationClient brandLabel={i18n.t("navigation.brand")} links={links} />

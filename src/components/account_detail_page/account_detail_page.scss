@@ -1,0 +1,25 @@
+@import "../../styles/variables.scss";
+
+.account-detail-page {
+  &__summary,
+  &__panel {
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-background-secondary);
+  }
+
+  &__entries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .account-detail-page {
+    &__summary,
+    &__panel {
+      max-width: 720px;
+    }
+  }
+}

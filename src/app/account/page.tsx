@@ -1,15 +1,5 @@
-import { AccountPage } from "@/components";
-import { requireCurrentUser } from "@/lib/session";
+import { redirect } from "next/navigation";
 
-export default async function Page(): Promise<React.ReactElement> {
-  const currentUser = await requireCurrentUser();
-
-  return (
-    <AccountPage
-      user={{
-        email: currentUser.email,
-        name: currentUser.name,
-      }}
-    />
-  );
+export default function Page(): never {
+  redirect("/settings");
 }

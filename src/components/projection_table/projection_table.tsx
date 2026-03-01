@@ -29,7 +29,7 @@ export function ProjectionTable({
 }: ProjectionTableProps): React.ReactElement {
   const currentDate = new Date();
   const [endDate, setEndDate] = useState<string>(
-    format(addMonths(currentDate, 6), "yyyy-MM"),
+    format(addMonths(currentDate, 1), "yyyy-MM"),
   );
 
   // Convert plain objects to Entry instances

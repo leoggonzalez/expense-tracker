@@ -48,6 +48,8 @@ export function Dashboard({
     activeEntriesCount === 1
       ? "dashboard.entries_active_this_month_one"
       : "dashboard.entries_active_this_month_other";
+  const accountBreakdown =
+    collection.getCurrentMonthBreakdownByAccount(currentMonth);
 
   const formatCurrency = (amount: number): string => {
     const absAmount = Math.abs(amount);
@@ -102,6 +104,63 @@ export function Dashboard({
           <Text size="lg" color="secondary">
             {i18n.t(activeEntriesTextKey, { count: activeEntriesCount })}
           </Text>
+        </div>
+
+        <div className="dashboard__account-section">
+          <Text size="h4" as="h3" weight="semibold">
+            {i18n.t("dashboard.accounts_this_month")}
+          </Text>
+
+          {accountBreakdown.length === 0 ? (
+            <div className="dashboard__account-empty">
+              <Text color="secondary">
+                {i18n.t("dashboard.no_accounts_this_month")}
+              </Text>
+            </div>
+          ) : (
+            <div className="dashboard__account-list">
+              {accountBreakdown.map((accountItem) => (
+                <div
+                  key={accountItem.account}
+                  className="dashboard__account-card"
+                >
+                  <Text size="md" weight="semibold">
+                    {accountItem.account}
+                  </Text>
+                  <div className="dashboard__account-metrics">
+                    <div>
+                      <Text size="xs" color="secondary">
+                        {i18n.t("dashboard.account_income")}
+                      </Text>
+                      <Text size="sm" weight="semibold" color="success">
+                        {formatCurrency(accountItem.income)}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text size="xs" color="secondary">
+                        {i18n.t("dashboard.account_expenses")}
+                      </Text>
+                      <Text size="sm" weight="semibold" color="danger">
+                        {formatCurrency(accountItem.expense)}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text size="xs" color="secondary">
+                        {i18n.t("dashboard.account_net")}
+                      </Text>
+                      <Text
+                        size="sm"
+                        weight="semibold"
+                        color={accountItem.net >= 0 ? "success" : "danger"}
+                      >
+                        {formatCurrency(accountItem.net)}
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Stack>
     </div>

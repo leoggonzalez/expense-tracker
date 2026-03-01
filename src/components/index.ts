@@ -38,7 +38,9 @@ export type { EntriesPageProps } from "./entries_page/entries_page";
 
 export { LoginPage } from "./login_page/login_page";
 export { VerifyLoginPage } from "./verify_login_page/verify_login_page";
-export { AccountPage } from "./account_page/account_page";
+export { SettingsPage } from "./settings_page/settings_page";
+export { AccountsPage } from "./accounts_page/accounts_page";
+export { AccountDetailPage } from "./account_detail_page/account_detail_page";
 
 export { Container } from "./container/container";
 export type { ContainerProps } from "./container/container";

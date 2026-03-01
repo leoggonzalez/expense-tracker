@@ -1,0 +1,18 @@
+@import "../../styles/variables.scss";
+
+.account-card {
+  display: block;
+
+  &__panel {
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-background);
+    min-height: 148px;
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+}

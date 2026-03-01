@@ -18,12 +18,23 @@ body {
 
 .app-container {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr auto;
   min-height: 100vh;
 }
 
 .app-main {
-  padding: var(--spacing-xl) 0;
+  padding: var(--spacing-lg) 0
+    calc(var(--navigation-height-mobile) + 32px + env(safe-area-inset-bottom));
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .app-container {
+    grid-template-rows: auto 1fr;
+  }
+
+  .app-main {
+    padding: var(--spacing-xl) 0;
+  }
 }
 
 a {

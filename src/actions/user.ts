@@ -27,6 +27,6 @@ export async function updateCurrentUserProfile(input: {
     return { success: true };
   } catch (error) {
     console.error("Failed to update current user profile:", error);
-    return { success: false, error: "account.update_failed" };
+    return { success: false, error: "settings_page.update_failed" };
   }
 }

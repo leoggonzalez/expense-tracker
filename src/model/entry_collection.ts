@@ -15,6 +15,13 @@ export interface AccountProjectionGroup {
   monthlyTotals: Map<string, number>;
 }
 
+export interface AccountMonthBreakdown {
+  account: string;
+  income: number;
+  expense: number;
+  net: number;
+}
+
 export class EntryCollection {
   private entries: Entry[];
 
@@ -160,6 +167,36 @@ export class EntryCollection {
     });
 
     return { accounts, monthlyTotals, months };
+  }
+
+  getCurrentMonthBreakdownByAccount(targetDate: Date): AccountMonthBreakdown[] {
+    return this.getEntriesByAccount()
+      .map((accountGroup) => {
+        const activeEntries = accountGroup.entries.filter((entry) =>
+          entry.isActiveInMonth(targetDate),
+        );
+
+        const income = activeEntries
+          .filter((entry) => entry.type === "income")
+          .reduce((sum, entry) => sum + entry.amount, 0);
+        const expense = activeEntries
+          .filter((entry) => entry.type === "expense")
+          .reduce((sum, entry) => sum + entry.amount, 0);
+        const net = income + expense;
+
+        return {
+          account: accountGroup.account,
+          income,
+          expense,
+          net,
+        };
+      })
+      .filter(
+        (accountBreakdown) =>
+          accountBreakdown.income !== 0 ||
+          accountBreakdown.expense !== 0 ||
+          accountBreakdown.net !== 0,
+      );
   }
 
   /**

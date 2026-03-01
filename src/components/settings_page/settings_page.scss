@@ -1,0 +1,23 @@
+@import "../../styles/variables.scss";
+
+.settings-page {
+  &__panel {
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-background-secondary);
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .settings-page {
+    &__actions {
+      max-width: 320px;
+    }
+  }
+}

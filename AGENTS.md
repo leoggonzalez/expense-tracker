@@ -60,6 +60,11 @@ export function Navigation(props: NavigationProps): React.ReactElement {
 
 ## Styling And Composition Conventions
 
+- All component styling must be mobile-first. Base styles target phones first, then layer larger-screen adjustments with media queries.
+- The only standard responsive breakpoints are:
+  - tablet: `min-width: 768px`
+  - desktop: `min-width: 1280px`
+- Prefer flat-design UI treatments across the app. Avoid heavy shadows, glassmorphism, decorative gradients, and lift-on-hover effects unless a change documents a clear exception.
 - Do not use inline styling in JSX or TSX. Avoid patterns such as `style={{ ... }}` and other inline style props.
 - The only allowed inline-style exception is declaring CSS custom properties inside shared layout primitives. This exception is for primitives such as `Stack`, `Box`, and `Grid`, not for page or feature components.
 - If layout, spacing, or presentation is needed, express it through component markup and SCSS classes, not inline style objects or page-local wrapper styling.
@@ -188,6 +193,7 @@ Use these scenarios when reviewing future changes against this document:
 - A contributor creating a rendered UI block under `src/app` should be able to determine that it belongs in `src/components`.
 - A reviewer should be able to reject a page-local `.scss` file under `src/app` unless it is a documented framework exception.
 - A contributor needing flex, box, or grid layout should be able to choose `Stack`, `Box`, or `Grid` instead of adding ad hoc inline styles.
+- A contributor creating a responsive component should be able to determine that phone styles come first, tablet changes begin at `768px`, and desktop changes begin at `1280px`.
 
 ## Assumptions and Defaults
 
