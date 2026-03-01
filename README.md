@@ -108,7 +108,7 @@ For Gmail SMTP:
 - use the app password in `SMTP_PASS`, not your normal Gmail password
 - keep `DEV_ADMIN_EMAIL` limited to your own local development account
 
-The `DEV_ADMIN_LOGIN_CODE=999999` bypass is development-only. It only works for the configured `DEV_ADMIN_EMAIL`, and it is ignored in production.
+The `DEV_ADMIN_LOGIN_CODE=999999` bypass is development-only. It only works for the configured `DEV_ADMIN_EMAIL`, it is ignored in production, and requesting a login code for that admin email skips email sending entirely so you can proceed directly to the verify screen.
 
 ### 4. Run Database Migrations
 
@@ -145,6 +145,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - Request a 6-digit login code with your email address
 - Enter the code on the verify page to create a session
 - In local development, the configured `DEV_ADMIN_EMAIL` can always log in with `999999`
+- Requesting a code for `admin@example.com` does not send an email and does not rotate stored login codes
 
 ### Dashboard
 

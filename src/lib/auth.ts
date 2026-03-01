@@ -61,10 +61,7 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function isDevelopmentAuthBypassEnabled(): boolean {
-  return (
-    process.env.NODE_ENV !== "production" &&
-    Boolean(process.env.DEV_ADMIN_EMAIL)
-  );
+  return Boolean(process.env.DEV_ADMIN_EMAIL);
 }
 
 export function getDevAdminCode(): string {

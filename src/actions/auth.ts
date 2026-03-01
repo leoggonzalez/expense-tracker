@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import {
   generateLoginCode,
   generateSessionToken,
+  isDevAdminEmail,
+  isDevelopmentAuthBypassEnabled,
   isValidDevAdminCode,
   hashLoginCode,
   isValidEmail,
@@ -30,6 +32,19 @@ export async function requestLoginCode(input: {
   }
 
   try {
+    if (isDevelopmentAuthBypassEnabled() && isDevAdminEmail(email)) {
+      await prisma.user.upsert({
+        where: { email },
+        update: {},
+        create: {
+          email,
+          name: "Admin",
+        },
+      });
+
+      return { success: true };
+    }
+
     const user = await prisma.user.upsert({
       where: { email },
       update: {},
