@@ -6,7 +6,6 @@ type EntriesPageSearchParams = Promise<{
   page?: string;
   account?: string;
   type?: string;
-  date?: string;
   start_date?: string;
   end_date?: string;
 }>;
@@ -24,7 +23,6 @@ export default async function Page({
   const account = params.account || "";
   const type =
     params.type === "income" || params.type === "expense" ? params.type : "";
-  const exactDate = params.date || "";
   const startDate = params.start_date || "";
   const endDate = params.end_date || "";
 
@@ -32,7 +30,6 @@ export default async function Page({
     getEntriesWithFilters({
       accountId: account || undefined,
       type: type || undefined,
-      date: exactDate ? new Date(exactDate) : undefined,
       startDate: startDate ? new Date(startDate) : undefined,
       endDate: endDate ? new Date(endDate) : undefined,
       page,
@@ -63,7 +60,6 @@ export default async function Page({
       filters={{
         account,
         type,
-        date: exactDate,
         startDate,
         endDate,
       }}

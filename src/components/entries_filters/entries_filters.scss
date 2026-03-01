@@ -15,6 +15,58 @@
     gap: var(--spacing-md);
   }
 
+  &__type-switcher {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  &__type-options {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  &__type-option {
+    min-height: 40px;
+    padding: 0 var(--spacing-md);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-full);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    font-family: inherit;
+
+    &--income {
+      border-color: color-mix(in srgb, var(--color-success) 45%, white);
+      color: var(--color-success-dark);
+    }
+
+    &--expense {
+      border-color: color-mix(in srgb, var(--color-danger) 45%, white);
+      color: var(--color-danger-dark);
+    }
+
+    &--active {
+      background-color: var(--color-background);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    &--income.entries-filters__type-option--active {
+      background-color: color-mix(in srgb, var(--color-success) 10%, white);
+      border-color: var(--color-success);
+      color: var(--color-success-dark);
+    }
+
+    &--expense.entries-filters__type-option--active {
+      background-color: color-mix(in srgb, var(--color-danger) 10%, white);
+      border-color: var(--color-danger);
+      color: var(--color-danger-dark);
+    }
+  }
+
   &__actions {
     display: flex;
     justify-content: flex-start;
@@ -32,7 +84,7 @@
 @media (min-width: $breakpoint-desktop) {
   .entries-filters {
     &__grid {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: 220px minmax(0, 1fr);
     }
   }
 }

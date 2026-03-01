@@ -2,11 +2,11 @@
 
 import "./entries_filters.scss";
 
-import React from "react";
+import { Button, DateRangeInput, Select } from "@/components";
+import { Stack, Text } from "@/elements";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { Button, Input, Select } from "@/components";
-import { Stack, Text } from "@/elements";
+import React from "react";
 import { i18n } from "@/model/i18n";
 
 type EntriesFiltersProps = {
@@ -17,7 +17,6 @@ type EntriesFiltersProps = {
   filters: {
     account: string;
     type: string;
-    date: string;
     startDate: string;
     endDate: string;
   };
@@ -58,7 +57,7 @@ export function EntriesFilters({
         <Text size="h4" as="h3" weight="semibold">
           {i18n.t("entries_page.filters")}
         </Text>
-        <div className="entries-filters__grid">
+        <Stack direction="row" gap={16} wrap align="center" justify="space-between">
           <Select
             label={i18n.t("entries_page.account")}
             value={filters.account}
@@ -70,44 +69,46 @@ export function EntriesFilters({
             }))}
           />
 
-          <Select
-            label={i18n.t("entries_page.type")}
-            value={filters.type}
-            onChange={(value) => updateQuery({ type: value })}
-            placeholder={i18n.t("entries_page.type_placeholder") as string}
-            options={[
-              {
-                value: "income",
-                label: i18n.t("common.income"),
-              },
-              {
-                value: "expense",
-                label: i18n.t("common.expense"),
-              },
-            ]}
-          />
+          <div className="entries-filters__type-switcher">
+            <Text size="sm" weight="medium">
+              {i18n.t("entries_page.type")}
+            </Text>
+            <div className="entries-filters__type-options">
+              {[
+                { value: "", label: i18n.t("entries_page.type_all") },
+                { value: "income", label: i18n.t("common.income") },
+                { value: "expense", label: i18n.t("common.expense") },
+              ].map((option) => (
+                <button
+                  key={option.value || "all"}
+                  type="button"
+                  className={[
+                    "entries-filters__type-option",
+                    option.value === "income" &&
+                    "entries-filters__type-option--income",
+                    option.value === "expense" &&
+                    "entries-filters__type-option--expense",
+                    filters.type === option.value &&
+                    "entries-filters__type-option--active",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  onClick={() => updateQuery({ type: option.value })}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <Input
-            type="date"
-            label={i18n.t("entries_page.date_exact")}
-            value={filters.date}
-            onChange={(value) => updateQuery({ date: value })}
+          <DateRangeInput
+            label={i18n.t("entries_page.date_range")}
+            startDate={filters.startDate}
+            endDate={filters.endDate}
+            onStartDateChange={(value) => updateQuery({ start_date: value })}
+            onEndDateChange={(value) => updateQuery({ end_date: value })}
           />
-
-          <Input
-            type="date"
-            label={i18n.t("entries_page.start_date")}
-            value={filters.startDate}
-            onChange={(value) => updateQuery({ start_date: value })}
-          />
-
-          <Input
-            type="date"
-            label={i18n.t("entries_page.end_date")}
-            value={filters.endDate}
-            onChange={(value) => updateQuery({ end_date: value })}
-          />
-        </div>
+        </Stack>
       </Stack>
 
       <div className="entries-filters__actions">

@@ -3,6 +3,7 @@ export type { ButtonProps } from "./button/button";
 
 export { Input } from "./input/input";
 export type { InputProps } from "./input/input";
+export { DateRangeInput } from "./date_range_input/date_range_input";
 
 export { Select } from "./select/select";
 export type { SelectProps, SelectOption } from "./select/select";
