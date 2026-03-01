@@ -10,19 +10,26 @@ import React, {
   useState,
 } from "react";
 
+import { Icon } from "@/elements";
 import { i18n } from "@/model/i18n";
+import type { IconName } from "@/elements/icon/icon_assets";
 
 type ToastKind = "success" | "error";
 
 type ToastState = {
   kind: ToastKind;
-  message: string;
+  message: React.ReactNode;
+  iconName?: IconName;
   visible: boolean;
 } | null;
 
+type ToastOptions = {
+  iconName?: IconName;
+};
+
 type ToastContextValue = {
-  showSuccess: (message: string) => void;
-  showError: (message: string) => void;
+  showSuccess: (message: React.ReactNode, options?: ToastOptions) => void;
+  showError: (message: React.ReactNode, options?: ToastOptions) => void;
 };
 
 type ToastProviderProps = {
@@ -72,7 +79,11 @@ export function ToastProvider({
     }, HIDE_DELAY_MS);
   };
 
-  const showToast = (kind: ToastKind, message: string) => {
+  const showToast = (
+    kind: ToastKind,
+    message: React.ReactNode,
+    options?: ToastOptions,
+  ) => {
     if (hideTimerRef.current !== null) {
       window.clearTimeout(hideTimerRef.current);
     }
@@ -80,7 +91,7 @@ export function ToastProvider({
       window.clearTimeout(clearTimerRef.current);
     }
 
-    setToast({ kind, message, visible: true });
+    setToast({ kind, message, iconName: options?.iconName, visible: true });
 
     const duration =
       kind === "success" ? SUCCESS_DURATION_MS : ERROR_DURATION_MS;
@@ -97,8 +108,8 @@ export function ToastProvider({
   };
 
   const contextValue: ToastContextValue = {
-    showSuccess: (message: string) => showToast("success", message),
-    showError: (message: string) => showToast("error", message),
+    showSuccess: (message, options) => showToast("success", message, options),
+    showError: (message, options) => showToast("error", message, options),
   };
 
   return (
@@ -116,6 +127,16 @@ export function ToastProvider({
               .join(" ")}
             role="status"
           >
+            <span className="toast-provider__activity-icon" aria-hidden="true">
+              <Icon
+                name={
+                  toast.iconName ||
+                  (toast.kind === "success" ? "check" : "alert")
+                }
+                size={18}
+              />
+            </span>
+            <span className="toast-provider__divider" aria-hidden="true" />
             <span className="toast-provider__message">{toast.message}</span>
             <button
               type="button"
@@ -123,7 +144,7 @@ export function ToastProvider({
               onClick={dismissToast}
               aria-label={i18n.t("toast.dismiss") as string}
             >
-              ×
+              <Icon name="close" size={16} />
             </button>
           </div>
         )}

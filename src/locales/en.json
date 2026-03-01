@@ -184,7 +184,9 @@
     "not_found": "Account not found."
   },
   "new_entry_page": {
-    "title": "New Entry",
+    "title_income": "Add new income",
+    "title_expense": "Add new expense",
+    "title_multiple": "Add multiple entries",
     "income_tab": "Income",
     "expense_tab": "Expense",
     "multiple_tab": "Multiple"
@@ -206,8 +208,12 @@
   },
   "toast": {
     "entry_created": "Entry created.",
+    "income_created": "Income entry created.",
+    "expense_created": "Expense entry created.",
     "entries_created": "Entries created.",
     "entry_create_failed": "Unable to create the entry.",
+    "income_create_failed": "Unable to create the income entry.",
+    "expense_create_failed": "Unable to create the expense entry.",
     "entries_create_failed": "Unable to create the entries.",
     "dismiss": "Dismiss notification"
   },

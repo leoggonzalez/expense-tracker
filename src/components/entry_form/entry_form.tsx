@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack } from "@/elements";
 import { AccountField, Button, Input, Select, Checkbox } from "@/components";
 import { i18n } from "@/model/i18n";
@@ -45,6 +45,18 @@ export function EntryForm({
 }: EntryFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
   const isCreateFlow = !isEdit && Boolean(entryType);
+  const successMessageKey =
+    entryType === "income"
+      ? "toast.income_created"
+      : entryType === "expense"
+        ? "toast.expense_created"
+        : "toast.entry_created";
+  const errorMessageKey =
+    entryType === "income"
+      ? "toast.income_create_failed"
+      : entryType === "expense"
+        ? "toast.expense_create_failed"
+        : "toast.entry_create_failed";
   const [formData, setFormData] = useState<Partial<CreateEntryInput>>({
     type: entryType || (initialData?.type as "income" | "expense") || "expense",
     accountName: initialData?.accountName || "",
@@ -61,15 +73,18 @@ export function EntryForm({
   );
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
+  const [isDraftReady, setIsDraftReady] = useState(!isCreateFlow);
   const [amountInput, setAmountInput] = useState(
     initialData?.amount ? String(initialData.amount) : "",
   );
 
   useEffect(() => {
     if (!isCreateFlow || initialData) {
+      setIsDraftReady(true);
       return;
     }
 
+    setIsDraftReady(false);
     setNewEntryFlowActive(true);
 
     const draft = loadNewEntryDraft();
@@ -87,6 +102,7 @@ export function EntryForm({
     }));
     setAmountInput(draft.amountInput);
     setIsRecurring(draft.isRecurring);
+    setIsDraftReady(true);
   }, [initialData, isCreateFlow]);
 
   useEffect(() => {
@@ -123,7 +139,7 @@ export function EntryForm({
   }, [entryType]);
 
   useEffect(() => {
-    if (!isCreateFlow) {
+    if (!isCreateFlow || !isDraftReady) {
       return;
     }
 
@@ -142,6 +158,7 @@ export function EntryForm({
     formData.description,
     formData.endDate,
     isCreateFlow,
+    isDraftReady,
     isRecurring,
   ]);
 
@@ -153,7 +170,9 @@ export function EntryForm({
       const parsedAmount = parseAmountInput(amountInput);
 
       if (parsedAmount === null) {
-        showError(i18n.t("toast.entry_create_failed") as string);
+        showError(i18n.t(errorMessageKey), {
+          iconName: entryType === "income" ? "income" : "expense",
+        });
         setLoading(false);
         return;
       }
@@ -172,7 +191,9 @@ export function EntryForm({
       if (result.success) {
         if (!isEdit) {
           clearNewEntryDraft();
-          showSuccess(i18n.t("toast.entry_created") as string);
+          showSuccess(i18n.t(successMessageKey), {
+            iconName: entryType === "income" ? "income" : "expense",
+          });
         }
         if (!isEdit) {
           setFormData({
@@ -192,13 +213,17 @@ export function EntryForm({
         }
       } else {
         if (!isEdit) {
-          showError(i18n.t("toast.entry_create_failed") as string);
+          showError(i18n.t(errorMessageKey), {
+            iconName: entryType === "income" ? "income" : "expense",
+          });
         }
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       if (!isEdit) {
-        showError(i18n.t("toast.entry_create_failed") as string);
+        showError(i18n.t(errorMessageKey), {
+          iconName: entryType === "income" ? "income" : "expense",
+        });
       }
     } finally {
       setLoading(false);

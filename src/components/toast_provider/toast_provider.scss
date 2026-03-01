@@ -44,16 +44,30 @@
 
   &__message {
     min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__activity-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    color: var(--color-text-secondary);
+  }
+
+  &__divider {
+    width: 1px;
+    align-self: stretch;
+    background-color: var(--color-border);
+    flex: 0 0 auto;
   }
 
   &__dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 auto;
     border: 0;
     background: transparent;
     color: var(--color-text-secondary);
-    font: inherit;
-    font-size: 1.125rem;
-    line-height: 1;
     cursor: pointer;
     padding: 0;
   }

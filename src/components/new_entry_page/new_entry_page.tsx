@@ -16,6 +16,13 @@ export function NewEntryPage({
   activeTab,
   children,
 }: NewEntryPageProps): React.ReactElement {
+  const titleKey =
+    activeTab === "income"
+      ? "new_entry_page.title_income"
+      : activeTab === "expense"
+        ? "new_entry_page.title_expense"
+        : "new_entry_page.title_multiple";
+
   const tabs = [
     {
       key: "income",
@@ -39,7 +46,7 @@ export function NewEntryPage({
       <div className="new-entry-page">
         <Stack gap={24}>
           <Text size="h2" as="h1" weight="bold">
-            {i18n.t("new_entry_page.title")}
+            {i18n.t(titleKey)}
           </Text>
           <div className="new-entry-page__tabs">
             {tabs.map((tab) => (

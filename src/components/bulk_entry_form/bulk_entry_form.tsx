@@ -89,7 +89,9 @@ export function BulkEntryForm({
       const result = await createMultipleEntries(inputs);
 
       if (result.success) {
-        showSuccess(i18n.t("toast.entries_created") as string);
+        showSuccess(i18n.t("toast.entries_created"), {
+          iconName: "entries",
+        });
         // Reset form
         setAccountName("");
         setBeginDate(new Date());
@@ -101,11 +103,15 @@ export function BulkEntryForm({
           onSuccess();
         }
       } else {
-        showError(i18n.t("toast.entries_create_failed") as string);
+        showError(i18n.t("toast.entries_create_failed"), {
+          iconName: "entries",
+        });
       }
     } catch (error) {
       console.error("Error submitting bulk entries:", error);
-      showError(i18n.t("toast.entries_create_failed") as string);
+      showError(i18n.t("toast.entries_create_failed"), {
+        iconName: "entries",
+      });
     } finally {
       setLoading(false);
     }
