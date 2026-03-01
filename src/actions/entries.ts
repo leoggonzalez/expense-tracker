@@ -1,6 +1,5 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -14,6 +13,72 @@ export interface CreateEntryInput {
   beginDate: Date;
   endDate?: Date | null;
 }
+
+type AccountRecord = {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type EntryWithAccountRecord = {
+  id: string;
+  type: string;
+  accountId: string;
+  description: string;
+  amount: number;
+  beginDate: Date;
+  endDate: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  account: AccountRecord;
+};
+
+type EntryFiltersWhere = {
+  account: {
+    userId: string;
+  };
+  accountId?: string;
+  description?: {
+    contains: string;
+    mode: "insensitive";
+  };
+  beginDate?: {
+    gte?: Date;
+    lte?: Date;
+  };
+};
+
+type EntryListWithPagination = {
+  entries: EntryWithAccountRecord[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+type EntryMutationResult =
+  | {
+      success: true;
+      entry: EntryWithAccountRecord;
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+type MultipleEntryMutationResult =
+  | {
+      success: true;
+      entries: EntryWithAccountRecord[];
+    }
+  | {
+      success: false;
+      error: string;
+    };
 
 async function findOrCreateAccount(userId: string, accountName: string) {
   let account = await prisma.account.findFirst({
@@ -43,7 +108,9 @@ function revalidateEntryPages() {
   revalidatePath("/account");
 }
 
-export async function createEntry(input: CreateEntryInput) {
+export async function createEntry(
+  input: CreateEntryInput,
+): Promise<EntryMutationResult> {
   const currentUser = await requireCurrentUser();
 
   try {
@@ -75,9 +142,11 @@ export async function createEntry(input: CreateEntryInput) {
   }
 }
 
-export async function createMultipleEntries(inputs: CreateEntryInput[]) {
+export async function createMultipleEntries(
+  inputs: CreateEntryInput[],
+): Promise<MultipleEntryMutationResult> {
   try {
-    const results = [];
+    const results: EntryWithAccountRecord[] = [];
 
     for (const input of inputs) {
       const result = await createEntry(input);
@@ -94,7 +163,7 @@ export async function createMultipleEntries(inputs: CreateEntryInput[]) {
   }
 }
 
-export async function getEntries() {
+export async function getEntries(): Promise<EntryWithAccountRecord[]> {
   const currentUser = await requireCurrentUser();
 
   try {
@@ -115,7 +184,9 @@ export async function getEntries() {
   }
 }
 
-export async function getRecentEntries(limit: number = 10) {
+export async function getRecentEntries(
+  limit: number = 10,
+): Promise<EntryWithAccountRecord[]> {
   const currentUser = await requireCurrentUser();
 
   try {
@@ -146,7 +217,7 @@ export async function getEntriesWithFilters(filters: {
   endDate?: Date;
   page?: number;
   limit?: number;
-}) {
+}): Promise<EntryListWithPagination> {
   const currentUser = await requireCurrentUser();
 
   try {
@@ -154,7 +225,7 @@ export async function getEntriesWithFilters(filters: {
     const limit = filters.limit || 20;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.EntryWhereInput = {
+    const where: EntryFiltersWhere = {
       account: {
         userId: currentUser.id,
       },
@@ -214,7 +285,7 @@ export async function getEntriesWithFilters(filters: {
   }
 }
 
-export async function getAccounts() {
+export async function getAccounts(): Promise<AccountRecord[]> {
   const currentUser = await requireCurrentUser();
 
   try {
@@ -232,7 +303,9 @@ export async function getAccounts() {
   }
 }
 
-export async function getEntryById(id: string) {
+export async function getEntryById(
+  id: string,
+): Promise<EntryWithAccountRecord | null> {
   const currentUser = await requireCurrentUser();
 
   try {
@@ -256,7 +329,7 @@ export async function getEntryById(id: string) {
 export async function updateEntry(
   id: string,
   input: Partial<CreateEntryInput>,
-) {
+): Promise<EntryMutationResult> {
   const currentUser = await requireCurrentUser();
 
   try {

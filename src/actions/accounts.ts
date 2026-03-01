@@ -1,6 +1,5 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -16,6 +15,16 @@ type AccountSummary = {
   name: string;
   entryCount: number;
   allTimeNet: number;
+};
+
+type AccountSummaryRecord = {
+  id: string;
+  name: string;
+  entries: Array<{
+    id: string;
+    type: string;
+    amount: number;
+  }>;
 };
 
 type AccountDetail = {
@@ -35,6 +44,22 @@ type AccountDetail = {
   }>;
 };
 
+type AccountDetailRecord = {
+  id: string;
+  name: string;
+  entries: AccountDetail["entries"];
+};
+
+type AccountDeleteCheckRecord = {
+  _count: {
+    entries: number;
+  };
+};
+
+type PrismaErrorWithCode = {
+  code: string;
+};
+
 function revalidateAccountPages(): void {
   revalidatePath("/");
   revalidatePath("/entries");
@@ -50,6 +75,15 @@ function getEntryNet(entry: { type: string; amount: number }): number {
     : entry.amount;
 }
 
+function isPrismaErrorWithCode(error: unknown): error is PrismaErrorWithCode {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string"
+  );
+}
+
 async function findOwnedAccountOrNull(userId: string, id: string) {
   return prisma.account.findFirst({
     where: {
@@ -63,7 +97,7 @@ export async function getAccountsWithSummary(): Promise<AccountSummary[]> {
   const currentUser = await requireCurrentUser();
 
   try {
-    const accounts = await prisma.account.findMany({
+    const accounts: AccountSummaryRecord[] = await prisma.account.findMany({
       where: {
         userId: currentUser.id,
       },
@@ -118,10 +152,7 @@ export async function createAccount(input: {
 
     return { success: true };
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (isPrismaErrorWithCode(error) && error.code === "P2002") {
       return { success: false, error: "accounts_page.duplicate_name" };
     }
 
@@ -134,7 +165,7 @@ export async function getAccountById(id: string): Promise<AccountDetail | null> 
   const currentUser = await requireCurrentUser();
 
   try {
-    const account = await prisma.account.findFirst({
+    const account: AccountDetailRecord | null = await prisma.account.findFirst({
       where: {
         id,
         userId: currentUser.id,
@@ -199,10 +230,7 @@ export async function updateAccount(
 
     return { success: true };
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (isPrismaErrorWithCode(error) && error.code === "P2002") {
       return { success: false, error: "account_detail_page.duplicate_name" };
     }
 
@@ -215,7 +243,8 @@ export async function deleteAccount(id: string): Promise<AccountActionResult> {
   const currentUser = await requireCurrentUser();
 
   try {
-    const account = await prisma.account.findFirst({
+    const account: AccountDeleteCheckRecord | null =
+      await prisma.account.findFirst({
       where: {
         id,
         userId: currentUser.id,

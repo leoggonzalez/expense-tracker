@@ -321,6 +321,29 @@ This repository includes a GitHub Actions workflow at [.github/workflows/ci.yml]
 - `yarn lint`
 - `yarn build`
 
+Before CI can pass in GitHub, configure these repository settings.
+
+GitHub Actions Secrets:
+
+- `DATABASE_URL`
+- `DIRECT_URL`
+- `AUTH_SECRET`
+- `EMAIL_FROM`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `DEV_ADMIN_LOGIN_CODE`
+
+GitHub Actions Variables:
+
+- `EMAIL_PROVIDER`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_SECURE`
+- `DEV_ADMIN_EMAIL`
+
+These values are required by the CI workflow and are managed in GitHub repository settings.
+Vercel production environment variables are configured separately in Vercel and are not inherited from GitHub Actions.
+
 Recommended GitHub branch protection for `main`:
 
 - require pull requests before merge
