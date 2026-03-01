@@ -2,20 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import { Stack, Text } from "@/elements";
-import { Button, Input, Select, Checkbox, Autocomplete } from "@/components";
+import { AccountField, Button, Input, Select, Checkbox } from "@/components";
 import { i18n } from "@/model/i18n";
 import {
   createMultipleEntries,
   CreateEntryInput,
   getAccounts,
 } from "@/actions/entries";
+import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import "./bulk_entry_form.scss";
 
 interface BulkEntryItem {
   id: string;
   type: "income" | "expense";
   description: string;
-  amount: number;
+  amount: string;
 }
 
 export interface BulkEntryFormProps {
@@ -30,7 +31,7 @@ export function BulkEntryForm({
   const [endDate, setEndDate] = useState(new Date());
   const [isRecurring, setIsRecurring] = useState(false);
   const [entries, setEntries] = useState<BulkEntryItem[]>([
-    { id: "1", type: "expense", description: "", amount: 0 },
+    { id: "1", type: "expense", description: "", amount: "" },
   ]);
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
@@ -49,7 +50,7 @@ export function BulkEntryForm({
     ).toString();
     setEntries([
       ...entries,
-      { id: newId, type: "expense", description: "", amount: 0 },
+      { id: newId, type: "expense", description: "", amount: "" },
     ]);
   };
 
@@ -78,7 +79,7 @@ export function BulkEntryForm({
         type: entry.type,
         accountName,
         description: entry.description,
-        amount: entry.amount,
+        amount: parseAmountInput(entry.amount) || 0,
         beginDate,
         endDate: isRecurring ? null : endDate,
       }));
@@ -91,7 +92,7 @@ export function BulkEntryForm({
         setBeginDate(new Date());
         setEndDate(new Date());
         setIsRecurring(false);
-        setEntries([{ id: "1", type: "expense", description: "", amount: 0 }]);
+        setEntries([{ id: "1", type: "expense", description: "", amount: "" }]);
 
         if (onSuccess) {
           onSuccess();
@@ -117,11 +118,11 @@ export function BulkEntryForm({
 
         <div className="bulk-entry-form__shared">
           <Stack gap={16}>
-            <Autocomplete
+            <AccountField
               label={i18n.t("bulk_entry_form.shared_account")}
               value={accountName}
               onChange={setAccountName}
-              options={accounts}
+              accounts={accounts}
               placeholder={
                 i18n.t("bulk_entry_form.shared_account_placeholder") as string
               }
@@ -196,12 +197,16 @@ export function BulkEntryForm({
                   />
 
                   <Input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     value={entry.amount}
                     onChange={(value) =>
-                      updateEntry(entry.id, "amount", parseFloat(value) || 0)
+                      updateEntry(
+                        entry.id,
+                        "amount",
+                        sanitizeAmountInput(value),
+                      )
                     }
-                    step="0.01"
                     placeholder={
                       i18n.t("bulk_entry_form.amount_placeholder") as string
                     }

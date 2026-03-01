@@ -1,5 +1,7 @@
 "use client";
 
+import "./login_page.scss";
+
 import { Button, Input } from "@/components";
 import { Container } from "@/components/container/container";
 import { requestLoginCode } from "@/actions/auth";
@@ -34,8 +36,8 @@ export function LoginPage(): React.ReactElement {
 
   return (
     <Container>
-      <Stack gap={24}>
-        <Box padding={24} maxWidth={480} className="login-page">
+      <div className="login-page">
+        <Box padding={24} maxWidth={480} className="login-page__card">
           <form onSubmit={handleSubmit}>
             <Stack gap={16}>
               <Text size="h2" as="h1" weight="bold">
@@ -45,9 +47,11 @@ export function LoginPage(): React.ReactElement {
 
               <Input
                 label={i18n.t("auth.email")}
+                type="email"
                 value={email}
                 onChange={setEmail}
                 placeholder={i18n.t("auth.email_placeholder") as string}
+                autoComplete="email"
                 required
               />
 
@@ -61,7 +65,7 @@ export function LoginPage(): React.ReactElement {
             </Stack>
           </form>
         </Box>
-      </Stack>
+      </div>
     </Container>
   );
 }

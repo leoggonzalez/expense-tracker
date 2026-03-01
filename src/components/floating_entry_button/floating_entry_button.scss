@@ -1,0 +1,28 @@
+@use "@/styles/variables.scss" as *;
+
+.floating-entry-button {
+  position: fixed;
+  right: var(--spacing-lg);
+  bottom: calc(
+    var(--navigation-height-mobile) + env(safe-area-inset-bottom) +
+      var(--spacing-lg)
+  );
+  z-index: calc(var(--z-index-dropdown) + 1);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--border-radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-width) solid var(--color-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .floating-entry-button {
+    right: var(--spacing-xl);
+    bottom: var(--spacing-xl);
+  }
+}

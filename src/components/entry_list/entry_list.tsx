@@ -8,6 +8,7 @@ import { deleteEntry } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
 import { Entry } from "@/model";
 import { format } from "date-fns";
+import Link from "next/link";
 import React from "react";
 
 export type EntryListItem = {
@@ -26,11 +27,15 @@ export interface EntryListProps {
   entries: EntryListItem[];
   showEdit?: boolean;
   showDelete?: boolean;
+  entryHref?: (entry: EntryListItem) => string | null;
+  entryHrefBase?: string;
 }
 
 export function EntryList({
   entries: plainEntries,
   showDelete = true,
+  entryHref,
+  entryHrefBase,
 }: EntryListProps): React.ReactElement {
   const handleDelete = async (id: string) => {
     if (confirm(i18n.t("entry_list.delete_confirm") as string)) {
@@ -59,8 +64,11 @@ export function EntryList({
   return (
     <div className="entry-list">
       <Stack gap={12}>
-        {entries.map((entry) => (
-          <div key={entry.id} className="entry-list__item">
+        {entries.map((entry, index) => {
+          const href =
+            entryHref?.(plainEntries[index]) ??
+            (entryHrefBase ? `${entryHrefBase}/${plainEntries[index].id}` : null);
+          const content = (
             <div className="entry-list__content">
               <div className="entry-list__main">
                 <Text size="sm" weight="semibold">
@@ -85,19 +93,31 @@ export function EntryList({
                 </Text>
               </div>
             </div>
-            {showDelete && (
-              <div className="entry-list__actions">
-                <Button
-                  size="sm"
-                  variant="danger"
-                  onClick={() => handleDelete(entry.id)}
-                >
-                  {i18n.t("entry_list.delete")}
-                </Button>
-              </div>
-            )}
-          </div>
-        ))}
+          );
+
+          return (
+            <div key={entry.id} className="entry-list__item">
+              {href ? (
+                <Link href={href} className="entry-list__link">
+                  {content}
+                </Link>
+              ) : (
+                content
+              )}
+              {showDelete && (
+                <div className="entry-list__actions">
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => handleDelete(entry.id)}
+                  >
+                    {i18n.t("entry_list.delete")}
+                  </Button>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </Stack>
     </div>
   );

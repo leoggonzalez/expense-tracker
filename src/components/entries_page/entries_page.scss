@@ -1,22 +1,25 @@
 @use "@/styles/variables.scss" as *;
 
 .entries-page {
-  &__section-heading {
-    margin-bottom: var(--spacing-md);
-  }
-
   &__header {
-    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-md);
   }
 
-  &__link {
-    color: var(--color-primary);
-    font-weight: var(--font-weight-medium);
-    text-decoration: none;
-    transition: color var(--transition-fast);
+  &__button-link {
+    display: inline-flex;
+  }
 
-    &:hover {
-      color: var(--color-primary-dark);
-    }
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    border: var(--border-width) solid var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
   }
 }

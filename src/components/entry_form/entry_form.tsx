@@ -2,9 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { Stack } from "@/elements";
-import { Button, Input, Select, Checkbox, Autocomplete } from "@/components";
+import { AccountField, Button, Input, Select, Checkbox } from "@/components";
 import { i18n } from "@/model/i18n";
-import { createEntry, CreateEntryInput, getAccounts } from "@/actions/entries";
+import {
+  createEntry,
+  CreateEntryInput,
+  getAccounts,
+  updateEntry,
+} from "@/actions/entries";
+import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import "./entry_form.scss";
 
 export interface EntryFormProps {
@@ -19,18 +25,23 @@ export interface EntryFormProps {
     endDate: string | null;
   };
   isEdit?: boolean;
+  entryType?: "income" | "expense";
+  hideTypeField?: boolean;
 }
 
 export function EntryForm({
   onSuccess,
   initialData,
   isEdit = false,
+  entryType,
+  hideTypeField = false,
 }: EntryFormProps): React.ReactElement {
   const [formData, setFormData] = useState<Partial<CreateEntryInput>>({
-    type: (initialData?.type as "income" | "expense") || "expense",
+    type:
+      entryType || (initialData?.type as "income" | "expense") || "expense",
     accountName: initialData?.accountName || "",
     description: initialData?.description || "",
-    amount: initialData?.amount || 0,
+    amount: initialData?.amount ?? 0,
     beginDate: initialData?.beginDate
       ? new Date(initialData.beginDate)
       : new Date(),
@@ -42,6 +53,9 @@ export function EntryForm({
   );
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
+  const [amountInput, setAmountInput] = useState(
+    initialData?.amount ? String(initialData.amount) : "",
+  );
 
   useEffect(() => {
     async function fetchAccounts() {
@@ -68,24 +82,50 @@ export function EntryForm({
     );
   }, [isRecurring]);
 
+  useEffect(() => {
+    if (!entryType) {
+      return;
+    }
+
+    setFormData((currentFormData) => ({ ...currentFormData, type: entryType }));
+  }, [entryType]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const result = await createEntry(formData as CreateEntryInput);
+      const parsedAmount = parseAmountInput(amountInput);
+
+      if (parsedAmount === null) {
+        setLoading(false);
+        return;
+      }
+
+      const payload = {
+        ...formData,
+        type: (entryType || formData.type) as "income" | "expense",
+        amount: parsedAmount,
+      } as CreateEntryInput;
+
+      const result =
+        isEdit && initialData?.id
+          ? await updateEntry(initialData.id, payload)
+          : await createEntry(payload);
 
       if (result.success) {
-        // Reset form
-        setFormData({
-          type: "expense",
-          accountName: "",
-          description: "",
-          amount: 0,
-          beginDate: new Date(),
-          endDate: new Date(),
-        });
-        setIsRecurring(false);
+        if (!isEdit) {
+          setFormData({
+            type: entryType || "expense",
+            accountName: "",
+            description: "",
+            amount: 0,
+            beginDate: new Date(),
+            endDate: new Date(),
+          });
+          setAmountInput("");
+          setIsRecurring(false);
+        }
 
         if (onSuccess) {
           onSuccess();
@@ -106,24 +146,25 @@ export function EntryForm({
   return (
     <form onSubmit={handleSubmit} className="entry-form">
       <Stack gap={16}>
-        <Select
-          label={i18n.t("entry_form.type")}
-          value={formData.type || ""}
-          onChange={(value) =>
-            setFormData({ ...formData, type: value as "income" | "expense" })
-          }
-          options={[
-            { value: "income", label: i18n.t("common.income") },
-            { value: "expense", label: i18n.t("common.expense") },
-          ]}
-          required
-        />
-
-        <Autocomplete
+        {!hideTypeField && (
+          <Select
+            label={i18n.t("entry_form.type")}
+            value={formData.type || ""}
+            onChange={(value) =>
+              setFormData({ ...formData, type: value as "income" | "expense" })
+            }
+            options={[
+              { value: "income", label: i18n.t("common.income") },
+              { value: "expense", label: i18n.t("common.expense") },
+            ]}
+            required
+          />
+        )}
+        <AccountField
           label={i18n.t("entry_form.account")}
           value={formData.accountName || ""}
           onChange={(value) => setFormData({ ...formData, accountName: value })}
-          options={accounts}
+          accounts={accounts}
           placeholder={i18n.t("entry_form.account_placeholder") as string}
           required
         />
@@ -138,12 +179,10 @@ export function EntryForm({
 
         <Input
           label={i18n.t("entry_form.amount")}
-          type="number"
-          value={formData.amount || 0}
-          onChange={(value) =>
-            setFormData({ ...formData, amount: parseFloat(value) || 0 })
-          }
-          step="0.01"
+          type="text"
+          inputMode="decimal"
+          value={amountInput}
+          onChange={(value) => setAmountInput(sanitizeAmountInput(value))}
           placeholder={i18n.t("entry_form.amount_placeholder") as string}
           required
         />

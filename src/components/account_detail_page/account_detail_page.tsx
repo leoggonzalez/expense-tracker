@@ -159,7 +159,11 @@ export function AccountDetailPage({
           <Text size="h4" as="h2" weight="semibold">
             {i18n.t("account_detail_page.related_entries")}
           </Text>
-          <EntryList entries={entries} showDelete={false} />
+          <EntryList
+            entries={entries}
+            showDelete={false}
+            entryHref={(entryItem) => `/entries/${entryItem.id}`}
+          />
         </div>
       </Stack>
     </Container>

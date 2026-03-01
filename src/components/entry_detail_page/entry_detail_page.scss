@@ -1,0 +1,9 @@
+@use "@/styles/variables.scss" as *;
+
+.entry-detail-page {
+  &__card {
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-background);
+  }
+}

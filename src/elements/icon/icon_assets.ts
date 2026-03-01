@@ -7,6 +7,8 @@ export const iconAssets = {
   accounts: new URL("./icons/accounts.svg", import.meta.url).toString(),
   settings: new URL("./icons/settings.svg", import.meta.url).toString(),
   login: new URL("./icons/login.svg", import.meta.url).toString(),
+  plus: new URL("./icons/plus.svg", import.meta.url).toString(),
+  close: new URL("./icons/close.svg", import.meta.url).toString(),
 } as const;
 
 export type IconName = keyof typeof iconAssets;
