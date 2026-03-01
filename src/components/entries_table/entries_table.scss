@@ -1,0 +1,97 @@
+@use "@/styles/variables.scss" as *;
+
+.entries-table {
+  min-width: 0;
+
+  &__scroll {
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-background);
+  }
+
+  &__table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+  }
+
+  &__head {
+    background-color: var(--color-background-secondary);
+  }
+
+  &__row {
+    border-bottom: var(--border-width) solid var(--color-border);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+
+    &:hover {
+      background-color: var(--color-background-secondary);
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__cell {
+    padding: var(--spacing-md);
+    text-align: left;
+    white-space: nowrap;
+
+    &--header {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-secondary);
+    }
+
+    &--details {
+      width: 100%;
+      white-space: normal;
+      min-width: 220px;
+    }
+
+    &--amount {
+      min-width: 120px;
+    }
+
+    &--date {
+      min-width: 140px;
+    }
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  &__type {
+    display: inline-flex;
+    width: fit-content;
+    padding: 2px var(--spacing-sm);
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+
+    &--income {
+      background-color: color-mix(in srgb, var(--color-success) 12%, white);
+      color: var(--color-success-dark);
+    }
+
+    &--expense {
+      background-color: color-mix(in srgb, var(--color-danger) 12%, white);
+      color: var(--color-danger-dark);
+    }
+  }
+
+  &__empty {
+    padding: var(--spacing-2xl);
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-background-secondary);
+    text-align: center;
+  }
+}

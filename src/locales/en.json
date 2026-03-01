@@ -26,7 +26,8 @@
     "account_net": "Net",
     "no_accounts_this_month": "No active accounts this month.",
     "entries_active_this_month_one": "%{count} entry active this month",
-    "entries_active_this_month_other": "%{count} entries active this month"
+    "entries_active_this_month_other": "%{count} entries active this month",
+    "see_all_entries": "See all entries"
   },
   "entry_form": {
     "type": "Type",
@@ -63,6 +64,20 @@
   "entries_page": {
     "title": "Entries",
     "add_entry": "Add Entry",
+    "account": "Account",
+    "details": "Details",
+    "amount": "Amount",
+    "date": "Date",
+    "date_range": "Date Range",
+    "filters": "Filters",
+    "type": "Type",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "account_placeholder": "All accounts",
+    "type_all": "All",
+    "clear_filters": "Clear Filters",
+    "showing_results": "Showing %{count} of %{total} entries",
+    "empty_state": "No entries match the current filters.",
     "add_new_entry": "Add New Entry",
     "add_multiple_entries": "Add Multiple Entries",
     "recent_entries": "Recent Entries (%{count} most recent)",
@@ -169,7 +184,9 @@
     "not_found": "Account not found."
   },
   "new_entry_page": {
-    "title": "New Entry",
+    "title_income": "Add new income",
+    "title_expense": "Add new expense",
+    "title_multiple": "Add multiple entries",
     "income_tab": "Income",
     "expense_tab": "Expense",
     "multiple_tab": "Multiple"
@@ -188,6 +205,17 @@
     "income": "Income",
     "expense": "Expense",
     "add_entry": "Add entry"
+  },
+  "toast": {
+    "entry_created": "Entry created.",
+    "income_created": "Income entry created.",
+    "expense_created": "Expense entry created.",
+    "entries_created": "Entries created.",
+    "entry_create_failed": "Unable to create the entry.",
+    "income_create_failed": "Unable to create the income entry.",
+    "expense_create_failed": "Unable to create the expense entry.",
+    "entries_create_failed": "Unable to create the entries.",
+    "dismiss": "Dismiss notification"
   },
   "errors": {
     "failed_to_create_entry": "Failed to create entry",

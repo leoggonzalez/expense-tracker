@@ -6,8 +6,8 @@ import { Container } from "@/components";
 import { Icon } from "@/elements";
 import type { IconName } from "@/elements/icon/icon_assets";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 type NavigationClientProps = {
   brandLabel: React.ReactNode;
@@ -33,7 +33,7 @@ export function NavigationClient({
 
   return (
     <nav className="navigation">
-      <Container maxWidth="full">
+      <Container maxWidth="wide">
         <div className="navigation__inner">
           <div className="navigation__brand">
             <Link href="/">{brandLabel}</Link>
@@ -48,7 +48,11 @@ export function NavigationClient({
                     isLinkActive(link.href) ? "navigation__link--active" : ""
                   }`}
                 >
-                  <Icon name={link.icon} size={22} className="navigation__icon" />
+                  <Icon
+                    name={link.icon}
+                    size={22}
+                    className="navigation__icon"
+                  />
                   <span className="navigation__label">{link.label}</span>
                 </Link>
               </li>

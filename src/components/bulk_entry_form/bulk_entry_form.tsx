@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Stack, Text } from "@/elements";
 import { AccountField, Button, Input, Select, Checkbox } from "@/components";
 import { i18n } from "@/model/i18n";
+import { useToast } from "@/components/toast_provider/toast_provider";
 import {
   createMultipleEntries,
   CreateEntryInput,
@@ -26,6 +27,7 @@ export interface BulkEntryFormProps {
 export function BulkEntryForm({
   onSuccess,
 }: BulkEntryFormProps): React.ReactElement {
+  const { showError, showSuccess } = useToast();
   const [accountName, setAccountName] = useState("");
   const [beginDate, setBeginDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -87,6 +89,9 @@ export function BulkEntryForm({
       const result = await createMultipleEntries(inputs);
 
       if (result.success) {
+        showSuccess(i18n.t("toast.entries_created"), {
+          iconName: "entries",
+        });
         // Reset form
         setAccountName("");
         setBeginDate(new Date());
@@ -97,9 +102,16 @@ export function BulkEntryForm({
         if (onSuccess) {
           onSuccess();
         }
+      } else {
+        showError(i18n.t("toast.entries_create_failed"), {
+          iconName: "entries",
+        });
       }
     } catch (error) {
       console.error("Error submitting bulk entries:", error);
+      showError(i18n.t("toast.entries_create_failed"), {
+        iconName: "entries",
+      });
     } finally {
       setLoading(false);
     }

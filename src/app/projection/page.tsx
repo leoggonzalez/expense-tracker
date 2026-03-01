@@ -1,6 +1,9 @@
-import { ProjectionTable, Container } from "@/components";
+import { Container, ProjectionTable } from "@/components";
+
 import { getEntries } from "@/actions/entries";
 import { requireCurrentUser } from "@/lib/session";
+
+export const dynamic = "force-dynamic";
 
 export default async function ProjectionPage(): Promise<React.ReactElement> {
   await requireCurrentUser();
@@ -19,7 +22,7 @@ export default async function ProjectionPage(): Promise<React.ReactElement> {
   }));
 
   return (
-    <Container maxWidth="wide">
+    <Container>
       <ProjectionTable entries={entries} />
     </Container>
   );

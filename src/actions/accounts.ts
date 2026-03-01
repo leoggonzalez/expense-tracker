@@ -161,7 +161,9 @@ export async function createAccount(input: {
   }
 }
 
-export async function getAccountById(id: string): Promise<AccountDetail | null> {
+export async function getAccountById(
+  id: string,
+): Promise<AccountDetail | null> {
   const currentUser = await requireCurrentUser();
 
   try {
@@ -245,18 +247,18 @@ export async function deleteAccount(id: string): Promise<AccountActionResult> {
   try {
     const account: AccountDeleteCheckRecord | null =
       await prisma.account.findFirst({
-      where: {
-        id,
-        userId: currentUser.id,
-      },
-      include: {
-        _count: {
-          select: {
-            entries: true,
+        where: {
+          id,
+          userId: currentUser.id,
+        },
+        include: {
+          _count: {
+            select: {
+              entries: true,
+            },
           },
         },
-      },
-    });
+      });
 
     if (!account) {
       return { success: false, error: "account_detail_page.not_found" };

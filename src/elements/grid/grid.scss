@@ -9,4 +9,9 @@
   row-gap: var(--grid-row-gap, var(--grid-gap, 0));
   align-items: var(--grid-align, stretch);
   justify-items: var(--grid-justify, stretch);
+  min-width: 0;
+}
+
+.grid > * {
+  min-width: 0;
 }

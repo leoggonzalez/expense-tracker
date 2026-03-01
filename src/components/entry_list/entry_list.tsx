@@ -67,7 +67,9 @@ export function EntryList({
         {entries.map((entry, index) => {
           const href =
             entryHref?.(plainEntries[index]) ??
-            (entryHrefBase ? `${entryHrefBase}/${plainEntries[index].id}` : null);
+            (entryHrefBase
+              ? `${entryHrefBase}/${plainEntries[index].id}`
+              : null);
           const content = (
             <div className="entry-list__content">
               <div className="entry-list__main">

@@ -3,6 +3,7 @@ export type { ButtonProps } from "./button/button";
 
 export { Input } from "./input/input";
 export type { InputProps } from "./input/input";
+export { DateRangeInput } from "./date_range_input/date_range_input";
 
 export { Select } from "./select/select";
 export type { SelectProps, SelectOption } from "./select/select";
@@ -30,6 +31,10 @@ export type { PaginationProps } from "./pagination/pagination";
 
 export { EntryList } from "./entry_list/entry_list";
 export type { EntryListItem, EntryListProps } from "./entry_list/entry_list";
+export { EntriesTable } from "./entries_table/entries_table";
+export type { EntriesTableItem } from "./entries_table/entries_table";
+export { EntriesFilters } from "./entries_filters/entries_filters";
+export { ToastProvider, useToast } from "./toast_provider/toast_provider";
 
 export { AllEntriesPage } from "./all_entries_page/all_entries_page";
 

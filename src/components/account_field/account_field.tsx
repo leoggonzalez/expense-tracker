@@ -29,7 +29,9 @@ export function AccountField({
     () => accounts.includes(value),
     [accounts, value],
   );
-  const [isCustomMode, setIsCustomMode] = useState(!hasMatchingAccount && !!value);
+  const [isCustomMode, setIsCustomMode] = useState(
+    !hasMatchingAccount && !!value,
+  );
 
   useEffect(() => {
     if (value && !accounts.includes(value)) {

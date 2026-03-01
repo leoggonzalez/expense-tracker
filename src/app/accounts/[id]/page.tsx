@@ -4,6 +4,8 @@ import { AccountDetailPage } from "@/components";
 import { getAccountById } from "@/actions/accounts";
 import { requireCurrentUser } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 type AccountRouteProps = {
   params: Promise<{
     id: string;

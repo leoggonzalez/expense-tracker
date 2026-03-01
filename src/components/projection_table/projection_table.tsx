@@ -98,7 +98,7 @@ export function ProjectionTable({
           <table className="projection-table__table">
             <thead className="projection-table__thead">
               <tr className="projection-table__row">
-                <th className="projection-table__cell projection-table__cell--header projection-table__cell--sticky">
+                <th className="projection-table__cell projection-table__cell--header projection-table__cell--sticky projection-table__cell--header-sticky">
                   {i18n.t("projection_table.account_description")}
                 </th>
                 {months.map((month) => (
@@ -121,6 +121,12 @@ export function ProjectionTable({
                           {account.account}
                         </Text>
                       </td>
+                      {months.map((month) => (
+                        <td
+                          key={month.toISOString()}
+                          className="projection-table__cell projection-table__cell--group-header"
+                        />
+                      ))}
                     </tr>
                     {account.entries.map((entry) => (
                       <tr

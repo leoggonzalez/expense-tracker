@@ -9,6 +9,10 @@
     gap: var(--spacing-md);
   }
 
+  &__card-link {
+    display: block;
+  }
+
   &__card {
     padding: var(--spacing-md);
     border-radius: var(--border-radius-md);
@@ -31,20 +35,23 @@
     }
   }
 
-  &__summary {
-    padding: var(--spacing-md);
-    background-color: var(--color-background-tertiary);
-    border-radius: var(--border-radius-md);
-    border: var(--border-width) solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-  }
-
   &__recent-section {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+  }
+
+  &__recent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+  }
+
+  &__recent-link {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-primary);
   }
 }
 

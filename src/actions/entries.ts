@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { endOfDay, startOfDay } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
 import { requireCurrentUser } from "@/lib/session";
@@ -40,6 +41,7 @@ type EntryFiltersWhere = {
     userId: string;
   };
   accountId?: string;
+  type?: "income" | "expense";
   description?: {
     contains: string;
     mode: "insensitive";
@@ -106,6 +108,7 @@ function revalidateEntryPages() {
   revalidatePath("/entries");
   revalidatePath("/entries/all");
   revalidatePath("/account");
+  revalidatePath("/settings");
 }
 
 export async function createEntry(
@@ -212,6 +215,8 @@ export async function getRecentEntries(
 
 export async function getEntriesWithFilters(filters: {
   accountId?: string;
+  type?: "income" | "expense";
+  date?: Date;
   description?: string;
   startDate?: Date;
   endDate?: Date;
@@ -235,6 +240,10 @@ export async function getEntriesWithFilters(filters: {
       where.accountId = filters.accountId;
     }
 
+    if (filters.type) {
+      where.type = filters.type;
+    }
+
     if (filters.description) {
       where.description = {
         contains: filters.description,
@@ -242,13 +251,25 @@ export async function getEntriesWithFilters(filters: {
       };
     }
 
-    if (filters.startDate || filters.endDate) {
+    if (filters.date || filters.startDate || filters.endDate) {
       where.beginDate = {};
-      if (filters.startDate) {
-        where.beginDate.gte = filters.startDate;
+
+      let minDate = filters.startDate;
+      let maxDate = filters.endDate;
+
+      if (filters.date) {
+        const exactDateStart = startOfDay(filters.date);
+        const exactDateEnd = endOfDay(filters.date);
+        minDate =
+          !minDate || exactDateStart > minDate ? exactDateStart : minDate;
+        maxDate = !maxDate || exactDateEnd < maxDate ? exactDateEnd : maxDate;
       }
-      if (filters.endDate) {
-        where.beginDate.lte = filters.endDate;
+
+      if (minDate) {
+        where.beginDate.gte = minDate;
+      }
+      if (maxDate) {
+        where.beginDate.lte = maxDate;
       }
     }
 
