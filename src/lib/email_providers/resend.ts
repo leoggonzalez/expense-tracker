@@ -34,6 +34,8 @@ export async function sendWithResend({
 
   if (!response.ok) {
     const responseText = await response.text();
-    throw new Error(`Resend request failed: ${response.status} ${responseText}`);
+    throw new Error(
+      `Resend request failed: ${response.status} ${responseText}`,
+    );
   }
 }

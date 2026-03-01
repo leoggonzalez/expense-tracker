@@ -27,7 +27,9 @@ export function LoginPage(): React.ReactElement {
       return;
     }
 
-    router.push(`/login/verify?email=${encodeURIComponent(email.trim().toLowerCase())}`);
+    router.push(
+      `/login/verify?email=${encodeURIComponent(email.trim().toLowerCase())}`,
+    );
   };
 
   return (
@@ -52,7 +54,9 @@ export function LoginPage(): React.ReactElement {
               {error && <Text color="danger">{i18n.t(error)}</Text>}
 
               <Button type="submit" disabled={loading} fullWidth>
-                {loading ? i18n.t("auth.sending_code") : i18n.t("auth.send_code")}
+                {loading
+                  ? i18n.t("auth.sending_code")
+                  : i18n.t("auth.send_code")}
               </Button>
             </Stack>
           </form>

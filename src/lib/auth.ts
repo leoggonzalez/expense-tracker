@@ -1,4 +1,9 @@
-import { createHash, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
+import {
+  createHash,
+  randomBytes,
+  randomInt,
+  timingSafeEqual,
+} from "node:crypto";
 
 const DEFAULT_AUTH_SECRET = "development-auth-secret";
 const LOGIN_CODE_LENGTH = 6;
@@ -11,9 +16,7 @@ function getAuthSecret(): string {
 }
 
 function createDigest(value: string): Buffer {
-  return createHash("sha256")
-    .update(`${getAuthSecret()}:${value}`)
-    .digest();
+  return createHash("sha256").update(`${getAuthSecret()}:${value}`).digest();
 }
 
 export function normalizeEmail(email: string): string {

@@ -16,9 +16,7 @@ type AccountPageProps = {
   };
 };
 
-export function AccountPage({
-  user,
-}: AccountPageProps): React.ReactElement {
+export function AccountPage({ user }: AccountPageProps): React.ReactElement {
   const router = useRouter();
   const [name, setName] = useState(user.name || "");
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +73,11 @@ export function AccountPage({
                 <Button type="submit" disabled={loading}>
                   {loading ? i18n.t("account.saving") : i18n.t("account.save")}
                 </Button>
-                <Button type="button" variant="secondary" onClick={handleLogout}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleLogout}
+                >
                   {i18n.t("account.logout")}
                 </Button>
               </Stack>

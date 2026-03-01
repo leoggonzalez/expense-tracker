@@ -65,7 +65,9 @@ export function VerifyLoginPage({
               <Input
                 label={i18n.t("auth.code")}
                 value={code}
-                onChange={(value) => setCode(value.replace(/\D/g, "").slice(0, 6))}
+                onChange={(value) =>
+                  setCode(value.replace(/\D/g, "").slice(0, 6))
+                }
                 placeholder={i18n.t("auth.code_placeholder") as string}
                 required
               />
@@ -73,7 +75,9 @@ export function VerifyLoginPage({
               {error && <Text color="danger">{i18n.t(error)}</Text>}
 
               <Button type="submit" disabled={loading} fullWidth>
-                {loading ? i18n.t("auth.verifying_code") : i18n.t("auth.verify_code")}
+                {loading
+                  ? i18n.t("auth.verifying_code")
+                  : i18n.t("auth.verify_code")}
               </Button>
             </Stack>
           </form>

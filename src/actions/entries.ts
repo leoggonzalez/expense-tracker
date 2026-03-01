@@ -47,7 +47,10 @@ export async function createEntry(input: CreateEntryInput) {
   const currentUser = await requireCurrentUser();
 
   try {
-    const account = await findOrCreateAccount(currentUser.id, input.accountName);
+    const account = await findOrCreateAccount(
+      currentUser.id,
+      input.accountName,
+    );
 
     const entry = await prisma.entry.create({
       data: {
@@ -276,7 +279,10 @@ export async function updateEntry(
     let accountId: string | undefined;
 
     if (input.accountName) {
-      const account = await findOrCreateAccount(currentUser.id, input.accountName);
+      const account = await findOrCreateAccount(
+        currentUser.id,
+        input.accountName,
+      );
       accountId = account.id;
     }
 

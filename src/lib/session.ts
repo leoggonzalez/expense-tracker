@@ -23,7 +23,10 @@ async function getCookieStore() {
   return cookies();
 }
 
-export async function createSession(userId: string, token: string): Promise<void> {
+export async function createSession(
+  userId: string,
+  token: string,
+): Promise<void> {
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
 
   await prisma.session.create({
