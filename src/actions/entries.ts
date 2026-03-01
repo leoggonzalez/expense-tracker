@@ -1,48 +1,69 @@
 "use server";
 
 import { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+
+import { prisma } from "@/lib/prisma";
+import { requireCurrentUser } from "@/lib/session";
 
 export interface CreateEntryInput {
   type: "income" | "expense";
-  groupName: string;
+  accountName: string;
   description: string;
   amount: number;
   beginDate: Date;
   endDate?: Date | null;
 }
 
-export async function createEntry(input: CreateEntryInput) {
-  try {
-    // Find or create group
-    let group = await prisma.group.findUnique({
-      where: { name: input.groupName },
-    });
+async function findOrCreateAccount(userId: string, accountName: string) {
+  let account = await prisma.account.findFirst({
+    where: {
+      userId,
+      name: accountName,
+    },
+  });
 
-    if (!group) {
-      group = await prisma.group.create({
-        data: { name: input.groupName },
-      });
-    }
+  if (!account) {
+    account = await prisma.account.create({
+      data: {
+        userId,
+        name: accountName,
+      },
+    });
+  }
+
+  return account;
+}
+
+function revalidateEntryPages() {
+  revalidatePath("/");
+  revalidatePath("/projection");
+  revalidatePath("/entries");
+  revalidatePath("/entries/all");
+  revalidatePath("/account");
+}
+
+export async function createEntry(input: CreateEntryInput) {
+  const currentUser = await requireCurrentUser();
+
+  try {
+    const account = await findOrCreateAccount(currentUser.id, input.accountName);
 
     const entry = await prisma.entry.create({
       data: {
         type: input.type,
-        groupId: group.id,
+        accountId: account.id,
         description: input.description,
         amount: input.amount,
         beginDate: input.beginDate,
         endDate: input.endDate || null,
       },
       include: {
-        group: true,
+        account: true,
       },
     });
 
-    revalidatePath("/");
-    revalidatePath("/projection");
-    revalidatePath("/entries");
+    revalidateEntryPages();
 
     return { success: true, entry };
   } catch (error) {
@@ -71,15 +92,20 @@ export async function createMultipleEntries(inputs: CreateEntryInput[]) {
 }
 
 export async function getEntries() {
-  try {
-    const entries = await prisma.entry.findMany({
-      include: {
-        group: true,
-      },
-      orderBy: [{ group: { name: "asc" } }, { beginDate: "asc" }],
-    });
+  const currentUser = await requireCurrentUser();
 
-    return entries;
+  try {
+    return await prisma.entry.findMany({
+      where: {
+        account: {
+          userId: currentUser.id,
+        },
+      },
+      include: {
+        account: true,
+      },
+      orderBy: [{ account: { name: "asc" } }, { beginDate: "asc" }],
+    });
   } catch (error) {
     console.error("Error fetching entries:", error);
     return [];
@@ -87,18 +113,23 @@ export async function getEntries() {
 }
 
 export async function getRecentEntries(limit: number = 10) {
+  const currentUser = await requireCurrentUser();
+
   try {
-    const entries = await prisma.entry.findMany({
+    return await prisma.entry.findMany({
+      where: {
+        account: {
+          userId: currentUser.id,
+        },
+      },
       include: {
-        group: true,
+        account: true,
       },
       orderBy: {
         createdAt: "desc",
       },
       take: limit,
     });
-
-    return entries;
   } catch (error) {
     console.error("Error fetching recent entries:", error);
     return [];
@@ -106,22 +137,28 @@ export async function getRecentEntries(limit: number = 10) {
 }
 
 export async function getEntriesWithFilters(filters: {
-  groupId?: string;
+  accountId?: string;
   description?: string;
   startDate?: Date;
   endDate?: Date;
   page?: number;
   limit?: number;
 }) {
+  const currentUser = await requireCurrentUser();
+
   try {
     const page = filters.page || 1;
     const limit = filters.limit || 20;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.EntryWhereInput = {};
+    const where: Prisma.EntryWhereInput = {
+      account: {
+        userId: currentUser.id,
+      },
+    };
 
-    if (filters.groupId) {
-      where.groupId = filters.groupId;
+    if (filters.accountId) {
+      where.accountId = filters.accountId;
     }
 
     if (filters.description) {
@@ -145,7 +182,7 @@ export async function getEntriesWithFilters(filters: {
       prisma.entry.findMany({
         where,
         include: {
-          group: true,
+          account: true,
         },
         orderBy: {
           beginDate: "desc",
@@ -174,31 +211,39 @@ export async function getEntriesWithFilters(filters: {
   }
 }
 
-export async function getGroups() {
+export async function getAccounts() {
+  const currentUser = await requireCurrentUser();
+
   try {
-    const groups = await prisma.group.findMany({
+    return await prisma.account.findMany({
+      where: {
+        userId: currentUser.id,
+      },
       orderBy: {
         name: "asc",
       },
     });
-
-    return groups;
   } catch (error) {
-    console.error("Error fetching groups:", error);
+    console.error("Error fetching accounts:", error);
     return [];
   }
 }
 
 export async function getEntryById(id: string) {
+  const currentUser = await requireCurrentUser();
+
   try {
-    const entry = await prisma.entry.findUnique({
-      where: { id },
+    return await prisma.entry.findFirst({
+      where: {
+        id,
+        account: {
+          userId: currentUser.id,
+        },
+      },
       include: {
-        group: true,
+        account: true,
       },
     });
-
-    return entry;
   } catch (error) {
     console.error("Error fetching entry:", error);
     return null;
@@ -209,41 +254,48 @@ export async function updateEntry(
   id: string,
   input: Partial<CreateEntryInput>,
 ) {
+  const currentUser = await requireCurrentUser();
+
   try {
-    let groupId: string | undefined;
+    const existingEntry = await prisma.entry.findFirst({
+      where: {
+        id,
+        account: {
+          userId: currentUser.id,
+        },
+      },
+      include: {
+        account: true,
+      },
+    });
 
-    if (input.groupName) {
-      let group = await prisma.group.findUnique({
-        where: { name: input.groupName },
-      });
+    if (!existingEntry) {
+      return { success: false, error: "failed_to_update_entry" };
+    }
 
-      if (!group) {
-        group = await prisma.group.create({
-          data: { name: input.groupName },
-        });
-      }
+    let accountId: string | undefined;
 
-      groupId = group.id;
+    if (input.accountName) {
+      const account = await findOrCreateAccount(currentUser.id, input.accountName);
+      accountId = account.id;
     }
 
     const entry = await prisma.entry.update({
       where: { id },
       data: {
         ...(input.type && { type: input.type }),
-        ...(groupId && { groupId }),
+        ...(accountId && { accountId }),
         ...(input.description && { description: input.description }),
         ...(input.amount !== undefined && { amount: input.amount }),
         ...(input.beginDate && { beginDate: input.beginDate }),
         ...(input.endDate !== undefined && { endDate: input.endDate }),
       },
       include: {
-        group: true,
+        account: true,
       },
     });
 
-    revalidatePath("/");
-    revalidatePath("/projection");
-    revalidatePath("/entries");
+    revalidateEntryPages();
 
     return { success: true, entry };
   } catch (error) {
@@ -253,14 +305,30 @@ export async function updateEntry(
 }
 
 export async function deleteEntry(id: string) {
+  const currentUser = await requireCurrentUser();
+
   try {
+    const existingEntry = await prisma.entry.findFirst({
+      where: {
+        id,
+        account: {
+          userId: currentUser.id,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!existingEntry) {
+      return { success: false, error: "failed_to_delete_entry" };
+    }
+
     await prisma.entry.delete({
       where: { id },
     });
 
-    revalidatePath("/");
-    revalidatePath("/projection");
-    revalidatePath("/entries");
+    revalidateEntryPages();
 
     return { success: true };
   } catch (error) {

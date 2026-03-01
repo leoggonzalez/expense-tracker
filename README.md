@@ -86,9 +86,29 @@ Create a `.env` file in the root directory:
 
 ```env
 DATABASE_URL="postgresql://username:password@localhost:5432/expense_tracker?schema=public"
+AUTH_SECRET="replace_me"
+
+EMAIL_PROVIDER="smtp"
+EMAIL_FROM="you@gmail.com"
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="465"
+SMTP_SECURE="true"
+SMTP_USER="you@gmail.com"
+SMTP_PASS="your_google_app_password"
+
+DEV_ADMIN_EMAIL="you@gmail.com"
+DEV_ADMIN_LOGIN_CODE="999999"
 ```
 
 Replace `username` and `password` with your PostgreSQL credentials.
+
+For Gmail SMTP:
+- enable 2-Step Verification on your Google account
+- create a Google app password
+- use the app password in `SMTP_PASS`, not your normal Gmail password
+- keep `DEV_ADMIN_EMAIL` limited to your own local development account
+
+The `DEV_ADMIN_LOGIN_CODE=999999` bypass is development-only. It only works for the configured `DEV_ADMIN_EMAIL`, and it is ignored in production.
 
 ### 4. Run Database Migrations
 
@@ -119,6 +139,12 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Usage
+
+### Login
+
+- Request a 6-digit login code with your email address
+- Enter the code on the verify page to create a session
+- In local development, the configured `DEV_ADMIN_EMAIL` can always log in with `999999`
 
 ### Dashboard
 

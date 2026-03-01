@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Navigation } from "@/components";
+import { Navigation } from "@/components/navigation/navigation";
 import { i18n } from "@/model/i18n";
 import "@/styles/globals.scss";
 

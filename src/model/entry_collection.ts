@@ -9,8 +9,8 @@ export interface MonthlyData {
   net: number;
 }
 
-export interface GroupedEntry {
-  group: string;
+export interface AccountProjectionGroup {
+  account: string;
   entries: Entry[];
   monthlyTotals: Map<string, number>;
 }
@@ -82,28 +82,28 @@ export class EntryCollection {
   }
 
   /**
-   * Get all unique groups
+   * Get all unique accounts
    */
-  getGroups(): string[] {
-    const groups = new Set<string>();
-    this.entries.forEach((entry) => groups.add(entry.group));
-    return Array.from(groups).sort();
+  getAccounts(): string[] {
+    const accounts = new Set<string>();
+    this.entries.forEach((entry) => accounts.add(entry.account));
+    return Array.from(accounts).sort();
   }
 
   /**
-   * Get entries grouped by their group property
+   * Get entries grouped by their account property
    */
-  getGroupedEntries(): GroupedEntry[] {
-    const groups = this.getGroups();
+  getEntriesByAccount(): AccountProjectionGroup[] {
+    const accounts = this.getAccounts();
 
-    return groups.map((group) => {
-      const groupEntries = this.entries.filter(
-        (entry) => entry.group === group,
+    return accounts.map((account) => {
+      const accountEntries = this.entries.filter(
+        (entry) => entry.account === account,
       );
 
       return {
-        group,
-        entries: groupEntries,
+        account,
+        entries: accountEntries,
         monthlyTotals: new Map(),
       };
     });
@@ -116,7 +116,7 @@ export class EntryCollection {
     startDate: Date,
     monthCount: number,
   ): {
-    groups: GroupedEntry[];
+    accounts: AccountProjectionGroup[];
     monthlyTotals: Map<
       string,
       { income: number; expense: number; net: number }
@@ -130,16 +130,16 @@ export class EntryCollection {
       months.push(startOfMonth(month));
     }
 
-    const groups = this.getGroupedEntries();
+    const accounts = this.getEntriesByAccount();
 
-    // Calculate monthly totals for each group
-    groups.forEach((group) => {
+    // Calculate monthly totals for each account
+    accounts.forEach((account) => {
       months.forEach((month) => {
         const monthKey = format(month, "yyyy-MM");
-        const total = group.entries.reduce((sum, entry) => {
+        const total = account.entries.reduce((sum, entry) => {
           return sum + entry.getAmountForMonth(month);
         }, 0);
-        group.monthlyTotals.set(monthKey, total);
+        account.monthlyTotals.set(monthKey, total);
       });
     });
 
@@ -159,7 +159,7 @@ export class EntryCollection {
       });
     });
 
-    return { groups, monthlyTotals, months };
+    return { accounts, monthlyTotals, months };
   }
 
   /**

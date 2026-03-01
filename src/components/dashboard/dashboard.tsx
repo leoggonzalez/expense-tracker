@@ -13,7 +13,7 @@ export interface DashboardProps {
   entries: Array<{
     id: string;
     type: string;
-    group: string;
+    account: string;
     description: string;
     amount: number;
     beginDate: string;

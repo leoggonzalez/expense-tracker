@@ -7,7 +7,7 @@ import { i18n } from "@/model/i18n";
 import {
   createMultipleEntries,
   CreateEntryInput,
-  getGroups,
+  getAccounts,
 } from "@/actions/entries";
 import "./bulk_entry_form.scss";
 
@@ -25,7 +25,7 @@ export interface BulkEntryFormProps {
 export function BulkEntryForm({
   onSuccess,
 }: BulkEntryFormProps): React.ReactElement {
-  const [groupName, setGroupName] = useState("");
+  const [accountName, setAccountName] = useState("");
   const [beginDate, setBeginDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [isRecurring, setIsRecurring] = useState(false);
@@ -33,14 +33,14 @@ export function BulkEntryForm({
     { id: "1", type: "expense", description: "", amount: 0 },
   ]);
   const [loading, setLoading] = useState(false);
-  const [groups, setGroups] = useState<string[]>([]);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   useEffect(() => {
-    async function fetchGroups() {
-      const groupsData = await getGroups();
-      setGroups(groupsData.map((g) => g.name));
+    async function fetchAccounts() {
+      const accountsData = await getAccounts();
+      setAccounts(accountsData.map((account) => account.name));
     }
-    fetchGroups();
+    void fetchAccounts();
   }, []);
 
   const addEntry = () => {
@@ -76,7 +76,7 @@ export function BulkEntryForm({
     try {
       const inputs: CreateEntryInput[] = entries.map((entry) => ({
         type: entry.type,
-        groupName,
+        accountName,
         description: entry.description,
         amount: entry.amount,
         beginDate,
@@ -87,7 +87,7 @@ export function BulkEntryForm({
 
       if (result.success) {
         // Reset form
-        setGroupName("");
+        setAccountName("");
         setBeginDate(new Date());
         setEndDate(new Date());
         setIsRecurring(false);
@@ -118,12 +118,12 @@ export function BulkEntryForm({
         <div className="bulk-entry-form__shared">
           <Stack gap={16}>
             <Autocomplete
-              label={i18n.t("bulk_entry_form.shared_group")}
-              value={groupName}
-              onChange={setGroupName}
-              options={groups}
+              label={i18n.t("bulk_entry_form.shared_account")}
+              value={accountName}
+              onChange={setAccountName}
+              options={accounts}
               placeholder={
-                i18n.t("bulk_entry_form.shared_group_placeholder") as string
+                i18n.t("bulk_entry_form.shared_account_placeholder") as string
               }
               required
             />

@@ -11,7 +11,7 @@ import {
 } from "@/components";
 import { EntryList, EntryListItem } from "@/components/entry_list/entry_list";
 import { Stack, Text } from "@/elements";
-import { getEntriesWithFilters, getGroups } from "@/actions/entries";
+import { getEntriesWithFilters, getAccounts } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
 import React, { useEffect, useState } from "react";
 
@@ -24,28 +24,30 @@ export function AllEntriesPage(): React.ReactElement {
     totalPages: 0,
   });
   const [filters, setFilters] = useState({
-    groupId: "",
+    accountId: "",
     description: "",
     startDate: "",
     endDate: "",
   });
-  const [groups, setGroups] = useState<Array<{ id: string; name: string }>>([]);
+  const [accounts, setAccounts] = useState<Array<{ id: string; name: string }>>(
+    [],
+  );
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchGroups() {
-      const groupsData = await getGroups();
-      setGroups(groupsData);
+    async function fetchAccounts() {
+      const accountsData = await getAccounts();
+      setAccounts(accountsData);
     }
 
-    fetchGroups();
+    void fetchAccounts();
   }, []);
 
   useEffect(() => {
     async function fetchEntries() {
       setLoading(true);
       const result = await getEntriesWithFilters({
-        groupId: filters.groupId,
+        accountId: filters.accountId,
         description: filters.description,
         startDate: filters.startDate ? new Date(filters.startDate) : undefined,
         endDate: filters.endDate ? new Date(filters.endDate) : undefined,
@@ -56,7 +58,7 @@ export function AllEntriesPage(): React.ReactElement {
       const mappedEntries: EntryListItem[] = result.entries.map((entry) => ({
         id: entry.id,
         type: entry.type,
-        groupName: entry.group.name,
+        accountName: entry.account.name,
         description: entry.description,
         amount: entry.amount,
         beginDate: entry.beginDate.toISOString(),
@@ -80,7 +82,7 @@ export function AllEntriesPage(): React.ReactElement {
 
   function handleClearFilters() {
     setFilters({
-      groupId: "",
+      accountId: "",
       description: "",
       startDate: "",
       endDate: "",
@@ -88,8 +90,8 @@ export function AllEntriesPage(): React.ReactElement {
     setPagination((currentPagination) => ({ ...currentPagination, page: 1 }));
   }
 
-  const selectedGroupName =
-    groups.find((group) => group.id === filters.groupId)?.name || "";
+  const selectedAccountName =
+    accounts.find((account) => account.id === filters.accountId)?.name || "";
 
   return (
     <Container>
@@ -104,15 +106,15 @@ export function AllEntriesPage(): React.ReactElement {
           </Text>
           <div className="all-entries-page__filter-grid">
             <Autocomplete
-              label={i18n.t("all_entries_page.group")}
-              value={selectedGroupName}
+              label={i18n.t("all_entries_page.account")}
+              value={selectedAccountName}
               onChange={(name) => {
-                const group = groups.find((item) => item.name === name);
-                handleFilterChange("groupId", group?.id || "");
+                const account = accounts.find((item) => item.name === name);
+                handleFilterChange("accountId", account?.id || "");
               }}
-              options={groups.map((group) => group.name)}
+              options={accounts.map((account) => account.name)}
               placeholder={
-                i18n.t("all_entries_page.group_placeholder") as string
+                i18n.t("all_entries_page.account_placeholder") as string
               }
             />
 

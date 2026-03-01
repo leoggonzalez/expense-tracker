@@ -7,19 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Group {
+model User {
+  id         String      @id @default(cuid())
+  email      String      @unique
+  name       String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  accounts   Account[]
+  loginCodes LoginCode[]
+  sessions   Session[]
+}
+
+model Account {
   id        String   @id @default(cuid())
-  name      String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   entries   Entry[]
+
+  @@unique([userId, name])
+  @@index([userId])
 }
 
 model Entry {
   id          String    @id @default(cuid())
   type        String    // "income" or "expense"
-  groupId     String
-  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
   description String
   amount      Float
   beginDate   DateTime
@@ -27,6 +43,33 @@ model Entry {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  @@index([groupId])
+  @@index([accountId])
   @@index([beginDate])
+}
+
+model LoginCode {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email      String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([email])
+  @@index([expiresAt])
+}
+
+model Session {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionTokenHash String   @unique
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }

@@ -1,6 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+const MIGRATION_USER_EMAIL = "bootstrap@local.invalid";
 
 // Your existing entries data
 const oldEntries = [
@@ -42,45 +43,67 @@ const oldEntries = [
 ];
 
 async function main() {
-  console.log('Starting migration of existing entries to new schema...');
+  console.log("Starting migration of existing entries to new schema...");
 
-  // Step 1: Get all unique group names
-  const uniqueGroups = [...new Set(oldEntries.map(entry => entry.group))];
-  console.log(`Found ${uniqueGroups.length} unique groups:`, uniqueGroups);
+  const user = await prisma.user.upsert({
+    where: {
+      email: MIGRATION_USER_EMAIL,
+    },
+    update: {
+      name: "Bootstrap User",
+    },
+    create: {
+      email: MIGRATION_USER_EMAIL,
+      name: "Bootstrap User",
+    },
+  });
 
-  // Step 2: Create groups and build a mapping
-  const groupMap = new Map<string, string>();
+  // Step 1: Get all unique account names
+  const uniqueAccounts = [...new Set(oldEntries.map((entry) => entry.group))];
+  console.log(
+    `Found ${uniqueAccounts.length} unique accounts:`,
+    uniqueAccounts,
+  );
+
+  // Step 2: Create accounts and build a mapping
+  const accountMap = new Map<string, string>();
   
-  for (const groupName of uniqueGroups) {
-    // Check if group already exists
-    let group = await prisma.group.findUnique({
-      where: { name: groupName },
+  for (const accountName of uniqueAccounts) {
+    let account = await prisma.account.findUnique({
+      where: {
+        userId_name: {
+          userId: user.id,
+          name: accountName,
+        },
+      },
     });
 
-    // If not, create it
-    if (!group) {
-      group = await prisma.group.create({
-        data: { name: groupName },
+    if (!account) {
+      account = await prisma.account.create({
+        data: {
+          userId: user.id,
+          name: accountName,
+        },
       });
-      console.log(`Created group: ${groupName}`);
+      console.log(`Created account: ${accountName}`);
     } else {
-      console.log(`Group already exists: ${groupName}`);
+      console.log(`Account already exists: ${accountName}`);
     }
 
-    groupMap.set(groupName, group.id);
+    accountMap.set(accountName, account.id);
   }
 
-  console.log('\nMigrating entries...');
+  console.log("\nMigrating entries...");
 
   // Step 3: Create entries with the new schema
   let created = 0;
   let skipped = 0;
 
   for (const entry of oldEntries) {
-    const groupId = groupMap.get(entry.group);
+    const accountId = accountMap.get(entry.group);
     
-    if (!groupId) {
-      console.log(`⚠️  Skipping entry ${entry.id}: Group not found`);
+    if (!accountId) {
+      console.log(`Skipping entry ${entry.id}: account not found`);
       skipped++;
       continue;
     }
@@ -92,17 +115,16 @@ async function main() {
       });
 
       if (existing) {
-        console.log(`⚠️  Entry already exists: ${entry.description} (${entry.id})`);
+        console.log(`Entry already exists: ${entry.description} (${entry.id})`);
         skipped++;
         continue;
       }
 
-      // Create the entry
       await prisma.entry.create({
         data: {
           id: entry.id,
-          type: entry.type as 'income' | 'expense',
-          groupId: groupId,
+          type: entry.type as "income" | "expense",
+          accountId,
           description: entry.description,
           amount: entry.amount,
           beginDate: new Date(entry.beginDate),
@@ -118,8 +140,8 @@ async function main() {
     }
   }
 
-  console.log('\n=== Migration Summary ===');
-  console.log(`Groups created: ${uniqueGroups.length}`);
+  console.log("\n=== Migration Summary ===");
+  console.log(`Accounts created: ${uniqueAccounts.length}`);
   console.log(`Entries created: ${created}`);
   console.log(`Entries skipped: ${skipped}`);
   console.log(`Total entries processed: ${oldEntries.length}`);
@@ -127,7 +149,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('Migration failed:', e);
+    console.error("Migration failed:", e);
     process.exit(1);
   })
   .finally(async () => {

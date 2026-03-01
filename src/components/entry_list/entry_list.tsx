@@ -13,7 +13,7 @@ import React from "react";
 export type EntryListItem = {
   id: string;
   type: string;
-  groupName: string;
+  accountName: string;
   description: string;
   amount: number;
   beginDate: string;
@@ -62,7 +62,7 @@ export function EntryList({
             <div className="entry-list__content">
               <div className="entry-list__main">
                 <Text size="sm" weight="semibold">
-                  {entry.groupName}
+                  {entry.accountName}
                 </Text>
                 <Text size="xs" color="secondary">
                   {entry.description}

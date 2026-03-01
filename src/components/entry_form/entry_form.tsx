@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Stack } from "@/elements";
 import { Button, Input, Select, Checkbox, Autocomplete } from "@/components";
 import { i18n } from "@/model/i18n";
-import { createEntry, CreateEntryInput, getGroups } from "@/actions/entries";
+import { createEntry, CreateEntryInput, getAccounts } from "@/actions/entries";
 import "./entry_form.scss";
 
 export interface EntryFormProps {
@@ -12,7 +12,7 @@ export interface EntryFormProps {
   initialData?: {
     id: string;
     type: string;
-    groupName: string;
+    accountName: string;
     description: string;
     amount: number;
     beginDate: string;
@@ -28,7 +28,7 @@ export function EntryForm({
 }: EntryFormProps): React.ReactElement {
   const [formData, setFormData] = useState<Partial<CreateEntryInput>>({
     type: (initialData?.type as "income" | "expense") || "expense",
-    groupName: initialData?.groupName || "",
+    accountName: initialData?.accountName || "",
     description: initialData?.description || "",
     amount: initialData?.amount || 0,
     beginDate: initialData?.beginDate
@@ -41,14 +41,14 @@ export function EntryForm({
     initialData ? !initialData.endDate : false,
   );
   const [loading, setLoading] = useState(false);
-  const [groups, setGroups] = useState<string[]>([]);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   useEffect(() => {
-    async function fetchGroups() {
-      const groupsData = await getGroups();
-      setGroups(groupsData.map((g) => g.name));
+    async function fetchAccounts() {
+      const accountsData = await getAccounts();
+      setAccounts(accountsData.map((account) => account.name));
     }
-    fetchGroups();
+    void fetchAccounts();
   }, []);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export function EntryForm({
         // Reset form
         setFormData({
           type: "expense",
-          groupName: "",
+          accountName: "",
           description: "",
           amount: 0,
           beginDate: new Date(),
@@ -120,11 +120,11 @@ export function EntryForm({
         />
 
         <Autocomplete
-          label={i18n.t("entry_form.group")}
-          value={formData.groupName || ""}
-          onChange={(value) => setFormData({ ...formData, groupName: value })}
-          options={groups}
-          placeholder={i18n.t("entry_form.group_placeholder") as string}
+          label={i18n.t("entry_form.account")}
+          value={formData.accountName || ""}
+          onChange={(value) => setFormData({ ...formData, accountName: value })}
+          options={accounts}
+          placeholder={i18n.t("entry_form.account_placeholder") as string}
           required
         />
 

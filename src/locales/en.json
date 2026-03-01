@@ -8,7 +8,9 @@
     "dashboard": "Dashboard",
     "projection": "Projection",
     "manage_entries": "Manage Entries",
-    "all_entries": "All Entries"
+    "all_entries": "All Entries",
+    "account": "Account",
+    "login": "Login"
   },
   "dashboard": {
     "current_month_overview": "Current Month Overview",
@@ -21,8 +23,8 @@
   },
   "entry_form": {
     "type": "Type",
-    "group": "Group",
-    "group_placeholder": "e.g., income, Various, Investment",
+    "account": "Account",
+    "account_placeholder": "e.g., salary, Main account, Investment",
     "description": "Description",
     "description_placeholder": "e.g., Salary, Rent",
     "amount": "Amount",
@@ -37,8 +39,8 @@
   },
   "bulk_entry_form": {
     "title": "Add Multiple Entries",
-    "shared_group": "Group (shared for all entries)",
-    "shared_group_placeholder": "e.g., Various, Investment",
+    "shared_account": "Account (shared for all entries)",
+    "shared_account_placeholder": "e.g., Main account, Investment",
     "shared_begin_date": "Begin Date (shared)",
     "recurring": "Recurring",
     "shared_end_date": "End Date (shared)",
@@ -66,8 +68,8 @@
   "all_entries_page": {
     "title": "All Entries",
     "filters": "Filters",
-    "group": "Group",
-    "group_placeholder": "All groups",
+    "account": "Account",
+    "account_placeholder": "All accounts",
     "description": "Description",
     "description_placeholder": "Search description...",
     "start_date": "Start Date",
@@ -80,8 +82,8 @@
   "projection_table": {
     "title": "Projected Expenses",
     "display_until": "Display until",
-    "group_description": "Group / Description",
-    "group_total": "%{group} Total",
+    "account_description": "Account / Description",
+    "account_total": "%{account} Total",
     "total_income": "Total Income",
     "total_expenses": "Total Expenses",
     "total": "Total"
@@ -89,6 +91,38 @@
   "pagination": {
     "previous": "Previous",
     "next": "Next"
+  },
+  "auth": {
+    "title": "Login",
+    "subtitle": "Login with your email and a 6-digit code",
+    "email": "Email",
+    "email_placeholder": "you@example.com",
+    "code": "6-digit code",
+    "code_placeholder": "123456",
+    "send_code": "Send login code",
+    "sending_code": "Sending code...",
+    "verify_title": "Verify code",
+    "verify_subtitle": "Insert the 6-digit code you received by email",
+    "verify_code": "Verify code",
+    "verifying_code": "Verifying code...",
+    "code_sent": "We sent a login code to %{email}.",
+    "invalid_email": "Please enter a valid email address.",
+    "invalid_code": "Invalid or expired code.",
+    "request_failed": "Unable to send the login code.",
+    "verify_failed": "Unable to verify the login code.",
+    "email_send_failed": "Unable to send the login email.",
+    "logout": "Logout"
+  },
+  "account": {
+    "title": "Your account",
+    "email": "Email",
+    "name": "Name",
+    "name_placeholder": "Your name",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "save_success": "Your account details have been updated.",
+    "update_failed": "Unable to update your account details.",
+    "logout": "Logout"
   },
   "common": {
     "income": "Income",
