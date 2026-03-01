@@ -2,7 +2,13 @@
 
 import "./toast_provider.scss";
 
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 type ToastKind = "success" | "error";
 

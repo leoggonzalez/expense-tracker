@@ -2,14 +2,19 @@
 
 import "./entries_page.scss";
 
-import { Container, EntriesFilters, EntriesTable, Pagination } from "@/components";
+import {
+  Container,
+  EntriesFilters,
+  EntriesTable,
+  Pagination,
+} from "@/components";
 import { Stack, Text } from "@/elements";
-import { i18n } from "@/model/i18n";
-import React from "react";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { EntriesTableItem } from "@/components/entries_table/entries_table";
+import Link from "next/link";
+import React from "react";
+import { i18n } from "@/model/i18n";
 
 export interface EntriesPageProps {
   entries: EntriesTableItem[];
@@ -20,7 +25,6 @@ export interface EntriesPageProps {
   filters: {
     account: string;
     type: string;
-    date: string;
     startDate: string;
     endDate: string;
   };

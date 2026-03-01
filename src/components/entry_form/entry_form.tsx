@@ -6,6 +6,14 @@ import { AccountField, Button, Input, Select, Checkbox } from "@/components";
 import { i18n } from "@/model/i18n";
 import { useToast } from "@/components/toast_provider/toast_provider";
 import {
+  clearNewEntryDraft,
+  getLastPathname,
+  loadNewEntryDraft,
+  saveNewEntryDraft,
+  setNewEntryFlowActive,
+  setLastPathname,
+} from "@/lib/new_entry_draft";
+import {
   createEntry,
   CreateEntryInput,
   getAccounts,
@@ -38,9 +46,9 @@ export function EntryForm({
   hideTypeField = false,
 }: EntryFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
+  const isCreateFlow = !isEdit && Boolean(entryType);
   const [formData, setFormData] = useState<Partial<CreateEntryInput>>({
-    type:
-      entryType || (initialData?.type as "income" | "expense") || "expense",
+    type: entryType || (initialData?.type as "income" | "expense") || "expense",
     accountName: initialData?.accountName || "",
     description: initialData?.description || "",
     amount: initialData?.amount ?? 0,
@@ -58,6 +66,37 @@ export function EntryForm({
   const [amountInput, setAmountInput] = useState(
     initialData?.amount ? String(initialData.amount) : "",
   );
+
+  useEffect(() => {
+    if (!isCreateFlow || initialData) {
+      return;
+    }
+
+    const previousPathname = getLastPathname();
+
+    if (!previousPathname?.startsWith("/entries/new")) {
+      clearNewEntryDraft();
+    }
+
+    setNewEntryFlowActive(true);
+    setLastPathname(`/entries/new/${entryType}`);
+
+    const draft = loadNewEntryDraft();
+
+    if (!draft) {
+      return;
+    }
+
+    setFormData((currentFormData) => ({
+      ...currentFormData,
+      accountName: draft.accountName,
+      description: draft.description,
+      beginDate: draft.beginDate ? new Date(draft.beginDate) : new Date(),
+      endDate: draft.endDate ? new Date(draft.endDate) : null,
+    }));
+    setAmountInput(draft.amountInput);
+    setIsRecurring(draft.isRecurring);
+  }, [entryType, initialData, isCreateFlow]);
 
   useEffect(() => {
     async function fetchAccounts() {
@@ -92,6 +131,29 @@ export function EntryForm({
     setFormData((currentFormData) => ({ ...currentFormData, type: entryType }));
   }, [entryType]);
 
+  useEffect(() => {
+    if (!isCreateFlow) {
+      return;
+    }
+
+    saveNewEntryDraft({
+      accountName: formData.accountName || "",
+      description: formData.description || "",
+      amountInput,
+      beginDate: formatDateForInput(formData.beginDate),
+      endDate: formatDateForInput(formData.endDate),
+      isRecurring,
+    });
+  }, [
+    amountInput,
+    formData.accountName,
+    formData.beginDate,
+    formData.description,
+    formData.endDate,
+    isCreateFlow,
+    isRecurring,
+  ]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -118,6 +180,7 @@ export function EntryForm({
 
       if (result.success) {
         if (!isEdit) {
+          clearNewEntryDraft();
           showSuccess(i18n.t("toast.entry_created") as string);
         }
         if (!isEdit) {

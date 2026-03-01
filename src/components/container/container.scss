@@ -3,7 +3,10 @@
 .container {
   --gutter-width: var(--spacing-md);
   display: grid;
-  grid-template-columns: minmax(var(--gutter-width), 1fr) minmax(0, var(--max-width-content)) minmax(var(--gutter-width), 1fr);
+  grid-template-columns: minmax(var(--gutter-width), 1fr) minmax(
+      0,
+      var(--max-width-content)
+    ) minmax(var(--gutter-width), 1fr);
   width: 100%;
   min-width: 0;
 

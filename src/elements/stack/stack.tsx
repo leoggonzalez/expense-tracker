@@ -10,11 +10,11 @@ export interface StackProps {
   gap?: number;
   align?: "flex-start" | "center" | "flex-end" | "stretch";
   justify?:
-  | "flex-start"
-  | "center"
-  | "flex-end"
-  | "space-between"
-  | "space-around";
+    | "flex-start"
+    | "center"
+    | "flex-end"
+    | "space-between"
+    | "space-around";
   wrap?: boolean;
   className?: string;
 }

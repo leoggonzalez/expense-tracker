@@ -126,7 +126,6 @@
     &--group-header {
       background-color: var(--color-background);
     }
-
   }
 
   &__entry {
@@ -134,7 +133,6 @@
     flex-direction: column;
     gap: var(--spacing-xs);
   }
-
 }
 
 @media (min-width: $breakpoint-tablet) {

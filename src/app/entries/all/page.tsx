@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { requireCurrentUser } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 type EntriesAllPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };

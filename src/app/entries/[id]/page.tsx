@@ -4,6 +4,8 @@ import { EntryDetailPage } from "@/components";
 import { getEntryById } from "@/actions/entries";
 import { requireCurrentUser } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 type EntryPageProps = {
   params: Promise<{
     id: string;

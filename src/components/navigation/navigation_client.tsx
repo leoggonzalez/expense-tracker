@@ -44,10 +44,15 @@ export function NavigationClient({
                 <Link
                   href={link.href}
                   aria-label={String(link.label)}
-                  className={`navigation__link ${isLinkActive(link.href) ? "navigation__link--active" : ""
-                    }`}
+                  className={`navigation__link ${
+                    isLinkActive(link.href) ? "navigation__link--active" : ""
+                  }`}
                 >
-                  <Icon name={link.icon} size={22} className="navigation__icon" />
+                  <Icon
+                    name={link.icon}
+                    size={22}
+                    className="navigation__icon"
+                  />
                   <span className="navigation__label">{link.label}</span>
                 </Link>
               </li>

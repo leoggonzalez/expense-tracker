@@ -111,7 +111,9 @@ export function AccountDetailPage({
               {formatCurrency(account.allTimeNet)}
             </Text>
             <Text size="sm" color="secondary">
-              {i18n.t("accounts_page.entry_count", { count: account.entryCount })}
+              {i18n.t("accounts_page.entry_count", {
+                count: account.entryCount,
+              })}
             </Text>
           </Stack>
         </Box>

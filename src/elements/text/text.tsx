@@ -6,16 +6,16 @@ export interface TextProps {
   children: React.ReactNode;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "h1" | "h2" | "h3" | "h4";
   color?:
-  | "primary"
-  | "secondary"
-  | "tertiary"
-  | "success"
-  | "success-light"
-  | "danger"
-  | "danger-light"
-  | "warning"
-  | "info"
-  | "inverse";
+    | "primary"
+    | "secondary"
+    | "tertiary"
+    | "success"
+    | "success-light"
+    | "danger"
+    | "danger-light"
+    | "warning"
+    | "info"
+    | "inverse";
   weight?: "normal" | "medium" | "semibold" | "bold";
   as?: "p" | "span" | "div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "label";
   className?: string;

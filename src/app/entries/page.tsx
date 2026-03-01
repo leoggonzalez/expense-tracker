@@ -2,6 +2,8 @@ import { EntriesPage } from "@/components";
 import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
 import { requireCurrentUser } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 type EntriesPageSearchParams = Promise<{
   page?: string;
   account?: string;

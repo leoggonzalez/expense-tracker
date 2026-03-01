@@ -90,6 +90,7 @@ export function Navigation(props: NavigationProps): React.ReactElement {
 - Pages with filterable content must read their initial state from the URL and update the URL when filters change.
 - Reload, bookmark, and browser back/forward navigation must preserve the same filtered result set.
 - “Clear filters” actions must reset both the visible controls and the related query parameters.
+- Pages that render authenticated, user-specific data must not rely on static rendering defaults. Treat account, entry, dashboard, projection, and settings pages as per-request/dynamic pages to avoid cross-user data leakage.
 
 Examples:
 

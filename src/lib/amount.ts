@@ -13,9 +13,7 @@ export function sanitizeAmountInput(value: string): string {
   }
 
   const integerPart = cleaned.slice(0, separatorIndex).replace(/[.,]/g, "");
-  const decimalPart = cleaned
-    .slice(separatorIndex + 1)
-    .replace(/[.,]/g, "");
+  const decimalPart = cleaned.slice(separatorIndex + 1).replace(/[.,]/g, "");
   const separator = cleaned[separatorIndex];
   const normalizedInteger = integerPart.replace(/^0+(?=\d)/, "") || "0";
 
