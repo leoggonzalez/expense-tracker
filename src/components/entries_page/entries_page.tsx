@@ -32,10 +32,7 @@ export function EntriesPage({ entries }: EntriesPageProps): React.ReactElement {
           </Link>
         </Stack>
 
-        <EntryList
-          entries={entries}
-          entryHref={(entry) => `/entries/${entry.id}`}
-        />
+        <EntryList entries={entries} entryHrefBase="/entries" />
       </Stack>
     </Container>
   );

@@ -28,12 +28,14 @@ export interface EntryListProps {
   showEdit?: boolean;
   showDelete?: boolean;
   entryHref?: (entry: EntryListItem) => string | null;
+  entryHrefBase?: string;
 }
 
 export function EntryList({
   entries: plainEntries,
   showDelete = true,
   entryHref,
+  entryHrefBase,
 }: EntryListProps): React.ReactElement {
   const handleDelete = async (id: string) => {
     if (confirm(i18n.t("entry_list.delete_confirm") as string)) {
@@ -63,7 +65,9 @@ export function EntryList({
     <div className="entry-list">
       <Stack gap={12}>
         {entries.map((entry, index) => {
-          const href = entryHref?.(plainEntries[index]);
+          const href =
+            entryHref?.(plainEntries[index]) ??
+            (entryHrefBase ? `${entryHrefBase}/${plainEntries[index].id}` : null);
           const content = (
             <div className="entry-list__content">
               <div className="entry-list__main">
