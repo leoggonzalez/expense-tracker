@@ -1,5 +1,6 @@
-import React from "react";
 import "./box.scss";
+
+import React from "react";
 
 type BoxStyle = React.CSSProperties & Record<`--${string}`, string>;
 

@@ -86,6 +86,7 @@ Create a `.env` file in the root directory:
 
 ```env
 DATABASE_URL="postgresql://username:password@localhost:5432/expense_tracker?schema=public"
+DIRECT_URL="postgresql://username:password@localhost:5432/expense_tracker?schema=public"
 AUTH_SECRET="replace_me"
 
 EMAIL_PROVIDER="smtp"
@@ -115,6 +116,8 @@ The `DEV_ADMIN_LOGIN_CODE=999999` bypass is development-only. It only works for 
 ```bash
 npx prisma migrate dev --name init
 ```
+
+For local development, both `DATABASE_URL` and `DIRECT_URL` should point to your local PostgreSQL instance.
 
 ### 5. Seed the Database (Optional)
 
@@ -232,7 +235,97 @@ model Entry {
 - `npm run lint` - Run ESLint
 - `npm run prisma:generate` - Generate Prisma Client
 - `npm run prisma:migrate` - Run database migrations
+- `npm run prisma:migrate:deploy` - Apply committed migrations without creating new ones
 - `npm run prisma:studio` - Open Prisma Studio
+
+## Deployment
+
+### Hosting
+
+- Application: **Vercel**
+- Production database: **Supabase Postgres**
+- Local development database: **local PostgreSQL**
+
+### Production database URLs
+
+Use two database URLs in production:
+
+- `DATABASE_URL`: Supabase transaction pooler URL for application runtime
+- `DIRECT_URL`: Supabase session pooler URL for Prisma CLI and migrations
+
+Recommended production shape:
+
+```env
+DATABASE_URL="postgresql://<user>:<password>@<transaction-pooler-host>:6543/postgres?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgresql://<user>:<password>@<session-pooler-host>:5432/postgres"
+```
+
+### Vercel configuration
+
+1. Connect your GitHub account to Vercel.
+2. Import this repository as a Vercel project.
+3. Set `main` as the production branch.
+4. Add all production environment variables in the Vercel project settings:
+   - `DATABASE_URL`
+   - `DIRECT_URL`
+   - `AUTH_SECRET`
+   - `EMAIL_PROVIDER`
+   - `EMAIL_FROM`
+   - `SMTP_HOST`
+   - `SMTP_PORT`
+   - `SMTP_SECURE`
+   - `SMTP_USER`
+   - `SMTP_PASS`
+   - `DEV_ADMIN_EMAIL`
+   - `DEV_ADMIN_LOGIN_CODE`
+
+Vercel Git integration will then:
+
+- create preview deployments for pull requests
+- deploy production automatically on every merge or push to `main`
+
+### Supabase configuration
+
+Create one Supabase production project and use the closest EU region available.
+
+Recommended setup:
+
+1. Create a dedicated Prisma database user.
+2. Grant that user access to the `public` schema.
+3. Use that user’s credentials for both the runtime and direct URLs.
+4. Copy the transaction pooler URL into `DATABASE_URL`.
+5. Copy the session pooler URL into `DIRECT_URL`.
+
+### Production migrations
+
+Production migrations are manual.
+
+Recommended release flow:
+
+1. Create and commit migrations in development.
+2. Merge to `main`.
+3. Run production migrations manually:
+
+```bash
+npx prisma migrate deploy
+```
+
+Run that command with production `DATABASE_URL` / `DIRECT_URL` values in your shell or environment.
+
+Do not run schema-changing migrations automatically during deployment.
+
+### GitHub
+
+This repository includes a GitHub Actions workflow at [.github/workflows/ci.yml](/Users/leogonzalez/development/leoggonzalez/expense-tracker/.github/workflows/ci.yml) that runs:
+
+- `yarn lint`
+- `yarn build`
+
+Recommended GitHub branch protection for `main`:
+
+- require pull requests before merge
+- require the CI workflow to pass
+- optionally require the branch to be up to date before merge
 
 ## Future Enhancements
 
