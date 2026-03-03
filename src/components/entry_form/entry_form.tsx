@@ -177,6 +177,7 @@ export function EntryForm({
   const [isDraftReady, setIsDraftReady] = useState(
     !(!isEdit && Boolean(entryType)),
   );
+  const hasHydratedDraftRef = useRef(false);
   const skipDraftSaveRef = useRef(false);
   const initialModelRef = useRef<EntryFormModel>(
     getInitialModel({
@@ -280,6 +281,10 @@ export function EntryForm({
       return;
     }
 
+    if (hasHydratedDraftRef.current) {
+      return;
+    }
+
     setIsDraftReady(false);
     setNewEntryFlowActive(true);
 
@@ -298,8 +303,9 @@ export function EntryForm({
       });
     }
 
+    hasHydratedDraftRef.current = true;
     setIsDraftReady(true);
-  }, [initialData, isCreateFlow, updateFields]);
+  }, [initialData, isCreateFlow]);
 
   useEffect(() => {
     if (!entryType || isEdit) {
@@ -309,7 +315,7 @@ export function EntryForm({
     if (model.type !== entryType) {
       updateFields({ type: entryType });
     }
-  }, [entryType, isEdit, model.type, updateFields]);
+  }, [entryType, isEdit, model.type]);
 
   useEffect(() => {
     if (model.isRecurring) {
@@ -340,7 +346,6 @@ export function EntryForm({
     model.endDate,
     model.endDateMode,
     model.isRecurring,
-    updateFields,
   ]);
 
   useEffect(() => {
