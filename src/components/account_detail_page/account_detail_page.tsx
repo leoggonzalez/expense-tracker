@@ -4,7 +4,7 @@ import "./account_detail_page.scss";
 
 import { Button, Container, EntryList, Input } from "@/components";
 import { deleteAccount, updateAccount } from "@/actions/accounts";
-import { Box, Stack, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -95,7 +95,11 @@ export function AccountDetailPage({
           {i18n.t("account_detail_page.title")}
         </Text>
 
-        <Box padding={20} className="account-detail-page__summary">
+        <Card
+          padding={20}
+          variant="secondary"
+          className="account-detail-page__summary"
+        >
           <Stack gap={10}>
             <Text size="lg" weight="semibold">
               {account.name}
@@ -116,9 +120,9 @@ export function AccountDetailPage({
               })}
             </Text>
           </Stack>
-        </Box>
+        </Card>
 
-        <Box padding={20} className="account-detail-page__panel">
+        <Card padding={20} className="account-detail-page__panel">
           <form onSubmit={handleSave}>
             <Stack gap={14}>
               <Text size="h4" as="h2" weight="semibold">
@@ -155,9 +159,9 @@ export function AccountDetailPage({
               </Stack>
             </Stack>
           </form>
-        </Box>
+        </Card>
 
-        <div className="account-detail-page__entries">
+        <Stack gap={16} className="account-detail-page__entries">
           <Text size="h4" as="h2" weight="semibold">
             {i18n.t("account_detail_page.related_entries")}
           </Text>
@@ -166,7 +170,7 @@ export function AccountDetailPage({
             showDelete={false}
             entryHref={(entryItem) => `/entries/${entryItem.id}`}
           />
-        </div>
+        </Stack>
       </Stack>
     </Container>
   );

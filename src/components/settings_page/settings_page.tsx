@@ -12,7 +12,7 @@ import {
 import { logout } from "@/actions/auth";
 import { LanguagePreference, ThemePreference } from "@/lib/app_preferences";
 import { updateCurrentUserProfile } from "@/actions/user";
-import { Box, Stack, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -67,15 +67,15 @@ export function SettingsPage({ user }: SettingsPageProps): React.ReactElement {
           {i18n.t("settings_page.title")}
         </Text>
 
-        <Box padding={20} className="settings-page__panel">
+        <Card padding={20} variant="secondary" className="settings-page__panel">
           <form onSubmit={handleSave}>
             <Stack gap={16}>
-              <div className="settings-page__field">
+              <Stack gap={4} className="settings-page__field">
                 <Text size="sm" weight="semibold">
                   {i18n.t("settings_page.email")}
                 </Text>
                 <Text color="secondary">{user.email}</Text>
-              </div>
+              </Stack>
 
               <Input
                 label={i18n.t("settings_page.name")}
@@ -84,7 +84,7 @@ export function SettingsPage({ user }: SettingsPageProps): React.ReactElement {
                 placeholder={i18n.t("settings_page.name_placeholder") as string}
               />
 
-              <div className="settings-page__preferences">
+              <Stack gap={16} className="settings-page__preferences">
                 <Text size="sm" weight="semibold">
                   {i18n.t("settings_page.appearance")}
                 </Text>
@@ -136,7 +136,7 @@ export function SettingsPage({ user }: SettingsPageProps): React.ReactElement {
                     },
                   ]}
                 />
-              </div>
+              </Stack>
 
               {error && <Text color="danger">{i18n.t(error)}</Text>}
               {success && <Text color="success">{i18n.t(success)}</Text>}
@@ -162,7 +162,7 @@ export function SettingsPage({ user }: SettingsPageProps): React.ReactElement {
               </Stack>
             </Stack>
           </form>
-        </Box>
+        </Card>
       </Stack>
     </Container>
   );

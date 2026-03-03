@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 
 import { Container } from "@/components";
-import { Stack, Text } from "@/elements";
+import { Card, Grid, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 type NewEntryPageProps = {
@@ -43,31 +43,31 @@ export function NewEntryPage({
 
   return (
     <Container>
-      <div className="new-entry-page">
-        <Stack gap={24}>
-          <Text size="h2" as="h1" weight="bold">
-            {i18n.t(titleKey)}
-          </Text>
-          <div className="new-entry-page__tabs">
-            {tabs.map((tab) => (
-              <Link
-                key={tab.key}
-                href={tab.href}
-                className={[
-                  "new-entry-page__tab",
-                  `new-entry-page__tab--${tab.key}`,
-                  activeTab === tab.key && "new-entry-page__tab--active",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
-                {tab.label}
-              </Link>
-            ))}
-          </div>
-          <div className="new-entry-page__panel">{children}</div>
-        </Stack>
-      </div>
+      <Stack gap={24} className="new-entry-page">
+        <Text size="h2" as="h1" weight="bold">
+          {i18n.t(titleKey)}
+        </Text>
+        <Grid columns="repeat(3, minmax(0, 1fr))" gap={8}>
+          {tabs.map((tab) => (
+            <Link
+              key={tab.key}
+              href={tab.href}
+              className={[
+                "new-entry-page__tab",
+                `new-entry-page__tab--${tab.key}`,
+                activeTab === tab.key && "new-entry-page__tab--active",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </Grid>
+        <Card padding={24} className="new-entry-page__panel">
+          {children}
+        </Card>
+      </Stack>
     </Container>
   );
 }

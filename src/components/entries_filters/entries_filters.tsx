@@ -3,7 +3,7 @@
 import "./entries_filters.scss";
 
 import { Button, DateRangeInput, Select } from "@/components";
-import { Stack, Text } from "@/elements";
+import { Card, Grid, Stack, Text } from "@/elements";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import React from "react";
@@ -54,9 +54,9 @@ export function EntriesFilters({
   const anyFilters = Object.values(filters).some((value) => value);
 
   return (
-    <div className="entries-filters">
-      <Stack direction="row" gap={16} align="center" justify="space-between">
-        <Stack direction="row" gap={32} justify="space-between">
+    <Card padding={24} variant="secondary" className="entries-filters">
+      <Stack gap={16}>
+        <Grid gap={16} className="entries-filters__grid">
           <Select
             label={i18n.t("entries_page.account")}
             value={filters.account}
@@ -68,11 +68,11 @@ export function EntriesFilters({
             }))}
           />
 
-          <div className="entries-filters__type-switcher">
+          <Stack gap={4}>
             <Text size="sm" weight="medium">
               {i18n.t("entries_page.type")}
             </Text>
-            <div className="entries-filters__type-options">
+            <Stack direction="row" wrap gap={8}>
               {[
                 { value: "", label: i18n.t("entries_page.type_all") },
                 { value: "income", label: i18n.t("common.income") },
@@ -97,8 +97,8 @@ export function EntriesFilters({
                   {option.label}
                 </button>
               ))}
-            </div>
-          </div>
+            </Stack>
+          </Stack>
 
           <DateRangeInput
             label={i18n.t("entries_page.date_range")}
@@ -107,15 +107,15 @@ export function EntriesFilters({
             onStartDateChange={(value) => updateQuery({ start_date: value })}
             onEndDateChange={(value) => updateQuery({ end_date: value })}
           />
-        </Stack>
+        </Grid>
         {anyFilters && (
-          <div className="entries-filters__actions">
+          <Stack direction="row" className="entries-filters__actions">
             <Button variant="secondary" size="sm" onClick={clearFilters}>
               {i18n.t("entries_page.clear_filters")}
             </Button>
-          </div>
+          </Stack>
         )}
       </Stack>
-    </div>
+    </Card>
   );
 }

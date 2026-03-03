@@ -4,9 +4,7 @@
   width: 100%;
 
   &__cards {
-    display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
   }
 
   &__card-link {
@@ -14,13 +12,7 @@
   }
 
   &__card {
-    padding: var(--spacing-md);
-    border-radius: var(--border-radius-md);
-    background-color: var(--color-background);
-    border: var(--border-width) solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
+    border-left-width: 3px;
 
     &--income {
       border-left: 3px solid var(--color-success);
@@ -35,19 +27,6 @@
     }
   }
 
-  &__recent-section {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-  }
-
-  &__recent-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-md);
-  }
-
   &__recent-link {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
@@ -59,7 +38,6 @@
   .dashboard {
     &__cards {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--spacing-lg);
     }
   }
 }

@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-import { Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export type EntriesTableItem = {
@@ -30,9 +30,9 @@ export function EntriesTable({
 
   if (entries.length === 0) {
     return (
-      <div className="entries-table__empty">
+      <Card padding={32} variant="dashed" className="entries-table__empty">
         <Text color="secondary">{i18n.t("entries_page.empty_state")}</Text>
-      </div>
+      </Card>
     );
   }
 
@@ -57,7 +57,7 @@ export function EntriesTable({
   };
 
   return (
-    <div className="entries-table">
+    <Card className="entries-table">
       <div className="entries-table__scroll">
         <table className="entries-table__table">
           <thead className="entries-table__head">
@@ -115,7 +115,7 @@ export function EntriesTable({
                   </Text>
                 </td>
                 <td className="entries-table__cell entries-table__cell--details">
-                  <div className="entries-table__details">
+                  <Stack gap={4} className="entries-table__details">
                     <span
                       className={[
                         "entries-table__type",
@@ -127,7 +127,7 @@ export function EntriesTable({
                         : i18n.t("common.expense")}
                     </span>
                     <Text size="sm">{entry.description}</Text>
-                  </div>
+                  </Stack>
                 </td>
                 <td className="entries-table__cell entries-table__cell--amount">
                   <Text
@@ -148,6 +148,6 @@ export function EntriesTable({
           </tbody>
         </table>
       </div>
-    </div>
+    </Card>
   );
 }

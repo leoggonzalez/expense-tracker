@@ -1,12 +1,6 @@
 @use "@/styles/variables.scss" as *;
 
 .new-entry-page {
-  &__tabs {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--spacing-sm);
-  }
-
   &__tab {
     border: var(--border-width) solid var(--color-border);
     border-radius: var(--border-radius-full);
@@ -70,12 +64,5 @@
       color: var(--color-primary);
       background-color: var(--color-background-secondary);
     }
-  }
-
-  &__panel {
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-background);
-    padding: var(--spacing-lg);
   }
 }

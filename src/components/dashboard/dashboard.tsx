@@ -3,7 +3,7 @@
 import "./dashboard.scss";
 
 import { Entry, EntryCollection } from "@/model";
-import { Stack, Text } from "@/elements";
+import { Card, Grid, Stack, Text } from "@/elements";
 
 import React from "react";
 import { i18n } from "@/model/i18n";
@@ -65,51 +65,68 @@ export function Dashboard({
           {i18n.t("dashboard.current_month_overview")}
         </Text>
 
-        <div className="dashboard__cards">
+        <Grid gap={16} className="dashboard__cards">
           <Link
             href={`/entries?${currentMonthQuery}&type=income`}
             className="dashboard__card-link"
           >
-            <div className="dashboard__card dashboard__card--income">
-              <Text size="sm" color="secondary" weight="medium">
-                {i18n.t("dashboard.income")}
-              </Text>
-              <Text size="2xl" weight="bold" color="success">
-                {formatCurrency(income)}
-              </Text>
-            </div>
+            <Card
+              padding={16}
+              className="dashboard__card dashboard__card--income"
+            >
+              <Stack gap={8}>
+                <Text size="sm" color="secondary" weight="medium">
+                  {i18n.t("dashboard.income")}
+                </Text>
+                <Text size="2xl" weight="bold" color="success">
+                  {formatCurrency(income)}
+                </Text>
+              </Stack>
+            </Card>
           </Link>
 
           <Link
             href={`/entries?${currentMonthQuery}&type=expense`}
             className="dashboard__card-link"
           >
-            <div className="dashboard__card dashboard__card--expense">
-              <Text size="sm" color="secondary" weight="medium">
-                {i18n.t("dashboard.expenses")}
-              </Text>
-              <Text size="2xl" weight="bold" color="danger">
-                {formatCurrency(expense)}
-              </Text>
-            </div>
+            <Card
+              padding={16}
+              className="dashboard__card dashboard__card--expense"
+            >
+              <Stack gap={8}>
+                <Text size="sm" color="secondary" weight="medium">
+                  {i18n.t("dashboard.expenses")}
+                </Text>
+                <Text size="2xl" weight="bold" color="danger">
+                  {formatCurrency(expense)}
+                </Text>
+              </Stack>
+            </Card>
           </Link>
 
-          <div className="dashboard__card dashboard__card--net">
-            <Text size="sm" color="secondary" weight="medium">
-              {i18n.t("dashboard.net")}
-            </Text>
-            <Text
-              size="2xl"
-              weight="bold"
-              color={net >= 0 ? "success" : "danger"}
-            >
-              {formatCurrency(net)}
-            </Text>
-          </div>
-        </div>
+          <Card padding={16} className="dashboard__card dashboard__card--net">
+            <Stack gap={8}>
+              <Text size="sm" color="secondary" weight="medium">
+                {i18n.t("dashboard.net")}
+              </Text>
+              <Text
+                size="2xl"
+                weight="bold"
+                color={net >= 0 ? "success" : "danger"}
+              >
+                {formatCurrency(net)}
+              </Text>
+            </Stack>
+          </Card>
+        </Grid>
 
-        <div className="dashboard__recent-section">
-          <div className="dashboard__recent-header">
+        <Stack gap={16} className="dashboard__recent-section">
+          <Stack
+            direction="row"
+            align="center"
+            justify="space-between"
+            className="dashboard__recent-header"
+          >
             <Text size="h4" as="h3" weight="semibold">
               {i18n.t("dashboard.recent_entries")}
             </Text>
@@ -119,13 +136,13 @@ export function Dashboard({
             >
               {i18n.t("dashboard.see_all_entries")}
             </Link>
-          </div>
+          </Stack>
           <EntryList
             entries={recentEntries}
             showDelete={false}
             entryHref={(entry) => `/entries/${entry.id}`}
           />
-        </div>
+        </Stack>
       </Stack>
     </div>
   );

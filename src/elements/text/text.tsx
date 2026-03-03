@@ -18,6 +18,7 @@ export interface TextProps {
     | "inverse";
   weight?: "normal" | "medium" | "semibold" | "bold";
   as?: "p" | "span" | "div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "label";
+  transform?: "none" | "uppercase" | "lowercase" | "capitalize";
   className?: string;
 }
 
@@ -27,6 +28,7 @@ export function Text({
   color = "primary",
   weight = "normal",
   as: Component = "p",
+  transform = "none",
   className = "",
 }: TextProps): React.ReactElement {
   const classes = [
@@ -34,6 +36,7 @@ export function Text({
     `text--size-${size}`,
     `text--color-${color}`,
     `text--weight-${weight}`,
+    `text--transform-${transform}`,
     className,
   ]
     .filter(Boolean)
