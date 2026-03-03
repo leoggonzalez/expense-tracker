@@ -55,16 +55,8 @@ export function EntriesFilters({
 
   return (
     <div className="entries-filters">
-      <Stack direction="row"
-        gap={16}
-        align="center"
-        justify="space-between"
-      >
-        <Stack
-          direction="row"
-          gap={32}
-          justify="space-between"
-        >
+      <Stack direction="row" gap={16} align="center" justify="space-between">
+        <Stack direction="row" gap={32} justify="space-between">
           <Select
             label={i18n.t("entries_page.account")}
             value={filters.account}
@@ -92,11 +84,11 @@ export function EntriesFilters({
                   className={[
                     "entries-filters__type-option",
                     option.value === "income" &&
-                    "entries-filters__type-option--income",
+                      "entries-filters__type-option--income",
                     option.value === "expense" &&
-                    "entries-filters__type-option--expense",
+                      "entries-filters__type-option--expense",
                     filters.type === option.value &&
-                    "entries-filters__type-option--active",
+                      "entries-filters__type-option--active",
                   ]
                     .filter(Boolean)
                     .join(" ")}
