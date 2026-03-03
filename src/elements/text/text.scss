@@ -106,4 +106,21 @@
   &--weight-bold {
     font-weight: var(--font-weight-bold);
   }
+
+  /* Transform */
+  &--transform-none {
+    text-transform: none;
+  }
+
+  &--transform-uppercase {
+    text-transform: uppercase;
+  }
+
+  &--transform-lowercase {
+    text-transform: lowercase;
+  }
+
+  &--transform-capitalize {
+    text-transform: capitalize;
+  }
 }

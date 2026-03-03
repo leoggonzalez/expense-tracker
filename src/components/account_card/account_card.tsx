@@ -1,9 +1,9 @@
 import "./account_card.scss";
 
-import Link from "next/link";
 import React from "react";
 
-import { Box, Stack, Text } from "@/elements";
+import { AppLink } from "@/components";
+import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 type AccountCardProps = {
@@ -26,13 +26,13 @@ export function AccountCard({
   allTimeNet,
 }: AccountCardProps): React.ReactElement {
   return (
-    <Link href={`/accounts/${id}`} className="account-card">
-      <Box padding={20} className="account-card__panel">
+    <AppLink href={`/accounts/${id}`} className="account-card">
+      <Card padding={20} className="account-card__panel">
         <Stack gap={10}>
           <Text size="lg" weight="semibold">
             {name}
           </Text>
-          <div className="account-card__meta">
+          <Stack gap={4} className="account-card__meta">
             <Text size="xs" color="secondary">
               {i18n.t("accounts_page.total_balance")}
             </Text>
@@ -43,12 +43,12 @@ export function AccountCard({
             >
               {formatCurrency(allTimeNet)}
             </Text>
-          </div>
+          </Stack>
           <Text size="sm" color="secondary">
             {i18n.t("accounts_page.entry_count", { count: entryCount })}
           </Text>
         </Stack>
-      </Box>
-    </Link>
+      </Card>
+    </AppLink>
   );
 }

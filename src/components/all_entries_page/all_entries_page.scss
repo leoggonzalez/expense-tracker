@@ -2,18 +2,6 @@
 
 .all-entries-page {
   &__filters {
-    padding: var(--spacing-lg);
-    background-color: var(--color-background-secondary);
-    border-radius: var(--border-radius-md);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-  }
-
-  &__filter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing-md);
   }
 
   &__results-header {

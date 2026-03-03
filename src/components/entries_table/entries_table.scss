@@ -7,9 +7,6 @@
     width: 100%;
     min-width: 0;
     overflow-x: auto;
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-background);
   }
 
   &__table {
@@ -63,9 +60,6 @@
   }
 
   &__details {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
   }
 
   &__type {
@@ -96,10 +90,6 @@
   }
 
   &__empty {
-    padding: var(--spacing-2xl);
-    border: var(--border-width) dashed var(--color-border);
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-background-secondary);
     text-align: center;
   }
 }

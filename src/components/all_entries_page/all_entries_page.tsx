@@ -10,7 +10,7 @@ import {
   Pagination,
 } from "@/components";
 import { EntryList, EntryListItem } from "@/components/entry_list/entry_list";
-import { Stack, Text } from "@/elements";
+import { Card, Grid, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export type AllEntriesPageProps = {
@@ -59,11 +59,19 @@ export function AllEntriesPage({
           {i18n.t("all_entries_page.title")}
         </Text>
 
-        <div className="all-entries-page__filters">
+        <Card
+          padding={24}
+          variant="secondary"
+          className="all-entries-page__filters"
+        >
           <Text size="h4" as="h3" weight="semibold">
             {i18n.t("all_entries_page.filters")}
           </Text>
-          <div className="all-entries-page__filter-grid">
+          <Grid
+            className="all-entries-page__filter-grid"
+            columns="repeat(auto-fit, minmax(200px, 1fr))"
+            gap={16}
+          >
             <Autocomplete
               label={i18n.t("all_entries_page.account")}
               value={selectedAccountName}
@@ -99,12 +107,12 @@ export function AllEntriesPage({
               value={filters.endDate}
               onChange={onEndDateChange}
             />
-          </div>
+          </Grid>
 
           <Button onClick={onClearFilters} variant="secondary" size="sm">
             {i18n.t("all_entries_page.clear_filters")}
           </Button>
-        </div>
+        </Card>
 
         <div>
           <div className="all-entries-page__results-header">

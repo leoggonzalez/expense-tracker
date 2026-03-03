@@ -4,7 +4,7 @@ import "./accounts_page.scss";
 
 import { Button, Container, Input } from "@/components";
 import { createAccount } from "@/actions/accounts";
-import { Grid, Stack, Text } from "@/elements";
+import { Card, Grid, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -53,35 +53,41 @@ export function AccountsPage({
           {i18n.t("accounts_page.title")}
         </Text>
 
-        <form onSubmit={handleSubmit} className="accounts-page__create-form">
-          <Stack gap={12}>
-            <Text size="sm" weight="semibold">
-              {i18n.t("accounts_page.create_account")}
-            </Text>
-            <div className="accounts-page__create-row">
-              <Input
-                label={i18n.t("accounts_page.account_name")}
-                value={name}
-                onChange={setName}
-                placeholder={
-                  i18n.t("accounts_page.account_name_placeholder") as string
-                }
-                required
-              />
-              <Button type="submit" disabled={loading}>
-                {loading
-                  ? i18n.t("accounts_page.creating")
-                  : i18n.t("accounts_page.create")}
-              </Button>
-            </div>
-            {error && <Text color="danger">{i18n.t(error)}</Text>}
-          </Stack>
-        </form>
+        <Card
+          padding={16}
+          variant="secondary"
+          className="accounts-page__create-form"
+        >
+          <form onSubmit={handleSubmit}>
+            <Stack gap={12}>
+              <Text size="sm" weight="semibold">
+                {i18n.t("accounts_page.create_account")}
+              </Text>
+              <div className="accounts-page__create-row">
+                <Input
+                  label={i18n.t("accounts_page.account_name")}
+                  value={name}
+                  onChange={setName}
+                  placeholder={
+                    i18n.t("accounts_page.account_name_placeholder") as string
+                  }
+                  required
+                />
+                <Button type="submit" disabled={loading}>
+                  {loading
+                    ? i18n.t("accounts_page.creating")
+                    : i18n.t("accounts_page.create")}
+                </Button>
+              </div>
+              {error && <Text color="danger">{i18n.t(error)}</Text>}
+            </Stack>
+          </form>
+        </Card>
 
         {accounts.length === 0 ? (
-          <div className="accounts-page__empty">
+          <Card padding={24} variant="dashed" className="accounts-page__empty">
             <Text color="secondary">{i18n.t("accounts_page.empty_state")}</Text>
-          </div>
+          </Card>
         ) : (
           <Grid className="accounts-page__grid" minColumnWidth={240} gap={16}>
             {accounts.map((account) => (

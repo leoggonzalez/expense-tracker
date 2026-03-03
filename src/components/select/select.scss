@@ -23,12 +23,30 @@
     font-size: var(--font-size-md);
     color: var(--color-text-primary);
     background-color: var(--color-background);
-    transition: border-color var(--transition-base);
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast),
+      background-color var(--transition-fast),
+      transform var(--transition-fast);
     cursor: pointer;
 
-    &:focus {
+    &:hover {
+      border-color: var(--color-border-dark);
+      background-color: var(--color-background-secondary);
+    }
+
+    &:focus,
+    &:focus-visible {
       outline: none;
       border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--color-primary) 18%, transparent);
+      background-color: var(--color-background);
+    }
+
+    &:active {
+      border-color: var(--color-primary-dark);
+      transform: scale(0.998);
     }
   }
 }

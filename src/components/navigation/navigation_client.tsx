@@ -2,11 +2,10 @@
 
 import "./navigation.scss";
 
-import { Container } from "@/components";
+import { AppLink, Container, useNavigationProgress } from "@/components";
 import { Icon } from "@/elements";
 import type { IconName } from "@/elements/icon/icon_assets";
 import { i18n } from "@/model/i18n";
-import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
 
@@ -18,6 +17,7 @@ export function NavigationClient({
   isAuthenticated,
 }: NavigationClientProps): React.ReactElement {
   const pathname = usePathname();
+  const { isNavigating, targetHref } = useNavigationProgress();
   const links: Array<{
     href: string;
     label: React.ReactNode;
@@ -65,17 +65,23 @@ export function NavigationClient({
       <Container maxWidth="wide">
         <div className="navigation__inner">
           <div className="navigation__brand">
-            <Link href="/">{i18n.t("navigation.brand")}</Link>
+            <AppLink href="/">{i18n.t("navigation.brand")}</AppLink>
           </div>
           <ul className="navigation__links">
             {links.map((link) => (
               <li key={link.href} className="navigation__item">
-                <Link
+                <AppLink
                   href={link.href}
-                  aria-label={String(link.label)}
-                  className={`navigation__link ${
-                    isLinkActive(link.href) ? "navigation__link--active" : ""
-                  }`}
+                  ariaLabel={String(link.label)}
+                  className={[
+                    "navigation__link",
+                    isLinkActive(link.href) && "navigation__link--active",
+                    isNavigating &&
+                      targetHref === link.href &&
+                      "navigation__link--pending",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 >
                   <Icon
                     name={link.icon}
@@ -83,7 +89,7 @@ export function NavigationClient({
                     className="navigation__icon"
                   />
                   <span className="navigation__label">{link.label}</span>
-                </Link>
+                </AppLink>
               </li>
             ))}
           </ul>

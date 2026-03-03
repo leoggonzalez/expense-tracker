@@ -44,9 +44,42 @@
     font-weight: var(--font-weight-medium);
     font-size: var(--font-size-xs);
     gap: var(--spacing-xs);
+    border-radius: var(--border-radius-md);
+    transition:
+      color var(--transition-fast),
+      background-color var(--transition-fast),
+      transform var(--transition-fast),
+      opacity var(--transition-fast);
+
+    &:hover {
+      color: var(--color-text-primary);
+      background-color: var(--color-background-secondary);
+    }
+
+    &:focus-visible {
+      outline: none;
+      color: var(--color-primary);
+      background-color: var(--color-background-secondary);
+      box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--color-primary) 18%, transparent);
+    }
+
+    &:active {
+      transform: scale(0.98);
+      background-color: var(--color-background-tertiary);
+    }
 
     &--active {
       color: var(--color-primary);
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 10%,
+        var(--color-background)
+      );
+    }
+
+    &--pending {
+      opacity: 0.72;
     }
   }
 

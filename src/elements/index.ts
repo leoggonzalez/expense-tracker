@@ -4,6 +4,9 @@ export type { StackProps } from "./stack/stack";
 export { Box } from "./box/box";
 export type { BoxProps, BoxPadding } from "./box/box";
 
+export { Card } from "./card/card";
+export type { CardProps } from "./card/card";
+
 export { Grid } from "./grid/grid";
 export type { GridProps } from "./grid/grid";
 

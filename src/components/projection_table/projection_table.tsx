@@ -2,14 +2,12 @@
 
 import "./projection_table.scss";
 
+import { Input, useNavigationProgress } from "@/components";
 import { Entry, EntryCollection } from "@/model";
 import { i18n } from "@/model/i18n";
 import React, { useState } from "react";
-import { Stack, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
-import { useRouter } from "next/navigation";
-
-import { Input } from "@/components";
 
 export interface ProjectionTableProps {
   entries: Array<{
@@ -28,7 +26,7 @@ export interface ProjectionTableProps {
 export function ProjectionTable({
   entries: plainEntries,
 }: ProjectionTableProps): React.ReactElement {
-  const router = useRouter();
+  const { push } = useNavigationProgress();
   const currentDate = new Date();
   const [endDate, setEndDate] = useState<string>(
     format(addMonths(currentDate, 5), "yyyy-MM"),
@@ -73,7 +71,7 @@ export function ProjectionTable({
   return (
     <div className="projection-table">
       <Stack gap={24}>
-        <div className="projection-table__header">
+        <Stack gap={16} className="projection-table__header">
           <Text size="h2" as="h2" weight="bold">
             {i18n.t("projection_table.title")}
           </Text>
@@ -86,9 +84,9 @@ export function ProjectionTable({
               min={format(currentDate, "yyyy-MM")}
             />
           </div>
-        </div>
+        </Stack>
 
-        <div className="projection-table__scroll-container">
+        <Card className="projection-table__scroll-container">
           <table className="projection-table__table">
             <thead className="projection-table__thead">
               <tr className="projection-table__row">
@@ -126,14 +124,14 @@ export function ProjectionTable({
                       <tr
                         key={entry.id}
                         className="projection-table__row projection-table__row--interactive"
-                        onClick={() => router.push(`/entries/${entry.id}`)}
+                        onClick={() => push(`/entries/${entry.id}`)}
                       >
                         <td className="projection-table__cell projection-table__cell--sticky">
-                          <div className="projection-table__entry">
+                          <Stack gap={4} className="projection-table__entry">
                             <Text size="xs" color="secondary">
                               {entry.description}
                             </Text>
-                          </div>
+                          </Stack>
                         </td>
                         {months.map((month) => {
                           const amount = entry.getAmountForMonth(month);
@@ -260,7 +258,7 @@ export function ProjectionTable({
               </tr>
             </tbody>
           </table>
-        </div>
+        </Card>
       </Stack>
     </div>
   );

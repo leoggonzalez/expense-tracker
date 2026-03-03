@@ -2,12 +2,15 @@
 
 import "./entry_detail_page.scss";
 
+import {
+  Button,
+  Container,
+  EntryForm,
+  useNavigationProgress,
+} from "@/components";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-
-import { Button, Container, EntryForm } from "@/components";
 import { deleteEntry } from "@/actions/entries";
-import { Box, Stack, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 type EntryDetailPageProps = {
@@ -27,7 +30,7 @@ export function EntryDetailPage({
   accounts,
   entry,
 }: EntryDetailPageProps): React.ReactElement {
-  const router = useRouter();
+  const { push, refresh } = useNavigationProgress();
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -43,40 +46,37 @@ export function EntryDetailPage({
       return;
     }
 
-    router.push("/entries");
-    router.refresh();
+    push("/entries");
   };
 
   return (
     <Container>
-      <div className="entry-detail-page">
-        <Stack gap={24}>
-          <Text size="h2" as="h1" weight="bold">
-            {i18n.t("entry_detail_page.title")}
-          </Text>
-          <Box padding={24} className="entry-detail-page__card">
-            <Stack gap={16}>
-              <EntryForm
-                accounts={accounts}
-                initialData={entry}
-                isEdit
-                onSuccess={() => router.refresh()}
-              />
-              <Button
-                type="button"
-                variant="danger"
-                onClick={handleDelete}
-                disabled={deleting}
-                fullWidth
-              >
-                {deleting
-                  ? i18n.t("entry_detail_page.deleting")
-                  : i18n.t("entry_detail_page.delete")}
-              </Button>
-            </Stack>
-          </Box>
-        </Stack>
-      </div>
+      <Stack gap={24} className="entry-detail-page">
+        <Text size="h2" as="h1" weight="bold">
+          {i18n.t("entry_detail_page.title")}
+        </Text>
+        <Card padding={24} className="entry-detail-page__card">
+          <Stack gap={16}>
+            <EntryForm
+              accounts={accounts}
+              initialData={entry}
+              isEdit
+              onSuccess={refresh}
+            />
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleDelete}
+              disabled={deleting}
+              fullWidth
+            >
+              {deleting
+                ? i18n.t("entry_detail_page.deleting")
+                : i18n.t("entry_detail_page.delete")}
+            </Button>
+          </Stack>
+        </Card>
+      </Stack>
     </Container>
   );
 }

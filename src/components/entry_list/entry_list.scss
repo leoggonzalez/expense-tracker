@@ -2,11 +2,7 @@
 
 .entry-list {
   &--empty {
-    padding: var(--spacing-2xl);
     text-align: center;
-    background-color: var(--color-background-secondary);
-    border-radius: var(--border-radius-md);
-    border: var(--border-width) dashed var(--color-border);
   }
 
   &__item {
@@ -14,17 +10,10 @@
     flex-direction: column;
     align-items: stretch;
     gap: var(--spacing-md);
-    padding: var(--spacing-md);
-    background-color: var(--color-background);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--border-radius-md);
   }
 
   &__content {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
   }
 
   &__link {
@@ -32,16 +21,7 @@
     flex: 1;
   }
 
-  &__main {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-  }
-
   &__details {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
     align-items: flex-start;
   }
 
@@ -60,10 +40,10 @@
     }
 
     &__content {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: var(--spacing-lg);
+      --stack-direction: row;
+      --stack-justify: space-between;
+      --stack-align: flex-start;
+      --stack-gap: var(--spacing-lg);
     }
 
     &__details {

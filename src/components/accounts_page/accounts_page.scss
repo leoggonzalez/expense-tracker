@@ -1,13 +1,6 @@
 @use "@/styles/variables.scss" as *;
 
 .accounts-page {
-  &__create-form {
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-background-secondary);
-    padding: var(--spacing-md);
-  }
-
   &__create-row {
     display: flex;
     flex-direction: column;
@@ -15,10 +8,6 @@
   }
 
   &__empty {
-    border: var(--border-width) dashed var(--color-border);
-    border-radius: var(--border-radius-lg);
-    padding: var(--spacing-xl);
-    background-color: var(--color-background-secondary);
     text-align: center;
   }
 }

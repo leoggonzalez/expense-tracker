@@ -2,16 +2,15 @@
 
 import "./login_page.scss";
 
-import { Button, Input } from "@/components";
+import { Button, Input, useNavigationProgress } from "@/components";
 import { Container } from "@/components/container/container";
 import { requestLoginCode } from "@/actions/auth";
 import { Box, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 export function LoginPage(): React.ReactElement {
-  const router = useRouter();
+  const { push } = useNavigationProgress();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,7 +28,7 @@ export function LoginPage(): React.ReactElement {
       return;
     }
 
-    router.push(
+    push(
       `/login/verify?email=${encodeURIComponent(email.trim().toLowerCase())}`,
     );
   };
