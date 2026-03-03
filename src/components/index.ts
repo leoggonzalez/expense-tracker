@@ -22,6 +22,7 @@ export type { ProjectionTableProps } from "./projection_table/projection_table";
 
 export { EntryForm } from "./entry_form/entry_form";
 export type { EntryFormProps } from "./entry_form/entry_form";
+export { EntryDateField } from "./entry_date_field/entry_date_field";
 
 export { BulkEntryForm } from "./bulk_entry_form/bulk_entry_form";
 export type { BulkEntryFormProps } from "./bulk_entry_form/bulk_entry_form";

@@ -57,8 +57,6 @@ export function EntryDetailPage({
               <EntryForm
                 initialData={entry}
                 isEdit
-                hideTypeField
-                entryType={entry.type as "income" | "expense"}
                 onSuccess={() => router.refresh()}
               />
               <Button

@@ -15,7 +15,7 @@ export async function FloatingEntryButton(): Promise<React.ReactElement | null> 
 
   return (
     <Link
-      href="/entries/new/income"
+      href="/entries/new/expense"
       className="floating-entry-button"
       aria-label={i18n.t("common.add_entry") as string}
     >

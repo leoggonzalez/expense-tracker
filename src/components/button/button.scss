@@ -4,6 +4,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--spacing-xs);
   border: none;
   border-radius: var(--border-radius-md);
   font-weight: var(--font-weight-medium);
@@ -71,5 +72,11 @@
   /* Full width */
   &--full-width {
     width: 100%;
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
