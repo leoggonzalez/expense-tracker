@@ -2,10 +2,13 @@
 
 import "./entry_detail_page.scss";
 
+import {
+  Button,
+  Container,
+  EntryForm,
+  useNavigationProgress,
+} from "@/components";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-
-import { Button, Container, EntryForm } from "@/components";
 import { deleteEntry } from "@/actions/entries";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
@@ -27,7 +30,7 @@ export function EntryDetailPage({
   accounts,
   entry,
 }: EntryDetailPageProps): React.ReactElement {
-  const router = useRouter();
+  const { push, refresh } = useNavigationProgress();
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -43,8 +46,7 @@ export function EntryDetailPage({
       return;
     }
 
-    router.push("/entries");
-    router.refresh();
+    push("/entries");
   };
 
   return (
@@ -59,7 +61,7 @@ export function EntryDetailPage({
               accounts={accounts}
               initialData={entry}
               isEdit
-              onSuccess={() => router.refresh()}
+              onSuccess={refresh}
             />
             <Button
               type="button"

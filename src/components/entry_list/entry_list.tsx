@@ -2,13 +2,12 @@
 
 import "./entry_list.scss";
 
-import { Button } from "@/components";
+import { AppLink, Button } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { deleteEntry } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
 import { Entry } from "@/model";
 import { format } from "date-fns";
-import Link from "next/link";
 import React from "react";
 
 export type EntryListItem = {
@@ -104,9 +103,9 @@ export function EntryList({
           return (
             <Card key={entry.id} padding={16} className="entry-list__item">
               {href ? (
-                <Link href={href} className="entry-list__link">
+                <AppLink href={href} className="entry-list__link">
                   {content}
-                </Link>
+                </AppLink>
               ) : (
                 content
               )}

@@ -2,14 +2,12 @@
 
 import "./projection_table.scss";
 
+import { Input, useNavigationProgress } from "@/components";
 import { Entry, EntryCollection } from "@/model";
 import { i18n } from "@/model/i18n";
 import React, { useState } from "react";
 import { Card, Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
-import { useRouter } from "next/navigation";
-
-import { Input } from "@/components";
 
 export interface ProjectionTableProps {
   entries: Array<{
@@ -28,7 +26,7 @@ export interface ProjectionTableProps {
 export function ProjectionTable({
   entries: plainEntries,
 }: ProjectionTableProps): React.ReactElement {
-  const router = useRouter();
+  const { push } = useNavigationProgress();
   const currentDate = new Date();
   const [endDate, setEndDate] = useState<string>(
     format(addMonths(currentDate, 5), "yyyy-MM"),
@@ -126,7 +124,7 @@ export function ProjectionTable({
                       <tr
                         key={entry.id}
                         className="projection-table__row projection-table__row--interactive"
-                        onClick={() => router.push(`/entries/${entry.id}`)}
+                        onClick={() => push(`/entries/${entry.id}`)}
                       >
                         <td className="projection-table__cell projection-table__cell--sticky">
                           <Stack gap={4} className="projection-table__entry">

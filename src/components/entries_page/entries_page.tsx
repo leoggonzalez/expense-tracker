@@ -3,16 +3,17 @@
 import "./entries_page.scss";
 
 import {
+  AppLink,
   Container,
   EntriesFilters,
   EntriesTable,
   Pagination,
+  useNavigationProgress,
 } from "@/components";
 import { Stack, Text } from "@/elements";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { EntriesTableItem } from "@/components/entries_table/entries_table";
-import Link from "next/link";
 import React from "react";
 import { i18n } from "@/model/i18n";
 
@@ -43,7 +44,7 @@ export function EntriesPage({
   pagination,
 }: EntriesPageProps): React.ReactElement {
   const pathname = usePathname();
-  const router = useRouter();
+  const { push } = useNavigationProgress();
   const searchParams = useSearchParams();
 
   const goToPage = (page: number) => {
@@ -56,7 +57,7 @@ export function EntriesPage({
     }
 
     const queryString = nextParams.toString();
-    router.push(queryString ? `${pathname}?${queryString}` : pathname);
+    push(queryString ? `${pathname}?${queryString}` : pathname);
   };
 
   return (
@@ -66,14 +67,14 @@ export function EntriesPage({
           <Text size="h2" as="h2" weight="bold">
             {i18n.t("entries_page.title")}
           </Text>
-          <Link
+          <AppLink
             href="/entries/new/expense"
             className="entries-page__button-link"
           >
             <span className="entries-page__button">
               {i18n.t("entries_page.add_entry")}
             </span>
-          </Link>
+          </AppLink>
         </Stack>
 
         <EntriesFilters accounts={accounts} filters={filters} />

@@ -2,12 +2,11 @@
 
 import "./verify_login_page.scss";
 
-import { Button, Input, OtpInput } from "@/components";
+import { Button, Input, OtpInput, useNavigationProgress } from "@/components";
 import { Container } from "@/components/container/container";
 import { verifyLoginCode } from "@/actions/auth";
 import { Box, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 type VerifyLoginPageProps = {
@@ -17,7 +16,7 @@ type VerifyLoginPageProps = {
 export function VerifyLoginPage({
   initialEmail,
 }: VerifyLoginPageProps): React.ReactElement {
-  const router = useRouter();
+  const { push, refresh } = useNavigationProgress();
   const email = initialEmail;
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -39,8 +38,8 @@ export function VerifyLoginPage({
       return;
     }
 
-    router.push("/");
-    router.refresh();
+    push("/");
+    refresh();
   };
 
   return (

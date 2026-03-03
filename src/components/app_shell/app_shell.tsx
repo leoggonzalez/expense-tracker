@@ -1,7 +1,10 @@
 "use client";
 
+import "./app_shell.scss";
+
 import { usePathname } from "next/navigation";
 import React, { useEffect } from "react";
+import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
 
 import {
   clearNewEntryDraft,
@@ -21,6 +24,7 @@ export function AppShell({
   children,
 }: AppShellProps): React.ReactElement {
   const pathname = usePathname();
+  const { isNavigating } = useNavigationProgress();
   const isAuthRoute = pathname === "/login" || pathname === "/login/verify";
   const isSingleEntryDraftRoute =
     pathname === "/entries/new/income" || pathname === "/entries/new/expense";
@@ -38,10 +42,20 @@ export function AppShell({
 
   return (
     <div
-      className={`app-container ${isAuthRoute ? "app-container--auth" : ""}`}
+      className={[
+        "app-container",
+        isAuthRoute && "app-container--auth",
+        isNavigating && "app-container--navigating",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
+      <div className="app-shell__loading-bar" aria-hidden="true" />
       {!isAuthRoute && navigation}
-      <main className={`app-main ${isAuthRoute ? "app-main--auth" : ""}`}>
+      <main
+        className={`app-main ${isAuthRoute ? "app-main--auth" : ""}`}
+        aria-busy={isNavigating}
+      >
         {children}
       </main>
       {!isFabHiddenRoute && floatingEntryButton}

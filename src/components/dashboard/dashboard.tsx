@@ -2,6 +2,7 @@
 
 import "./dashboard.scss";
 
+import { AppLink } from "@/components";
 import { Entry, EntryCollection } from "@/model";
 import { Card, Grid, Stack, Text } from "@/elements";
 
@@ -9,7 +10,6 @@ import React from "react";
 import { i18n } from "@/model/i18n";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { EntryList, EntryListItem } from "@/components";
-import Link from "next/link";
 
 export interface DashboardProps {
   entries: Array<{
@@ -66,7 +66,7 @@ export function Dashboard({
         </Text>
 
         <Grid gap={16} className="dashboard__cards">
-          <Link
+          <AppLink
             href={`/entries?${currentMonthQuery}&type=income`}
             className="dashboard__card-link"
           >
@@ -83,9 +83,9 @@ export function Dashboard({
                 </Text>
               </Stack>
             </Card>
-          </Link>
+          </AppLink>
 
-          <Link
+          <AppLink
             href={`/entries?${currentMonthQuery}&type=expense`}
             className="dashboard__card-link"
           >
@@ -102,7 +102,7 @@ export function Dashboard({
                 </Text>
               </Stack>
             </Card>
-          </Link>
+          </AppLink>
 
           <Card padding={16} className="dashboard__card dashboard__card--net">
             <Stack gap={8}>
@@ -130,12 +130,12 @@ export function Dashboard({
             <Text size="h4" as="h3" weight="semibold">
               {i18n.t("dashboard.recent_entries")}
             </Text>
-            <Link
+            <AppLink
               href={`/entries?${currentMonthQuery}`}
               className="dashboard__recent-link"
             >
               {i18n.t("dashboard.see_all_entries")}
-            </Link>
+            </AppLink>
           </Stack>
           <EntryList
             entries={recentEntries}

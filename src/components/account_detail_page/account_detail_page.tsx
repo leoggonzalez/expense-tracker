@@ -2,11 +2,16 @@
 
 import "./account_detail_page.scss";
 
-import { Button, Container, EntryList, Input } from "@/components";
+import {
+  Button,
+  Container,
+  EntryList,
+  Input,
+  useNavigationProgress,
+} from "@/components";
 import { deleteAccount, updateAccount } from "@/actions/accounts";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 type AccountDetailPageProps = {
@@ -37,7 +42,7 @@ function formatCurrency(amount: number): string {
 export function AccountDetailPage({
   account,
 }: AccountDetailPageProps): React.ReactElement {
-  const router = useRouter();
+  const { push, refresh } = useNavigationProgress();
   const [name, setName] = useState(account.name);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -65,7 +70,7 @@ export function AccountDetailPage({
 
     setSuccess("account_detail_page.update_success");
     setLoading(false);
-    router.refresh();
+    refresh();
   };
 
   const handleDelete = async () => {
@@ -84,8 +89,7 @@ export function AccountDetailPage({
       return;
     }
 
-    router.push("/accounts");
-    router.refresh();
+    push("/accounts");
   };
 
   return (

@@ -2,8 +2,8 @@
 
 import "./entries_table.scss";
 
+import { useNavigationProgress } from "@/components";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
 import React from "react";
 
 import { Card, Stack, Text } from "@/elements";
@@ -26,7 +26,7 @@ type EntriesTableProps = {
 export function EntriesTable({
   entries,
 }: EntriesTableProps): React.ReactElement {
-  const router = useRouter();
+  const { push } = useNavigationProgress();
 
   if (entries.length === 0) {
     return (
@@ -99,11 +99,11 @@ export function EntriesTable({
               <tr
                 key={entry.id}
                 className="entries-table__row"
-                onClick={() => router.push(`/entries/${entry.id}`)}
+                onClick={() => push(`/entries/${entry.id}`)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
-                    router.push(`/entries/${entry.id}`);
+                    push(`/entries/${entry.id}`);
                   }
                 }}
                 role="link"

@@ -1,9 +1,8 @@
 import "./new_entry_page.scss";
 
-import Link from "next/link";
 import React from "react";
 
-import { Container } from "@/components";
+import { AppLink, Container } from "@/components";
 import { Card, Grid, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
@@ -49,7 +48,7 @@ export function NewEntryPage({
         </Text>
         <Grid columns="repeat(3, minmax(0, 1fr))" gap={8}>
           {tabs.map((tab) => (
-            <Link
+            <AppLink
               key={tab.key}
               href={tab.href}
               className={[
@@ -61,7 +60,7 @@ export function NewEntryPage({
                 .join(" ")}
             >
               {tab.label}
-            </Link>
+            </AppLink>
           ))}
         </Grid>
         <Card padding={24} className="new-entry-page__panel">

@@ -1,8 +1,8 @@
 import "./account_card.scss";
 
-import Link from "next/link";
 import React from "react";
 
+import { AppLink } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
@@ -26,7 +26,7 @@ export function AccountCard({
   allTimeNet,
 }: AccountCardProps): React.ReactElement {
   return (
-    <Link href={`/accounts/${id}`} className="account-card">
+    <AppLink href={`/accounts/${id}`} className="account-card">
       <Card padding={20} className="account-card__panel">
         <Stack gap={10}>
           <Text size="lg" weight="semibold">
@@ -49,6 +49,6 @@ export function AccountCard({
           </Text>
         </Stack>
       </Card>
-    </Link>
+    </AppLink>
   );
 }

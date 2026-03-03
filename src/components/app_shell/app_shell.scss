@@ -1,0 +1,36 @@
+@use "@/styles/variables.scss" as *;
+
+.app-shell {
+  &__loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: calc(var(--z-index-dropdown) + 10);
+    height: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transform: scaleX(0.08);
+    transform-origin: left center;
+    background: linear-gradient(
+      90deg,
+      var(--color-primary),
+      var(--color-success),
+      var(--color-primary)
+    );
+    transition:
+      opacity var(--transition-fast),
+      transform 700ms ease;
+  }
+}
+
+.app-container--navigating {
+  .app-shell__loading-bar {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .app-main {
+    cursor: progress;
+  }
+}

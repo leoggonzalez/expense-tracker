@@ -2,9 +2,14 @@
 
 import "./entries_filters.scss";
 
-import { Button, DateRangeInput, Select } from "@/components";
+import {
+  Button,
+  DateRangeInput,
+  Select,
+  useNavigationProgress,
+} from "@/components";
 import { Card, Grid, Stack, Text } from "@/elements";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import React from "react";
 import { i18n } from "@/model/i18n";
@@ -27,7 +32,7 @@ export function EntriesFilters({
   filters,
 }: EntriesFiltersProps): React.ReactElement {
   const pathname = usePathname();
-  const router = useRouter();
+  const { push } = useNavigationProgress();
   const searchParams = useSearchParams();
 
   const updateQuery = (updates: Record<string, string>) => {
@@ -44,11 +49,11 @@ export function EntriesFilters({
     nextParams.delete("page");
 
     const queryString = nextParams.toString();
-    router.push(queryString ? `${pathname}?${queryString}` : pathname);
+    push(queryString ? `${pathname}?${queryString}` : pathname);
   };
 
   const clearFilters = () => {
-    router.push(pathname);
+    push(pathname);
   };
 
   const anyFilters = Object.values(filters).some((value) => value);
