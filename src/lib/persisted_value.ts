@@ -1,16 +1,22 @@
+export type PersistedStorage = "session" | "local";
+
 export class PersistedValue<T> {
   private readonly key: string;
+  private readonly storage: PersistedStorage;
 
-  public constructor(key: string) {
+  public constructor(key: string, storage: PersistedStorage = "session") {
     this.key = key;
+    this.storage = storage;
   }
 
   public load(): T | null {
-    if (!this.canUseSessionStorage()) {
+    const storage = this.getStorage();
+
+    if (!storage) {
       return null;
     }
 
-    const value = window.sessionStorage.getItem(this.key);
+    const value = storage.getItem(this.key);
 
     if (!value) {
       return null;
@@ -24,22 +30,32 @@ export class PersistedValue<T> {
   }
 
   public save(value: T): void {
-    if (!this.canUseSessionStorage()) {
+    const storage = this.getStorage();
+
+    if (!storage) {
       return;
     }
 
-    window.sessionStorage.setItem(this.key, JSON.stringify(value));
+    storage.setItem(this.key, JSON.stringify(value));
   }
 
   public clear(): void {
-    if (!this.canUseSessionStorage()) {
+    const storage = this.getStorage();
+
+    if (!storage) {
       return;
     }
 
-    window.sessionStorage.removeItem(this.key);
+    storage.removeItem(this.key);
   }
 
-  private canUseSessionStorage(): boolean {
-    return typeof window !== "undefined";
+  private getStorage(): Storage | null {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    return this.storage === "local"
+      ? window.localStorage
+      : window.sessionStorage;
   }
 }

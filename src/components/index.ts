@@ -47,6 +47,10 @@ export { VerifyLoginPage } from "./verify_login_page/verify_login_page";
 export { OtpInput } from "./otp_input/otp_input";
 export { AccountField } from "./account_field/account_field";
 export { SettingsPage } from "./settings_page/settings_page";
+export {
+  AppPreferencesProvider,
+  useAppPreferences,
+} from "./app_preferences_provider/app_preferences_provider";
 export { AccountsPage } from "./accounts_page/accounts_page";
 export { AccountDetailPage } from "./account_detail_page/account_detail_page";
 export { NewEntryPage } from "./new_entry_page/new_entry_page";

@@ -77,12 +77,20 @@
     font-weight: var(--font-weight-semibold);
 
     &--income {
-      background-color: color-mix(in srgb, var(--color-success) 12%, white);
+      background-color: color-mix(
+        in srgb,
+        var(--color-success) 14%,
+        var(--color-background)
+      );
       color: var(--color-success-dark);
     }
 
     &--expense {
-      background-color: color-mix(in srgb, var(--color-danger) 12%, white);
+      background-color: color-mix(
+        in srgb,
+        var(--color-danger) 14%,
+        var(--color-background)
+      );
       color: var(--color-danger-dark);
     }
   }

@@ -51,17 +51,18 @@ export function EntriesFilters({
     router.push(pathname);
   };
 
+  const anyFilters = Object.values(filters).some((value) => value);
+
   return (
     <div className="entries-filters">
-      <Stack gap={12}>
-        <Text size="h4" as="h3" weight="semibold">
-          {i18n.t("entries_page.filters")}
-        </Text>
+      <Stack direction="row"
+        gap={16}
+        align="center"
+        justify="space-between"
+      >
         <Stack
           direction="row"
-          gap={16}
-          wrap
-          align="center"
+          gap={32}
           justify="space-between"
         >
           <Select
@@ -91,11 +92,11 @@ export function EntriesFilters({
                   className={[
                     "entries-filters__type-option",
                     option.value === "income" &&
-                      "entries-filters__type-option--income",
+                    "entries-filters__type-option--income",
                     option.value === "expense" &&
-                      "entries-filters__type-option--expense",
+                    "entries-filters__type-option--expense",
                     filters.type === option.value &&
-                      "entries-filters__type-option--active",
+                    "entries-filters__type-option--active",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -115,13 +116,14 @@ export function EntriesFilters({
             onEndDateChange={(value) => updateQuery({ end_date: value })}
           />
         </Stack>
+        {anyFilters && (
+          <div className="entries-filters__actions">
+            <Button variant="secondary" size="sm" onClick={clearFilters}>
+              {i18n.t("entries_page.clear_filters")}
+            </Button>
+          </div>
+        )}
       </Stack>
-
-      <div className="entries-filters__actions">
-        <Button variant="secondary" size="sm" onClick={clearFilters}>
-          {i18n.t("entries_page.clear_filters")}
-        </Button>
-      </div>
     </div>
   );
 }
