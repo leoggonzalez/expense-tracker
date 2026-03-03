@@ -11,6 +11,7 @@ import { Box, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 type EntryDetailPageProps = {
+  accounts: string[];
   entry: {
     id: string;
     type: string;
@@ -23,6 +24,7 @@ type EntryDetailPageProps = {
 };
 
 export function EntryDetailPage({
+  accounts,
   entry,
 }: EntryDetailPageProps): React.ReactElement {
   const router = useRouter();
@@ -55,6 +57,7 @@ export function EntryDetailPage({
           <Box padding={24} className="entry-detail-page__card">
             <Stack gap={16}>
               <EntryForm
+                accounts={accounts}
                 initialData={entry}
                 isEdit
                 onSuccess={() => router.refresh()}

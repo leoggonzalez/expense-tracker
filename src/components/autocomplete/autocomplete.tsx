@@ -23,15 +23,10 @@ export function Autocomplete({
   className = "",
 }: AutocompleteProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
-  const [filteredOptions, setFilteredOptions] = useState<string[]>(options);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const filtered = options.filter((option) =>
-      option.toLowerCase().includes(value.toLowerCase()),
-    );
-    setFilteredOptions(filtered);
-  }, [value, options]);
+  const filteredOptions = options.filter((option) =>
+    option.toLowerCase().includes(value.toLowerCase()),
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

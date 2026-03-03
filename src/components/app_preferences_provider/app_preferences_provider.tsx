@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 import {
   AppPreferences,
@@ -118,22 +112,14 @@ export function AppPreferencesProvider({
     });
   };
 
-  const contextValue = useMemo<AppPreferencesContextValue>(
-    () => ({
-      themePreference: preferences.theme,
-      effectiveTheme,
-      languagePreference: preferences.language,
-      effectiveLanguage,
-      setThemePreference,
-      setLanguagePreference,
-    }),
-    [
-      effectiveLanguage,
-      effectiveTheme,
-      preferences.language,
-      preferences.theme,
-    ],
-  );
+  const contextValue: AppPreferencesContextValue = {
+    themePreference: preferences.theme,
+    effectiveTheme,
+    languagePreference: preferences.language,
+    effectiveLanguage,
+    setThemePreference,
+    setLanguagePreference,
+  };
 
   return (
     <AppPreferencesContext.Provider value={contextValue}>

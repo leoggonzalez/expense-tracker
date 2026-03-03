@@ -11,85 +11,44 @@ import {
 } from "@/components";
 import { EntryList, EntryListItem } from "@/components/entry_list/entry_list";
 import { Stack, Text } from "@/elements";
-import { getEntriesWithFilters, getAccounts } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
-import React, { useEffect, useState } from "react";
 
-export function AllEntriesPage(): React.ReactElement {
-  const [entries, setEntries] = useState<EntryListItem[]>([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 20,
-    total: 0,
-    totalPages: 0,
-  });
-  const [filters, setFilters] = useState({
-    accountId: "",
-    description: "",
-    startDate: "",
-    endDate: "",
-  });
-  const [accounts, setAccounts] = useState<Array<{ id: string; name: string }>>(
-    [],
-  );
-  const [loading, setLoading] = useState(false);
+export type AllEntriesPageProps = {
+  accounts: Array<{ id: string; name: string }>;
+  entries: EntryListItem[];
+  filters: {
+    accountId: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+  };
+  loading?: boolean;
+  pagination: {
+    page: number;
+    total: number;
+    totalPages: number;
+  };
+  onAccountChange: (accountId: string) => void;
+  onDescriptionChange: (value: string) => void;
+  onStartDateChange: (value: string) => void;
+  onEndDateChange: (value: string) => void;
+  onClearFilters: () => void;
+  onPageChange: (page: number) => void;
+};
 
-  useEffect(() => {
-    async function fetchAccounts() {
-      const accountsData = await getAccounts();
-      setAccounts(accountsData);
-    }
-
-    void fetchAccounts();
-  }, []);
-
-  useEffect(() => {
-    async function fetchEntries() {
-      setLoading(true);
-      const result = await getEntriesWithFilters({
-        accountId: filters.accountId,
-        description: filters.description,
-        startDate: filters.startDate ? new Date(filters.startDate) : undefined,
-        endDate: filters.endDate ? new Date(filters.endDate) : undefined,
-        page: pagination.page,
-        limit: 20,
-      });
-
-      const mappedEntries: EntryListItem[] = result.entries.map((entry) => ({
-        id: entry.id,
-        type: entry.type,
-        accountName: entry.account.name,
-        description: entry.description,
-        amount: entry.amount,
-        beginDate: entry.beginDate.toISOString(),
-        endDate: entry.endDate?.toISOString() || null,
-        createdAt: entry.createdAt.toISOString(),
-        updatedAt: entry.updatedAt.toISOString(),
-      }));
-
-      setEntries(mappedEntries);
-      setPagination(result.pagination);
-      setLoading(false);
-    }
-
-    fetchEntries();
-  }, [filters, pagination.page]);
-
-  function handleFilterChange(key: string, value: string) {
-    setFilters((currentFilters) => ({ ...currentFilters, [key]: value }));
-    setPagination((currentPagination) => ({ ...currentPagination, page: 1 }));
-  }
-
-  function handleClearFilters() {
-    setFilters({
-      accountId: "",
-      description: "",
-      startDate: "",
-      endDate: "",
-    });
-    setPagination((currentPagination) => ({ ...currentPagination, page: 1 }));
-  }
-
+export function AllEntriesPage({
+  accounts,
+  entries,
+  filters,
+  loading = false,
+  pagination,
+  onAccountChange,
+  onDescriptionChange,
+  onStartDateChange,
+  onEndDateChange,
+  onClearFilters,
+  onPageChange,
+}: AllEntriesPageProps): React.ReactElement {
   const selectedAccountName =
     accounts.find((account) => account.id === filters.accountId)?.name || "";
 
@@ -110,7 +69,7 @@ export function AllEntriesPage(): React.ReactElement {
               value={selectedAccountName}
               onChange={(name) => {
                 const account = accounts.find((item) => item.name === name);
-                handleFilterChange("accountId", account?.id || "");
+                onAccountChange(account?.id || "");
               }}
               options={accounts.map((account) => account.name)}
               placeholder={
@@ -121,7 +80,7 @@ export function AllEntriesPage(): React.ReactElement {
             <Input
               label={i18n.t("all_entries_page.description")}
               value={filters.description}
-              onChange={(value) => handleFilterChange("description", value)}
+              onChange={onDescriptionChange}
               placeholder={
                 i18n.t("all_entries_page.description_placeholder") as string
               }
@@ -131,18 +90,18 @@ export function AllEntriesPage(): React.ReactElement {
               label={i18n.t("all_entries_page.start_date")}
               type="date"
               value={filters.startDate}
-              onChange={(value) => handleFilterChange("startDate", value)}
+              onChange={onStartDateChange}
             />
 
             <Input
               label={i18n.t("all_entries_page.end_date")}
               type="date"
               value={filters.endDate}
-              onChange={(value) => handleFilterChange("endDate", value)}
+              onChange={onEndDateChange}
             />
           </div>
 
-          <Button onClick={handleClearFilters} variant="secondary" size="sm">
+          <Button onClick={onClearFilters} variant="secondary" size="sm">
             {i18n.t("all_entries_page.clear_filters")}
           </Button>
         </div>
@@ -173,12 +132,7 @@ export function AllEntriesPage(): React.ReactElement {
                 <Pagination
                   currentPage={pagination.page}
                   totalPages={pagination.totalPages}
-                  onPageChange={(page) =>
-                    setPagination((currentPagination) => ({
-                      ...currentPagination,
-                      page,
-                    }))
-                  }
+                  onPageChange={onPageChange}
                 />
               )}
             </>

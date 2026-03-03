@@ -16,17 +16,13 @@ import {
   EntryDateFieldMode,
 } from "@/components/entry_date_field/entry_date_field";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
-import {
-  createEntry,
-  CreateEntryInput,
-  getAccounts,
-  updateEntry,
-} from "@/actions/entries";
+import { createEntry, CreateEntryInput, updateEntry } from "@/actions/entries";
 import { useToast } from "@/components/toast_provider/toast_provider";
 import { i18n } from "@/model/i18n";
 import "./entry_form.scss";
 
 export interface EntryFormProps {
+  accounts?: string[];
   onSuccess?: () => void;
   initialData?: {
     id: string;
@@ -92,6 +88,26 @@ function toModeValue(value: string, mode: EntryDateFieldMode): string {
   return mode === "month"
     ? value.slice(0, 7)
     : normalizeDateValue(value, "date");
+}
+
+function getAlignedEndDate(
+  beginDate: string,
+  beginDateMode: EntryDateFieldMode,
+  endDate: string,
+  endDateMode: EntryDateFieldMode,
+): string {
+  const normalizedBeginDate = normalizeDateValue(beginDate, beginDateMode);
+  const normalizedEndDate = normalizeDateValue(endDate, endDateMode);
+
+  if (!normalizedBeginDate) {
+    return endDate;
+  }
+
+  if (!normalizedEndDate || normalizedBeginDate > normalizedEndDate) {
+    return toModeValue(normalizedBeginDate, endDateMode);
+  }
+
+  return endDate;
 }
 
 function getInitialModel(props: EntryFormProps): EntryFormModel {
@@ -166,6 +182,7 @@ function getSubmitButtonConfig(
 }
 
 export function EntryForm({
+  accounts: initialAccounts = [],
   onSuccess,
   initialData,
   isEdit = false,
@@ -173,7 +190,6 @@ export function EntryForm({
   hideTypeField = false,
 }: EntryFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
-  const [accounts, setAccounts] = useState<string[]>([]);
   const [isDraftReady, setIsDraftReady] = useState(
     !(!isEdit && Boolean(entryType)),
   );
@@ -267,15 +283,6 @@ export function EntryForm({
     form;
 
   useEffect(() => {
-    async function fetchAccounts(): Promise<void> {
-      const accountsData = await getAccounts();
-      setAccounts(accountsData.map((account) => account.name));
-    }
-
-    void fetchAccounts();
-  }, []);
-
-  useEffect(() => {
     if (!isCreateFlow || initialData) {
       setIsDraftReady(true);
       return;
@@ -305,48 +312,7 @@ export function EntryForm({
 
     hasHydratedDraftRef.current = true;
     setIsDraftReady(true);
-  }, [initialData, isCreateFlow]);
-
-  useEffect(() => {
-    if (!entryType || isEdit) {
-      return;
-    }
-
-    if (model.type !== entryType) {
-      updateFields({ type: entryType });
-    }
-  }, [entryType, isEdit, model.type]);
-
-  useEffect(() => {
-    if (model.isRecurring) {
-      return;
-    }
-
-    const normalizedBeginDate = normalizeDateValue(
-      model.beginDate,
-      model.beginDateMode,
-    );
-    const normalizedEndDate = normalizeDateValue(
-      model.endDate,
-      model.endDateMode,
-    );
-
-    if (!normalizedBeginDate) {
-      return;
-    }
-
-    if (!normalizedEndDate || normalizedBeginDate > normalizedEndDate) {
-      updateFields({
-        endDate: toModeValue(normalizedBeginDate, model.endDateMode),
-      });
-    }
-  }, [
-    model.beginDate,
-    model.beginDateMode,
-    model.endDate,
-    model.endDateMode,
-    model.isRecurring,
-  ]);
+  }, [initialData, isCreateFlow, updateFields]);
 
   useEffect(() => {
     if (!isCreateFlow || !isDraftReady) {
@@ -385,10 +351,66 @@ export function EntryForm({
   const isSubmitting = submissionStatus === "submitting";
   const submitButton = getSubmitButtonConfig(isEdit, model.type, isSubmitting);
 
+  const handleTypeChange = (value: string): void => {
+    updateFields({
+      type: value as EntryFormModel["type"],
+    });
+  };
+
+  const handleBeginDateChange = (value: string): void => {
+    const nextEndDate = model.isRecurring
+      ? model.endDate
+      : getAlignedEndDate(
+          value,
+          model.beginDateMode,
+          model.endDate,
+          model.endDateMode,
+        );
+
+    updateFields({
+      beginDate: value,
+      endDate: nextEndDate,
+    });
+  };
+
+  const handleEndDateChange = (value: string): void => {
+    updateFields({
+      endDate: value,
+    });
+  };
+
+  const handleRecurringChange = (checked: boolean): void => {
+    updateFields({
+      isRecurring: checked,
+      endDate: checked
+        ? model.endDate
+        : getAlignedEndDate(
+            model.beginDate,
+            model.beginDateMode,
+            model.endDate,
+            model.endDateMode,
+          ),
+    });
+  };
+
   const handleBeginDateModeChange = (): void => {
+    const nextBeginDate = normalizeDateValue(
+      model.beginDate,
+      model.beginDateMode,
+    );
+    const nextEndDate = model.isRecurring
+      ? model.endDate
+      : getAlignedEndDate(
+          nextBeginDate,
+          "date",
+          model.endDate,
+          model.endDateMode,
+        );
+
     updateFields({
       beginDateMode: "date",
-      beginDate: normalizeDateValue(model.beginDate, model.beginDateMode),
+      beginDate: nextBeginDate,
+      endDate: nextEndDate,
     });
   };
 
@@ -406,9 +428,7 @@ export function EntryForm({
           <Select
             label={i18n.t("entry_form.type")}
             value={fields.type.value || ""}
-            onChange={(value) =>
-              fields.type.onChange(value as EntryFormModel["type"])
-            }
+            onChange={handleTypeChange}
             options={[
               { value: "income", label: i18n.t("common.income") },
               { value: "expense", label: i18n.t("common.expense") },
@@ -421,7 +441,7 @@ export function EntryForm({
           label={i18n.t("entry_form.account")}
           value={fields.accountName.value || ""}
           onChange={(value) => fields.accountName.onChange(value)}
-          accounts={accounts}
+          accounts={initialAccounts}
           placeholder={i18n.t("entry_form.account_placeholder") as string}
           required
         />
@@ -454,7 +474,7 @@ export function EntryForm({
           )}
           mode={model.beginDateMode}
           value={fields.beginDate.value || ""}
-          onChange={(value) => fields.beginDate.onChange(value)}
+          onChange={handleBeginDateChange}
           onEnableFullDate={handleBeginDateModeChange}
           editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
           required
@@ -462,7 +482,7 @@ export function EntryForm({
 
         <Checkbox
           checked={model.isRecurring}
-          onChange={(checked) => fields.isRecurring.onChange(checked)}
+          onChange={handleRecurringChange}
           label={i18n.t("entry_form.recurring")}
         />
 
@@ -475,7 +495,7 @@ export function EntryForm({
             )}
             mode={model.endDateMode}
             value={fields.endDate.value || ""}
-            onChange={(value) => fields.endDate.onChange(value)}
+            onChange={handleEndDateChange}
             onEnableFullDate={handleEndDateModeChange}
             editLabel={String(i18n.t("entry_form.edit_full_end_date"))}
           />

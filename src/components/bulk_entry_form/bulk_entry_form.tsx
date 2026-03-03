@@ -1,15 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useForm } from "react-use-form-library";
 
 import { Stack, Text } from "@/elements";
 import { AccountField, Button, Checkbox, Input, Select } from "@/components";
-import {
-  createMultipleEntries,
-  CreateEntryInput,
-  getAccounts,
-} from "@/actions/entries";
+import { createMultipleEntries, CreateEntryInput } from "@/actions/entries";
 import { useToast } from "@/components/toast_provider/toast_provider";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import { i18n } from "@/model/i18n";
@@ -31,6 +27,7 @@ type BulkEntryFormModel = {
 };
 
 export interface BulkEntryFormProps {
+  accounts?: string[];
   onSuccess?: () => void;
 }
 
@@ -51,10 +48,10 @@ function getInitialModel(): BulkEntryFormModel {
 }
 
 export function BulkEntryForm({
+  accounts: initialAccounts = [],
   onSuccess,
 }: BulkEntryFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
-  const [accounts, setAccounts] = useState<string[]>([]);
   const initialModelRef = useRef<BulkEntryFormModel>(getInitialModel());
   const form = useForm<BulkEntryFormModel>({
     model: initialModelRef.current,
@@ -96,25 +93,6 @@ export function BulkEntryForm({
   const { fields, model, onSubmit, reset, submissionStatus, updateFields } =
     form;
 
-  useEffect(() => {
-    async function fetchAccounts(): Promise<void> {
-      const accountsData = await getAccounts();
-      setAccounts(accountsData.map((account) => account.name));
-    }
-
-    void fetchAccounts();
-  }, []);
-
-  useEffect(() => {
-    if (model.isRecurring) {
-      return;
-    }
-
-    if (!model.endDate || model.beginDate > model.endDate) {
-      updateFields({ endDate: model.beginDate });
-    }
-  }, [model.beginDate, model.endDate, model.isRecurring, updateFields]);
-
   const updateEntryField = <Key extends keyof BulkEntryItem>(
     id: string,
     field: Key,
@@ -150,6 +128,32 @@ export function BulkEntryForm({
     });
   };
 
+  const handleBeginDateChange = (value: string): void => {
+    updateFields({
+      beginDate: value,
+      endDate:
+        model.isRecurring || !model.endDate || value <= model.endDate
+          ? model.endDate
+          : value,
+    });
+  };
+
+  const handleEndDateChange = (value: string): void => {
+    updateFields({
+      endDate: value,
+    });
+  };
+
+  const handleRecurringChange = (checked: boolean): void => {
+    updateFields({
+      isRecurring: checked,
+      endDate:
+        checked || model.endDate || model.beginDate <= model.endDate
+          ? model.endDate
+          : model.beginDate,
+    });
+  };
+
   const isSubmitting = submissionStatus === "submitting";
 
   return (
@@ -165,7 +169,7 @@ export function BulkEntryForm({
               label={i18n.t("bulk_entry_form.shared_account")}
               value={fields.accountName.value || ""}
               onChange={(value) => fields.accountName.onChange(value)}
-              accounts={accounts}
+              accounts={initialAccounts}
               placeholder={
                 i18n.t("bulk_entry_form.shared_account_placeholder") as string
               }
@@ -176,13 +180,13 @@ export function BulkEntryForm({
               label={i18n.t("bulk_entry_form.shared_begin_date")}
               type="date"
               value={fields.beginDate.value || ""}
-              onChange={(value) => fields.beginDate.onChange(value)}
+              onChange={handleBeginDateChange}
               required
             />
 
             <Checkbox
               checked={model.isRecurring}
-              onChange={(checked) => fields.isRecurring.onChange(checked)}
+              onChange={handleRecurringChange}
               label={i18n.t("bulk_entry_form.recurring")}
             />
 
@@ -191,7 +195,7 @@ export function BulkEntryForm({
                 label={i18n.t("bulk_entry_form.shared_end_date")}
                 type="date"
                 value={fields.endDate.value || ""}
-                onChange={(value) => fields.endDate.onChange(value)}
+                onChange={handleEndDateChange}
               />
             )}
           </Stack>
