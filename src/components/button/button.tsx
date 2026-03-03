@@ -10,6 +10,7 @@ export interface ButtonProps {
   disabled?: boolean;
   fullWidth?: boolean;
   className?: string;
+  startIcon?: React.ReactNode;
 }
 
 export function Button({
@@ -21,6 +22,7 @@ export function Button({
   disabled = false,
   fullWidth = false,
   className = "",
+  startIcon,
 }: ButtonProps): React.ReactElement {
   const classes = [
     "button",
@@ -39,6 +41,7 @@ export function Button({
       disabled={disabled}
       className={classes}
     >
+      {startIcon && <span className="button__icon">{startIcon}</span>}
       {children}
     </button>
   );

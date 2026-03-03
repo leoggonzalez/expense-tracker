@@ -2,7 +2,7 @@
 
 import "./account_field.scss";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 
 import { Input, Select } from "@/components";
 import { Icon } from "@/elements";
@@ -25,22 +25,14 @@ export function AccountField({
   placeholder,
   required = false,
 }: AccountFieldProps): React.ReactElement {
-  const hasMatchingAccount = useMemo(
-    () => accounts.includes(value),
-    [accounts, value],
-  );
-  const [isCustomMode, setIsCustomMode] = useState(
+  const hasMatchingAccount = accounts.includes(value);
+  const [prefersCustomMode, setPrefersCustomMode] = useState(
     !hasMatchingAccount && !!value,
   );
-
-  useEffect(() => {
-    if (value && !accounts.includes(value)) {
-      setIsCustomMode(true);
-    }
-  }, [accounts, value]);
+  const isCustomMode = prefersCustomMode || (!hasMatchingAccount && !!value);
 
   const handleToggle = () => {
-    setIsCustomMode((current) => {
+    setPrefersCustomMode((current) => {
       const next = !current;
 
       if (!next && !accounts.includes(value)) {

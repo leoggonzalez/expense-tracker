@@ -18,7 +18,11 @@
     gap: var(--spacing-sm);
     border: var(--border-width) solid var(--color-border);
     border-radius: var(--border-radius-full);
-    background-color: rgba(255, 255, 255, 0.98);
+    background-color: color-mix(
+      in srgb,
+      var(--color-background-secondary) 96%,
+      transparent
+    );
     box-shadow: var(--shadow-lg);
     color: var(--color-text-primary);
     padding: var(--spacing-md) var(--spacing-lg);
@@ -34,11 +38,19 @@
     }
 
     &--success {
-      border-color: color-mix(in srgb, var(--color-success) 35%, white);
+      border-color: color-mix(
+        in srgb,
+        var(--color-success) 35%,
+        var(--color-background)
+      );
     }
 
     &--error {
-      border-color: color-mix(in srgb, var(--color-danger) 35%, white);
+      border-color: color-mix(
+        in srgb,
+        var(--color-danger) 35%,
+        var(--color-background)
+      );
     }
   }
 

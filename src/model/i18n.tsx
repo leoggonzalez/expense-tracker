@@ -2,6 +2,8 @@ import React, { ReactElement } from "react";
 import { I18n, TranslateOptions } from "i18n-js";
 
 import en from "@/locales/en.json";
+import es from "@/locales/es.json";
+import ptBr from "@/locales/pt_br.json";
 
 type Interpolate = (
   i18n: I18n,
@@ -13,7 +15,13 @@ interface CustomI18n extends Omit<I18n, "interpolate"> {
   interpolate: Interpolate;
 }
 
-export const i18n = new I18n({ en }) as CustomI18n;
+export type SupportedLocale = "en" | "es" | "pt-BR";
+
+export const i18n = new I18n({
+  en,
+  es,
+  "pt-BR": ptBr,
+}) as CustomI18n;
 i18n.locale = "en";
 i18n.enableFallback = true;
 i18n.defaultLocale = "en";
@@ -66,6 +74,10 @@ i18n.interpolate = (i18n, message, options) => {
 };
 
 export const formatterLocale = "de";
+
+export function setLocale(locale: SupportedLocale): void {
+  i18n.locale = locale;
+}
 
 export function formatError(error: string): string {
   const errorMessage = String(i18n.t(`errors.${error}`));

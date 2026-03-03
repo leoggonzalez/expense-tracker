@@ -12,6 +12,14 @@
     flex-direction: column;
     gap: var(--spacing-xs);
   }
+
+  &__preferences {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    border-top: var(--border-width) solid var(--color-border);
+  }
 }
 
 @media (min-width: $breakpoint-tablet) {

@@ -39,12 +39,20 @@
     font-family: inherit;
 
     &--income {
-      border-color: color-mix(in srgb, var(--color-success) 45%, white);
+      border-color: color-mix(
+        in srgb,
+        var(--color-success) 45%,
+        var(--color-background)
+      );
       color: var(--color-success-dark);
     }
 
     &--expense {
-      border-color: color-mix(in srgb, var(--color-danger) 45%, white);
+      border-color: color-mix(
+        in srgb,
+        var(--color-danger) 45%,
+        var(--color-background)
+      );
       color: var(--color-danger-dark);
     }
 
@@ -55,13 +63,21 @@
     }
 
     &--income.entries-filters__type-option--active {
-      background-color: color-mix(in srgb, var(--color-success) 10%, white);
+      background-color: color-mix(
+        in srgb,
+        var(--color-success) 14%,
+        var(--color-background)
+      );
       border-color: var(--color-success);
       color: var(--color-success-dark);
     }
 
     &--expense.entries-filters__type-option--active {
-      background-color: color-mix(in srgb, var(--color-danger) 10%, white);
+      background-color: color-mix(
+        in srgb,
+        var(--color-danger) 14%,
+        var(--color-background)
+      );
       border-color: var(--color-danger);
       color: var(--color-danger-dark);
     }

@@ -58,6 +58,24 @@ export function Navigation(props: NavigationProps): React.ReactElement {
 }
 ```
 
+## React Compiler And Effects
+
+- React Compiler is enabled repo-wide and should be assumed active for all React code.
+- Do not add `useMemo`, `useCallback`, or `React.memo` by default.
+- Only keep or add manual memoization when there is a demonstrated reason the compiler does not cover, and document that reason inline.
+- `useEffect` is an escape hatch and should be used sparingly.
+- Before adding an effect, first try:
+  - deriving values during render
+  - moving logic into event handlers
+  - lifting data loading to route/server composition
+  - using framework state such as URL search params when appropriate
+- Avoid effects for:
+  - derived state
+  - mirroring props or state into more state
+  - post-processing render data
+  - user-event logic that can run directly in handlers
+- Legitimate effects are limited to synchronization with external systems such as DOM subscriptions, timers, browser storage, `matchMedia`, and async work that cannot be expressed through framework data loading.
+
 ## Styling And Composition Conventions
 
 - All component styling must be mobile-first. Base styles target phones first, then layer larger-screen adjustments with media queries.

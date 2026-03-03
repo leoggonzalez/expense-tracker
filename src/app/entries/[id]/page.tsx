@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { EntryDetailPage } from "@/components";
-import { getEntryById } from "@/actions/entries";
+import { getAccounts, getEntryById } from "@/actions/entries";
 import { requireCurrentUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +17,10 @@ export default async function Page({
 }: EntryPageProps): Promise<React.ReactElement> {
   await requireCurrentUser();
   const { id } = await params;
-  const entry = await getEntryById(id);
+  const [entry, accounts] = await Promise.all([
+    getEntryById(id),
+    getAccounts(),
+  ]);
 
   if (!entry) {
     notFound();
@@ -25,6 +28,7 @@ export default async function Page({
 
   return (
     <EntryDetailPage
+      accounts={accounts.map((account) => account.name)}
       entry={{
         id: entry.id,
         type: entry.type,

@@ -4,7 +4,7 @@ import "./projection_table.scss";
 
 import { Entry, EntryCollection } from "@/model";
 import { i18n } from "@/model/i18n";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -31,14 +31,8 @@ export function ProjectionTable({
   const router = useRouter();
   const currentDate = new Date();
   const [endDate, setEndDate] = useState<string>(
-    format(addMonths(currentDate, 1), "yyyy-MM"),
+    format(addMonths(currentDate, 5), "yyyy-MM"),
   );
-
-  useEffect(() => {
-    if (window.matchMedia("(min-width: 1280px)").matches) {
-      setEndDate(format(addMonths(new Date(), 5), "yyyy-MM"));
-    }
-  }, []);
 
   // Convert plain objects to Entry instances
   const entries = plainEntries.map((entry) =>

@@ -1,10 +1,7 @@
 import "./floating_entry_button.scss";
 
-import Link from "next/link";
-
 import { getCurrentUser } from "@/lib/session";
-import { Icon } from "@/elements";
-import { i18n } from "@/model/i18n";
+import { FloatingEntryButtonClient } from "@/components/floating_entry_button/floating_entry_button_client";
 
 export async function FloatingEntryButton(): Promise<React.ReactElement | null> {
   const currentUser = await getCurrentUser();
@@ -13,13 +10,5 @@ export async function FloatingEntryButton(): Promise<React.ReactElement | null> 
     return null;
   }
 
-  return (
-    <Link
-      href="/entries/new/income"
-      className="floating-entry-button"
-      aria-label={i18n.t("common.add_entry") as string}
-    >
-      <Icon name="plus" size={22} />
-    </Link>
-  );
+  return <FloatingEntryButtonClient />;
 }

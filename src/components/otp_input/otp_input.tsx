@@ -2,7 +2,7 @@
 
 import "./otp_input.scss";
 
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 
 type OtpInputProps = {
   label: React.ReactNode;
@@ -23,10 +23,6 @@ export function OtpInput({
 }: OtpInputProps): React.ReactElement {
   const refs = useRef<Array<HTMLInputElement | null>>([]);
   const digits = Array.from({ length }, (_, index) => value[index] ?? "");
-
-  useEffect(() => {
-    refs.current = refs.current.slice(0, length);
-  }, [length]);
 
   const focusIndex = (index: number) => {
     refs.current[index]?.focus();
@@ -114,6 +110,7 @@ export function OtpInput({
           <input
             key={index}
             ref={(node) => {
+              refs.current = refs.current.slice(0, length);
               refs.current[index] = node;
             }}
             className="otp-input__box"

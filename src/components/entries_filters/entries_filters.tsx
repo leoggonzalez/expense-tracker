@@ -51,19 +51,12 @@ export function EntriesFilters({
     router.push(pathname);
   };
 
+  const anyFilters = Object.values(filters).some((value) => value);
+
   return (
     <div className="entries-filters">
-      <Stack gap={12}>
-        <Text size="h4" as="h3" weight="semibold">
-          {i18n.t("entries_page.filters")}
-        </Text>
-        <Stack
-          direction="row"
-          gap={16}
-          wrap
-          align="center"
-          justify="space-between"
-        >
+      <Stack direction="row" gap={16} align="center" justify="space-between">
+        <Stack direction="row" gap={32} justify="space-between">
           <Select
             label={i18n.t("entries_page.account")}
             value={filters.account}
@@ -115,13 +108,14 @@ export function EntriesFilters({
             onEndDateChange={(value) => updateQuery({ end_date: value })}
           />
         </Stack>
+        {anyFilters && (
+          <div className="entries-filters__actions">
+            <Button variant="secondary" size="sm" onClick={clearFilters}>
+              {i18n.t("entries_page.clear_filters")}
+            </Button>
+          </div>
+        )}
       </Stack>
-
-      <div className="entries-filters__actions">
-        <Button variant="secondary" size="sm" onClick={clearFilters}>
-          {i18n.t("entries_page.clear_filters")}
-        </Button>
-      </div>
     </div>
   );
 }

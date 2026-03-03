@@ -68,7 +68,7 @@ export function EntriesPage({
               {i18n.t("entries_page.title")}
             </Text>
             <Link
-              href="/entries/new/income"
+              href="/entries/new/expense"
               className="entries-page__button-link"
             >
               <span className="entries-page__button">
