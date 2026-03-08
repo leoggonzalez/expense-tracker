@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "prisma generate",
     "build": "next build",
+    "build:vercel": "bash scripts/vercel_build.sh",
     "start": "next start",
     "lint": "next lint",
     "add-icon": "node scripts/add_icon.mjs",

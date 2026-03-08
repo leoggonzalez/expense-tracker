@@ -298,21 +298,20 @@ Recommended setup:
 
 ### Production migrations
 
-Production migrations are manual.
+Production migrations are applied automatically during **Vercel production builds**.
 
-Recommended release flow:
+Current setup:
 
-1. Create and commit migrations in development.
-2. Merge to `main`.
-3. Run production migrations manually:
+- `vercel.json` uses `buildCommand: yarn build:vercel`
+- `scripts/vercel_build.sh` runs:
+  - `yarn prisma:migrate:deploy` when `VERCEL_ENV=production`
+  - `yarn build` afterward
+- Preview deployments skip migration deploy.
 
-```bash
-npx prisma migrate deploy
-```
+Required in Vercel Production environment:
 
-Run that command with production `DATABASE_URL` / `DIRECT_URL` values in your shell or environment.
-
-Do not run schema-changing migrations automatically during deployment.
+- `DATABASE_URL`
+- `DIRECT_URL`
 
 ### GitHub
 

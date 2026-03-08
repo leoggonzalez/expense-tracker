@@ -1,4 +1,5 @@
 {
+  "buildCommand": "yarn build:vercel",
   "crons": [
     {
       "path": "/api/cron/sync-current-month-entry-counters",
