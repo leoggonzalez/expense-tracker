@@ -53,7 +53,10 @@ export function ProjectionTable({
     : fallbackStartMonth;
   const defaultEndMonth = addMonths(fallbackStartMonth, 5);
   const [endDate, setEndDate] = useState<string>(
-    format(defaultEndMonth < startMonth ? startMonth : defaultEndMonth, "yyyy-MM"),
+    format(
+      defaultEndMonth < startMonth ? startMonth : defaultEndMonth,
+      "yyyy-MM",
+    ),
   );
 
   const collection = new EntryCollection(entries);

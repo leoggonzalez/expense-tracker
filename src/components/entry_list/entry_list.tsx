@@ -65,7 +65,8 @@ export function EntryList({
       <Card padding={0} className="entry-list__list">
         {plainEntries.map((entry) => {
           const href =
-            entryHref?.(entry) ?? (entryHrefBase ? `${entryHrefBase}/${entry.id}` : null);
+            entryHref?.(entry) ??
+            (entryHrefBase ? `${entryHrefBase}/${entry.id}` : null);
 
           const rowMain = (
             <div className="entry-list__row-main">

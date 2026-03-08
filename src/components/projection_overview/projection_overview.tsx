@@ -3,9 +3,6 @@
 import "./projection_overview.scss";
 
 import { AppLink, EntryList, useNavigationProgress } from "@/components";
-import { Card, Icon, Stack, Text } from "@/elements";
-import { i18n } from "@/model/i18n";
-import React from "react";
 import {
   Bar,
   BarChart,
@@ -16,6 +13,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Box, Card, Grid, Icon, Stack, Text } from "@/elements";
+
+import React from "react";
+import { i18n } from "@/model/i18n";
 
 type ProjectionOverviewProps = {
   focusedMonthLabel: string;
@@ -67,11 +68,17 @@ export function ProjectionOverview({
   return (
     <div className="projection-overview">
       <Stack gap={24}>
-        <div className="projection-overview__header">
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          gap={16}
+          className="projection-overview__header"
+        >
           <Text size="h2" as="h2" weight="bold">
             {focusedMonthLabel}
           </Text>
-          <div className="projection-overview__navigation">
+          <Stack direction="row" gap={8}>
             <button
               type="button"
               className="projection-overview__nav-button"
@@ -88,8 +95,8 @@ export function ProjectionOverview({
             >
               <Icon name="chevron-right" />
             </button>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
 
         <Card padding={20} className="projection-overview__chart-card">
           <Stack gap={12}>
@@ -100,9 +107,15 @@ export function ProjectionOverview({
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="monthLabel" tickLine={false} axisLine={false} />
+                  <XAxis
+                    dataKey="monthLabel"
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <YAxis tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Tooltip
+                    formatter={(value: number) => formatCurrency(value)}
+                  />
                   <Legend />
                   <Bar
                     dataKey="income"
@@ -122,89 +135,110 @@ export function ProjectionOverview({
           </Stack>
         </Card>
 
-        <Card padding={20} className="projection-overview__totals-card">
-          <Stack gap={12}>
-            <Text size="h4" as="h3" weight="semibold">
-              {i18n.t("projection_page.month_totals")}
-            </Text>
-            <div className="projection-overview__totals-grid">
-              <div className="projection-overview__total-item">
-                <Text size="sm" color="secondary">
-                  {i18n.t("projection_page.income")}
-                </Text>
-                <Text size="lg" weight="bold" color="success">
-                  {formatCurrency(totals.income)}
-                </Text>
-              </div>
-              <div className="projection-overview__total-item">
-                <Text size="sm" color="secondary">
-                  {i18n.t("projection_page.expenses")}
-                </Text>
-                <Text size="lg" weight="bold" color="danger">
-                  {formatCurrency(totals.expense)}
-                </Text>
-              </div>
-              <div className="projection-overview__total-item projection-overview__total-item--net">
-                <Text size="sm" color="secondary">
-                  {i18n.t("projection_page.total")}
-                </Text>
-                <Text
-                  size="2xl"
-                  weight="bold"
-                  color={totals.net >= 0 ? "success" : "danger"}
-                >
-                  {formatCurrency(totals.net)}
-                </Text>
-              </div>
-            </div>
-          </Stack>
-        </Card>
+        <Stack gap={12}>
+          <Text size="h4" as="h3" weight="semibold">
+            {i18n.t("projection_page.month_totals")}
+          </Text>
+          <Grid
+            gap={16}
+            className="projection-overview__totals-grid"
+            columns="repeat(var(--projection-totals-columns, 1), minmax(0, 1fr))"
+          >
+            <Box padding={8} className="projection-overview__total-item">
+              <Text size="sm" color="secondary">
+                {i18n.t("projection_page.income")}
+              </Text>
+              <Text size="lg" weight="bold" color="success">
+                {formatCurrency(totals.income)}
+              </Text>
+            </Box>
+            <Box padding={8} className="projection-overview__total-item">
+              <Text size="sm" color="secondary">
+                {i18n.t("projection_page.expenses")}
+              </Text>
+              <Text size="lg" weight="bold" color="danger">
+                {formatCurrency(totals.expense)}
+              </Text>
+            </Box>
+            <Box
+              padding={8}
+              className="projection-overview__total-item projection-overview__total-item--net"
+            >
+              <Text size="sm" color="secondary">
+                {i18n.t("projection_page.total")}
+              </Text>
+              <Text
+                size="2xl"
+                weight="bold"
+                color={totals.net >= 0 ? "success" : "danger"}
+              >
+                {formatCurrency(totals.net)}
+              </Text>
+            </Box>
+          </Grid>
+        </Stack>
 
-        <Stack gap={16}>
+        <Stack gap={24}>
           <Text size="h4" as="h3" weight="semibold">
             {i18n.t("projection_page.accounts_with_entries")}
           </Text>
 
-          {accounts.length === 0 ? (
-            <Card padding={20} variant="dashed">
-              <Text color="secondary">
-                {i18n.t("projection_page.empty_month_entries")}
-              </Text>
-            </Card>
-          ) : (
-            accounts.map((account) => (
-              <div key={account.accountId} className="projection-overview__account-group">
-                <div className="projection-overview__account-header">
-                  <Text size="md" weight="bold">
-                    {account.accountName}
-                  </Text>
-                  <Text
-                    size="sm"
-                    weight="bold"
-                    color={account.monthTotal >= 0 ? "success" : "danger"}
-                  >
-                    {formatCurrency(account.monthTotal)}
-                  </Text>
-                </div>
-
-                <EntryList
-                  entries={account.entries}
-                  showDelete={false}
-                  entryHref={(entry) => `/entries/${entry.id}`}
-                />
-
-                <AppLink
-                  href={`/accounts/${account.accountId}`}
-                  className="projection-overview__account-link"
+          <Stack gap={32}>
+            {accounts.length === 0 ? (
+              <Card padding={20} variant="dashed">
+                <Text color="secondary">
+                  {i18n.t("projection_page.empty_month_entries")}
+                </Text>
+              </Card>
+            ) : (
+              accounts.map((account) => (
+                <Stack
+                  key={account.accountId}
+                  gap={16}
+                  className="projection-overview__account-group"
                 >
-                  {i18n.t("projection_page.open_account")}
-                </AppLink>
-              </div>
-            ))
-          )}
+                  <Stack
+                    direction="row"
+                    align="center"
+                    justify="space-between"
+                    gap={8}
+                  >
+                    <Stack direction="row" align="center" gap={8}>
+                      <Text size="md" weight="bold">
+                        {account.accountName}
+                      </Text>
+                      <Text
+                        size="sm"
+                        weight="bold"
+                        color={account.monthTotal >= 0 ? "success" : "danger"}
+                      >
+                        {formatCurrency(account.monthTotal)}
+                      </Text>
+                    </Stack>
+
+                    <AppLink
+                      href={`/accounts/${account.accountId}`}
+                      className="projection-overview__account-link"
+                    >
+                      {i18n.t("projection_page.open_account")}
+                    </AppLink>
+                  </Stack>
+
+                  <EntryList
+                    entries={account.entries}
+                    showDelete={false}
+                    entryHref={(entry) => `/entries/${entry.id}`}
+                  />
+                </Stack>
+              ))
+            )}
+          </Stack>
         </Stack>
 
-        <AppLink href="/entries" className="projection-overview__all-entries-link">
+        <AppLink
+          href="/entries"
+          className="projection-overview__all-entries-link"
+        >
           {i18n.t("projection_page.see_all_entries")}
         </AppLink>
       </Stack>

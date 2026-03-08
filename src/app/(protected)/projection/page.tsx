@@ -1,7 +1,7 @@
 import { Container, ProjectionOverview } from "@/components";
+import { format, startOfMonth } from "date-fns";
 
 import { getProjectionPagePayload } from "@/actions/entries";
-import { format, startOfMonth } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
@@ -31,26 +31,11 @@ export default async function ProjectionPage({
   const params = await searchParams;
   const focusedMonth = getFocusedMonth(params.month);
   const payload = await getProjectionPagePayload(focusedMonth);
+
   const chartData = payload.chartMonths.map((month) => ({
     monthLabel: format(new Date(`${month.monthKey}-01T00:00:00`), "MMM yyyy"),
     income: month.income,
     expenses: Math.abs(month.expense),
-  }));
-  const accounts = payload.focusedMonthAccounts.map((account) => ({
-    accountId: account.accountId,
-    accountName: account.accountName,
-    monthTotal: account.monthTotal,
-    entries: account.entries.map((entry) => ({
-      id: entry.id,
-      type: entry.type,
-      accountName: entry.accountName,
-      description: entry.description,
-      amount: entry.amount,
-      beginDate: entry.beginDate,
-      endDate: entry.endDate,
-      createdAt: entry.createdAt,
-      updatedAt: entry.updatedAt,
-    })),
   }));
 
   return (
@@ -61,7 +46,7 @@ export default async function ProjectionPage({
         nextMonthKey={payload.nextMonthKey}
         chartData={chartData}
         totals={payload.focusedMonthTotals}
-        accounts={accounts}
+        accounts={payload.focusedMonthAccounts}
       />
     </Container>
   );

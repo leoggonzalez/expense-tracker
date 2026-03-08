@@ -43,9 +43,7 @@ export function EntriesTable({
     return `${sign}${Math.abs(normalizedAmount).toFixed(2)} €`;
   };
 
-  const formatEntryDate = (
-    beginDate: string,
-  ): string => {
+  const formatEntryDate = (beginDate: string): string => {
     const formattedBeginDate = format(new Date(beginDate), "MMM dd, yyyy");
     return formattedBeginDate;
   };

@@ -289,7 +289,9 @@ async function getMonthTotalsForUser(
   }
 }
 
-export async function getMonthTotals(monthStart: Date): Promise<DashboardTotals> {
+export async function getMonthTotals(
+  monthStart: Date,
+): Promise<DashboardTotals> {
   const currentUser = await requireCurrentUser();
   return getMonthTotalsForUser(currentUser.id, monthStart);
 }
@@ -459,7 +461,9 @@ export async function getCurrentMonthTotals(): Promise<DashboardTotals> {
   return getMonthTotals(new Date());
 }
 
-export async function getProjectionEntries(): Promise<SerializedProjectionEntry[]> {
+export async function getProjectionEntries(): Promise<
+  SerializedProjectionEntry[]
+> {
   const entries = await getEntries();
   return entries.map(serializeProjectionEntry);
 }
@@ -474,7 +478,7 @@ export async function getProjectionPagePayload(
 
   const [chartRows, focusedMonthTotals, accountTotalsRows, accountEntriesRows] =
     await Promise.all([
-    prisma.$queryRaw<ProjectionChartMonthRow[]>`
+      prisma.$queryRaw<ProjectionChartMonthRow[]>`
       WITH months AS (
         SELECT generate_series(
           ${normalizedFocusedMonthStart}::timestamp,
@@ -516,8 +520,8 @@ export async function getProjectionPagePayload(
       GROUP BY months.month_start
       ORDER BY months.month_start ASC
     `,
-    getMonthTotalsForUser(currentUser.id, normalizedFocusedMonthStart),
-    prisma.$queryRaw<ProjectionFocusedAccountTotalRow[]>`
+      getMonthTotalsForUser(currentUser.id, normalizedFocusedMonthStart),
+      prisma.$queryRaw<ProjectionFocusedAccountTotalRow[]>`
       SELECT
         a.id AS "accountId",
         a.name AS "accountName",
@@ -542,7 +546,7 @@ export async function getProjectionPagePayload(
       GROUP BY a.id, a.name
       ORDER BY a.name ASC
     `,
-    prisma.$queryRaw<ProjectionFocusedAccountEntryRow[]>`
+      prisma.$queryRaw<ProjectionFocusedAccountEntryRow[]>`
       SELECT
         ranked."accountId",
         ranked."accountName",
@@ -579,7 +583,7 @@ export async function getProjectionPagePayload(
       WHERE ranked.row_number <= 5
       ORDER BY ranked."accountName" ASC, ranked."createdAt" DESC
     `,
-  ]);
+    ]);
 
   const chartMonths: ProjectionChartMonth[] = chartRows.map((row, index) => {
     const monthStart = addMonths(normalizedFocusedMonthStart, index);
@@ -621,7 +625,10 @@ export async function getProjectionPagePayload(
       key: format(normalizedFocusedMonthStart, "yyyy-MM"),
       label: format(normalizedFocusedMonthStart, "MMMM yyyy"),
     },
-    previousMonthKey: format(addMonths(normalizedFocusedMonthStart, -1), "yyyy-MM"),
+    previousMonthKey: format(
+      addMonths(normalizedFocusedMonthStart, -1),
+      "yyyy-MM",
+    ),
     nextMonthKey: format(addMonths(normalizedFocusedMonthStart, 1), "yyyy-MM"),
     chartMonths,
     focusedMonthTotals,
