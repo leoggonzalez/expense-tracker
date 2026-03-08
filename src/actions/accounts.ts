@@ -1,6 +1,6 @@
 "use server";
 
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { endOfMonth, startOfMonth } from "date-fns";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -39,12 +39,6 @@ type AccountDetailEntry = {
   updatedAt: string;
 };
 
-type AccountDetailMonthGroup = {
-  monthKey: string;
-  monthLabel: string;
-  entries: AccountDetailEntry[];
-};
-
 export type AccountDetailPageData = {
   account: {
     id: string;
@@ -52,7 +46,8 @@ export type AccountDetailPageData = {
     isArchived: boolean;
     currentMonthTotal: number;
   };
-  entryMonthGroups: AccountDetailMonthGroup[];
+  currentMonthRelevantEntries: AccountDetailEntry[];
+  allEntries: AccountDetailEntry[];
   pagination: {
     page: number;
     limit: number;
@@ -211,8 +206,9 @@ export async function getAccountDetailPageData(input: {
   const currentUser = await requireCurrentUser();
 
   const page = Math.max(1, input.page || 1);
-  const limit = Math.max(1, input.limit || 20);
+  const limit = Math.max(1, input.limit || 10);
   const take = page * limit;
+  const { monthStart, monthEnd } = getCurrentMonthBounds();
 
   try {
     const account = await findOwnedAccountOrNull(currentUser.id, input.accountId);
@@ -221,7 +217,8 @@ export async function getAccountDetailPageData(input: {
       return null;
     }
 
-    const [total, entries, currentMonthTotal] = await Promise.all([
+    const [total, allEntriesRaw, currentMonthTotal, currentMonthRelevantRaw] =
+      await Promise.all([
       prisma.entry.count({
         where: {
           accountId: account.id,
@@ -245,28 +242,47 @@ export async function getAccountDetailPageData(input: {
         take,
       }),
       getCurrentMonthTotalForAccount(currentUser.id, account.id),
+      prisma.entry.findMany({
+        where: {
+          accountId: account.id,
+          beginDate: {
+            lte: monthEnd,
+          },
+          OR: [
+            {
+              endDate: null,
+            },
+            {
+              endDate: {
+                gte: monthStart,
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          type: true,
+          description: true,
+          amount: true,
+          beginDate: true,
+          endDate: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
+      }),
     ]);
 
-    const monthGroupsMap = new Map<string, AccountDetailMonthGroup>();
-
-    entries.forEach((entry) => {
-      const monthKey = format(entry.beginDate, "yyyy-MM");
-      const monthLabel = format(entry.beginDate, "MMMM yyyy");
-
-      if (!monthGroupsMap.has(monthKey)) {
-        monthGroupsMap.set(monthKey, {
-          monthKey,
-          monthLabel,
-          entries: [],
-        });
-      }
-
-      const group = monthGroupsMap.get(monthKey);
-      if (!group) {
-        return;
-      }
-
-      group.entries.push({
+    const serializeEntry = (entry: {
+      id: string;
+      type: string;
+      description: string;
+      amount: number;
+      beginDate: Date;
+      endDate: Date | null;
+      createdAt: Date;
+      updatedAt: Date;
+    }): AccountDetailEntry => ({
         id: entry.id,
         type: entry.type,
         accountName: account.name,
@@ -277,7 +293,6 @@ export async function getAccountDetailPageData(input: {
         createdAt: entry.createdAt.toISOString(),
         updatedAt: entry.updatedAt.toISOString(),
       });
-    });
 
     return {
       account: {
@@ -286,12 +301,13 @@ export async function getAccountDetailPageData(input: {
         isArchived: account.isArchived,
         currentMonthTotal,
       },
-      entryMonthGroups: Array.from(monthGroupsMap.values()),
+      currentMonthRelevantEntries: currentMonthRelevantRaw.map(serializeEntry),
+      allEntries: allEntriesRaw.map(serializeEntry),
       pagination: {
         page,
         limit,
         total,
-        hasMore: total > entries.length,
+        hasMore: total > allEntriesRaw.length,
       },
     };
   } catch (error) {

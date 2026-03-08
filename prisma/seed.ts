@@ -2,48 +2,324 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const ACCOUNT_COUNT = 10;
-const ENTRIES_PER_ACCOUNT = 50;
-const RECURRING_PER_ACCOUNT = 15; // 30% of 50
-const FIXED_RECURRING_PER_ACCOUNT = 5;
+type EntryType = "income" | "expense";
+type RecurringMode = "open_ended" | "fixed";
 
-const ACCOUNT_NAME_PREFIXES = [
-  "Housing",
-  "Utilities",
-  "Groceries",
-  "Transport",
-  "Leisure",
-  "Health",
-  "Savings",
-  "Investments",
-  "Subscriptions",
-  "Misc",
-];
+type RecurringTemplate = {
+  description: string;
+  type: EntryType;
+  mode: RecurringMode;
+  amountRange: [number, number];
+  startMonthOffsetRange: [number, number];
+  durationMonthRange?: [number, number];
+};
 
-const EXPENSE_DESCRIPTIONS = [
-  "Rent",
-  "Electric bill",
-  "Internet",
-  "Groceries",
-  "Dining out",
-  "Fuel",
-  "Gym membership",
-  "Insurance",
-  "Phone plan",
-  "Streaming",
-  "Pharmacy",
-  "House supplies",
-];
+type AccountSeedSpec = {
+  name: string;
+  targetEntries: number;
+  oneTimeIncomeRatio: number;
+  oneTimeExpenseDescriptions: string[];
+  oneTimeIncomeDescriptions: string[];
+  recurringTemplates: RecurringTemplate[];
+  oneTimeExpenseRange: [number, number];
+  oneTimeIncomeRange: [number, number];
+};
 
-const INCOME_DESCRIPTIONS = [
-  "Salary",
-  "Freelance",
-  "Bonus",
-  "Side project",
-  "Investment return",
-  "Refund",
-  "Tax adjustment",
-  "Rental income",
+const ACCOUNT_SPECS: AccountSeedSpec[] = [
+  {
+    name: "Amex credit card",
+    targetEntries: 35,
+    oneTimeIncomeRatio: 0.08,
+    recurringTemplates: [
+      {
+        description: "Phone installment",
+        type: "expense",
+        mode: "fixed",
+        amountRange: [45, 85],
+        startMonthOffsetRange: [-16, -8],
+        durationMonthRange: [10, 18],
+      },
+      {
+        description: "Gym membership",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [28, 49],
+        startMonthOffsetRange: [-20, -6],
+      },
+      {
+        description: "Streaming bundle",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [18, 35],
+        startMonthOffsetRange: [-20, -4],
+      },
+    ],
+    oneTimeExpenseDescriptions: [
+      "Groceries",
+      "Dining out",
+      "Fuel",
+      "Online shopping",
+      "Travel booking",
+      "Electronics",
+      "Pharmacy",
+      "Household supplies",
+    ],
+    oneTimeIncomeDescriptions: ["Card refund", "Cashback reversal", "Chargeback"],
+    oneTimeExpenseRange: [12, 420],
+    oneTimeIncomeRange: [8, 95],
+  },
+  {
+    name: "Visa credit card",
+    targetEntries: 34,
+    oneTimeIncomeRatio: 0.07,
+    recurringTemplates: [
+      {
+        description: "Cloud storage",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [5, 18],
+        startMonthOffsetRange: [-22, -7],
+      },
+      {
+        description: "Music subscription",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [8, 16],
+        startMonthOffsetRange: [-22, -8],
+      },
+      {
+        description: "Laptop installment",
+        type: "expense",
+        mode: "fixed",
+        amountRange: [60, 130],
+        startMonthOffsetRange: [-18, -10],
+        durationMonthRange: [8, 14],
+      },
+    ],
+    oneTimeExpenseDescriptions: [
+      "Groceries",
+      "Restaurant",
+      "Parking",
+      "Taxi",
+      "Weekend trip",
+      "Pet supplies",
+      "Hardware store",
+      "Books",
+    ],
+    oneTimeIncomeDescriptions: ["Vendor refund", "Return credit"],
+    oneTimeExpenseRange: [10, 390],
+    oneTimeIncomeRange: [10, 80],
+  },
+  {
+    name: "Main account",
+    targetEntries: 38,
+    oneTimeIncomeRatio: 0.45,
+    recurringTemplates: [
+      {
+        description: "Salary",
+        type: "income",
+        mode: "open_ended",
+        amountRange: [4200, 5200],
+        startMonthOffsetRange: [-24, -12],
+      },
+      {
+        description: "Apartment transfer",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [950, 1450],
+        startMonthOffsetRange: [-24, -10],
+      },
+      {
+        description: "Investment contribution",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [300, 700],
+        startMonthOffsetRange: [-22, -8],
+      },
+      {
+        description: "Bonus plan",
+        type: "income",
+        mode: "fixed",
+        amountRange: [450, 1200],
+        startMonthOffsetRange: [-14, -5],
+        durationMonthRange: [4, 9],
+      },
+    ],
+    oneTimeExpenseDescriptions: [
+      "Insurance",
+      "Medical appointment",
+      "Furniture",
+      "Transfer to savings",
+      "Emergency repair",
+    ],
+    oneTimeIncomeDescriptions: [
+      "Freelance payment",
+      "Tax refund",
+      "Expense reimbursement",
+      "Gift received",
+      "Annual bonus",
+    ],
+    oneTimeExpenseRange: [40, 1600],
+    oneTimeIncomeRange: [150, 3200],
+  },
+  {
+    name: "Main-street",
+    targetEntries: 33,
+    oneTimeIncomeRatio: 0.03,
+    recurringTemplates: [
+      {
+        description: "Main-street rent",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [1180, 1380],
+        startMonthOffsetRange: [-24, -12],
+      },
+      {
+        description: "Main-street utilities",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [110, 220],
+        startMonthOffsetRange: [-24, -10],
+      },
+      {
+        description: "Condo services",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [60, 130],
+        startMonthOffsetRange: [-22, -6],
+      },
+    ],
+    oneTimeExpenseDescriptions: [
+      "Appliance repair",
+      "Plumber",
+      "Painting",
+      "Cleaning service",
+      "Small maintenance",
+    ],
+    oneTimeIncomeDescriptions: ["Deposit reimbursement"],
+    oneTimeExpenseRange: [45, 680],
+    oneTimeIncomeRange: [40, 250],
+  },
+  {
+    name: "Old-street",
+    targetEntries: 32,
+    oneTimeIncomeRatio: 0.04,
+    recurringTemplates: [
+      {
+        description: "Old-street rent",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [820, 980],
+        startMonthOffsetRange: [-24, -14],
+      },
+      {
+        description: "Old-street internet",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [35, 75],
+        startMonthOffsetRange: [-24, -8],
+      },
+      {
+        description: "Old-street utilities",
+        type: "expense",
+        mode: "fixed",
+        amountRange: [70, 140],
+        startMonthOffsetRange: [-18, -6],
+        durationMonthRange: [8, 16],
+      },
+    ],
+    oneTimeExpenseDescriptions: [
+      "Leak fix",
+      "Old-street repaint",
+      "Minor renovation",
+      "Home supplies",
+      "Electrician",
+    ],
+    oneTimeIncomeDescriptions: ["Overpayment refund"],
+    oneTimeExpenseRange: [30, 620],
+    oneTimeIncomeRange: [20, 180],
+  },
+  {
+    name: "Investments",
+    targetEntries: 36,
+    oneTimeIncomeRatio: 0.45,
+    recurringTemplates: [
+      {
+        description: "ETF contribution",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [250, 650],
+        startMonthOffsetRange: [-24, -10],
+      },
+      {
+        description: "Dividend payout",
+        type: "income",
+        mode: "fixed",
+        amountRange: [80, 260],
+        startMonthOffsetRange: [-16, -6],
+        durationMonthRange: [6, 14],
+      },
+      {
+        description: "Broker fee",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [4, 18],
+        startMonthOffsetRange: [-24, -12],
+      },
+    ],
+    oneTimeExpenseDescriptions: [
+      "Broker commission",
+      "FX fee",
+      "Portfolio rebalance",
+      "Transfer to broker",
+    ],
+    oneTimeIncomeDescriptions: [
+      "Stock sale",
+      "Interest payment",
+      "Fund distribution",
+      "Bond coupon",
+    ],
+    oneTimeExpenseRange: [15, 1400],
+    oneTimeIncomeRange: [35, 1800],
+  },
+  {
+    name: "Subscriptions",
+    targetEntries: 31,
+    oneTimeIncomeRatio: 0.03,
+    recurringTemplates: [
+      {
+        description: "Streaming services",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [18, 55],
+        startMonthOffsetRange: [-24, -8],
+      },
+      {
+        description: "Productivity apps",
+        type: "expense",
+        mode: "open_ended",
+        amountRange: [15, 35],
+        startMonthOffsetRange: [-22, -8],
+      },
+      {
+        description: "Domain and hosting",
+        type: "expense",
+        mode: "fixed",
+        amountRange: [90, 190],
+        startMonthOffsetRange: [-16, -4],
+        durationMonthRange: [6, 13],
+      },
+    ],
+    oneTimeExpenseDescriptions: [
+      "Annual renewal",
+      "Add-on license",
+      "Family plan upgrade",
+      "One-time plugin",
+    ],
+    oneTimeIncomeDescriptions: ["Subscription refund"],
+    oneTimeExpenseRange: [12, 240],
+    oneTimeIncomeRange: [10, 55],
+  },
 ];
 
 function mulberry32(seed: number): () => number {
@@ -53,12 +329,6 @@ function mulberry32(seed: number): () => number {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-function addMonths(base: Date, months: number): Date {
-  const date = new Date(base);
-  date.setMonth(date.getMonth() + months);
-  return date;
 }
 
 function getSeedEmail(): string {
@@ -73,72 +343,83 @@ function fromCents(cents: number): number {
   return cents / 100;
 }
 
-function nextExpenseAmount(random: () => number): number {
-  // Range: -15.00 to -2500.00
-  const cents = 1500 + Math.floor(random() * (250000 - 1500 + 1));
-  return fromCents(-cents);
+function pickInteger(random: () => number, min: number, max: number): number {
+  return min + Math.floor(random() * (max - min + 1));
 }
 
-function nextIncomeAmount(random: () => number): number {
-  // Range: 50.00 to 7000.00
-  const cents = 5000 + Math.floor(random() * (700000 - 5000 + 1));
-  return fromCents(cents);
-}
-
-function pickDescription(
-  type: "income" | "expense",
-  accountIndex: number,
-  entryIndex: number,
-): string {
-  const source = type === "expense" ? EXPENSE_DESCRIPTIONS : INCOME_DESCRIPTIONS;
-  const descriptor = source[(accountIndex * 11 + entryIndex * 7) % source.length];
-  return `${descriptor} ${entryIndex + 1}`;
-}
-
-function computeBeginDate(random: () => number): Date {
-  const now = new Date();
-  const monthOffset = -23 + Math.floor(random() * 24); // within last 24 months
-  const day = 1 + Math.floor(random() * 28);
-  const date = addMonths(new Date(now.getFullYear(), now.getMonth(), 1), monthOffset);
-  date.setDate(day);
+function addMonths(base: Date, months: number): Date {
+  const date = new Date(base);
+  date.setMonth(date.getMonth() + months);
   return date;
+}
+
+function startOfCurrentMonth(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1, 12, 0, 0, 0);
+}
+
+function buildDateFromMonthOffset(monthOffset: number, day: number): Date {
+  const monthStart = addMonths(startOfCurrentMonth(), monthOffset);
+  const date = new Date(monthStart);
+  date.setDate(Math.max(1, Math.min(day, 28)));
+  return date;
+}
+
+function randomAmount(
+  random: () => number,
+  type: EntryType,
+  range: [number, number],
+): number {
+  const [min, max] = range;
+  const cents = pickInteger(random, toCents(min), toCents(max));
+  const absolute = fromCents(cents);
+
+  return type === "expense" ? -absolute : absolute;
 }
 
 function computeEndDate(
   beginDate: Date,
-  mode: "non_recurring" | "fixed_recurring" | "open_ended",
+  mode: RecurringMode,
   random: () => number,
+  durationMonthRange?: [number, number],
 ): Date | null {
   if (mode === "open_ended") {
     return null;
   }
 
-  if (mode === "non_recurring") {
-    return new Date(beginDate);
-  }
-
-  // fixed recurring from 2 to 12 months
-  const durationMonths = 2 + Math.floor(random() * 11);
-  const endDate = addMonths(beginDate, durationMonths);
-
-  // Keep same day where possible
+  const durationRange = durationMonthRange || [6, 12];
+  const durationMonths = pickInteger(random, durationRange[0], durationRange[1]);
+  const endDate = addMonths(beginDate, Math.max(1, durationMonths));
   endDate.setDate(beginDate.getDate());
-
-  if (endDate <= beginDate) {
-    const fallback = new Date(beginDate);
-    fallback.setMonth(fallback.getMonth() + 2);
-    return fallback;
-  }
 
   return endDate;
 }
 
-function getAccountName(index: number): string {
-  return `${ACCOUNT_NAME_PREFIXES[index]} Account ${index + 1}`;
+async function refreshCurrentMonthCounters(): Promise<void> {
+  const monthStart = startOfCurrentMonth();
+  const monthEnd = addMonths(monthStart, 1);
+  monthEnd.setMilliseconds(-1);
+
+  await prisma.$executeRaw`
+    UPDATE "Account" a
+    SET "currentMonthEntryCount" = COALESCE(month_counts."entryCount", 0)
+    FROM (
+      SELECT
+        a2.id AS "accountId",
+        COUNT(e.id)::integer AS "entryCount"
+      FROM "Account" a2
+      LEFT JOIN "Entry" e
+        ON e."accountId" = a2.id
+       AND e."beginDate" <= ${monthEnd}
+       AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+      GROUP BY a2.id
+    ) month_counts
+    WHERE a.id = month_counts."accountId"
+  `;
 }
 
 async function main() {
-  console.log("Starting stress-test seed...");
+  console.log("Starting scenario-based seed...");
 
   await prisma.loginCode.deleteMany();
   await prisma.session.deleteMany();
@@ -146,24 +427,21 @@ async function main() {
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
 
-  console.log("Cleared users, accounts, entries, login codes, and sessions");
-
   const seedEmail = getSeedEmail();
 
   const user = await prisma.user.create({
     data: {
       email: seedEmail,
-      name: "Stress Seed User",
+      name: "Scenario Seed User",
     },
   });
 
-  const accountData = Array.from({ length: ACCOUNT_COUNT }, (_, index) => ({
-    userId: user.id,
-    name: getAccountName(index),
-  }));
-
   await prisma.account.createMany({
-    data: accountData,
+    data: ACCOUNT_SPECS.map((accountSpec) => ({
+      userId: user.id,
+      name: accountSpec.name,
+      isArchived: false,
+    })),
   });
 
   const accounts = await prisma.account.findMany({
@@ -173,45 +451,87 @@ async function main() {
     orderBy: {
       name: "asc",
     },
+    select: {
+      id: true,
+      name: true,
+    },
   });
 
-  const entryData = accounts.flatMap((account, accountIndex) => {
-    const random = mulberry32(12345 + accountIndex * 97);
+  const accountByName = new Map(accounts.map((account) => [account.name, account.id]));
 
-    return Array.from({ length: ENTRIES_PER_ACCOUNT }, (_, entryIndex) => {
-      const isRecurring = entryIndex < RECURRING_PER_ACCOUNT;
-      const isFixedRecurring = entryIndex < FIXED_RECURRING_PER_ACCOUNT;
+  const entriesData = ACCOUNT_SPECS.flatMap((accountSpec, accountIndex) => {
+    const random = mulberry32(94731 + accountIndex * 103);
+    const accountId = accountByName.get(accountSpec.name);
 
-      const recurrenceMode = isRecurring
-        ? isFixedRecurring
-          ? "fixed_recurring"
-          : "open_ended"
-        : "non_recurring";
+    if (!accountId) {
+      throw new Error(`Missing seeded account: ${accountSpec.name}`);
+    }
 
-      const type: "income" | "expense" =
-        entryIndex % 10 < 7 ? "expense" : "income";
+    const recurringEntries = accountSpec.recurringTemplates.map((template) => {
+      const monthOffset = pickInteger(
+        random,
+        template.startMonthOffsetRange[0],
+        template.startMonthOffsetRange[1],
+      );
 
-      const beginDate = computeBeginDate(random);
-      const endDate = computeEndDate(beginDate, recurrenceMode, random);
-      const amount =
-        type === "expense"
-          ? nextExpenseAmount(random)
-          : nextIncomeAmount(random);
+      const beginDate = buildDateFromMonthOffset(monthOffset, pickInteger(random, 1, 28));
+      const endDate = computeEndDate(
+        beginDate,
+        template.mode,
+        random,
+        template.durationMonthRange,
+      );
 
       return {
-        accountId: account.id,
-        type,
-        description: pickDescription(type, accountIndex, entryIndex),
-        amount: fromCents(toCents(amount)),
+        accountId,
+        type: template.type,
+        description: template.description,
+        amount: randomAmount(random, template.type, template.amountRange),
         beginDate,
         endDate,
       };
     });
+
+    const oneTimeCount = Math.max(0, accountSpec.targetEntries - recurringEntries.length);
+
+    const oneTimeEntries = Array.from({ length: oneTimeCount }, (_, entryIndex) => {
+      const isIncome = random() < accountSpec.oneTimeIncomeRatio;
+      const type: EntryType = isIncome ? "income" : "expense";
+
+      const descriptionPool = isIncome
+        ? accountSpec.oneTimeIncomeDescriptions
+        : accountSpec.oneTimeExpenseDescriptions;
+
+      const descriptionBase =
+        descriptionPool[(entryIndex + accountIndex * 5) % descriptionPool.length];
+
+      const monthOffset = pickInteger(random, -22, 2);
+      const beginDate = buildDateFromMonthOffset(monthOffset, pickInteger(random, 1, 28));
+
+      return {
+        accountId,
+        type,
+        description: `${descriptionBase} ${entryIndex + 1}`,
+        amount: randomAmount(
+          random,
+          type,
+          type === "income"
+            ? accountSpec.oneTimeIncomeRange
+            : accountSpec.oneTimeExpenseRange,
+        ),
+        beginDate,
+        endDate: new Date(beginDate),
+      };
+    });
+
+    return [...recurringEntries, ...oneTimeEntries];
   });
 
   await prisma.entry.createMany({
-    data: entryData,
+    data: entriesData,
   });
+
+  await refreshCurrentMonthCounters();
 
   const [userCount, accountCount, entryCount, recurringEntries] = await Promise.all([
     prisma.user.count(),
@@ -224,6 +544,7 @@ async function main() {
       },
     }),
   ]);
+
   const recurringCount = recurringEntries.filter((entry) => {
     if (entry.endDate === null) {
       return true;

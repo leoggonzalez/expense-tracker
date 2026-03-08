@@ -4,6 +4,7 @@ import { getAccountDetailPageData, unarchiveAccount } from "@/actions/accounts";
 import {
   AccountArchiveForm,
   AppLink,
+  Avatar,
   Button,
   Container,
   EntryList,
@@ -38,7 +39,7 @@ export default async function Page({
   const data = await getAccountDetailPageData({
     accountId: id,
     page,
-    limit: 20,
+    limit: 10,
   });
 
   if (!data) {
@@ -61,9 +62,12 @@ export default async function Page({
         <Card padding={20} variant="secondary">
           <Stack gap={14}>
             <Stack direction="row" align="center" justify="space-between" gap={12}>
-              <Text size="h4" as="h2" weight="semibold">
-                {data.account.name}
-              </Text>
+              <Stack direction="row" align="center" gap={10}>
+                <Avatar name={data.account.name} />
+                <Text size="h4" as="h2" weight="semibold">
+                  {data.account.name}
+                </Text>
+              </Stack>
               <Text
                 size="h4"
                 weight="bold"
@@ -99,29 +103,34 @@ export default async function Page({
 
         <Stack gap={16}>
           <Text size="h4" as="h2" weight="semibold">
-            {i18n.t("account_detail_page.related_entries")}
+            {i18n.t("accounts_page.current_month_relevant_entries")}
           </Text>
 
-          {data.entryMonthGroups.length === 0 ? (
-            <Card padding={20} variant="dashed">
-              <Text color="secondary">{i18n.t("entries_page.empty_state")}</Text>
-            </Card>
-          ) : (
-            <Stack gap={20}>
-              {data.entryMonthGroups.map((group) => (
-                <Stack key={group.monthKey} gap={10}>
-                  <Text size="md" weight="semibold">
-                    {group.monthLabel}
-                  </Text>
-                  <EntryList
-                    entries={group.entries}
-                    showDelete={false}
-                    entryHrefBase="/entries"
-                  />
-                </Stack>
-              ))}
-            </Stack>
-          )}
+          <EntryList
+            entries={data.currentMonthRelevantEntries}
+            showDelete={false}
+            entryHrefBase="/entries"
+            summaryRows={[
+              {
+                id: "current-month-relevant-total",
+                label: i18n.t("accounts_page.current_month_relevant_total") as string,
+                value: formatCurrency(data.account.currentMonthTotal),
+                tone: "emphasis",
+              },
+            ]}
+          />
+        </Stack>
+
+        <Stack gap={16}>
+          <Text size="h4" as="h2" weight="semibold">
+            {i18n.t("accounts_page.all_entries")}
+          </Text>
+
+          <EntryList
+            entries={data.allEntries}
+            showDelete={false}
+            entryHrefBase="/entries"
+          />
 
           {data.pagination.hasMore ? (
             <form method="get">
