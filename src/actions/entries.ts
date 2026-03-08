@@ -295,42 +295,39 @@ export async function getCurrentMonthTotals(): Promise<DashboardTotals> {
   try {
     const rows = await prisma.$queryRaw<TotalsRow[]>`
       SELECT
-        COALESCE(
-          SUM(
-            CASE
-              WHEN e.type = 'income' THEN e.amount
-              ELSE 0
-            END
-          ),
-          0
-        ) AS income,
-        COALESCE(
-          SUM(
-            CASE
-              WHEN e.type = 'expense' THEN
-                CASE
-                  WHEN e.amount > 0 THEN -e.amount
-                  ELSE e.amount
-                END
-              ELSE 0
-            END
-          ),
-          0
-        ) AS expense,
-        COALESCE(
-          SUM(
-            CASE
-              WHEN e.type = 'expense' AND e.amount > 0 THEN -e.amount
-              ELSE e.amount
-            END
-          ),
-          0
-        ) AS net
-      FROM "Entry" e
-      INNER JOIN "Account" a ON a.id = e."accountId"
-      WHERE a."userId" = ${currentUser.id}
-        AND e."beginDate" <= ${monthEnd}
-        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+        totals.income,
+        totals.expense,
+        totals.income + totals.expense AS net
+      FROM (
+        SELECT
+          COALESCE(
+            SUM(
+              CASE
+                WHEN e.type = 'income' THEN e.amount
+                ELSE 0
+              END
+            ),
+            0
+          ) AS income,
+          COALESCE(
+            SUM(
+              CASE
+                WHEN e.type = 'expense' THEN
+                  CASE
+                    WHEN e.amount > 0 THEN -e.amount
+                    ELSE e.amount
+                  END
+                ELSE 0
+              END
+            ),
+            0
+          ) AS expense
+        FROM "Entry" e
+        INNER JOIN "Account" a ON a.id = e."accountId"
+        WHERE a."userId" = ${currentUser.id}
+          AND e."beginDate" <= ${monthEnd}
+          AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+      ) AS totals
     `;
 
     const totals = rows[0];

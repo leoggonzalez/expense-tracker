@@ -5,49 +5,87 @@
     text-align: center;
   }
 
-  &__item {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--spacing-md);
+  &__list {
+    overflow: hidden;
   }
 
-  &__content {
-    flex: 1;
+  &__row {
+    border-bottom: var(--border-width) solid var(--color-border);
+
+    &:first-child .entry-list__row-main {
+      border-top-left-radius: var(--border-radius-md);
+      border-top-right-radius: var(--border-radius-md);
+    }
+
+    &:last-child {
+      border-bottom: none;
+
+      .entry-list__row-main {
+        border-bottom-left-radius: var(--border-radius-md);
+        border-bottom-right-radius: var(--border-radius-md);
+      }
+    }
   }
 
   &__link {
     display: block;
-    flex: 1;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+      background-color: var(--color-background-secondary);
+    }
+  }
+
+  &__content {
+    min-width: 0;
+  }
+
+  &__row-main {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-height: 68px;
+    padding: var(--spacing-md);
   }
 
   &__details {
-    align-items: flex-start;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+
+    > * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__amount {
+    text-align: right;
+  }
+
+  &__account {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__actions {
     display: flex;
+    justify-content: flex-end;
     gap: var(--spacing-sm);
+    padding: 0 var(--spacing-md) var(--spacing-md);
   }
 }
 
 @media (min-width: $breakpoint-tablet) {
   .entry-list {
-    &__item {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    &__content {
-      --stack-direction: row;
-      --stack-justify: space-between;
-      --stack-align: flex-start;
-      --stack-gap: var(--spacing-lg);
-    }
-
-    &__details {
-      align-items: flex-end;
+    &__row-main {
+      min-height: 72px;
+      padding: var(--spacing-md) var(--spacing-lg);
     }
   }
 }

@@ -63,3 +63,4 @@ export { EntryDetailPage } from "./entry_detail_page/entry_detail_page";
 
 export { Container } from "./container/container";
 export type { ContainerProps } from "./container/container";
+export { Avatar } from "./avatar/avatar";

@@ -2,11 +2,10 @@
 
 import "./entry_list.scss";
 
-import { AppLink, Button } from "@/components";
-import { Card, Stack, Text } from "@/elements";
+import { AppLink, Avatar, Button } from "@/components";
+import { Card, Text } from "@/elements";
 import { deleteEntry } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
-import { Entry } from "@/model";
 import { format } from "date-fns";
 import React from "react";
 
@@ -42,17 +41,7 @@ export function EntryList({
     }
   };
 
-  const entries = plainEntries.map((entry) =>
-    Entry.fromJSON({
-      ...entry,
-      beginDate: new Date(entry.beginDate),
-      endDate: entry.endDate ? new Date(entry.endDate) : null,
-      createdAt: new Date(entry.createdAt),
-      updatedAt: new Date(entry.updatedAt),
-    }),
-  );
-
-  if (entries.length === 0) {
+  if (plainEntries.length === 0) {
     return (
       <Card
         padding={32}
@@ -64,51 +53,60 @@ export function EntryList({
     );
   }
 
+  const formatAmount = (type: string, amount: number): string => {
+    const normalizedAmount =
+      type === "expense" && amount > 0 ? -amount : amount;
+    const sign = normalizedAmount < 0 ? "-" : "";
+    return `${sign}${Math.abs(normalizedAmount).toFixed(2)} €`;
+  };
+
   return (
     <div className="entry-list">
-      <Stack gap={12}>
-        {entries.map((entry, index) => {
+      <Card padding={0} className="entry-list__list">
+        {plainEntries.map((entry) => {
           const href =
-            entryHref?.(plainEntries[index]) ??
-            (entryHrefBase
-              ? `${entryHrefBase}/${plainEntries[index].id}`
-              : null);
-          const content = (
-            <Stack gap={12} className="entry-list__content">
-              <Stack gap={4} className="entry-list__main">
+            entryHref?.(entry) ?? (entryHrefBase ? `${entryHrefBase}/${entry.id}` : null);
+
+          const rowMain = (
+            <div className="entry-list__row-main">
+              <div className="entry-list__account">
+                <Avatar name={entry.accountName} />
+              </div>
+              <div className="entry-list__details">
                 <Text size="sm" weight="semibold">
-                  {entry.accountName}
-                </Text>
-                <Text size="xs" color="secondary">
                   {entry.description}
                 </Text>
-              </Stack>
-              <Stack gap={4} className="entry-list__details">
+                <Text size="xs" color="secondary">
+                  {format(new Date(entry.beginDate), "MMM dd, yyyy")}
+                </Text>
+              </div>
+              <div className="entry-list__amount">
                 <Text
                   size="sm"
                   weight="bold"
-                  color={entry.isIncome() ? "success" : "danger"}
+                  color={entry.type === "income" ? "success" : "danger"}
                 >
-                  {entry.getFormattedAmount()}
+                  {formatAmount(entry.type, entry.amount)}
                 </Text>
-                <Text size="xs" color="secondary">
-                  {format(entry.beginDate, "MMM dd, yyyy")}
-                  {entry.endDate &&
-                    ` - ${format(entry.endDate, "MMM dd, yyyy")}`}
-                </Text>
-              </Stack>
-            </Stack>
+              </div>
+            </div>
+          );
+
+          const content = (
+            <div className="entry-list__content">
+              {href ? (
+                <AppLink href={href} className="entry-list__link">
+                  {rowMain}
+                </AppLink>
+              ) : (
+                rowMain
+              )}
+            </div>
           );
 
           return (
-            <Card key={entry.id} padding={16} className="entry-list__item">
-              {href ? (
-                <AppLink href={href} className="entry-list__link">
-                  {content}
-                </AppLink>
-              ) : (
-                content
-              )}
+            <div key={entry.id} className="entry-list__row">
+              {content}
               {showDelete && (
                 <div className="entry-list__actions">
                   <Button
@@ -120,10 +118,10 @@ export function EntryList({
                   </Button>
                 </div>
               )}
-            </Card>
+            </div>
           );
         })}
-      </Stack>
+      </Card>
     </div>
   );
 }
