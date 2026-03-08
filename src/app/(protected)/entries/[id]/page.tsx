@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { EntryDetailPage } from "@/components";
-import { getAccounts, getEntryById } from "@/actions/entries";
+import { getEntryById } from "@/actions/entries";
 
 export const dynamic = "force-dynamic";
 
@@ -15,10 +15,7 @@ export default async function Page({
   params,
 }: EntryPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const [entry, accounts] = await Promise.all([
-    getEntryById(id),
-    getAccounts(),
-  ]);
+  const entry = await getEntryById(id);
 
   if (!entry) {
     notFound();
@@ -26,11 +23,13 @@ export default async function Page({
 
   return (
     <EntryDetailPage
-      accounts={accounts.map((account) => account.name)}
       entry={{
         id: entry.id,
         type: entry.type,
+        accountId: entry.accountId,
         accountName: entry.account.name,
+        transferAccountId: entry.transferAccountId,
+        transferAccountName: entry.transferAccount?.name || null,
         description: entry.description,
         amount: entry.amount,
         beginDate: entry.beginDate.toISOString(),

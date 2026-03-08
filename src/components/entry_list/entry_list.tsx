@@ -36,6 +36,7 @@ export interface EntryListProps {
   showDelete?: boolean;
   entryHref?: (entry: EntryListItem) => string | null;
   entryHrefBase?: string;
+  topSummaryRows?: EntryListSummaryRow[];
   summaryRows?: EntryListSummaryRow[];
 }
 
@@ -44,6 +45,7 @@ export function EntryList({
   showDelete = true,
   entryHref,
   entryHrefBase,
+  topSummaryRows = [],
   summaryRows = [],
 }: EntryListProps): React.ReactElement {
   const handleDelete = async (id: string) => {
@@ -66,6 +68,37 @@ export function EntryList({
     <div className="entry-list">
       <div className="entry-list__list">
         <Card padding={0}>
+          {topSummaryRows.map((row) => (
+            <div
+              key={row.id}
+              className={[
+                "entry-list__summary-row",
+                row.tone === "emphasis" && "entry-list__summary-row--emphasis",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {row.href ? (
+                <div className="entry-list__summary-link">
+                  <AppLink href={row.href}>{row.label}</AppLink>
+                </div>
+              ) : (
+                <Text size="sm" color="secondary" as="span">
+                  {row.label}
+                </Text>
+              )}
+              {row.value ? (
+                typeof row.value === "string" ? (
+                  <Text size="sm" weight="bold" as="span">
+                    {row.value}
+                  </Text>
+                ) : (
+                  <span className="entry-list__summary-value">{row.value}</span>
+                )
+              ) : null}
+            </div>
+          ))}
+
           {plainEntries.map((entry) => {
             const href =
               entryHref?.(entry) ??

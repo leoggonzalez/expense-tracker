@@ -85,6 +85,10 @@ function getInitialModel(props: EntryFormProps): EntryFormModel {
     ? new Date(props.initialData.endDate)
     : null;
   const schedule = deriveScheduleFromDates({ beginDate, endDate });
+  const isCreateSingleEntry = !props.isEdit && Boolean(props.entryType);
+  const defaultScheduleMode = isCreateSingleEntry
+    ? "one_time"
+    : schedule.scheduleMode || "one_time";
 
   return {
     type,
@@ -95,7 +99,7 @@ function getInitialModel(props: EntryFormProps): EntryFormModel {
       : "",
     beginDate: formatMonthForInput(beginDate),
     beginDateMode: "month",
-    scheduleMode: schedule.scheduleMode || "one_time",
+    scheduleMode: defaultScheduleMode,
     installments: String(schedule.installments),
   };
 }
@@ -346,12 +350,6 @@ export function EntryForm({
     });
   };
 
-  const handleBeginDateChange = (value: string): void => {
-    updateFields({
-      beginDate: value,
-    });
-  };
-
   const handleBeginDateModeChange = (): void => {
     updateFields({
       beginDateMode: "date",
@@ -471,8 +469,7 @@ export function EntryForm({
               : "entry_form.begin_date",
           )}
           mode={model.beginDateMode}
-          value={fields.beginDate.value || ""}
-          onChange={handleBeginDateChange}
+          field={fields.beginDate}
           onEnableFullDate={handleBeginDateModeChange}
           editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
           monthLabel={i18n.t("entry_form.month")}

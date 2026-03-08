@@ -6,7 +6,7 @@ import {
   ProjectionChart,
 } from "@/components";
 import { Card, Grid, Icon, Stack, Text } from "@/elements";
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { format, startOfMonth } from "date-fns";
 
 import { getProjectionPagePayload } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
@@ -39,17 +39,12 @@ export default async function ProjectionPage({
   const params = await searchParams;
   const focusedMonth = getFocusedMonth(params.month);
   const payload = await getProjectionPagePayload(focusedMonth);
-  const focusedMonthStart = startOfMonth(focusedMonth);
-  const focusedMonthEnd = endOfMonth(focusedMonthStart);
 
   const chartData = payload.chartMonths.map((month) => ({
     monthLabel: format(new Date(`${month.monthKey}-01T00:00:00`), "MMM yyyy"),
     income: month.income,
     expenses: Math.abs(month.expense),
   }));
-
-  const focusedMonthStartQuery = format(focusedMonthStart, "yyyy-MM-dd");
-  const focusedMonthEndQuery = format(focusedMonthEnd, "yyyy-MM-dd");
 
   return (
     <Container>
@@ -143,21 +138,20 @@ export default async function ProjectionPage({
                   account.monthEntryCount - account.entries.length,
                 );
 
-                const moreEntriesHref = `/entries?account=${account.accountId}&start_date=${focusedMonthStartQuery}&end_date=${focusedMonthEndQuery}`;
+                const accountMonthHref = `/accounts/${account.accountId}?currentMonth=${payload.focusedMonth.key}`;
 
                 return (
                   <Stack key={account.accountId} gap={12}>
-                      <Text size="md" weight="bold">
-                        {account.accountName}
-                      </Text>
-
+                    <Text size="md" weight="bold">
+                      {account.accountName}
+                    </Text>
 
                     <EntryList
                       entries={account.entries}
                       showDelete={false}
                       entryHrefBase="/entries"
-                      summaryRows={[
-                        ...(hiddenEntriesCount > 0
+                      topSummaryRows={
+                        hiddenEntriesCount > 0
                           ? [
                               {
                                 id: `more-${account.accountId}`,
@@ -167,10 +161,12 @@ export default async function ProjectionPage({
                                     count: hiddenEntriesCount,
                                   },
                                 ) as string,
-                                href: moreEntriesHref,
+                                href: accountMonthHref,
                               },
                             ]
-                          : []),
+                          : []
+                      }
+                      summaryRows={[
                         {
                           id: `total-${account.accountId}`,
                           label: i18n.t("projection_page.account_month_total"),
@@ -179,8 +175,6 @@ export default async function ProjectionPage({
                         },
                       ]}
                     />
-
-                    
                   </Stack>
                 );
               })}

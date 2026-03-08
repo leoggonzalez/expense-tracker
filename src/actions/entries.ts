@@ -813,7 +813,7 @@ export async function getProjectionPagePayload(
           e."updatedAt",
           ROW_NUMBER() OVER (
             PARTITION BY a.id
-            ORDER BY e."createdAt" DESC
+            ORDER BY e."beginDate" DESC, e."createdAt" DESC
           ) AS row_number
         FROM "Account" a
         INNER JOIN "Entry" e ON e."accountId" = a.id
@@ -824,7 +824,7 @@ export async function getProjectionPagePayload(
           AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
       ) ranked
       WHERE ranked.row_number <= 5
-      ORDER BY ranked."accountName" ASC, ranked."createdAt" ASC
+      ORDER BY ranked."accountName" ASC, ranked."beginDate" DESC, ranked."createdAt" DESC
     `,
     ]);
 
@@ -1069,6 +1069,12 @@ export async function getEntryById(
       },
       include: {
         account: true,
+        transferAccount: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
   } catch (error) {

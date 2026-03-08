@@ -1,6 +1,6 @@
 "use server";
 
-import { endOfMonth, startOfMonth } from "date-fns";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -42,13 +42,18 @@ type AccountDetailEntry = {
 };
 
 export type AccountDetailPageData = {
+  selectedMonth: {
+    key: string;
+    label: string;
+  };
   account: {
     id: string;
     name: string;
     isArchived: boolean;
-    currentMonthTotal: number;
+    historicalTotal: number;
+    selectedMonthTotal: number;
   };
-  currentMonthRelevantEntries: AccountDetailEntry[];
+  selectedMonthRelevantEntries: AccountDetailEntry[];
   allEntries: AccountDetailEntry[];
   pagination: {
     page: number;
@@ -108,12 +113,12 @@ async function findOwnedAccountOrNull(userId: string, id: string) {
   });
 }
 
-async function getCurrentMonthTotalForAccount(
+async function getMonthTotalForAccount(
   userId: string,
   accountId: string,
+  monthStart: Date,
+  monthEnd: Date,
 ): Promise<number> {
-  const { monthStart, monthEnd } = getCurrentMonthBounds();
-
   const rows = await prisma.$queryRaw<Array<{ currentMonthTotal: number | null }>>`
     SELECT
       COALESCE(
@@ -140,6 +145,36 @@ async function getCurrentMonthTotalForAccount(
   `;
 
   return Number(rows[0]?.currentMonthTotal || 0);
+}
+
+async function getHistoricalTotalForAccount(
+  userId: string,
+  accountId: string,
+): Promise<number> {
+  const rows = await prisma.$queryRaw<Array<{ historicalTotal: number | null }>>`
+    SELECT
+      COALESCE(
+        SUM(
+          CASE
+            WHEN e.type = 'expense' THEN
+              CASE
+                WHEN e.amount > 0 THEN -e.amount
+                ELSE e.amount
+              END
+            ELSE e.amount
+          END
+        ),
+        0
+      ) AS "historicalTotal"
+    FROM "Account" a
+    LEFT JOIN "Entry" e
+      ON e."accountId" = a.id
+    WHERE a.id = ${accountId}
+      AND a."userId" = ${userId}
+    GROUP BY a.id
+  `;
+
+  return Number(rows[0]?.historicalTotal || 0);
 }
 
 async function getAccountsByArchiveState(
@@ -204,13 +239,15 @@ export async function getAccountDetailPageData(input: {
   accountId: string;
   page?: number;
   limit?: number;
+  selectedMonthStart?: Date;
 }): Promise<AccountDetailPageData | null> {
   const currentUser = await requireCurrentUser();
 
   const page = Math.max(1, input.page || 1);
   const limit = Math.max(1, input.limit || 10);
   const take = page * limit;
-  const { monthStart, monthEnd } = getCurrentMonthBounds();
+  const monthStart = startOfMonth(input.selectedMonthStart || new Date());
+  const monthEnd = endOfMonth(monthStart);
 
   try {
     const account = await findOwnedAccountOrNull(currentUser.id, input.accountId);
@@ -219,7 +256,7 @@ export async function getAccountDetailPageData(input: {
       return null;
     }
 
-    const [total, allEntriesRaw, currentMonthTotal, currentMonthRelevantRaw] =
+    const [total, allEntriesRaw, selectedMonthTotal, historicalTotal, selectedMonthRelevantRaw] =
       await Promise.all([
       prisma.entry.count({
         where: {
@@ -249,7 +286,8 @@ export async function getAccountDetailPageData(input: {
         orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
         take,
       }),
-      getCurrentMonthTotalForAccount(currentUser.id, account.id),
+      getMonthTotalForAccount(currentUser.id, account.id, monthStart, monthEnd),
+      getHistoricalTotalForAccount(currentUser.id, account.id),
       prisma.entry.findMany({
         where: {
           accountId: account.id,
@@ -283,24 +321,17 @@ export async function getAccountDetailPageData(input: {
           createdAt: true,
           updatedAt: true,
         },
-        orderBy: [{ beginDate: "asc" }, { createdAt: "asc" }],
+        orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
       }),
     ]);
 
-    const sortedCurrentMonthRelevantRaw = [...currentMonthRelevantRaw].sort(
+    const sortedSelectedMonthRelevantRaw = [...selectedMonthRelevantRaw].sort(
       (left, right) => {
-        const leftIsRecurringBucket = left.beginDate < monthStart;
-        const rightIsRecurringBucket = right.beginDate < monthStart;
-
-        if (leftIsRecurringBucket !== rightIsRecurringBucket) {
-          return leftIsRecurringBucket ? -1 : 1;
-        }
-
         if (left.beginDate.getTime() !== right.beginDate.getTime()) {
-          return left.beginDate.getTime() - right.beginDate.getTime();
+          return right.beginDate.getTime() - left.beginDate.getTime();
         }
 
-        return left.createdAt.getTime() - right.createdAt.getTime();
+        return right.createdAt.getTime() - left.createdAt.getTime();
       },
     );
 
@@ -332,13 +363,18 @@ export async function getAccountDetailPageData(input: {
       });
 
     return {
+      selectedMonth: {
+        key: format(monthStart, "yyyy-MM"),
+        label: format(monthStart, "MMMM yyyy"),
+      },
       account: {
         id: account.id,
         name: account.name,
         isArchived: account.isArchived,
-        currentMonthTotal,
+        historicalTotal,
+        selectedMonthTotal,
       },
-      currentMonthRelevantEntries: sortedCurrentMonthRelevantRaw.map(serializeEntry),
+      selectedMonthRelevantEntries: sortedSelectedMonthRelevantRaw.map(serializeEntry),
       allEntries: allEntriesRaw.map(serializeEntry),
       pagination: {
         page,

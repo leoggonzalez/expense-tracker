@@ -1,7 +1,10 @@
+"use client";
+
 import "./new_entry_page.scss";
 
 import { AppLink, Container } from "@/components";
 import { Card, Grid, Stack, Text } from "@/elements";
+import { useAppPreferences } from "@/components/app_preferences_provider/app_preferences_provider";
 
 import React from "react";
 import { i18n } from "@/model/i18n";
@@ -17,6 +20,8 @@ export function NewEntryPage({
   children,
   showTabs = true,
 }: NewEntryPageProps): React.ReactElement {
+  useAppPreferences();
+
   const titleKey =
     pageType === "income"
       ? "new_entry_page.title_income"
