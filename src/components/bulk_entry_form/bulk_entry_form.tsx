@@ -1,15 +1,29 @@
 "use client";
 
-import React, { useRef } from "react";
-import { useForm } from "react-use-form-library";
-
-import { Stack, Text } from "@/elements";
-import { AccountField, Button, Checkbox, Input, Select } from "@/components";
-import { createMultipleEntries, CreateEntryInput } from "@/actions/entries";
-import { useToast } from "@/components/toast_provider/toast_provider";
-import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
-import { i18n } from "@/model/i18n";
 import "./bulk_entry_form.scss";
+
+import {
+  AccountField,
+  Button,
+  Input,
+  MonthSelector,
+  Select,
+} from "@/components";
+import { CreateEntryInput, createMultipleEntries } from "@/actions/entries";
+import {
+  EntryDateMode,
+  EntryScheduleMode,
+  normalizeDateValue,
+  resolveEndDate,
+  toDate,
+} from "@/lib/entry_schedule";
+import React, { useMemo, useRef, useState } from "react";
+import { Stack, Text } from "@/elements";
+import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
+
+import { format } from "date-fns";
+import { i18n } from "@/model/i18n";
+import { useToast } from "@/components/toast_provider/toast_provider";
 
 interface BulkEntryItem {
   id: string;
@@ -18,33 +32,49 @@ interface BulkEntryItem {
   amount: string;
 }
 
-type BulkEntryFormModel = {
-  accountName: string;
-  beginDate: string;
-  endDate: string;
-  isRecurring: boolean;
-  entries: BulkEntryItem[];
-};
-
 export interface BulkEntryFormProps {
   accounts?: string[];
   onSuccess?: () => void;
 }
 
+type SharedScheduleState = {
+  accountName: string;
+  beginDate: string;
+  beginDateMode: EntryDateMode;
+  scheduleMode: EntryScheduleMode;
+  installments: string;
+};
+
 function formatDateForInput(date: Date): string {
   return date.toISOString().split("T")[0];
 }
 
-function getInitialModel(): BulkEntryFormModel {
-  const today = formatDateForInput(new Date());
-
+function getInitialSharedState(): SharedScheduleState {
   return {
     accountName: "",
-    beginDate: today,
-    endDate: today,
-    isRecurring: false,
-    entries: [{ id: "1", type: "expense", description: "", amount: "" }],
+    beginDate: formatDateForInput(new Date()).slice(0, 7),
+    beginDateMode: "month",
+    scheduleMode: "one_time",
+    installments: "1",
   };
+}
+
+function getInitialEntries(): BulkEntryItem[] {
+  return [{ id: "1", type: "expense", description: "", amount: "" }];
+}
+
+function parseInstallments(value: string): number | null {
+  const parsed = Number.parseInt(value, 10);
+
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 120) {
+    return null;
+  }
+
+  return parsed;
+}
+
+function sanitizeInstallmentsInput(value: string): string {
+  return value.replace(/\D/g, "");
 }
 
 export function BulkEntryForm({
@@ -52,109 +82,150 @@ export function BulkEntryForm({
   onSuccess,
 }: BulkEntryFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
-  const initialModelRef = useRef<BulkEntryFormModel>(getInitialModel());
-  const form = useForm<BulkEntryFormModel>({
-    model: initialModelRef.current,
-    handleSubmit: async () => {
-      const inputs: CreateEntryInput[] = model.entries.map((entry) => ({
-        type: entry.type,
-        accountName: model.accountName,
-        description: entry.description,
-        amount: parseAmountInput(entry.amount) || 0,
-        beginDate: new Date(model.beginDate),
-        endDate: model.isRecurring ? null : new Date(model.endDate),
-      }));
+  const [shared, setShared] = useState<SharedScheduleState>(
+    getInitialSharedState(),
+  );
+  const [entries, setEntries] = useState<BulkEntryItem[]>(getInitialEntries());
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const nextIdRef = useRef(2);
 
-      const result = await createMultipleEntries(inputs);
+  const beginDate = useMemo(
+    () => toDate(shared.beginDate, shared.beginDateMode),
+    [shared.beginDate, shared.beginDateMode],
+  );
+  const parsedInstallments = useMemo(
+    () => parseInstallments(shared.installments),
+    [shared.installments],
+  );
+  const calculatedEndDate = useMemo(() => {
+    if (
+      !beginDate ||
+      shared.scheduleMode !== "installments" ||
+      !parsedInstallments
+    ) {
+      return null;
+    }
 
-      if (!result.success) {
-        showError(i18n.t("toast.entries_create_failed"), {
-          iconName: "entries",
-        });
-        return;
-      }
+    return resolveEndDate({
+      scheduleMode: shared.scheduleMode,
+      beginDate,
+      installments: parsedInstallments,
+    });
+  }, [beginDate, parsedInstallments, shared.scheduleMode]);
 
-      showSuccess(i18n.t("toast.entries_created"), {
-        iconName: "entries",
-      });
-      reset();
-
-      if (onSuccess) {
-        onSuccess();
-      }
-    },
-    onSubmitError: (error) => {
-      console.error("Error submitting bulk entries:", error);
-      showError(i18n.t("toast.entries_create_failed"), {
-        iconName: "entries",
-      });
-    },
-  });
-  const { fields, model, onSubmit, reset, submissionStatus, updateFields } =
-    form;
+  const formattedEndDate = calculatedEndDate
+    ? format(
+        calculatedEndDate,
+        shared.beginDateMode === "month" ? "MMMM yyyy" : "MMM dd, yyyy",
+      )
+    : null;
 
   const updateEntryField = <Key extends keyof BulkEntryItem>(
     id: string,
     field: Key,
     value: BulkEntryItem[Key],
   ): void => {
-    updateFields({
-      entries: model.entries.map((entry) =>
+    setEntries((currentEntries) =>
+      currentEntries.map((entry) =>
         entry.id === id ? { ...entry, [field]: value } : entry,
       ),
-    });
+    );
   };
 
   const addEntry = (): void => {
-    const nextId = String(
-      Math.max(0, ...model.entries.map((entry) => Number(entry.id))) + 1,
-    );
+    const nextId = String(nextIdRef.current);
+    nextIdRef.current += 1;
 
-    updateFields({
-      entries: [
-        ...model.entries,
-        { id: nextId, type: "expense", description: "", amount: "" },
-      ],
-    });
+    setEntries((currentEntries) => [
+      ...currentEntries,
+      { id: nextId, type: "expense", description: "", amount: "" },
+    ]);
   };
 
   const removeEntry = (id: string): void => {
-    if (model.entries.length === 1) {
+    setEntries((currentEntries) => {
+      if (currentEntries.length <= 1) {
+        return currentEntries;
+      }
+
+      return currentEntries.filter((entry) => entry.id !== id);
+    });
+  };
+
+  const resetForm = (): void => {
+    setShared(getInitialSharedState());
+    setEntries(getInitialEntries());
+    nextIdRef.current = 2;
+  };
+
+  const onSubmit = async (event: React.FormEvent): Promise<void> => {
+    event.preventDefault();
+
+    const parsedBeginDate = toDate(shared.beginDate, shared.beginDateMode);
+    const installments = parseInstallments(shared.installments);
+
+    if (!shared.accountName || !parsedBeginDate) {
+      showError(i18n.t("toast.entries_create_failed"), {
+        iconName: "entries",
+      });
       return;
     }
 
-    updateFields({
-      entries: model.entries.filter((entry) => entry.id !== id),
-    });
-  };
+    if (shared.scheduleMode === "installments" && !installments) {
+      showError(i18n.t("entry_form.invalid_installments"), {
+        iconName: "entries",
+      });
+      return;
+    }
 
-  const handleBeginDateChange = (value: string): void => {
-    updateFields({
-      beginDate: value,
-      endDate:
-        model.isRecurring || !model.endDate || value <= model.endDate
-          ? model.endDate
-          : value,
+    const payloadEndDate = resolveEndDate({
+      scheduleMode: shared.scheduleMode,
+      beginDate: parsedBeginDate,
+      installments: installments || 1,
     });
-  };
 
-  const handleEndDateChange = (value: string): void => {
-    updateFields({
-      endDate: value,
+    const inputs: CreateEntryInput[] = [];
+
+    for (const entry of entries) {
+      const parsedAmount = parseAmountInput(entry.amount);
+
+      if (!entry.description || parsedAmount === null) {
+        showError(i18n.t("toast.entries_create_failed"), {
+          iconName: "entries",
+        });
+        return;
+      }
+
+      inputs.push({
+        type: entry.type,
+        accountName: shared.accountName,
+        description: entry.description,
+        amount: parsedAmount,
+        beginDate: parsedBeginDate,
+        endDate: payloadEndDate,
+      });
+    }
+
+    setIsSubmitting(true);
+    const result = await createMultipleEntries(inputs);
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      showError(i18n.t("toast.entries_create_failed"), {
+        iconName: "entries",
+      });
+      return;
+    }
+
+    showSuccess(i18n.t("toast.entries_created"), {
+      iconName: "entries",
     });
-  };
+    resetForm();
 
-  const handleRecurringChange = (checked: boolean): void => {
-    updateFields({
-      isRecurring: checked,
-      endDate:
-        checked || model.endDate || model.beginDate <= model.endDate
-          ? model.endDate
-          : model.beginDate,
-    });
+    if (onSuccess) {
+      onSuccess();
+    }
   };
-
-  const isSubmitting = submissionStatus === "submitting";
 
   return (
     <form onSubmit={onSubmit} className="bulk-entry-form">
@@ -163,52 +234,138 @@ export function BulkEntryForm({
           {i18n.t("bulk_entry_form.title")}
         </Text>
 
-        <div className="bulk-entry-form__shared">
-          <Stack gap={16}>
-            <AccountField
-              label={i18n.t("bulk_entry_form.shared_account")}
-              value={fields.accountName.value || ""}
-              onChange={(value) => fields.accountName.onChange(value)}
-              accounts={initialAccounts}
-              placeholder={
-                i18n.t("bulk_entry_form.shared_account_placeholder") as string
-              }
-              required
-            />
+        <Stack gap={16}>
+          <AccountField
+            label={i18n.t("bulk_entry_form.shared_account")}
+            value={shared.accountName}
+            onChange={(value) =>
+              setShared((current) => ({ ...current, accountName: value }))
+            }
+            accounts={initialAccounts}
+            placeholder={
+              i18n.t("bulk_entry_form.shared_account_placeholder") as string
+            }
+            required
+          />
 
-            <Input
-              label={i18n.t("bulk_entry_form.shared_begin_date")}
-              type="date"
-              value={fields.beginDate.value || ""}
-              onChange={handleBeginDateChange}
-              required
-            />
+          <Stack gap={4}>
+            <Text size="sm" weight="medium">
+              {i18n.t("entry_form.schedule_label")}
+            </Text>
 
-            <Checkbox
-              checked={model.isRecurring}
-              onChange={handleRecurringChange}
-              label={i18n.t("bulk_entry_form.recurring")}
-            />
-
-            {!model.isRecurring && (
-              <Input
-                label={i18n.t("bulk_entry_form.shared_end_date")}
-                type="date"
-                value={fields.endDate.value || ""}
-                onChange={handleEndDateChange}
-              />
-            )}
+            <Stack direction="row" wrap gap={12}>
+              {(
+                [
+                  {
+                    value: "one_time",
+                    label: i18n.t("entry_form.schedule_one_time"),
+                  },
+                  {
+                    value: "installments",
+                    label: i18n.t("entry_form.schedule_installments"),
+                  },
+                  {
+                    value: "unlimited",
+                    label: i18n.t("entry_form.schedule_unlimited"),
+                  },
+                ] as const
+              ).map((option) => (
+                <label
+                  key={option.value}
+                  className="bulk-entry-form__schedule-option"
+                >
+                  <input
+                    type="radio"
+                    name="bulk-entry-schedule"
+                    checked={shared.scheduleMode === option.value}
+                    onChange={() =>
+                      setShared((current) => ({
+                        ...current,
+                        scheduleMode: option.value,
+                        installments:
+                          option.value === "installments"
+                            ? current.installments || "1"
+                            : "1",
+                      }))
+                    }
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </Stack>
           </Stack>
-        </div>
+
+          <MonthSelector
+            label={i18n.t(
+              shared.beginDateMode === "month"
+                ? "entry_form.begin_date_month"
+                : "entry_form.begin_date",
+            )}
+            mode={shared.beginDateMode}
+            value={shared.beginDate}
+            onChange={(value) =>
+              setShared((current) => ({ ...current, beginDate: value }))
+            }
+            onEnableFullDate={() =>
+              setShared((current) => ({
+                ...current,
+                beginDateMode: "date",
+                beginDate: normalizeDateValue(
+                  current.beginDate,
+                  current.beginDateMode,
+                ),
+              }))
+            }
+            editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
+            monthLabel={i18n.t("entry_form.month")}
+            yearLabel={i18n.t("entry_form.year")}
+            required
+          />
+
+          {shared.scheduleMode === "installments" && (
+            <Stack gap={8}>
+              <Input
+                label={i18n.t("entry_form.installments")}
+                type="number"
+                value={shared.installments}
+                onChange={(value) =>
+                  setShared((current) => ({
+                    ...current,
+                    installments: sanitizeInstallmentsInput(value),
+                  }))
+                }
+                min={1}
+                max={120}
+                step={1}
+                required
+              />
+
+              {formattedEndDate && (
+                <Text size="sm" color="secondary">
+                  {i18n.t("entry_form.calculated_end_date", {
+                    endDate: formattedEndDate,
+                  })}
+                </Text>
+              )}
+            </Stack>
+          )}
+        </Stack>
 
         <div className="bulk-entry-form__entries">
           <Text size="sm" weight="semibold" color="secondary">
             {i18n.t("bulk_entry_form.entries")}
           </Text>
           <Stack gap={12}>
-            {model.entries.map((entry) => (
-              <div key={entry.id} className="bulk-entry-form__entry">
-                <div className="bulk-entry-form__entry-fields">
+            {entries.map((entry) => (
+              <Stack
+                direction="row"
+                wrap
+                gap={12}
+                align="center"
+                justify="space-between"
+                key={entry.id}
+              >
+                <Stack direction="row" wrap gap={12} align="center">
                   <Select
                     value={entry.type}
                     onChange={(value) =>
@@ -259,19 +416,19 @@ export function BulkEntryForm({
                     }
                     required
                   />
+                </Stack>
 
-                  {model.entries.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="danger"
-                      size="sm"
-                      onClick={() => removeEntry(entry.id)}
-                    >
-                      {i18n.t("bulk_entry_form.remove")}
-                    </Button>
-                  )}
-                </div>
-              </div>
+                {entries.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    onClick={() => removeEntry(entry.id)}
+                  >
+                    {i18n.t("bulk_entry_form.remove")}
+                  </Button>
+                )}
+              </Stack>
             ))}
           </Stack>
 
@@ -284,10 +441,10 @@ export function BulkEntryForm({
           {isSubmitting
             ? i18n.t("bulk_entry_form.add_entries_loading")
             : i18n.t(
-                model.entries.length === 1
+                entries.length === 1
                   ? "bulk_entry_form.add_entries_one"
                   : "bulk_entry_form.add_entries_other",
-                { count: model.entries.length },
+                { count: entries.length },
               )}
         </Button>
       </Stack>

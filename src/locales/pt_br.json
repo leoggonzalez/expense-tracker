@@ -39,6 +39,15 @@
     "amount_placeholder": "0.00",
     "begin_date": "Data inicial",
     "begin_date_month": "Mês inicial",
+    "month": "Mês",
+    "year": "Ano",
+    "schedule_label": "Programação",
+    "schedule_one_time": "Uma vez",
+    "schedule_installments": "Parcelas",
+    "schedule_unlimited": "Sem limite",
+    "installments": "Parcelas",
+    "calculated_end_date": "Termina em %{endDate}",
+    "invalid_installments": "As parcelas devem ser um número inteiro entre 1 e 120.",
     "recurring": "Recorrente",
     "end_date": "Data final",
     "end_date_month": "Mês final",
@@ -224,7 +233,9 @@
     "title_multiple": "Adicionar vários lançamentos",
     "income_tab": "Receita",
     "expense_tab": "Despesa",
-    "multiple_tab": "Vários"
+    "multiple_tab": "Vários",
+    "recent_entries": "Lançamentos recentes",
+    "open_all_entries": "Ver todos os lançamentos"
   },
   "entry_detail_page": {
     "title": "Editar lançamento",

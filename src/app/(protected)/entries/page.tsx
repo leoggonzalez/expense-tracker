@@ -50,7 +50,13 @@ export default async function Page({
   return (
     <Container maxWidth="wide">
       <Stack gap={24}>
-        <Stack direction="row" align="center" justify="space-between" wrap gap={16}>
+        <Stack
+          direction="row"
+          align="center"
+          justify="space-between"
+          wrap
+          gap={16}
+        >
           <Text size="h2" as="h2" weight="bold">
             {i18n.t("entries_page.title")}
           </Text>

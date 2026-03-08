@@ -1,0 +1,11 @@
+@use "@/styles/variables.scss" as *;
+
+.new-entry-recent-entries {
+  margin-top: var(--spacing-xl);
+
+  &__all-link {
+    font-size: var(--font-size-sm);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+  }
+}

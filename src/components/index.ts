@@ -24,6 +24,7 @@ export { ProjectionOverview } from "./projection_overview/projection_overview";
 export { EntryForm } from "./entry_form/entry_form";
 export type { EntryFormProps } from "./entry_form/entry_form";
 export { EntryDateField } from "./entry_date_field/entry_date_field";
+export { MonthSelector } from "./month_selector/month_selector";
 
 export { BulkEntryForm } from "./bulk_entry_form/bulk_entry_form";
 export type { BulkEntryFormProps } from "./bulk_entry_form/bulk_entry_form";
@@ -58,6 +59,7 @@ export { AppLink } from "./app_link/app_link";
 export { AccountsPage } from "./accounts_page/accounts_page";
 export { AccountDetailPage } from "./account_detail_page/account_detail_page";
 export { NewEntryPage } from "./new_entry_page/new_entry_page";
+export { NewEntryRecentEntries } from "./new_entry_recent_entries/new_entry_recent_entries";
 export { EntryDetailPage } from "./entry_detail_page/entry_detail_page";
 
 export { Container } from "./container/container";
