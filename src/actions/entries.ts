@@ -136,13 +136,25 @@ type EntryFiltersWhere = {
 };
 
 type EntryListWithPagination = {
-  entries: EntryWithAccountRecord[];
+  entries: FilteredEntryListItem[];
   pagination: {
     page: number;
     limit: number;
     total: number;
     totalPages: number;
   };
+};
+
+export type FilteredEntryListItem = {
+  id: string;
+  type: "income" | "expense";
+  accountName: string;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type EntryMutationResult =
@@ -727,8 +739,20 @@ export async function getEntriesWithFilters(filters: {
     const [entries, total] = await Promise.all([
       prisma.entry.findMany({
         where,
-        include: {
-          account: true,
+        select: {
+          id: true,
+          type: true,
+          description: true,
+          amount: true,
+          beginDate: true,
+          endDate: true,
+          createdAt: true,
+          updatedAt: true,
+          account: {
+            select: {
+              name: true,
+            },
+          },
         },
         orderBy: {
           beginDate: "desc",
@@ -740,7 +764,17 @@ export async function getEntriesWithFilters(filters: {
     ]);
 
     return {
-      entries,
+      entries: entries.map((entry) => ({
+        id: entry.id,
+        type: entry.type as "income" | "expense",
+        accountName: entry.account.name,
+        description: entry.description,
+        amount: entry.amount,
+        beginDate: entry.beginDate.toISOString(),
+        endDate: entry.endDate?.toISOString() || null,
+        createdAt: entry.createdAt.toISOString(),
+        updatedAt: entry.updatedAt.toISOString(),
+      })),
       pagination: {
         page,
         limit,

@@ -1,6 +1,14 @@
 import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
 
-import { EntriesPage } from "@/components";
+import {
+  AppLink,
+  Container,
+  EntriesFilters,
+  EntriesPagination,
+  EntriesTable,
+} from "@/components";
+import { Stack, Text } from "@/elements";
+import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +35,6 @@ export default async function Page({
   const startDate = params.start_date || "";
   const endDate = params.end_date || "";
 
-  // TODO: getEntriesWithFilters should already return an entry with the account name, so we don't have to do an extra query for each entry. Make sure entries only fetch their account name and nothign else.
   const [entriesData, accounts] = await Promise.all([
     getEntriesWithFilters({
       accountId: account || undefined,
@@ -40,38 +47,47 @@ export default async function Page({
     getAccounts(),
   ]);
 
-  // TODO: Entries should come already formatted from the server
-  const entries = entriesData.entries.map((entry) => ({
-    id: entry.id,
-    type: entry.type,
-    accountName: entry.account.name,
-    description: entry.description,
-    amount: entry.amount,
-    beginDate: entry.beginDate.toISOString(),
-    endDate: entry.endDate?.toISOString() || null,
-    createdAt: entry.createdAt.toISOString(),
-    updatedAt: entry.updatedAt.toISOString(),
-  }));
-
   return (
-    /* TODO: we shouldn't have a specific entries page component. Rather here we want 3 sections:
-    1. A header with the title and the "add entry" button
-    2. A filters section with all the filters (account, type, date range). 
-    3. The entries list with pagination
-    */
-    <EntriesPage
-      entries={entries}
-      accounts={accounts.map((entryAccount) => ({
-        id: entryAccount.id,
-        name: entryAccount.name,
-      }))}
-      filters={{
-        account,
-        type,
-        startDate,
-        endDate,
-      }}
-      pagination={entriesData.pagination}
-    />
+    <Container maxWidth="wide">
+      <Stack gap={24}>
+        <Stack direction="row" align="center" justify="space-between" wrap gap={16}>
+          <Text size="h2" as="h2" weight="bold">
+            {i18n.t("entries_page.title")}
+          </Text>
+          <AppLink href="/entries/new/expense">
+            {i18n.t("entries_page.add_entry")}
+          </AppLink>
+        </Stack>
+
+        <EntriesFilters
+          accounts={accounts.map((entryAccount) => ({
+            id: entryAccount.id,
+            name: entryAccount.name,
+          }))}
+          filters={{
+            account,
+            type,
+            startDate,
+            endDate,
+          }}
+        />
+
+        <Text size="sm" color="secondary">
+          {i18n.t("entries_page.showing_results", {
+            count: entriesData.entries.length,
+            total: entriesData.pagination.total,
+          })}
+        </Text>
+
+        <EntriesTable entries={entriesData.entries} />
+
+        {entriesData.pagination.totalPages > 1 && (
+          <EntriesPagination
+            currentPage={entriesData.pagination.page}
+            totalPages={entriesData.pagination.totalPages}
+          />
+        )}
+      </Stack>
+    </Container>
   );
 }

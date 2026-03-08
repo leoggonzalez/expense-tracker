@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Box, Card, Grid, Icon, Stack, Text } from "@/elements";
+import { Card, Grid, Icon, Stack, Text } from "@/elements";
 
 import React from "react";
 import { i18n } from "@/model/i18n";
