@@ -1,122 +1,247 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-const SEED_USER_EMAIL = "seed@example.com";
 
-// Parse CSV-style euro amounts (e.g., "3.944,73 €" or "-1.291,77 €")
-function parseEuroAmount(amountStr: string): number {
-  // Remove euro symbol and spaces
-  let cleaned = amountStr.replace('€', '').trim();
-  
-  // Remove thousands separator (.) and replace decimal comma with period
-  cleaned = cleaned.replace(/\./g, '').replace(',', '.');
-  
-  return parseFloat(cleaned);
+const ACCOUNT_COUNT = 10;
+const ENTRIES_PER_ACCOUNT = 50;
+const RECURRING_PER_ACCOUNT = 15; // 30% of 50
+const FIXED_RECURRING_PER_ACCOUNT = 5;
+
+const ACCOUNT_NAME_PREFIXES = [
+  "Housing",
+  "Utilities",
+  "Groceries",
+  "Transport",
+  "Leisure",
+  "Health",
+  "Savings",
+  "Investments",
+  "Subscriptions",
+  "Misc",
+];
+
+const EXPENSE_DESCRIPTIONS = [
+  "Rent",
+  "Electric bill",
+  "Internet",
+  "Groceries",
+  "Dining out",
+  "Fuel",
+  "Gym membership",
+  "Insurance",
+  "Phone plan",
+  "Streaming",
+  "Pharmacy",
+  "House supplies",
+];
+
+const INCOME_DESCRIPTIONS = [
+  "Salary",
+  "Freelance",
+  "Bonus",
+  "Side project",
+  "Investment return",
+  "Refund",
+  "Tax adjustment",
+  "Rental income",
+];
+
+function mulberry32(seed: number): () => number {
+  return () => {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
-// Parse date string in DD/MM/YYYY format
-function parseDate(dateStr: string): Date | null {
-  if (!dateStr || dateStr.trim() === '') return null;
-  
-  const [day, month, year] = dateStr.split('/');
-  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+function addMonths(base: Date, months: number): Date {
+  const date = new Date(base);
+  date.setMonth(date.getMonth() + months);
+  return date;
+}
+
+function getSeedEmail(): string {
+  return process.env.DEV_ADMIN_EMAIL?.trim() || "admin@example.com";
+}
+
+function toCents(amount: number): number {
+  return Math.round(amount * 100);
+}
+
+function fromCents(cents: number): number {
+  return cents / 100;
+}
+
+function nextExpenseAmount(random: () => number): number {
+  // Range: -15.00 to -2500.00
+  const cents = 1500 + Math.floor(random() * (250000 - 1500 + 1));
+  return fromCents(-cents);
+}
+
+function nextIncomeAmount(random: () => number): number {
+  // Range: 50.00 to 7000.00
+  const cents = 5000 + Math.floor(random() * (700000 - 5000 + 1));
+  return fromCents(cents);
+}
+
+function pickDescription(
+  type: "income" | "expense",
+  accountIndex: number,
+  entryIndex: number,
+): string {
+  const source = type === "expense" ? EXPENSE_DESCRIPTIONS : INCOME_DESCRIPTIONS;
+  const descriptor = source[(accountIndex * 11 + entryIndex * 7) % source.length];
+  return `${descriptor} ${entryIndex + 1}`;
+}
+
+function computeBeginDate(random: () => number): Date {
+  const now = new Date();
+  const monthOffset = -23 + Math.floor(random() * 24); // within last 24 months
+  const day = 1 + Math.floor(random() * 28);
+  const date = addMonths(new Date(now.getFullYear(), now.getMonth(), 1), monthOffset);
+  date.setDate(day);
+  return date;
+}
+
+function computeEndDate(
+  beginDate: Date,
+  mode: "non_recurring" | "fixed_recurring" | "open_ended",
+  random: () => number,
+): Date | null {
+  if (mode === "open_ended") {
+    return null;
+  }
+
+  if (mode === "non_recurring") {
+    return new Date(beginDate);
+  }
+
+  // fixed recurring from 2 to 12 months
+  const durationMonths = 2 + Math.floor(random() * 11);
+  const endDate = addMonths(beginDate, durationMonths);
+
+  // Keep same day where possible
+  endDate.setDate(beginDate.getDate());
+
+  if (endDate <= beginDate) {
+    const fallback = new Date(beginDate);
+    fallback.setMonth(fallback.getMonth() + 2);
+    return fallback;
+  }
+
+  return endDate;
+}
+
+function getAccountName(index: number): string {
+  return `${ACCOUNT_NAME_PREFIXES[index]} Account ${index + 1}`;
 }
 
 async function main() {
-  console.log('Starting seed...');
+  console.log("Starting stress-test seed...");
 
-  // Sample data from your CSV
-  const entries = [
-    { type: 'income', account: 'income', description: 'salary', amount: '3.944,73 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Apartment Franz-Jacob', description: 'rent', amount: '-1.291,77 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Apartment Franz-Jacob', description: 'Vodafone Internet', amount: '-53,98 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Apartment Franz-Jacob', description: 'Octopus Electricidad', amount: '-71,29 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Apartment Franz-Jacob', description: 'Radio TV tax', amount: '-55,08 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Apartment Franz-Jacob', description: 'Kaution', amount: '-927,77 €', beginDate: '01/02/2026', endDate: '01/02/2026' },
-    { type: 'income', account: 'Apartment Franz-Jacob', description: 'Karen Rent', amount: '285,00 €', beginDate: '01/02/2026', endDate: '01/02/2026' },
-    { type: 'expense', account: 'Apartment Franz-Jacob', description: 'Karen Caution', amount: '-600,00 €', beginDate: '01/02/2026', endDate: '01/02/2026' },
-    { type: 'income', account: 'Apartment Franz-Jacob', description: 'Matias Rent', amount: '600,00 €', beginDate: '01/02/2026', endDate: '01/02/2026' },
-    { type: 'expense', account: 'Apartment Klara-Franke', description: 'Rent', amount: '-1.054,00 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Apartment Klara-Franke', description: 'DNS:NET', amount: '-44,70 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Apartment Klara-Franke', description: 'E WIE EINFACH', amount: '-51,00 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Apartment Klara-Franke', description: 'Radio TV Tax', amount: '-18,36 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'income', account: 'Apartment Klara-Franke', description: 'Rodrigo', amount: '1.168,06 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Various', description: 'Rent Sophia', amount: '-374,47 €', beginDate: '01/02/2026', endDate: '01/05/2026' },
-    { type: 'expense', account: 'Various', description: 'CARE', amount: '-12,00 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Various', description: 'iCloud', amount: '-2,99 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Various', description: 'FitX', amount: '-24,00 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Various', description: 'Aldi talk', amount: '-9,99 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Various', description: 'Insurance', amount: '-38,65 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Amazon Credit Card', description: 'TV', amount: '-71,80 €', beginDate: '01/02/2026', endDate: '01/04/2026' },
-    { type: 'expense', account: 'Amazon Credit Card', description: 'Apple watch sofi', amount: '-89,90 €', beginDate: '01/02/2026', endDate: '01/05/2026' },
-    { type: 'expense', account: 'Estimated', description: 'Living expenses', amount: '-600,00 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Investment', description: 'Retirement', amount: '-160,42 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Investment', description: 'S&P500', amount: '-300,00 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'expense', account: 'Investment', description: 'Aggresive Funds', amount: '-200,00 €', beginDate: '01/02/2026', endDate: '' },
-    { type: 'income', account: 'Investment', description: 'Other investments', amount: '1.600,00 €', beginDate: '01/02/2026', endDate: '01/02/2026' },
-  ];
-
-  // Clear existing data
   await prisma.loginCode.deleteMany();
   await prisma.session.deleteMany();
   await prisma.entry.deleteMany();
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
-  console.log('Cleared existing entries, accounts, users, login codes, and sessions');
+
+  console.log("Cleared users, accounts, entries, login codes, and sessions");
+
+  const seedEmail = getSeedEmail();
 
   const user = await prisma.user.create({
     data: {
-      email: SEED_USER_EMAIL,
-      name: "Seed User",
+      email: seedEmail,
+      name: "Stress Seed User",
     },
   });
 
-  // Get unique account names
-  const accountNames = [...new Set(entries.map(e => e.account))];
-  
-  // Create accounts
-  const accountMap = new Map<string, string>();
-  for (const accountName of accountNames) {
-    const account = await prisma.account.create({
-      data: {
-        name: accountName,
-        userId: user.id,
-      },
+  const accountData = Array.from({ length: ACCOUNT_COUNT }, (_, index) => ({
+    userId: user.id,
+    name: getAccountName(index),
+  }));
+
+  await prisma.account.createMany({
+    data: accountData,
+  });
+
+  const accounts = await prisma.account.findMany({
+    where: {
+      userId: user.id,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  const entryData = accounts.flatMap((account, accountIndex) => {
+    const random = mulberry32(12345 + accountIndex * 97);
+
+    return Array.from({ length: ENTRIES_PER_ACCOUNT }, (_, entryIndex) => {
+      const isRecurring = entryIndex < RECURRING_PER_ACCOUNT;
+      const isFixedRecurring = entryIndex < FIXED_RECURRING_PER_ACCOUNT;
+
+      const recurrenceMode = isRecurring
+        ? isFixedRecurring
+          ? "fixed_recurring"
+          : "open_ended"
+        : "non_recurring";
+
+      const type: "income" | "expense" =
+        entryIndex % 10 < 7 ? "expense" : "income";
+
+      const beginDate = computeBeginDate(random);
+      const endDate = computeEndDate(beginDate, recurrenceMode, random);
+      const amount =
+        type === "expense"
+          ? nextExpenseAmount(random)
+          : nextIncomeAmount(random);
+
+      return {
+        accountId: account.id,
+        type,
+        description: pickDescription(type, accountIndex, entryIndex),
+        amount: fromCents(toCents(amount)),
+        beginDate,
+        endDate,
+      };
     });
-    accountMap.set(accountName, account.id);
-  }
-  console.log(`Created ${accountNames.length} accounts`);
+  });
 
-  // Insert entries
-  let createdCount = 0;
-  for (const entry of entries) {
-    const beginDate = parseDate(entry.beginDate);
-    const endDate = parseDate(entry.endDate);
-    
-    if (!beginDate) continue; // Skip entries without a begin date
+  await prisma.entry.createMany({
+    data: entryData,
+  });
 
-    const accountId = accountMap.get(entry.account);
-    if (!accountId) continue; // Skip if account not found
-
-    await prisma.entry.create({
-      data: {
-        type: entry.type as 'income' | 'expense',
-        accountId: accountId,
-        description: entry.description,
-        amount: parseEuroAmount(entry.amount),
-        beginDate: beginDate,
-        endDate: endDate,
+  const [userCount, accountCount, entryCount, recurringEntries] = await Promise.all([
+    prisma.user.count(),
+    prisma.account.count(),
+    prisma.entry.count(),
+    prisma.entry.findMany({
+      select: {
+        beginDate: true,
+        endDate: true,
       },
-    });
-    createdCount++;
-  }
+    }),
+  ]);
+  const recurringCount = recurringEntries.filter((entry) => {
+    if (entry.endDate === null) {
+      return true;
+    }
 
-  console.log(`Seeded ${createdCount} entries`);
+    return entry.endDate > entry.beginDate;
+  }).length;
+
+  console.log(`Seed user: ${seedEmail}`);
+  console.log(`Users: ${userCount}`);
+  console.log(`Accounts: ${accountCount}`);
+  console.log(`Entries: ${entryCount}`);
+  console.log(`Recurring entries: ${recurringCount}`);
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
+  .catch((error) => {
+    console.error(error);
     process.exit(1);
   })
   .finally(async () => {

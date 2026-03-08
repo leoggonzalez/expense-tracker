@@ -1,6 +1,5 @@
 import { EntriesPage } from "@/components";
 import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
-import { requireCurrentUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +18,6 @@ type EntriesPageProps = {
 export default async function Page({
   searchParams,
 }: EntriesPageProps): Promise<React.ReactElement> {
-  await requireCurrentUser();
   const params = await searchParams;
   const page = Math.max(1, Number(params.page || "1") || 1);
   const account = params.account || "";

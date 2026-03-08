@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 
 import { EntryDetailPage } from "@/components";
 import { getAccounts, getEntryById } from "@/actions/entries";
-import { requireCurrentUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +14,6 @@ type EntryPageProps = {
 export default async function Page({
   params,
 }: EntryPageProps): Promise<React.ReactElement> {
-  await requireCurrentUser();
   const { id } = await params;
   const [entry, accounts] = await Promise.all([
     getEntryById(id),

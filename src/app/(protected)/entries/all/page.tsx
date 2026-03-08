@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { requireCurrentUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +9,6 @@ type EntriesAllPageProps = {
 export default async function Page({
   searchParams,
 }: EntriesAllPageProps): Promise<React.ReactElement> {
-  await requireCurrentUser();
   const params = await searchParams;
   const query = new URLSearchParams();
 

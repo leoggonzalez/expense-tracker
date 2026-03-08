@@ -27,10 +27,6 @@ export function ProjectionTable({
   entries: plainEntries,
 }: ProjectionTableProps): React.ReactElement {
   const { push } = useNavigationProgress();
-  const currentDate = new Date();
-  const [endDate, setEndDate] = useState<string>(
-    format(addMonths(currentDate, 5), "yyyy-MM"),
-  );
 
   // Convert plain objects to Entry instances
   const entries = plainEntries.map((entry) =>
@@ -43,10 +39,26 @@ export function ProjectionTable({
     }),
   );
 
+  const currentDate = new Date();
+  const fallbackStartMonth = startOfMonth(currentDate);
+  const earliestBeginDate = entries.reduce<Date | null>((earliest, entry) => {
+    if (!earliest || entry.beginDate < earliest) {
+      return entry.beginDate;
+    }
+
+    return earliest;
+  }, null);
+  const startMonth = earliestBeginDate
+    ? startOfMonth(earliestBeginDate)
+    : fallbackStartMonth;
+  const defaultEndMonth = addMonths(fallbackStartMonth, 5);
+  const [endDate, setEndDate] = useState<string>(
+    format(defaultEndMonth < startMonth ? startMonth : defaultEndMonth, "yyyy-MM"),
+  );
+
   const collection = new EntryCollection(entries);
 
-  // Calculate number of months from current month to end month
-  const startMonth = startOfMonth(currentDate);
+  // Calculate number of months from start month to end month
   const [endYear, endMonth] = endDate.split("-").map(Number);
   const endMonthDate = new Date(endYear, endMonth - 1, 1);
 
@@ -81,7 +93,7 @@ export function ProjectionTable({
               label={i18n.t("projection_table.display_until")}
               value={endDate}
               onChange={setEndDate}
-              min={format(currentDate, "yyyy-MM")}
+              min={format(startMonth, "yyyy-MM")}
             />
           </div>
         </Stack>

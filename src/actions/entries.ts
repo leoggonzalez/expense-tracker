@@ -1,10 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { endOfDay, startOfDay } from "date-fns";
+import { endOfDay, endOfMonth, format, startOfDay, startOfMonth } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
 import { requireCurrentUser } from "@/lib/session";
+import { revalidatePath } from "next/cache";
 
 export interface CreateEntryInput {
   type: "income" | "expense";
@@ -34,6 +34,43 @@ type EntryWithAccountRecord = {
   createdAt: Date;
   updatedAt: Date;
   account: AccountRecord;
+};
+
+export type SerializedProjectionEntry = {
+  id: string;
+  type: string;
+  account: string;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DashboardTotals = {
+  income: number;
+  expense: number;
+  net: number;
+};
+
+export type DashboardPayload = {
+  totals: DashboardTotals;
+  recentEntries: Array<{
+    id: string;
+    type: string;
+    accountName: string;
+    description: string;
+    amount: number;
+    beginDate: string;
+    endDate: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  currentMonthRange: {
+    startDate: string;
+    endDate: string;
+  };
 };
 
 type EntryFiltersWhere = {
@@ -100,6 +137,36 @@ async function findOrCreateAccount(userId: string, accountName: string) {
   }
 
   return account;
+}
+
+function serializeProjectionEntry(
+  entry: EntryWithAccountRecord,
+): SerializedProjectionEntry {
+  return {
+    id: entry.id,
+    type: entry.type,
+    account: entry.account.name,
+    description: entry.description,
+    amount: entry.amount,
+    beginDate: entry.beginDate.toISOString(),
+    endDate: entry.endDate?.toISOString() || null,
+    createdAt: entry.createdAt.toISOString(),
+    updatedAt: entry.updatedAt.toISOString(),
+  };
+}
+
+function serializeDashboardRecentEntry(entry: EntryWithAccountRecord) {
+  return {
+    id: entry.id,
+    type: entry.type,
+    accountName: entry.account.name,
+    description: entry.description,
+    amount: entry.amount,
+    beginDate: entry.beginDate.toISOString(),
+    endDate: entry.endDate?.toISOString() || null,
+    createdAt: entry.createdAt.toISOString(),
+    updatedAt: entry.updatedAt.toISOString(),
+  };
 }
 
 function revalidateEntryPages() {
@@ -211,6 +278,101 @@ export async function getRecentEntries(
     console.error("Error fetching recent entries:", error);
     return [];
   }
+}
+
+export async function getCurrentMonthTotals(): Promise<DashboardTotals> {
+  const currentUser = await requireCurrentUser();
+  const now = new Date();
+  const monthStart = startOfMonth(now);
+  const monthEnd = endOfMonth(now);
+
+  type TotalsRow = {
+    income: number | null;
+    expense: number | null;
+    net: number | null;
+  };
+
+  try {
+    const rows = await prisma.$queryRaw<TotalsRow[]>`
+      SELECT
+        COALESCE(
+          SUM(
+            CASE
+              WHEN e.type = 'income' THEN e.amount
+              ELSE 0
+            END
+          ),
+          0
+        ) AS income,
+        COALESCE(
+          SUM(
+            CASE
+              WHEN e.type = 'expense' THEN
+                CASE
+                  WHEN e.amount > 0 THEN -e.amount
+                  ELSE e.amount
+                END
+              ELSE 0
+            END
+          ),
+          0
+        ) AS expense,
+        COALESCE(
+          SUM(
+            CASE
+              WHEN e.type = 'expense' AND e.amount > 0 THEN -e.amount
+              ELSE e.amount
+            END
+          ),
+          0
+        ) AS net
+      FROM "Entry" e
+      INNER JOIN "Account" a ON a.id = e."accountId"
+      WHERE a."userId" = ${currentUser.id}
+        AND e."beginDate" <= ${monthEnd}
+        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+    `;
+
+    const totals = rows[0];
+
+    return {
+      income: Number(totals?.income || 0),
+      expense: Number(totals?.expense || 0),
+      net: Number(totals?.net || 0),
+    };
+  } catch (error) {
+    console.error("Error fetching current month totals:", error);
+    return {
+      income: 0,
+      expense: 0,
+      net: 0,
+    };
+  }
+}
+
+export async function getProjectionEntries(): Promise<SerializedProjectionEntry[]> {
+  const entries = await getEntries();
+  return entries.map(serializeProjectionEntry);
+}
+
+export async function getDashboardPayload(): Promise<DashboardPayload> {
+  const now = new Date();
+  const monthStart = startOfMonth(now);
+  const monthEnd = endOfMonth(now);
+
+  const [totals, recentEntries] = await Promise.all([
+    getCurrentMonthTotals(),
+    getRecentEntries(10),
+  ]);
+
+  return {
+    totals,
+    recentEntries: recentEntries.map(serializeDashboardRecentEntry),
+    currentMonthRange: {
+      startDate: format(monthStart, "yyyy-MM-dd"),
+      endDate: format(monthEnd, "yyyy-MM-dd"),
+    },
+  };
 }
 
 export async function getEntriesWithFilters(filters: {

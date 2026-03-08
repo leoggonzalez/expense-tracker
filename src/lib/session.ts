@@ -65,7 +65,6 @@ export async function getCurrentSession(): Promise<SessionWithUser | null> {
   });
 
   if (!session) {
-    cookieStore.delete(SESSION_COOKIE_NAME);
     return null;
   }
 
@@ -75,7 +74,6 @@ export async function getCurrentSession(): Promise<SessionWithUser | null> {
         id: session.id,
       },
     });
-    cookieStore.delete(SESSION_COOKIE_NAME);
     return null;
   }
 

@@ -2,56 +2,32 @@
 
 import "./dashboard.scss";
 
-import { AppLink } from "@/components";
-import { Entry, EntryCollection } from "@/model";
 import { Card, Grid, Stack, Text } from "@/elements";
-
-import React from "react";
-import { i18n } from "@/model/i18n";
-import { endOfMonth, format, startOfMonth } from "date-fns";
 import { EntryList, EntryListItem } from "@/components";
 
+import { AppLink } from "@/components";
+import React from "react";
+import { i18n } from "@/model/i18n";
+
 export interface DashboardProps {
-  entries: Array<{
-    id: string;
-    type: string;
-    account: string;
-    description: string;
-    amount: number;
-    beginDate: string;
-    endDate: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
+  totals: {
+    income: number;
+    expense: number;
+    net: number;
+  };
+  currentMonthRange: {
+    startDate: string;
+    endDate: string;
+  };
   recentEntries: EntryListItem[];
 }
 
 export function Dashboard({
-  entries: plainEntries,
+  totals,
+  currentMonthRange,
   recentEntries,
 }: DashboardProps): React.ReactElement {
-  // Convert plain objects to Entry instances
-  const entries = plainEntries.map((entry) =>
-    Entry.fromJSON({
-      ...entry,
-      beginDate: new Date(entry.beginDate),
-      endDate: entry.endDate ? new Date(entry.endDate) : null,
-      createdAt: new Date(entry.createdAt),
-      updatedAt: new Date(entry.updatedAt),
-    }),
-  );
-
-  const collection = new EntryCollection(entries);
-  const currentMonth = startOfMonth(new Date());
-  const currentMonthEnd = endOfMonth(currentMonth);
-
-  const income = collection.getTotalForMonth(currentMonth, "income");
-  const expense = collection.getTotalForMonth(currentMonth, "expense");
-  const net = income + expense; // expense is negative
-  const currentMonthQuery = `start_date=${format(currentMonth, "yyyy-MM-dd")}&end_date=${format(
-    currentMonthEnd,
-    "yyyy-MM-dd",
-  )}`;
+  const currentMonthQuery = `start_date=${currentMonthRange.startDate}&end_date=${currentMonthRange.endDate}`;
   const formatCurrency = (amount: number): string => {
     const absAmount = Math.abs(amount);
     const sign = amount < 0 ? "-" : "";
@@ -79,7 +55,7 @@ export function Dashboard({
                   {i18n.t("dashboard.income")}
                 </Text>
                 <Text size="2xl" weight="bold" color="success">
-                  {formatCurrency(income)}
+                  {formatCurrency(totals.income)}
                 </Text>
               </Stack>
             </Card>
@@ -98,7 +74,7 @@ export function Dashboard({
                   {i18n.t("dashboard.expenses")}
                 </Text>
                 <Text size="2xl" weight="bold" color="danger">
-                  {formatCurrency(expense)}
+                  {formatCurrency(totals.expense)}
                 </Text>
               </Stack>
             </Card>
@@ -112,9 +88,9 @@ export function Dashboard({
               <Text
                 size="2xl"
                 weight="bold"
-                color={net >= 0 ? "success" : "danger"}
+                color={totals.net >= 0 ? "success" : "danger"}
               >
-                {formatCurrency(net)}
+                {formatCurrency(totals.net)}
               </Text>
             </Stack>
           </Card>
