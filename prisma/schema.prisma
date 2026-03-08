@@ -29,6 +29,7 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   entries   Entry[]
+  transferEntries Entry[] @relation("EntryTransferAccount")
 
   @@unique([userId, name])
   @@index([userId])
@@ -39,6 +40,8 @@ model Entry {
   type        String    // "income" or "expense"
   accountId   String
   account     Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  transferAccountId String?
+  transferAccount Account? @relation("EntryTransferAccount", fields: [transferAccountId], references: [id], onDelete: SetNull)
   description String
   amount      Float
   beginDate   DateTime
@@ -47,6 +50,7 @@ model Entry {
   updatedAt   DateTime  @updatedAt
 
   @@index([accountId])
+  @@index([transferAccountId])
   @@index([beginDate])
 }
 

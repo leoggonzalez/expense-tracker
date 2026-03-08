@@ -27,7 +27,7 @@
       color: var(--color-danger-dark);
     }
 
-    &--multiple {
+    &--transfer {
       border-color: var(--color-border-dark);
       color: var(--color-text-primary);
     }
@@ -58,7 +58,7 @@
       );
     }
 
-    &--multiple.new-entry-page__tab--active {
+    &--transfer.new-entry-page__tab--active {
       border-color: var(--color-primary);
       color: var(--color-primary);
       background-color: var(--color-background-secondary);

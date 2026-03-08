@@ -28,6 +28,7 @@ export { MonthSelector } from "./month_selector/month_selector";
 
 export { BulkEntryForm } from "./bulk_entry_form/bulk_entry_form";
 export type { BulkEntryFormProps } from "./bulk_entry_form/bulk_entry_form";
+export { TransferForm } from "./transfer_form/transfer_form";
 
 export { Pagination } from "./pagination/pagination";
 export type { PaginationProps } from "./pagination/pagination";

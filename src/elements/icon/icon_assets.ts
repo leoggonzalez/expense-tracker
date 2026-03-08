@@ -9,6 +9,7 @@ export const iconAssets = {
   login: new URL("./icons/login.svg", import.meta.url).toString(),
   income: new URL("./icons/income.svg", import.meta.url).toString(),
   expense: new URL("./icons/expense.svg", import.meta.url).toString(),
+  transfer: new URL("./icons/transfer.svg", import.meta.url).toString(),
   plus: new URL("./icons/plus.svg", import.meta.url).toString(),
   edit: new URL("./icons/edit.svg", import.meta.url).toString(),
   close: new URL("./icons/close.svg", import.meta.url).toString(),

@@ -86,6 +86,7 @@ export function EntriesFilters({
                     { value: "", label: i18n.t("entries_page.type_all") },
                     { value: "income", label: i18n.t("common.income") },
                     { value: "expense", label: i18n.t("common.expense") },
+                    { value: "transfer", label: i18n.t("common.transfer") },
                   ].map((option) => (
                     <button
                       key={option.value || "all"}
@@ -96,6 +97,8 @@ export function EntriesFilters({
                           "entries-filters__type-option--income",
                         option.value === "expense" &&
                           "entries-filters__type-option--expense",
+                        option.value === "transfer" &&
+                          "entries-filters__type-option--transfer",
                         filters.type === option.value &&
                           "entries-filters__type-option--active",
                       ]
