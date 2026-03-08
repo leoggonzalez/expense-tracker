@@ -1,10 +1,12 @@
 "use client";
 
+import "./transfer_form.scss";
+
 import React, { useMemo, useState } from "react";
 
 import { createTransferEntry } from "@/actions/entries";
 import { MonthSelector } from "@/components/month_selector/month_selector";
-import { Button, Input, Select } from "@/components";
+import { Button, InfoBox, Input, Select } from "@/components";
 import { normalizeDateValue, toDate, type EntryDateMode } from "@/lib/entry_schedule";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import { Icon, Stack, Text } from "@/elements";
@@ -14,22 +16,31 @@ import { useToast } from "@/components/toast_provider/toast_provider";
 type TransferAccount = {
   id: string;
   name: string;
+  currentMonthTotal: number;
+};
+
+type TransferFormInitialValues = {
+  toAccountId?: string;
+  description?: string;
+  amount?: string;
 };
 
 type TransferFormProps = {
   accounts: TransferAccount[];
+  initialValues?: TransferFormInitialValues;
   onSuccess?: () => void;
 };
 
 export function TransferForm({
   accounts,
+  initialValues,
   onSuccess,
 }: TransferFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
   const [fromAccountId, setFromAccountId] = useState("");
-  const [toAccountId, setToAccountId] = useState("");
-  const [description, setDescription] = useState("");
-  const [amountInput, setAmountInput] = useState("");
+  const [toAccountId, setToAccountId] = useState(initialValues?.toAccountId || "");
+  const [description, setDescription] = useState(initialValues?.description || "");
+  const [amountInput, setAmountInput] = useState(initialValues?.amount || "");
   const [beginDate, setBeginDate] = useState(new Date().toISOString().slice(0, 7));
   const [beginDateMode, setBeginDateMode] = useState<EntryDateMode>("month");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +53,13 @@ export function TransferForm({
       })),
     [accounts],
   );
+  const parsedAmount = parseAmountInput(amountInput);
+  const selectedFromAccount = accounts.find((account) => account.id === fromAccountId);
+  const showInsufficientFundsWarning =
+    Boolean(selectedFromAccount) &&
+    parsedAmount !== null &&
+    parsedAmount > 0 &&
+    parsedAmount > (selectedFromAccount?.currentMonthTotal || 0);
 
   const onSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -112,6 +130,19 @@ export function TransferForm({
           placeholder={i18n.t("entry_form.transfer_account_placeholder") as string}
           required
         />
+        {showInsufficientFundsWarning && selectedFromAccount ? (
+          <InfoBox
+            variant="warning"
+            title={String(i18n.t("entry_form.transfer_insufficient_funds_title"))}
+            message={String(
+              i18n.t("entry_form.transfer_insufficient_funds_message", {
+                account: selectedFromAccount.name,
+                amount: parsedAmount?.toFixed(2) || "0.00",
+                balance: selectedFromAccount.currentMonthTotal.toFixed(2),
+              }),
+            )}
+          />
+        ) : null}
 
         <Select
           label={i18n.t("entry_form.transfer_to")}
@@ -164,7 +195,7 @@ export function TransferForm({
 
         <Button
           type="submit"
-          variant="primary"
+          variant="transfer"
           disabled={isSubmitting}
           startIcon={<Icon name="transfer" />}
         >

@@ -15,9 +15,14 @@ export default async function Layout({
     type: entry.type,
     accountName: entry.account.name,
     description: entry.description,
-    amount: entry.amount,
+    amount:
+      entry.type === "expense" && entry.amount > 0
+        ? -entry.amount
+        : entry.amount,
     beginDate: entry.beginDate.toISOString(),
     endDate: entry.endDate?.toISOString() || null,
+    transferAccountId: entry.transferAccountId,
+    transferAccountName: entry.transferAccount?.name || null,
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   }));

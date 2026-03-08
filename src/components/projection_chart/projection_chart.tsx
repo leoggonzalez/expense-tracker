@@ -15,6 +15,7 @@ import {
 } from "recharts";
 
 import { i18n } from "@/model/i18n";
+import { formatCurrency } from "@/lib/utils";
 
 type ProjectionChartDataItem = {
   monthLabel: string;
@@ -25,11 +26,6 @@ type ProjectionChartDataItem = {
 type ProjectionChartProps = {
   data: ProjectionChartDataItem[];
 };
-
-function formatCurrency(amount: number): string {
-  const sign = amount < 0 ? "-" : "";
-  return `${sign}${Math.abs(amount).toFixed(2)} €`;
-}
 
 function formatTooltipValue(value: unknown): string {
   const numericValue = typeof value === "number" ? value : Number(value ?? 0);

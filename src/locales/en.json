@@ -71,6 +71,8 @@
     "transfer_same_account": "From and to accounts must be different.",
     "transfer_invalid_amount": "Amount must be greater than zero.",
     "transfer_one_time_info": "Transfers are one-time entries and settle in the selected month.",
+    "transfer_insufficient_funds_title": "Insufficient funds",
+    "transfer_insufficient_funds_message": "%{account} has %{balance} € for this month, below %{amount} €.",
     "add_transfer": "Add transfer",
     "adding_transfer": "Adding transfer..."
   },
@@ -114,6 +116,8 @@
   },
   "entry_list": {
     "empty_state": "No entries yet. Add your first entry!",
+    "to_account": "To %{account}",
+    "from_account": "From %{account}",
     "delete": "Delete",
     "delete_confirm": "Are you sure you want to delete this entry?"
   },
@@ -219,6 +223,9 @@
     "back_to_accounts": "Back to accounts",
     "back_to_account": "Back to account",
     "edit_account": "Edit account",
+    "settle": "Settle",
+    "settle_unavailable": "No amount to settle for this account.",
+    "settle_description": "Settle %{account} for %{month}",
     "archive": "Archive",
     "archive_account": "Archive account",
     "archiving": "Archiving...",

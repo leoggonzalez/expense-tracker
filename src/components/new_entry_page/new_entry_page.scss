@@ -28,8 +28,8 @@
     }
 
     &--transfer {
-      border-color: var(--color-border-dark);
-      color: var(--color-text-primary);
+      border-color: color-mix(in srgb, #7c3aed 45%, var(--color-background));
+      color: #6d28d9;
     }
 
     &--active {
@@ -59,9 +59,13 @@
     }
 
     &--transfer.new-entry-page__tab--active {
-      border-color: var(--color-primary);
-      color: var(--color-primary);
-      background-color: var(--color-background-secondary);
+      border-color: #7c3aed;
+      color: #5b21b6;
+      background-color: color-mix(
+        in srgb,
+        #7c3aed 16%,
+        var(--color-background)
+      );
     }
   }
 

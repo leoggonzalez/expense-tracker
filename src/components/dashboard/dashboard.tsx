@@ -3,7 +3,7 @@
 import "./dashboard.scss";
 
 import { Card, Stack, Text } from "@/elements";
-import { EntryList, EntryListItem } from "@/components";
+import { Currency, EntryList, EntryListItem } from "@/components";
 
 import { AppLink } from "@/components";
 import React from "react";
@@ -28,11 +28,6 @@ export function Dashboard({
   recentEntries,
 }: DashboardProps): React.ReactElement {
   const currentMonthQuery = `start_date=${currentMonthRange.startDate}&end_date=${currentMonthRange.endDate}`;
-  const formatCurrency = (amount: number): string => {
-    const absAmount = Math.abs(amount);
-    const sign = amount < 0 ? "-" : "";
-    return `${sign}${absAmount.toFixed(2)} €`;
-  };
 
   return (
     <div className="dashboard">
@@ -51,9 +46,7 @@ export function Dashboard({
                       <Text size="sm" color="secondary" weight="medium">
                         {i18n.t("dashboard.income")}
                       </Text>
-                      <Text size="2xl" weight="bold" color="success">
-                        {formatCurrency(totals.income)}
-                      </Text>
+                      <Currency value={totals.income} size="2xl" weight="bold" />
                     </Stack>
                   </Card>
                 </div>
@@ -68,9 +61,7 @@ export function Dashboard({
                       <Text size="sm" color="secondary" weight="medium">
                         {i18n.t("dashboard.expenses")}
                       </Text>
-                      <Text size="2xl" weight="bold" color="danger">
-                        {formatCurrency(totals.expense)}
-                      </Text>
+                      <Currency value={totals.expense} size="2xl" weight="bold" />
                     </Stack>
                   </Card>
                 </div>
@@ -84,13 +75,7 @@ export function Dashboard({
                     <Text size="sm" color="secondary" weight="medium">
                       {i18n.t("dashboard.net")}
                     </Text>
-                    <Text
-                      size="2xl"
-                      weight="bold"
-                      color={totals.net >= 0 ? "success" : "danger"}
-                    >
-                      {formatCurrency(totals.net)}
-                    </Text>
+                    <Currency value={totals.net} size="2xl" weight="bold" />
                   </Stack>
                 </Card>
               </div>

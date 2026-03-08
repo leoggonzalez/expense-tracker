@@ -1,14 +1,9 @@
 import { getAccountsCurrentMonthSummary } from "@/actions/accounts";
-import { AppLink, Avatar, Button, Container } from "@/components";
+import { AppLink, Avatar, Button, Container, Currency } from "@/components";
 import { Card, Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
-
-function formatCurrency(amount: number): string {
-  const sign = amount < 0 ? "-" : "";
-  return `${sign}${Math.abs(amount).toFixed(2)} €`;
-}
 
 export default async function Page(): Promise<React.ReactElement> {
   const accounts = await getAccountsCurrentMonthSummary();
@@ -48,15 +43,11 @@ export default async function Page(): Promise<React.ReactElement> {
                         {account.name}
                       </Text>
                     </Stack>
-                    <Text
+                    <Currency
+                      value={account.currentMonthTotal}
                       size="md"
                       weight="bold"
-                      color={
-                        account.currentMonthTotal >= 0 ? "success" : "danger"
-                      }
-                    >
-                      {formatCurrency(account.currentMonthTotal)}
-                    </Text>
+                    />
                   </Stack>
                 </AppLink>
               </Card>

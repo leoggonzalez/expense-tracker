@@ -51,6 +51,10 @@ type EntryWithAccountRecord = {
   createdAt: Date;
   updatedAt: Date;
   account: AccountRecord;
+  transferAccount?: {
+    id: string;
+    name: string;
+  } | null;
 };
 
 export type SerializedProjectionEntry = {
@@ -81,6 +85,8 @@ export type DashboardPayload = {
     amount: number;
     beginDate: string;
     endDate: string | null;
+    transferAccountId: string | null;
+    transferAccountName: string | null;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -98,6 +104,8 @@ export type ProjectionMonthEntry = {
   amount: number;
   beginDate: string;
   endDate: string | null;
+  transferAccountId: string | null;
+  transferAccountName: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -163,6 +171,7 @@ export type FilteredEntryListItem = {
   id: string;
   type: "income" | "expense";
   transferAccountId: string | null;
+  transferAccountName: string | null;
   accountName: string;
   description: string;
   amount: number;
@@ -234,6 +243,8 @@ type ProjectionFocusedAccountEntryRow = {
   accountName: string;
   id: string;
   type: string;
+  transferAccountId: string | null;
+  transferAccountName: string | null;
   description: string;
   amount: number;
   beginDate: Date;
@@ -261,6 +272,8 @@ function serializeProjectionMonthEntryRow(
     amount: normalizeEntryAmount(entry.type, entry.amount),
     beginDate: entry.beginDate.toISOString(),
     endDate: entry.endDate?.toISOString() || null,
+    transferAccountId: entry.transferAccountId,
+    transferAccountName: entry.transferAccountName,
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   };
@@ -451,14 +464,18 @@ function serializeProjectionEntry(
 }
 
 function serializeDashboardRecentEntry(entry: EntryWithAccountRecord) {
+  const normalizedAmount = normalizeEntryAmount(entry.type, entry.amount);
+
   return {
     id: entry.id,
     type: entry.type,
     accountName: entry.account.name,
     description: entry.description,
-    amount: entry.amount,
+    amount: normalizedAmount,
     beginDate: entry.beginDate.toISOString(),
     endDate: entry.endDate?.toISOString() || null,
+    transferAccountId: entry.transferAccountId,
+    transferAccountName: entry.transferAccount?.name || null,
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   };
@@ -649,6 +666,12 @@ export async function getRecentEntries(
       },
       include: {
         account: true,
+        transferAccount: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -766,6 +789,8 @@ export async function getProjectionPagePayload(
         ranked."accountName",
         ranked.id,
         ranked.type,
+        ranked."transferAccountId",
+        ranked."transferAccountName",
         ranked.description,
         ranked.amount,
         ranked."beginDate",
@@ -778,6 +803,8 @@ export async function getProjectionPagePayload(
           a.name AS "accountName",
           e.id,
           e.type,
+          e."transferAccountId",
+          transfer_account.name AS "transferAccountName",
           e.description,
           e.amount,
           e."beginDate",
@@ -790,6 +817,8 @@ export async function getProjectionPagePayload(
           ) AS row_number
         FROM "Account" a
         INNER JOIN "Entry" e ON e."accountId" = a.id
+        LEFT JOIN "Account" transfer_account
+          ON transfer_account.id = e."transferAccountId"
         WHERE a."userId" = ${currentUser.id}
           AND e."beginDate" <= ${focusedMonthEnd}
           AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
@@ -961,6 +990,11 @@ export async function getEntriesWithFilters(filters: {
               name: true,
             },
           },
+          transferAccount: {
+            select: {
+              name: true,
+            },
+          },
         },
         orderBy: {
           beginDate: "desc",
@@ -976,9 +1010,10 @@ export async function getEntriesWithFilters(filters: {
         id: entry.id,
         type: entry.type as "income" | "expense",
         transferAccountId: entry.transferAccountId,
+        transferAccountName: entry.transferAccount?.name || null,
         accountName: entry.account.name,
         description: entry.description,
-        amount: entry.amount,
+        amount: normalizeEntryAmount(entry.type, entry.amount),
         beginDate: entry.beginDate.toISOString(),
         endDate: entry.endDate?.toISOString() || null,
         createdAt: entry.createdAt.toISOString(),

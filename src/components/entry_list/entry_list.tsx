@@ -2,11 +2,10 @@
 
 import "./entry_list.scss";
 
-import { AppLink, Avatar, Button } from "@/components";
+import { AppLink, Button, EntryCard } from "@/components";
 import { Card, Text } from "@/elements";
 import { deleteEntry } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
-import { format } from "date-fns";
 import React from "react";
 
 export type EntryListItem = {
@@ -17,14 +16,16 @@ export type EntryListItem = {
   amount: number;
   beginDate: string;
   endDate: string | null;
+  transferAccountId?: string | null;
+  transferAccountName?: string | null;
   createdAt: string;
   updatedAt: string;
 };
 
 export type EntryListSummaryRow = {
   id: string;
-  label: string;
-  value?: string;
+  label: React.ReactNode;
+  value?: React.ReactNode;
   href?: string;
   tone?: "default" | "emphasis";
 };
@@ -61,13 +62,6 @@ export function EntryList({
     );
   }
 
-  const formatAmount = (type: string, amount: number): string => {
-    const normalizedAmount =
-      type === "expense" && amount > 0 ? -amount : amount;
-    const sign = normalizedAmount < 0 ? "-" : "";
-    return `${sign}${Math.abs(normalizedAmount).toFixed(2)} €`;
-  };
-
   return (
     <div className="entry-list">
       <div className="entry-list__list">
@@ -78,32 +72,7 @@ export function EntryList({
               (entryHrefBase ? `${entryHrefBase}/${entry.id}` : null);
 
             const rowMain = (
-              <div className="entry-list__row-main">
-                <div className="entry-list__account">
-                  <Avatar name={entry.accountName} />
-                </div>
-                <div className="entry-list__details">
-                  <div className="entry-list__detail-line">
-                    <Text size="sm" weight="semibold">
-                      {entry.description}
-                    </Text>
-                  </div>
-                  <div className="entry-list__detail-line">
-                    <Text size="xs" color="secondary">
-                      {format(new Date(entry.beginDate), "MMM dd, yyyy")}
-                    </Text>
-                  </div>
-                </div>
-                <div className="entry-list__amount">
-                  <Text
-                    size="sm"
-                    weight="bold"
-                    color={entry.type === "income" ? "success" : "danger"}
-                  >
-                    {formatAmount(entry.type, entry.amount)}
-                  </Text>
-                </div>
-              </div>
+              <EntryCard entry={entry} />
             );
 
             const content = (
@@ -155,14 +124,18 @@ export function EntryList({
                   <AppLink href={row.href}>{row.label}</AppLink>
                 </div>
               ) : (
-                <Text size="sm" color="secondary">
+                <Text size="sm" color="secondary" as="span">
                   {row.label}
                 </Text>
               )}
               {row.value ? (
-                <Text size="sm" weight="bold">
-                  {row.value}
-                </Text>
+                typeof row.value === "string" ? (
+                  <Text size="sm" weight="bold" as="span">
+                    {row.value}
+                  </Text>
+                ) : (
+                  <span className="entry-list__summary-value">{row.value}</span>
+                )
               ) : null}
             </div>
           ))}

@@ -71,6 +71,8 @@
     "transfer_same_account": "La cuenta de origen y destino deben ser distintas.",
     "transfer_invalid_amount": "El importe debe ser mayor que cero.",
     "transfer_one_time_info": "Las transferencias son movimientos de una sola vez y se aplican en el mes seleccionado.",
+    "transfer_insufficient_funds_title": "Fondos insuficientes",
+    "transfer_insufficient_funds_message": "%{account} tiene %{balance} € para este mes, por debajo de %{amount} €.",
     "add_transfer": "Añadir transferencia",
     "adding_transfer": "Añadiendo transferencia..."
   },
@@ -114,6 +116,8 @@
   },
   "entry_list": {
     "empty_state": "Todavía no hay movimientos. Añade el primero.",
+    "to_account": "A %{account}",
+    "from_account": "De %{account}",
     "delete": "Eliminar",
     "delete_confirm": "¿Seguro que quieres eliminar este movimiento?"
   },
@@ -219,6 +223,9 @@
     "back_to_accounts": "Volver a cuentas",
     "back_to_account": "Volver a la cuenta",
     "edit_account": "Editar cuenta",
+    "settle": "Liquidar",
+    "settle_unavailable": "No hay importe pendiente para liquidar en esta cuenta.",
+    "settle_description": "Liquidar %{account} para %{month}",
     "archive": "Archivar",
     "archive_account": "Archivar cuenta",
     "archiving": "Archivando...",
