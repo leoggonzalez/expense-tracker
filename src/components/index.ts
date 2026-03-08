@@ -19,7 +19,7 @@ export type { DashboardProps } from "./dashboard/dashboard";
 
 export { ProjectionTable } from "./projection_table/projection_table";
 export type { ProjectionTableProps } from "./projection_table/projection_table";
-export { ProjectionOverview } from "./projection_overview/projection_overview";
+export { ProjectionChart } from "./projection_chart/projection_chart";
 
 export { EntryForm } from "./entry_form/entry_form";
 export type { EntryFormProps } from "./entry_form/entry_form";
@@ -33,7 +33,11 @@ export { Pagination } from "./pagination/pagination";
 export type { PaginationProps } from "./pagination/pagination";
 
 export { EntryList } from "./entry_list/entry_list";
-export type { EntryListItem, EntryListProps } from "./entry_list/entry_list";
+export type {
+  EntryListItem,
+  EntryListProps,
+  EntryListSummaryRow,
+} from "./entry_list/entry_list";
 export { EntriesTable } from "./entries_table/entries_table";
 export type { EntriesTableItem } from "./entries_table/entries_table";
 export { EntriesFilters } from "./entries_filters/entries_filters";

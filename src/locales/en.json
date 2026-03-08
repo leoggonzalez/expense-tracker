@@ -142,6 +142,8 @@
     "total": "Total",
     "accounts_with_entries": "Accounts with entries this month",
     "empty_month_entries": "No entries for this month.",
+    "more_entries_this_month": "%{count} more entries for this month",
+    "account_month_total": "Month total",
     "open_account": "Open account",
     "see_all_entries": "See all entries"
   },

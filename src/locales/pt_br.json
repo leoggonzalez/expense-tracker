@@ -142,6 +142,8 @@
     "total": "Total",
     "accounts_with_entries": "Contas com lançamentos neste mês",
     "empty_month_entries": "Não há lançamentos para este mês.",
+    "more_entries_this_month": "%{count} lançamentos a mais neste mês",
+    "account_month_total": "Total do mês",
     "open_account": "Abrir conta",
     "see_all_entries": "Ver todos os lançamentos"
   },

@@ -1,0 +1,11 @@
+@use "@/styles/variables.scss" as *;
+
+.projection-chart {
+  height: 260px;
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .projection-chart {
+    height: 320px;
+  }
+}

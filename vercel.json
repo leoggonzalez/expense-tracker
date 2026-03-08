@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-current-month-entry-counters",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

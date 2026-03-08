@@ -142,6 +142,8 @@
     "total": "Total",
     "accounts_with_entries": "Cuentas con movimientos este mes",
     "empty_month_entries": "No hay movimientos para este mes.",
+    "more_entries_this_month": "%{count} movimientos más para este mes",
+    "account_month_total": "Total del mes",
     "open_account": "Abrir cuenta",
     "see_all_entries": "Ver todos los movimientos"
   },

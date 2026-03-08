@@ -24,6 +24,7 @@ model Account {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
+  currentMonthEntryCount Int @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   entries   Entry[]
