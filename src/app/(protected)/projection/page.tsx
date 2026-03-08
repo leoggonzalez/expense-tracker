@@ -1,7 +1,14 @@
-import { Container, ProjectionOverview } from "@/components";
-import { format, startOfMonth } from "date-fns";
+import {
+  AppLink,
+  Container,
+  EntryList,
+  ProjectionChart,
+} from "@/components";
+import { Card, Grid, Icon, Stack, Text } from "@/elements";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 
 import { getProjectionPagePayload } from "@/actions/entries";
+import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +38,8 @@ export default async function ProjectionPage({
   const params = await searchParams;
   const focusedMonth = getFocusedMonth(params.month);
   const payload = await getProjectionPagePayload(focusedMonth);
+  const focusedMonthStart = startOfMonth(focusedMonth);
+  const focusedMonthEnd = endOfMonth(focusedMonthStart);
 
   const chartData = payload.chartMonths.map((month) => ({
     monthLabel: format(new Date(`${month.monthKey}-01T00:00:00`), "MMM yyyy"),
@@ -38,16 +47,151 @@ export default async function ProjectionPage({
     expenses: Math.abs(month.expense),
   }));
 
+  const focusedMonthStartQuery = format(focusedMonthStart, "yyyy-MM-dd");
+  const focusedMonthEndQuery = format(focusedMonthEnd, "yyyy-MM-dd");
+
+  const formatCurrency = (amount: number): string => {
+    const sign = amount < 0 ? "-" : "";
+    return `${sign}${Math.abs(amount).toFixed(2)} €`;
+  };
+
   return (
     <Container>
-      <ProjectionOverview
-        focusedMonthLabel={payload.focusedMonth.label}
-        previousMonthKey={payload.previousMonthKey}
-        nextMonthKey={payload.nextMonthKey}
-        chartData={chartData}
-        totals={payload.focusedMonthTotals}
-        accounts={payload.focusedMonthAccounts}
-      />
+      <Stack gap={24}>
+        <Stack direction="row" align="center" justify="space-between" gap={16}>
+          <Text size="h2" as="h2" weight="bold">
+            {payload.focusedMonth.label}
+          </Text>
+          <Stack direction="row" align="center" gap={8}>
+            <Card padding={8}>
+              <AppLink
+                href={`/projection?month=${payload.previousMonthKey}`}
+                ariaLabel={i18n.t("projection_page.previous_month") as string}
+              >
+                <Icon name="chevron-left" />
+              </AppLink>
+            </Card>
+            <Card padding={8}>
+              <AppLink
+                href={`/projection?month=${payload.nextMonthKey}`}
+                ariaLabel={i18n.t("projection_page.next_month") as string}
+              >
+                <Icon name="chevron-right" />
+              </AppLink>
+            </Card>
+          </Stack>
+        </Stack>
+
+        <Stack gap={12}>
+          <Text size="h4" as="h3" weight="semibold">
+            {i18n.t("projection_page.chart_title")}
+          </Text>
+          <Card padding={20}>
+            <ProjectionChart data={chartData} />
+          </Card>
+        </Stack>
+
+        <Stack gap={12}>
+          <Text size="h4" as="h3" weight="semibold">
+            {i18n.t("projection_page.month_totals")}
+          </Text>
+          <Grid minColumnWidth={220} gap={16}>
+            <Card padding={8}>
+              <Text size="sm" color="secondary">
+                {i18n.t("projection_page.income")}
+              </Text>
+              <Text size="2xl" weight="bold" color="success">
+                {formatCurrency(payload.focusedMonthTotals.income)}
+              </Text>
+            </Card>
+            <Card padding={8}>
+              <Text size="sm" color="secondary">
+                {i18n.t("projection_page.expenses")}
+              </Text>
+              <Text size="2xl" weight="bold" color="danger">
+                {formatCurrency(payload.focusedMonthTotals.expense)}
+              </Text>
+            </Card>
+            <Card padding={8}>
+              <Text size="sm" color="secondary">
+                {i18n.t("projection_page.total")}
+              </Text>
+              <Text
+                size="2xl"
+                weight="bold"
+                color={
+                  payload.focusedMonthTotals.net >= 0 ? "success" : "danger"
+                }
+              >
+                {formatCurrency(payload.focusedMonthTotals.net)}
+              </Text>
+            </Card>
+          </Grid>
+        </Stack>
+
+        <Stack gap={24}>
+          <Text size="h4" as="h3" weight="semibold">
+            {i18n.t("projection_page.accounts_with_entries")}
+          </Text>
+          {payload.focusedMonthAccounts.length === 0 ? (
+            <Card padding={20} variant="dashed">
+              <Text color="secondary">
+                {i18n.t("projection_page.empty_month_entries")}
+              </Text>
+            </Card>
+          ) : (
+            <Stack gap={24}>
+              {payload.focusedMonthAccounts.map((account) => {
+                const hiddenEntriesCount = Math.max(
+                  0,
+                  account.monthEntryCount - account.entries.length,
+                );
+
+                const moreEntriesHref = `/entries?account=${account.accountId}&start_date=${focusedMonthStartQuery}&end_date=${focusedMonthEndQuery}`;
+
+                return (
+                  <Stack key={account.accountId} gap={12}>
+                      <Text size="md" weight="bold">
+                        {account.accountName}
+                      </Text>
+
+
+                    <EntryList
+                      entries={account.entries}
+                      showDelete={false}
+                      entryHrefBase="/entries"
+                      summaryRows={[
+                        ...(hiddenEntriesCount > 0
+                          ? [
+                              {
+                                id: `more-${account.accountId}`,
+                                label: i18n.t(
+                                  "projection_page.more_entries_this_month",
+                                  {
+                                    count: hiddenEntriesCount,
+                                  },
+                                ) as string,
+                                href: moreEntriesHref,
+                              },
+                            ]
+                          : []),
+                        {
+                          id: `total-${account.accountId}`,
+                          label: i18n.t("projection_page.account_month_total"),
+                          value: formatCurrency(account.monthTotal),
+                          tone: "emphasis",
+                        },
+                      ]}
+                    />
+
+                    
+                  </Stack>
+                );
+              })}
+            </Stack>
+          )}
+        </Stack>
+      </Stack>
     </Container>
   );
 }

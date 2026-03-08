@@ -5,6 +5,7 @@ import {
   endOfDay,
   endOfMonth,
   format,
+  isSameMonth,
   startOfDay,
   startOfMonth,
 } from "date-fns";
@@ -104,6 +105,7 @@ export type ProjectionFocusedAccount = {
   accountId: string;
   accountName: string;
   monthTotal: number;
+  monthEntryCount: number;
   entries: ProjectionMonthEntry[];
 };
 
@@ -193,13 +195,15 @@ type ProjectionFocusedAccountAccumulator = {
   accountId: string;
   accountName: string;
   monthTotal: number;
+  monthEntryCount: number;
   entries: ProjectionMonthEntry[];
 };
 
-type ProjectionFocusedAccountTotalRow = {
+type ProjectionFocusedAccountSummaryRow = {
   accountId: string;
   accountName: string;
   monthTotal: number | null;
+  monthEntryCount: number | null;
 };
 
 type ProjectionFocusedAccountEntryRow = {
@@ -237,6 +241,68 @@ function serializeProjectionMonthEntryRow(
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   };
+}
+
+function getCurrentMonthBounds(): { monthStart: Date; monthEnd: Date } {
+  const monthStart = startOfMonth(new Date());
+  const monthEnd = endOfMonth(monthStart);
+
+  return { monthStart, monthEnd };
+}
+
+async function syncCurrentMonthEntryCounterForAccount(
+  accountId: string,
+): Promise<void> {
+  const { monthStart, monthEnd } = getCurrentMonthBounds();
+
+  await prisma.$executeRaw`
+    UPDATE "Account" a
+    SET "currentMonthEntryCount" = (
+      SELECT COUNT(e.id)::integer
+      FROM "Entry" e
+      WHERE e."accountId" = a.id
+        AND e."beginDate" <= ${monthEnd}
+        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+    )
+    WHERE a.id = ${accountId}
+  `;
+}
+
+async function syncCurrentMonthEntryCounterForAccounts(
+  accountIds: string[],
+): Promise<void> {
+  const uniqueAccountIds = Array.from(new Set(accountIds.filter(Boolean)));
+
+  if (uniqueAccountIds.length === 0) {
+    return;
+  }
+
+  await Promise.all(
+    uniqueAccountIds.map((accountId) =>
+      syncCurrentMonthEntryCounterForAccount(accountId),
+    ),
+  );
+}
+
+export async function syncAllCurrentMonthEntryCounters(): Promise<void> {
+  const { monthStart, monthEnd } = getCurrentMonthBounds();
+
+  await prisma.$executeRaw`
+    UPDATE "Account" a
+    SET "currentMonthEntryCount" = COALESCE(month_counts."entryCount", 0)
+    FROM (
+      SELECT
+        a2.id AS "accountId",
+        COUNT(e.id)::integer AS "entryCount"
+      FROM "Account" a2
+      LEFT JOIN "Entry" e
+        ON e."accountId" = a2.id
+       AND e."beginDate" <= ${monthEnd}
+       AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+      GROUP BY a2.id
+    ) month_counts
+    WHERE a.id = month_counts."accountId"
+  `;
 }
 
 async function getMonthTotalsForUser(
@@ -313,10 +379,26 @@ async function findOrCreateAccount(userId: string, accountName: string) {
     where: {
       userId,
       name: accountName,
+      isArchived: false,
     },
   });
 
   if (!account) {
+    const archivedAccount = await prisma.account.findFirst({
+      where: {
+        userId,
+        name: accountName,
+        isArchived: true,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (archivedAccount) {
+      throw new Error("account_is_archived");
+    }
+
     account = await prisma.account.create({
       data: {
         userId,
@@ -392,10 +474,15 @@ export async function createEntry(
       },
     });
 
+    await syncCurrentMonthEntryCounterForAccount(account.id);
     revalidateEntryPages();
 
     return { success: true, entry };
   } catch (error) {
+    if (error instanceof Error && error.message === "account_is_archived") {
+      return { success: false, error: "account_is_archived" };
+    }
+
     console.error("Error creating entry:", error);
     return { success: false, error: "failed_to_create_entry" };
   }
@@ -487,8 +574,12 @@ export async function getProjectionPagePayload(
   const normalizedFocusedMonthStart = startOfMonth(focusedMonthStart);
   const endMonthStart = addMonths(normalizedFocusedMonthStart, 5);
   const focusedMonthEnd = endOfMonth(normalizedFocusedMonthStart);
+  const focusedMonthIsCurrent = isSameMonth(
+    normalizedFocusedMonthStart,
+    startOfMonth(new Date()),
+  );
 
-  const [chartRows, focusedMonthTotals, accountTotalsRows, accountEntriesRows] =
+  const [chartRows, focusedMonthTotals, accountSummaryRows, accountEntriesRows] =
     await Promise.all([
       prisma.$queryRaw<ProjectionChartMonthRow[]>`
       WITH months AS (
@@ -533,7 +624,7 @@ export async function getProjectionPagePayload(
       ORDER BY months.month_start ASC
     `,
       getMonthTotalsForUser(currentUser.id, normalizedFocusedMonthStart),
-      prisma.$queryRaw<ProjectionFocusedAccountTotalRow[]>`
+      prisma.$queryRaw<ProjectionFocusedAccountSummaryRow[]>`
       SELECT
         a.id AS "accountId",
         a.name AS "accountName",
@@ -550,12 +641,17 @@ export async function getProjectionPagePayload(
           ),
           0
         ) AS "monthTotal"
+        ,
+        CASE
+          WHEN ${focusedMonthIsCurrent} THEN a."currentMonthEntryCount"
+          ELSE COUNT(e.id)::integer
+        END AS "monthEntryCount"
       FROM "Account" a
       INNER JOIN "Entry" e ON e."accountId" = a.id
       WHERE a."userId" = ${currentUser.id}
         AND e."beginDate" <= ${focusedMonthEnd}
         AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
-      GROUP BY a.id, a.name
+      GROUP BY a.id, a.name, a."currentMonthEntryCount"
       ORDER BY a.name ASC
     `,
       prisma.$queryRaw<ProjectionFocusedAccountEntryRow[]>`
@@ -593,7 +689,7 @@ export async function getProjectionPagePayload(
           AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
       ) ranked
       WHERE ranked.row_number <= 5
-      ORDER BY ranked."accountName" ASC, ranked."createdAt" DESC
+      ORDER BY ranked."accountName" ASC, ranked."createdAt" ASC
     `,
     ]);
 
@@ -612,12 +708,13 @@ export async function getProjectionPagePayload(
   });
 
   const accountMap = new Map<string, ProjectionFocusedAccountAccumulator>(
-    accountTotalsRows.map((account) => [
+    accountSummaryRows.map((account) => [
       account.accountId,
       {
         accountId: account.accountId,
         accountName: account.accountName,
         monthTotal: Number(account.monthTotal || 0),
+        monthEntryCount: Number(account.monthEntryCount || 0),
         entries: [],
       },
     ]),
@@ -650,6 +747,7 @@ export async function getProjectionPagePayload(
         accountId: account.accountId,
         accountName: account.accountName,
         monthTotal: account.monthTotal,
+        monthEntryCount: account.monthEntryCount,
         entries: account.entries,
       })),
   };
@@ -798,6 +896,7 @@ export async function getAccounts(): Promise<AccountRecord[]> {
     return await prisma.account.findMany({
       where: {
         userId: currentUser.id,
+        isArchived: false,
       },
       orderBy: {
         name: "asc",
@@ -880,6 +979,10 @@ export async function updateEntry(
       },
     });
 
+    await syncCurrentMonthEntryCounterForAccounts([
+      existingEntry.accountId,
+      entry.accountId,
+    ]);
     revalidateEntryPages();
 
     return { success: true, entry };
@@ -902,6 +1005,7 @@ export async function deleteEntry(id: string) {
       },
       select: {
         id: true,
+        accountId: true,
       },
     });
 
@@ -913,6 +1017,7 @@ export async function deleteEntry(id: string) {
       where: { id },
     });
 
+    await syncCurrentMonthEntryCounterForAccount(existingEntry.accountId);
     revalidateEntryPages();
 
     return { success: true };

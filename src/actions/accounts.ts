@@ -1,5 +1,6 @@
 "use server";
 
+import { endOfMonth, startOfMonth } from "date-fns";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -10,69 +11,70 @@ type AccountActionResult = {
   error?: string;
 };
 
-type AccountSummary = {
-  id: string;
-  name: string;
-  entryCount: number;
-  allTimeNet: number;
-};
-
-type AccountSummaryRecord = {
-  id: string;
-  name: string;
-  entries: Array<{
-    id: string;
-    type: string;
-    amount: number;
-  }>;
-};
-
-type AccountDetail = {
-  id: string;
-  name: string;
-  entryCount: number;
-  allTimeNet: number;
-  entries: Array<{
-    id: string;
-    type: string;
-    description: string;
-    amount: number;
-    beginDate: Date;
-    endDate: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }>;
-};
-
-type AccountDetailRecord = {
-  id: string;
-  name: string;
-  entries: AccountDetail["entries"];
-};
-
-type AccountDeleteCheckRecord = {
-  _count: {
-    entries: number;
-  };
-};
-
 type PrismaErrorWithCode = {
   code: string;
 };
 
-function revalidateAccountPages(): void {
-  revalidatePath("/");
-  revalidatePath("/entries");
-  revalidatePath("/entries/all");
-  revalidatePath("/projection");
-  revalidatePath("/accounts");
-  revalidatePath("/settings");
+type AccountCurrentMonthSummaryRow = {
+  id: string;
+  name: string;
+  currentMonthTotal: number | null;
+};
+
+type AccountCurrentMonthSummary = {
+  id: string;
+  name: string;
+  currentMonthTotal: number;
+};
+
+type AccountDetailEntry = {
+  id: string;
+  type: string;
+  accountName: string;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AccountDetailPageData = {
+  account: {
+    id: string;
+    name: string;
+    isArchived: boolean;
+    currentMonthTotal: number;
+  };
+  currentMonthRelevantEntries: AccountDetailEntry[];
+  allEntries: AccountDetailEntry[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  };
+};
+
+export type AccountEditData = {
+  id: string;
+  name: string;
+  isArchived: boolean;
+};
+
+function getCurrentMonthBounds(): { monthStart: Date; monthEnd: Date } {
+  const monthStart = startOfMonth(new Date());
+  const monthEnd = endOfMonth(monthStart);
+
+  return { monthStart, monthEnd };
 }
 
-function getEntryNet(entry: { type: string; amount: number }): number {
-  return entry.type === "expense" && entry.amount > 0
-    ? -entry.amount
-    : entry.amount;
+function normalizeEntryAmount(type: string, amount: number): number {
+  if (type === "expense" && amount > 0) {
+    return -amount;
+  }
+
+  return amount;
 }
 
 function isPrismaErrorWithCode(error: unknown): error is PrismaErrorWithCode {
@@ -84,6 +86,17 @@ function isPrismaErrorWithCode(error: unknown): error is PrismaErrorWithCode {
   );
 }
 
+function revalidateAccountPages(): void {
+  revalidatePath("/");
+  revalidatePath("/entries");
+  revalidatePath("/entries/all");
+  revalidatePath("/projection");
+  revalidatePath("/accounts");
+  revalidatePath("/accounts/new");
+  revalidatePath("/accounts/archived");
+  revalidatePath("/settings");
+}
+
 async function findOwnedAccountOrNull(userId: string, id: string) {
   return prisma.account.findFirst({
     where: {
@@ -93,40 +106,234 @@ async function findOwnedAccountOrNull(userId: string, id: string) {
   });
 }
 
-export async function getAccountsWithSummary(): Promise<AccountSummary[]> {
+async function getCurrentMonthTotalForAccount(
+  userId: string,
+  accountId: string,
+): Promise<number> {
+  const { monthStart, monthEnd } = getCurrentMonthBounds();
+
+  const rows = await prisma.$queryRaw<Array<{ currentMonthTotal: number | null }>>`
+    SELECT
+      COALESCE(
+        SUM(
+          CASE
+            WHEN e.type = 'expense' THEN
+              CASE
+                WHEN e.amount > 0 THEN -e.amount
+                ELSE e.amount
+              END
+            ELSE e.amount
+          END
+        ),
+        0
+      ) AS "currentMonthTotal"
+    FROM "Account" a
+    LEFT JOIN "Entry" e
+      ON e."accountId" = a.id
+     AND e."beginDate" <= ${monthEnd}
+     AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+    WHERE a.id = ${accountId}
+      AND a."userId" = ${userId}
+    GROUP BY a.id
+  `;
+
+  return Number(rows[0]?.currentMonthTotal || 0);
+}
+
+async function getAccountsByArchiveState(
+  isArchived: boolean,
+): Promise<AccountCurrentMonthSummary[]> {
+  const currentUser = await requireCurrentUser();
+  const { monthStart, monthEnd } = getCurrentMonthBounds();
+
+  try {
+    const rows = await prisma.$queryRaw<AccountCurrentMonthSummaryRow[]>`
+      SELECT
+        a.id,
+        a.name,
+        COALESCE(
+          SUM(
+            CASE
+              WHEN e.type = 'expense' THEN
+                CASE
+                  WHEN e.amount > 0 THEN -e.amount
+                  ELSE e.amount
+                END
+              ELSE e.amount
+            END
+          ),
+          0
+        ) AS "currentMonthTotal"
+      FROM "Account" a
+      LEFT JOIN "Entry" e
+        ON e."accountId" = a.id
+       AND e."beginDate" <= ${monthEnd}
+       AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+      WHERE a."userId" = ${currentUser.id}
+        AND a."isArchived" = ${isArchived}
+      GROUP BY a.id, a.name
+      ORDER BY a.name ASC
+    `;
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      currentMonthTotal: Number(row.currentMonthTotal || 0),
+    }));
+  } catch (error) {
+    console.error("Error fetching accounts summary:", error);
+    return [];
+  }
+}
+
+export async function getAccountsCurrentMonthSummary(): Promise<
+  AccountCurrentMonthSummary[]
+> {
+  return getAccountsByArchiveState(false);
+}
+
+export async function getArchivedAccountsCurrentMonthSummary(): Promise<
+  AccountCurrentMonthSummary[]
+> {
+  return getAccountsByArchiveState(true);
+}
+
+export async function getAccountDetailPageData(input: {
+  accountId: string;
+  page?: number;
+  limit?: number;
+}): Promise<AccountDetailPageData | null> {
+  const currentUser = await requireCurrentUser();
+
+  const page = Math.max(1, input.page || 1);
+  const limit = Math.max(1, input.limit || 10);
+  const take = page * limit;
+  const { monthStart, monthEnd } = getCurrentMonthBounds();
+
+  try {
+    const account = await findOwnedAccountOrNull(currentUser.id, input.accountId);
+
+    if (!account) {
+      return null;
+    }
+
+    const [total, allEntriesRaw, currentMonthTotal, currentMonthRelevantRaw] =
+      await Promise.all([
+      prisma.entry.count({
+        where: {
+          accountId: account.id,
+        },
+      }),
+      prisma.entry.findMany({
+        where: {
+          accountId: account.id,
+        },
+        select: {
+          id: true,
+          type: true,
+          description: true,
+          amount: true,
+          beginDate: true,
+          endDate: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
+        take,
+      }),
+      getCurrentMonthTotalForAccount(currentUser.id, account.id),
+      prisma.entry.findMany({
+        where: {
+          accountId: account.id,
+          beginDate: {
+            lte: monthEnd,
+          },
+          OR: [
+            {
+              endDate: null,
+            },
+            {
+              endDate: {
+                gte: monthStart,
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          type: true,
+          description: true,
+          amount: true,
+          beginDate: true,
+          endDate: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
+      }),
+    ]);
+
+    const serializeEntry = (entry: {
+      id: string;
+      type: string;
+      description: string;
+      amount: number;
+      beginDate: Date;
+      endDate: Date | null;
+      createdAt: Date;
+      updatedAt: Date;
+    }): AccountDetailEntry => ({
+        id: entry.id,
+        type: entry.type,
+        accountName: account.name,
+        description: entry.description,
+        amount: normalizeEntryAmount(entry.type, entry.amount),
+        beginDate: entry.beginDate.toISOString(),
+        endDate: entry.endDate?.toISOString() || null,
+        createdAt: entry.createdAt.toISOString(),
+        updatedAt: entry.updatedAt.toISOString(),
+      });
+
+    return {
+      account: {
+        id: account.id,
+        name: account.name,
+        isArchived: account.isArchived,
+        currentMonthTotal,
+      },
+      currentMonthRelevantEntries: currentMonthRelevantRaw.map(serializeEntry),
+      allEntries: allEntriesRaw.map(serializeEntry),
+      pagination: {
+        page,
+        limit,
+        total,
+        hasMore: total > allEntriesRaw.length,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching account detail page data:", error);
+    return null;
+  }
+}
+
+export async function getAccountForEdit(id: string): Promise<AccountEditData | null> {
   const currentUser = await requireCurrentUser();
 
   try {
-    const accounts: AccountSummaryRecord[] = await prisma.account.findMany({
-      where: {
-        userId: currentUser.id,
-      },
-      include: {
-        entries: {
-          select: {
-            id: true,
-            type: true,
-            amount: true,
-          },
-        },
-      },
-      orderBy: {
-        name: "asc",
-      },
-    });
+    const account = await findOwnedAccountOrNull(currentUser.id, id);
 
-    return accounts.map((account) => ({
+    if (!account) {
+      return null;
+    }
+
+    return {
       id: account.id,
       name: account.name,
-      entryCount: account.entries.length,
-      allTimeNet: account.entries.reduce(
-        (sum, entry) => sum + getEntryNet(entry),
-        0,
-      ),
-    }));
+      isArchived: account.isArchived,
+    };
   } catch (error) {
-    console.error("Error fetching accounts with summary:", error);
-    return [];
+    console.error("Error fetching account for edit:", error);
+    return null;
   }
 }
 
@@ -158,46 +365,6 @@ export async function createAccount(input: {
 
     console.error("Error creating account:", error);
     return { success: false, error: "accounts_page.create_failed" };
-  }
-}
-
-export async function getAccountById(
-  id: string,
-): Promise<AccountDetail | null> {
-  const currentUser = await requireCurrentUser();
-
-  try {
-    const account: AccountDetailRecord | null = await prisma.account.findFirst({
-      where: {
-        id,
-        userId: currentUser.id,
-      },
-      include: {
-        entries: {
-          orderBy: {
-            beginDate: "desc",
-          },
-        },
-      },
-    });
-
-    if (!account) {
-      return null;
-    }
-
-    return {
-      id: account.id,
-      name: account.name,
-      entryCount: account.entries.length,
-      allTimeNet: account.entries.reduce(
-        (sum, entry) => sum + getEntryNet(entry),
-        0,
-      ),
-      entries: account.entries,
-    };
-  } catch (error) {
-    console.error("Error fetching account by id:", error);
-    return null;
   }
 }
 
@@ -241,39 +408,27 @@ export async function updateAccount(
   }
 }
 
-export async function deleteAccount(id: string): Promise<AccountActionResult> {
+export async function archiveAccount(
+  id: string,
+  confirmationText: string,
+): Promise<AccountActionResult> {
   const currentUser = await requireCurrentUser();
 
-  try {
-    const account: AccountDeleteCheckRecord | null =
-      await prisma.account.findFirst({
-        where: {
-          id,
-          userId: currentUser.id,
-        },
-        include: {
-          _count: {
-            select: {
-              entries: true,
-            },
-          },
-        },
-      });
+  if (confirmationText !== "delete") {
+    return { success: false, error: "accounts_page.archive_requires_confirm" };
+  }
 
-    if (!account) {
+  try {
+    const existingAccount = await findOwnedAccountOrNull(currentUser.id, id);
+
+    if (!existingAccount) {
       return { success: false, error: "account_detail_page.not_found" };
     }
 
-    if (account._count.entries > 0) {
-      return {
-        success: false,
-        error: "account_detail_page.delete_blocked_has_entries",
-      };
-    }
-
-    await prisma.account.delete({
-      where: {
-        id,
+    await prisma.account.update({
+      where: { id },
+      data: {
+        isArchived: true,
       },
     });
 
@@ -281,7 +436,33 @@ export async function deleteAccount(id: string): Promise<AccountActionResult> {
 
     return { success: true };
   } catch (error) {
-    console.error("Error deleting account:", error);
-    return { success: false, error: "account_detail_page.delete_failed" };
+    console.error("Error archiving account:", error);
+    return { success: false, error: "accounts_page.archive_failed" };
+  }
+}
+
+export async function unarchiveAccount(id: string): Promise<AccountActionResult> {
+  const currentUser = await requireCurrentUser();
+
+  try {
+    const existingAccount = await findOwnedAccountOrNull(currentUser.id, id);
+
+    if (!existingAccount) {
+      return { success: false, error: "account_detail_page.not_found" };
+    }
+
+    await prisma.account.update({
+      where: { id },
+      data: {
+        isArchived: false,
+      },
+    });
+
+    revalidateAccountPages();
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error unarchiving account:", error);
+    return { success: false, error: "accounts_page.unarchive_failed" };
   }
 }

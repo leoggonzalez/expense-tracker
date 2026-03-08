@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import React from "react";
-
 import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
 
 type AppLinkProps = {
