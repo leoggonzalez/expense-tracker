@@ -41,5 +41,9 @@ export function Box({
     style["--box-max-width"] = `${maxWidth}px`;
   }
 
-  return <div className="box" style={style}>{children}</div>;
+  return (
+    <div className="box" style={style}>
+      {children}
+    </div>
+  );
 }

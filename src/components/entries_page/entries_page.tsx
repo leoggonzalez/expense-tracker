@@ -65,10 +65,16 @@ export function EntriesPage({
       <div className="entries-page">
         <Stack gap={24}>
           <div className="entries-page__header">
-            <Stack gap={16}>
-          <Text size="h2" as="h2" weight="bold">
-            {i18n.t("entries_page.title")}
-          </Text>
+            <Stack
+              gap={16}
+              direction="row"
+              align="center"
+              justify="space-between"
+              wrap
+            >
+              <Text size="h2" as="h2" weight="bold">
+                {i18n.t("entries_page.title")}
+              </Text>
               <div className="entries-page__button-link">
                 <AppLink href="/entries/new/expense">
                   <span className="entries-page__button">

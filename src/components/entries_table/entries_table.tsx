@@ -30,9 +30,11 @@ export function EntriesTable({
 
   if (entries.length === 0) {
     return (
-      <Card padding={32} variant="dashed" className="entries-table__empty">
-        <Text color="secondary">{i18n.t("entries_page.empty_state")}</Text>
-      </Card>
+      <div className="entries-table__empty">
+        <Card padding={32} variant="dashed">
+          <Text color="secondary">{i18n.t("entries_page.empty_state")}</Text>
+        </Card>
+      </div>
     );
   }
 
@@ -49,43 +51,45 @@ export function EntriesTable({
   };
 
   return (
-    <Card padding={0} className="entries-table">
-      {entries.map((entry) => (
-        <div
-          key={entry.id}
-          className="entries-table__row"
-          onClick={() => push(`/entries/${entry.id}`)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              push(`/entries/${entry.id}`);
-            }
-          }}
-          role="link"
-          tabIndex={0}
-        >
-          <div className="entries-table__account">
-            <Avatar name={entry.accountName} />
+    <div className="entries-table">
+      <Card padding={0}>
+        {entries.map((entry) => (
+          <div
+            key={entry.id}
+            className="entries-table__row"
+            onClick={() => push(`/entries/${entry.id}`)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                push(`/entries/${entry.id}`);
+              }
+            }}
+            role="link"
+            tabIndex={0}
+          >
+            <div className="entries-table__account">
+              <Avatar name={entry.accountName} />
+            </div>
+            <div className="entries-table__details">
+              <Text size="sm" weight="semibold">
+                {entry.description}
+              </Text>
+              <Text size="xs" color="secondary">
+                {formatEntryDate(entry.beginDate)}
+              </Text>
+            </div>
+            <div className="entries-table__amount">
+              <Text
+                size="sm"
+                weight="bold"
+                color={entry.type === "income" ? "success" : "danger"}
+              >
+                {formatAmount(entry.type, entry.amount)}
+              </Text>
+            </div>
           </div>
-          <div className="entries-table__details">
-            <Text size="sm" weight="semibold">
-              {entry.description}
-            </Text>
-            <Text size="xs" color="secondary">
-              {formatEntryDate(entry.beginDate)}
-            </Text>
-          </div>
-          <div className="entries-table__amount">
-            <Text
-              size="sm"
-              weight="bold"
-              color={entry.type === "income" ? "success" : "danger"}
-            >
-              {formatAmount(entry.type, entry.amount)}
-            </Text>
-          </div>
-        </div>
-      ))}
-    </Card>
+        ))}
+      </Card>
+    </div>
   );
 }

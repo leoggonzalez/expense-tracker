@@ -41,5 +41,9 @@ export function AppLink({
     push(href);
   };
 
-  return <Link href={href} aria-label={ariaLabel} onClick={handleClick}>{children}</Link>;
+  return (
+    <Link href={href} aria-label={ariaLabel} onClick={handleClick}>
+      {children}
+    </Link>
+  );
 }

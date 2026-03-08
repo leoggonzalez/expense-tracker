@@ -2,7 +2,7 @@
 
 import "./dashboard.scss";
 
-import { Card, Grid, Stack, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { EntryList, EntryListItem } from "@/components";
 
 import { AppLink } from "@/components";
@@ -42,54 +42,60 @@ export function Dashboard({
         </Text>
 
         <div className="dashboard__cards">
-          <Grid gap={16}>
+          <div className="dashboard__cards-grid">
             <div className="dashboard__card-link dashboard__card-link--income">
               <AppLink href={`/entries?${currentMonthQuery}&type=income`}>
-                <Card padding={16}>
-                  <Stack gap={8}>
-                    <Text size="sm" color="secondary" weight="medium">
-                      {i18n.t("dashboard.income")}
-                    </Text>
-                    <Text size="2xl" weight="bold" color="success">
-                      {formatCurrency(totals.income)}
-                    </Text>
-                  </Stack>
-                </Card>
+                <div className="dashboard__card-surface dashboard__card-surface--income">
+                  <Card padding={16}>
+                    <Stack gap={8}>
+                      <Text size="sm" color="secondary" weight="medium">
+                        {i18n.t("dashboard.income")}
+                      </Text>
+                      <Text size="2xl" weight="bold" color="success">
+                        {formatCurrency(totals.income)}
+                      </Text>
+                    </Stack>
+                  </Card>
+                </div>
               </AppLink>
             </div>
 
             <div className="dashboard__card-link dashboard__card-link--expense">
               <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
-                <Card padding={16}>
-                  <Stack gap={8}>
-                    <Text size="sm" color="secondary" weight="medium">
-                      {i18n.t("dashboard.expenses")}
-                    </Text>
-                    <Text size="2xl" weight="bold" color="danger">
-                      {formatCurrency(totals.expense)}
-                    </Text>
-                  </Stack>
-                </Card>
+                <div className="dashboard__card-surface dashboard__card-surface--expense">
+                  <Card padding={16}>
+                    <Stack gap={8}>
+                      <Text size="sm" color="secondary" weight="medium">
+                        {i18n.t("dashboard.expenses")}
+                      </Text>
+                      <Text size="2xl" weight="bold" color="danger">
+                        {formatCurrency(totals.expense)}
+                      </Text>
+                    </Stack>
+                  </Card>
+                </div>
               </AppLink>
             </div>
 
             <div className="dashboard__card dashboard__card--net">
-              <Card padding={16}>
-                <Stack gap={8}>
-                  <Text size="sm" color="secondary" weight="medium">
-                    {i18n.t("dashboard.net")}
-                  </Text>
-                  <Text
-                    size="2xl"
-                    weight="bold"
-                    color={totals.net >= 0 ? "success" : "danger"}
-                  >
-                    {formatCurrency(totals.net)}
-                  </Text>
-                </Stack>
-              </Card>
+              <div className="dashboard__card-surface dashboard__card-surface--net">
+                <Card padding={16}>
+                  <Stack gap={8}>
+                    <Text size="sm" color="secondary" weight="medium">
+                      {i18n.t("dashboard.net")}
+                    </Text>
+                    <Text
+                      size="2xl"
+                      weight="bold"
+                      color={totals.net >= 0 ? "success" : "danger"}
+                    >
+                      {formatCurrency(totals.net)}
+                    </Text>
+                  </Stack>
+                </Card>
+              </div>
             </div>
-          </Grid>
+          </div>
         </div>
 
         <div className="dashboard__recent-section">

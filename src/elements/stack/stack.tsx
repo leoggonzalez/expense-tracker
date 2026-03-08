@@ -40,5 +40,9 @@ export function Stack({
     style["--stack-justify"] = justify;
   }
 
-  return <div className="stack" style={style}>{children}</div>;
+  return (
+    <div className="stack" style={style}>
+      {children}
+    </div>
+  );
 }

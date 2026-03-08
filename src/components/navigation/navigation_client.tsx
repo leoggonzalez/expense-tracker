@@ -70,9 +70,7 @@ export function NavigationClient({
           <ul className="navigation__links">
             {links.map((link) => (
               <li key={link.href} className="navigation__item">
-                <AppLink
-                  href={link.href}
-                  ariaLabel={String(link.label)}
+                <div
                   className={[
                     "navigation__link",
                     isLinkActive(link.href) && "navigation__link--active",
@@ -83,13 +81,15 @@ export function NavigationClient({
                     .filter(Boolean)
                     .join(" ")}
                 >
-                  <Icon
-                    name={link.icon}
-                    size={22}
-                    className="navigation__icon"
-                  />
-                  <span className="navigation__label">{link.label}</span>
-                </AppLink>
+                  <AppLink href={link.href} ariaLabel={String(link.label)}>
+                    <span className="navigation__link-content">
+                      <span className="navigation__icon">
+                        <Icon name={link.icon} size={22} />
+                      </span>
+                      <span className="navigation__label">{link.label}</span>
+                    </span>
+                  </AppLink>
+                </div>
               </li>
             ))}
           </ul>

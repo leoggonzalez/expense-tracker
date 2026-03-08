@@ -60,5 +60,9 @@ export function Grid({
     style["--grid-justify"] = justify;
   }
 
-  return <div className="grid" style={style}>{children}</div>;
+  return (
+    <div className="grid" style={style}>
+      {children}
+    </div>
+  );
 }

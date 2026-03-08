@@ -42,31 +42,36 @@ export function NewEntryPage({
 
   return (
     <Container>
-      <Stack gap={24} className="new-entry-page">
-        <Text size="h2" as="h1" weight="bold">
-          {i18n.t(titleKey)}
-        </Text>
-        <Grid columns="repeat(3, minmax(0, 1fr))" gap={8}>
-          {tabs.map((tab) => (
-            <AppLink
-              key={tab.key}
-              href={tab.href}
-              className={[
-                "new-entry-page__tab",
-                `new-entry-page__tab--${tab.key}`,
-                activeTab === tab.key && "new-entry-page__tab--active",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              {tab.label}
-            </AppLink>
-          ))}
-        </Grid>
-        <Card padding={24} className="new-entry-page__panel">
-          {children}
-        </Card>
-      </Stack>
+      <div className="new-entry-page">
+        <Stack gap={24}>
+          <Text size="h2" as="h1" weight="bold">
+            {i18n.t(titleKey)}
+          </Text>
+          <Grid columns="repeat(3, minmax(0, 1fr))" gap={8}>
+            {tabs.map((tab) => (
+              <div
+                key={tab.key}
+                className={[
+                  "new-entry-page__tab",
+                  `new-entry-page__tab--${tab.key}`,
+                  activeTab === tab.key && "new-entry-page__tab--active",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <AppLink href={tab.href}>
+                  <span className="new-entry-page__tab-content">
+                    {tab.label}
+                  </span>
+                </AppLink>
+              </div>
+            ))}
+          </Grid>
+          <div className="new-entry-page__panel">
+            <Card padding={24}>{children}</Card>
+          </div>
+        </Stack>
+      </div>
     </Container>
   );
 }

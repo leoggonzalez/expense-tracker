@@ -19,13 +19,3 @@
     font-weight: var(--font-weight-medium);
   }
 }
-
-@media (min-width: $breakpoint-tablet) {
-  .entries-page {
-    &__header {
-      --stack-direction: row;
-      --stack-align: center;
-      --stack-justify: space-between;
-    }
-  }
-}

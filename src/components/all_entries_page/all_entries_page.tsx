@@ -59,60 +59,56 @@ export function AllEntriesPage({
           {i18n.t("all_entries_page.title")}
         </Text>
 
-        <Card
-          padding={24}
-          variant="secondary"
-          className="all-entries-page__filters"
-        >
-          <Text size="h4" as="h3" weight="semibold">
-            {i18n.t("all_entries_page.filters")}
-          </Text>
-          <Grid
-            className="all-entries-page__filter-grid"
-            columns="repeat(auto-fit, minmax(200px, 1fr))"
-            gap={16}
-          >
-            <Autocomplete
-              label={i18n.t("all_entries_page.account")}
-              value={selectedAccountName}
-              onChange={(name) => {
-                const account = accounts.find((item) => item.name === name);
-                onAccountChange(account?.id || "");
-              }}
-              options={accounts.map((account) => account.name)}
-              placeholder={
-                i18n.t("all_entries_page.account_placeholder") as string
-              }
-            />
+        <div className="all-entries-page__filters">
+          <Card padding={24} variant="secondary">
+            <Text size="h4" as="h3" weight="semibold">
+              {i18n.t("all_entries_page.filters")}
+            </Text>
+            <div className="all-entries-page__filter-grid">
+              <Grid columns="repeat(auto-fit, minmax(200px, 1fr))" gap={16}>
+                <Autocomplete
+                  label={i18n.t("all_entries_page.account")}
+                  value={selectedAccountName}
+                  onChange={(name) => {
+                    const account = accounts.find((item) => item.name === name);
+                    onAccountChange(account?.id || "");
+                  }}
+                  options={accounts.map((account) => account.name)}
+                  placeholder={
+                    i18n.t("all_entries_page.account_placeholder") as string
+                  }
+                />
 
-            <Input
-              label={i18n.t("all_entries_page.description")}
-              value={filters.description}
-              onChange={onDescriptionChange}
-              placeholder={
-                i18n.t("all_entries_page.description_placeholder") as string
-              }
-            />
+                <Input
+                  label={i18n.t("all_entries_page.description")}
+                  value={filters.description}
+                  onChange={onDescriptionChange}
+                  placeholder={
+                    i18n.t("all_entries_page.description_placeholder") as string
+                  }
+                />
 
-            <Input
-              label={i18n.t("all_entries_page.start_date")}
-              type="date"
-              value={filters.startDate}
-              onChange={onStartDateChange}
-            />
+                <Input
+                  label={i18n.t("all_entries_page.start_date")}
+                  type="date"
+                  value={filters.startDate}
+                  onChange={onStartDateChange}
+                />
 
-            <Input
-              label={i18n.t("all_entries_page.end_date")}
-              type="date"
-              value={filters.endDate}
-              onChange={onEndDateChange}
-            />
-          </Grid>
+                <Input
+                  label={i18n.t("all_entries_page.end_date")}
+                  type="date"
+                  value={filters.endDate}
+                  onChange={onEndDateChange}
+                />
+              </Grid>
+            </div>
 
-          <Button onClick={onClearFilters} variant="secondary" size="sm">
-            {i18n.t("all_entries_page.clear_filters")}
-          </Button>
-        </Card>
+            <Button onClick={onClearFilters} variant="secondary" size="sm">
+              {i18n.t("all_entries_page.clear_filters")}
+            </Button>
+          </Card>
+        </div>
 
         <div>
           <div className="all-entries-page__results-header">

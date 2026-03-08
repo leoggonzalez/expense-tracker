@@ -43,13 +43,11 @@ export function EntryList({
 
   if (plainEntries.length === 0) {
     return (
-      <Card
-        padding={32}
-        variant="dashed"
-        className="entry-list entry-list--empty"
-      >
-        <Text color="secondary">{i18n.t("entry_list.empty_state")}</Text>
-      </Card>
+      <div className="entry-list entry-list--empty">
+        <Card padding={32} variant="dashed">
+          <Text color="secondary">{i18n.t("entry_list.empty_state")}</Text>
+        </Card>
+      </div>
     );
   }
 
@@ -62,67 +60,77 @@ export function EntryList({
 
   return (
     <div className="entry-list">
-      <Card padding={0} className="entry-list__list">
-        {plainEntries.map((entry) => {
-          const href =
-            entryHref?.(entry) ??
-            (entryHrefBase ? `${entryHrefBase}/${entry.id}` : null);
+      <div className="entry-list__list">
+        <Card padding={0}>
+          {plainEntries.map((entry) => {
+            const href =
+              entryHref?.(entry) ??
+              (entryHrefBase ? `${entryHrefBase}/${entry.id}` : null);
 
-          const rowMain = (
-            <div className="entry-list__row-main">
-              <div className="entry-list__account">
-                <Avatar name={entry.accountName} />
-              </div>
-              <div className="entry-list__details">
-                <Text size="sm" weight="semibold">
-                  {entry.description}
-                </Text>
-                <Text size="xs" color="secondary">
-                  {format(new Date(entry.beginDate), "MMM dd, yyyy")}
-                </Text>
-              </div>
-              <div className="entry-list__amount">
-                <Text
-                  size="sm"
-                  weight="bold"
-                  color={entry.type === "income" ? "success" : "danger"}
-                >
-                  {formatAmount(entry.type, entry.amount)}
-                </Text>
-              </div>
-            </div>
-          );
-
-          const content = (
-            <div className="entry-list__content">
-              {href ? (
-                <AppLink href={href} className="entry-list__link">
-                  {rowMain}
-                </AppLink>
-              ) : (
-                rowMain
-              )}
-            </div>
-          );
-
-          return (
-            <div key={entry.id} className="entry-list__row">
-              {content}
-              {showDelete && (
-                <div className="entry-list__actions">
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    onClick={() => handleDelete(entry.id)}
-                  >
-                    {i18n.t("entry_list.delete")}
-                  </Button>
+            const rowMain = (
+              <div className="entry-list__row-main">
+                <div className="entry-list__account">
+                  <Avatar name={entry.accountName} />
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </Card>
+                <div className="entry-list__details">
+                  <div className="entry-list__detail-line">
+                    <Text size="sm" weight="semibold">
+                      {entry.description}
+                    </Text>
+                  </div>
+                  <div className="entry-list__detail-line">
+                    <Text size="xs" color="secondary">
+                      {format(new Date(entry.beginDate), "MMM dd, yyyy")}
+                    </Text>
+                  </div>
+                </div>
+                <div className="entry-list__amount">
+                  <Text
+                    size="sm"
+                    weight="bold"
+                    color={entry.type === "income" ? "success" : "danger"}
+                  >
+                    {formatAmount(entry.type, entry.amount)}
+                  </Text>
+                </div>
+              </div>
+            );
+
+            const content = (
+              <div className="entry-list__content">
+                {href ? (
+                  <div className="entry-list__link">
+                    <AppLink href={href}>
+                      <span className="entry-list__link-content">
+                        {rowMain}
+                      </span>
+                    </AppLink>
+                  </div>
+                ) : (
+                  rowMain
+                )}
+              </div>
+            );
+
+            return (
+              <div key={entry.id} className="entry-list__row">
+                {content}
+                {showDelete && (
+                  <div className="entry-list__actions">
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleDelete(entry.id)}
+                    >
+                      {i18n.t("entry_list.delete")}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </Card>
+      </div>
     </div>
   );
 }

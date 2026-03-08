@@ -53,47 +53,51 @@ export function AccountsPage({
           {i18n.t("accounts_page.title")}
         </Text>
 
-        <Card
-          padding={16}
-          variant="secondary"
-          className="accounts-page__create-form"
-        >
-          <form onSubmit={handleSubmit}>
-            <Stack gap={12}>
-              <Text size="sm" weight="semibold">
-                {i18n.t("accounts_page.create_account")}
-              </Text>
-              <div className="accounts-page__create-row">
-                <Input
-                  label={i18n.t("accounts_page.account_name")}
-                  value={name}
-                  onChange={setName}
-                  placeholder={
-                    i18n.t("accounts_page.account_name_placeholder") as string
-                  }
-                  required
-                />
-                <Button type="submit" disabled={loading}>
-                  {loading
-                    ? i18n.t("accounts_page.creating")
-                    : i18n.t("accounts_page.create")}
-                </Button>
-              </div>
-              {error && <Text color="danger">{i18n.t(error)}</Text>}
-            </Stack>
-          </form>
-        </Card>
+        <div className="accounts-page__create-form">
+          <Card padding={16} variant="secondary">
+            <form onSubmit={handleSubmit}>
+              <Stack gap={12}>
+                <Text size="sm" weight="semibold">
+                  {i18n.t("accounts_page.create_account")}
+                </Text>
+                <div className="accounts-page__create-row">
+                  <Input
+                    label={i18n.t("accounts_page.account_name")}
+                    value={name}
+                    onChange={setName}
+                    placeholder={
+                      i18n.t("accounts_page.account_name_placeholder") as string
+                    }
+                    required
+                  />
+                  <Button type="submit" disabled={loading}>
+                    {loading
+                      ? i18n.t("accounts_page.creating")
+                      : i18n.t("accounts_page.create")}
+                  </Button>
+                </div>
+                {error && <Text color="danger">{i18n.t(error)}</Text>}
+              </Stack>
+            </form>
+          </Card>
+        </div>
 
         {accounts.length === 0 ? (
-          <Card padding={24} variant="dashed" className="accounts-page__empty">
-            <Text color="secondary">{i18n.t("accounts_page.empty_state")}</Text>
-          </Card>
+          <div className="accounts-page__empty">
+            <Card padding={24} variant="dashed">
+              <Text color="secondary">
+                {i18n.t("accounts_page.empty_state")}
+              </Text>
+            </Card>
+          </div>
         ) : (
-          <Grid className="accounts-page__grid" minColumnWidth={240} gap={16}>
-            {accounts.map((account) => (
-              <AccountCard key={account.id} {...account} />
-            ))}
-          </Grid>
+          <div className="accounts-page__grid">
+            <Grid minColumnWidth={240} gap={16}>
+              {accounts.map((account) => (
+                <AccountCard key={account.id} {...account} />
+              ))}
+            </Grid>
+          </div>
         )}
       </Stack>
     </Container>

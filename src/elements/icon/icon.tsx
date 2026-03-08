@@ -1,7 +1,7 @@
 import React from "react";
 
-import type { IconName } from "./icon_assets";
-import { iconAssets } from "./icon_assets";
+import type { IconName } from "@/elements/icon/icon_assets";
+import { iconAssets } from "@/elements/icon/icon_assets";
 import "./icon.scss";
 
 type IconSize = number | { width: number; height: number };
@@ -25,10 +25,7 @@ function getIconDimensions(size: IconSize): { width: string; height: string } {
   };
 }
 
-export function Icon({
-  name,
-  size = 20,
-}: IconProps): React.ReactElement {
+export function Icon({ name, size = 20 }: IconProps): React.ReactElement {
   const dimensions = getIconDimensions(size);
   const style = {
     "--icon-width": dimensions.width,
