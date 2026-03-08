@@ -379,10 +379,26 @@ async function findOrCreateAccount(userId: string, accountName: string) {
     where: {
       userId,
       name: accountName,
+      isArchived: false,
     },
   });
 
   if (!account) {
+    const archivedAccount = await prisma.account.findFirst({
+      where: {
+        userId,
+        name: accountName,
+        isArchived: true,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (archivedAccount) {
+      throw new Error("account_is_archived");
+    }
+
     account = await prisma.account.create({
       data: {
         userId,
@@ -463,6 +479,10 @@ export async function createEntry(
 
     return { success: true, entry };
   } catch (error) {
+    if (error instanceof Error && error.message === "account_is_archived") {
+      return { success: false, error: "account_is_archived" };
+    }
+
     console.error("Error creating entry:", error);
     return { success: false, error: "failed_to_create_entry" };
   }
@@ -876,6 +896,7 @@ export async function getAccounts(): Promise<AccountRecord[]> {
     return await prisma.account.findMany({
       where: {
         userId: currentUser.id,
+        isArchived: false,
       },
       orderBy: {
         name: "asc",

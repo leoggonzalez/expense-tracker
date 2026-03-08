@@ -60,8 +60,9 @@ export {
   useNavigationProgress,
 } from "./navigation_progress_provider/navigation_progress_provider";
 export { AppLink } from "./app_link/app_link";
-export { AccountsPage } from "./accounts_page/accounts_page";
-export { AccountDetailPage } from "./account_detail_page/account_detail_page";
+export { AccountCreateForm } from "./account_create_form/account_create_form";
+export { AccountEditForm } from "./account_edit_form/account_edit_form";
+export { AccountArchiveForm } from "./account_archive_form/account_archive_form";
 export { NewEntryPage } from "./new_entry_page/new_entry_page";
 export { NewEntryRecentEntries } from "./new_entry_recent_entries/new_entry_recent_entries";
 export { EntryDetailPage } from "./entry_detail_page/entry_detail_page";
