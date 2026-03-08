@@ -1,0 +1,94 @@
+@use "@/styles/variables.scss" as *;
+
+.projection-overview {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+  }
+
+  &__navigation {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+
+  &__nav-button {
+    width: 36px;
+    height: 36px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  &__chart-wrapper {
+    width: 100%;
+    height: 260px;
+  }
+
+  &__totals-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  &__total-item {
+    padding: var(--spacing-sm);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+
+    &--net {
+      background-color: var(--color-background-secondary);
+    }
+  }
+
+  &__all-entries-link {
+    text-decoration: underline;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  &__account-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding-bottom: var(--spacing-md);
+    border-bottom: var(--border-width) solid var(--color-border);
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  &__account-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+
+  &__account-link {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-decoration: underline;
+    width: fit-content;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .projection-overview {
+    &__totals-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    &__chart-wrapper {
+      height: 320px;
+    }
+  }
+}

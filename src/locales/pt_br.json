@@ -123,6 +123,19 @@
     "total_expenses": "Despesa total",
     "total": "Total"
   },
+  "projection_page": {
+    "previous_month": "Mês anterior",
+    "next_month": "Próximo mês",
+    "chart_title": "Receitas vs despesas (próximos 6 meses)",
+    "month_totals": "Totais do mês",
+    "income": "Receitas",
+    "expenses": "Despesas",
+    "total": "Total",
+    "accounts_with_entries": "Contas com lançamentos neste mês",
+    "empty_month_entries": "Não há lançamentos para este mês.",
+    "open_account": "Abrir conta",
+    "see_all_entries": "Ver todos os lançamentos"
+  },
   "pagination": {
     "previous": "Anterior",
     "next": "Próxima"

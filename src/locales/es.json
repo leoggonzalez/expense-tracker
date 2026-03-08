@@ -123,6 +123,19 @@
     "total_expenses": "Gastos totales",
     "total": "Total"
   },
+  "projection_page": {
+    "previous_month": "Mes anterior",
+    "next_month": "Mes siguiente",
+    "chart_title": "Ingresos vs gastos (próximos 6 meses)",
+    "month_totals": "Totales del mes",
+    "income": "Ingresos",
+    "expenses": "Gastos",
+    "total": "Total",
+    "accounts_with_entries": "Cuentas con movimientos este mes",
+    "empty_month_entries": "No hay movimientos para este mes.",
+    "open_account": "Abrir cuenta",
+    "see_all_entries": "Ver todos los movimientos"
+  },
   "pagination": {
     "previous": "Anterior",
     "next": "Siguiente"
