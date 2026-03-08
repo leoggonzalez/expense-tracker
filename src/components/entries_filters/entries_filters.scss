@@ -36,6 +36,15 @@
       color: var(--color-danger-dark);
     }
 
+    &--transfer {
+      border-color: color-mix(
+        in srgb,
+        var(--color-primary) 45%,
+        var(--color-background)
+      );
+      color: var(--color-primary);
+    }
+
     &--active {
       background-color: var(--color-background);
       border-color: var(--color-primary);
@@ -60,6 +69,16 @@
       );
       border-color: var(--color-danger);
       color: var(--color-danger-dark);
+    }
+
+    &--transfer.entries-filters__type-option--active {
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 14%,
+        var(--color-background)
+      );
+      border-color: var(--color-primary);
+      color: var(--color-primary);
     }
   }
 

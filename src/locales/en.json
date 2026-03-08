@@ -64,7 +64,17 @@
     "updating_income": "Updating Income...",
     "updating_expense": "Updating Expense...",
     "edit_full_begin_date": "Edit full begin date",
-    "edit_full_end_date": "Edit full end date"
+    "edit_full_end_date": "Edit full end date",
+    "transfer_from": "From account",
+    "transfer_to": "To account",
+    "transfer_account_placeholder": "Select an account",
+    "transfer_same_account": "From and to accounts must be different.",
+    "transfer_invalid_amount": "Amount must be greater than zero.",
+    "transfer_one_time_info": "Transfers are one-time entries and settle in the selected month.",
+    "transfer_insufficient_funds_title": "Insufficient funds",
+    "transfer_insufficient_funds_message": "%{account} has %{balance} € for this month, below %{amount} €.",
+    "add_transfer": "Add transfer",
+    "adding_transfer": "Adding transfer..."
   },
   "bulk_entry_form": {
     "title": "Add Multiple Entries",
@@ -106,6 +116,8 @@
   },
   "entry_list": {
     "empty_state": "No entries yet. Add your first entry!",
+    "to_account": "To %{account}",
+    "from_account": "From %{account}",
     "delete": "Delete",
     "delete_confirm": "Are you sure you want to delete this entry?"
   },
@@ -211,6 +223,9 @@
     "back_to_accounts": "Back to accounts",
     "back_to_account": "Back to account",
     "edit_account": "Edit account",
+    "settle": "Settle",
+    "settle_unavailable": "No amount to settle for this account.",
+    "settle_description": "Settle %{account} for %{month}",
     "archive": "Archive",
     "archive_account": "Archive account",
     "archiving": "Archiving...",
@@ -254,9 +269,11 @@
   "new_entry_page": {
     "title_income": "Add new income",
     "title_expense": "Add new expense",
+    "title_transfer": "Add new transfer",
     "title_multiple": "Add multiple entries",
     "income_tab": "Income",
     "expense_tab": "Expense",
+    "transfer_tab": "Transfer",
     "multiple_tab": "Multiple",
     "recent_entries": "Recent entries",
     "open_all_entries": "See all entries"
@@ -274,6 +291,7 @@
   "common": {
     "income": "Income",
     "expense": "Expense",
+    "transfer": "Transfer",
     "add_entry": "Add entry"
   },
   "toast": {
@@ -284,6 +302,8 @@
     "entry_create_failed": "Unable to create the entry.",
     "income_create_failed": "Unable to create the income entry.",
     "expense_create_failed": "Unable to create the expense entry.",
+    "transfer_created": "Transfer created.",
+    "transfer_create_failed": "Unable to create the transfer.",
     "entries_create_failed": "Unable to create the entries.",
     "dismiss": "Dismiss notification"
   },

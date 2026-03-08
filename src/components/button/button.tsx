@@ -5,7 +5,7 @@ export interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
-  variant?: "primary" | "secondary" | "danger" | "success";
+  variant?: "primary" | "secondary" | "danger" | "success" | "transfer";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   fullWidth?: boolean;

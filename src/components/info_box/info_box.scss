@@ -1,0 +1,52 @@
+@use "@/styles/variables.scss" as *;
+
+.info-box {
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-background-secondary);
+
+  &__icon {
+    line-height: 0;
+  }
+
+  &--warning {
+    border-color: color-mix(in srgb, var(--color-warning) 45%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--color-warning) 12%,
+      var(--color-background)
+    );
+    color: var(--color-warning-dark);
+  }
+
+  &--error {
+    border-color: color-mix(in srgb, var(--color-danger) 45%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--color-danger) 12%,
+      var(--color-background)
+    );
+    color: var(--color-danger-dark);
+  }
+
+  &--info {
+    border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 10%,
+      var(--color-background)
+    );
+    color: var(--color-primary-dark);
+  }
+
+  &--success {
+    border-color: color-mix(in srgb, var(--color-success) 45%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--color-success) 10%,
+      var(--color-background)
+    );
+    color: var(--color-success-dark);
+  }
+}

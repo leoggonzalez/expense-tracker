@@ -31,6 +31,8 @@ type AccountDetailEntry = {
   id: string;
   type: string;
   accountName: string;
+  transferAccountId: string | null;
+  transferAccountName: string | null;
   description: string;
   amount: number;
   beginDate: string;
@@ -231,6 +233,12 @@ export async function getAccountDetailPageData(input: {
         select: {
           id: true,
           type: true,
+          transferAccountId: true,
+          transferAccount: {
+            select: {
+              name: true,
+            },
+          },
           description: true,
           amount: true,
           beginDate: true,
@@ -262,6 +270,12 @@ export async function getAccountDetailPageData(input: {
         select: {
           id: true,
           type: true,
+          transferAccountId: true,
+          transferAccount: {
+            select: {
+              name: true,
+            },
+          },
           description: true,
           amount: true,
           beginDate: true,
@@ -269,13 +283,34 @@ export async function getAccountDetailPageData(input: {
           createdAt: true,
           updatedAt: true,
         },
-        orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
+        orderBy: [{ beginDate: "asc" }, { createdAt: "asc" }],
       }),
     ]);
+
+    const sortedCurrentMonthRelevantRaw = [...currentMonthRelevantRaw].sort(
+      (left, right) => {
+        const leftIsRecurringBucket = left.beginDate < monthStart;
+        const rightIsRecurringBucket = right.beginDate < monthStart;
+
+        if (leftIsRecurringBucket !== rightIsRecurringBucket) {
+          return leftIsRecurringBucket ? -1 : 1;
+        }
+
+        if (left.beginDate.getTime() !== right.beginDate.getTime()) {
+          return left.beginDate.getTime() - right.beginDate.getTime();
+        }
+
+        return left.createdAt.getTime() - right.createdAt.getTime();
+      },
+    );
 
     const serializeEntry = (entry: {
       id: string;
       type: string;
+      transferAccountId: string | null;
+      transferAccount: {
+        name: string;
+      } | null;
       description: string;
       amount: number;
       beginDate: Date;
@@ -286,6 +321,8 @@ export async function getAccountDetailPageData(input: {
         id: entry.id,
         type: entry.type,
         accountName: account.name,
+        transferAccountId: entry.transferAccountId,
+        transferAccountName: entry.transferAccount?.name || null,
         description: entry.description,
         amount: normalizeEntryAmount(entry.type, entry.amount),
         beginDate: entry.beginDate.toISOString(),
@@ -301,7 +338,7 @@ export async function getAccountDetailPageData(input: {
         isArchived: account.isArchived,
         currentMonthTotal,
       },
-      currentMonthRelevantEntries: currentMonthRelevantRaw.map(serializeEntry),
+      currentMonthRelevantEntries: sortedCurrentMonthRelevantRaw.map(serializeEntry),
       allEntries: allEntriesRaw.map(serializeEntry),
       pagination: {
         page,

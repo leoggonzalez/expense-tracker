@@ -1,6 +1,7 @@
 import {
   AppLink,
   Container,
+  Currency,
   EntryList,
   ProjectionChart,
 } from "@/components";
@@ -50,11 +51,6 @@ export default async function ProjectionPage({
   const focusedMonthStartQuery = format(focusedMonthStart, "yyyy-MM-dd");
   const focusedMonthEndQuery = format(focusedMonthEnd, "yyyy-MM-dd");
 
-  const formatCurrency = (amount: number): string => {
-    const sign = amount < 0 ? "-" : "";
-    return `${sign}${Math.abs(amount).toFixed(2)} €`;
-  };
-
   return (
     <Container>
       <Stack gap={24}>
@@ -100,31 +96,31 @@ export default async function ProjectionPage({
               <Text size="sm" color="secondary">
                 {i18n.t("projection_page.income")}
               </Text>
-              <Text size="2xl" weight="bold" color="success">
-                {formatCurrency(payload.focusedMonthTotals.income)}
-              </Text>
+              <Currency
+                value={payload.focusedMonthTotals.income}
+                size="2xl"
+                weight="bold"
+              />
             </Card>
             <Card padding={8}>
               <Text size="sm" color="secondary">
                 {i18n.t("projection_page.expenses")}
               </Text>
-              <Text size="2xl" weight="bold" color="danger">
-                {formatCurrency(payload.focusedMonthTotals.expense)}
-              </Text>
+              <Currency
+                value={payload.focusedMonthTotals.expense}
+                size="2xl"
+                weight="bold"
+              />
             </Card>
             <Card padding={8}>
               <Text size="sm" color="secondary">
                 {i18n.t("projection_page.total")}
               </Text>
-              <Text
+              <Currency
+                value={payload.focusedMonthTotals.net}
                 size="2xl"
                 weight="bold"
-                color={
-                  payload.focusedMonthTotals.net >= 0 ? "success" : "danger"
-                }
-              >
-                {formatCurrency(payload.focusedMonthTotals.net)}
-              </Text>
+              />
             </Card>
           </Grid>
         </Stack>
@@ -178,7 +174,7 @@ export default async function ProjectionPage({
                         {
                           id: `total-${account.accountId}`,
                           label: i18n.t("projection_page.account_month_total"),
-                          value: formatCurrency(account.monthTotal),
+                          value: <Currency value={account.monthTotal} size="sm" weight="bold" />,
                           tone: "emphasis",
                         },
                       ]}

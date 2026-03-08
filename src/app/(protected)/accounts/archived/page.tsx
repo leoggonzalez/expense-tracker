@@ -1,14 +1,9 @@
 import { getArchivedAccountsCurrentMonthSummary, unarchiveAccount } from "@/actions/accounts";
-import { AppLink, Avatar, Button, Container } from "@/components";
+import { AppLink, Avatar, Button, Container, Currency } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
-
-function formatCurrency(amount: number): string {
-  const sign = amount < 0 ? "-" : "";
-  return `${sign}${Math.abs(amount).toFixed(2)} €`;
-}
 
 export default async function Page(): Promise<React.ReactElement> {
   const accounts = await getArchivedAccountsCurrentMonthSummary();
@@ -51,13 +46,11 @@ export default async function Page(): Promise<React.ReactElement> {
                       <Text size="md" weight="semibold">
                         {account.name}
                       </Text>
-                      <Text
+                      <Currency
+                        value={account.currentMonthTotal}
                         size="sm"
                         weight="bold"
-                        color={account.currentMonthTotal >= 0 ? "success" : "danger"}
-                      >
-                        {formatCurrency(account.currentMonthTotal)}
-                      </Text>
+                      />
                     </Stack>
                   </Stack>
 

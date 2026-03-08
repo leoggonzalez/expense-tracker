@@ -31,7 +31,11 @@ export default async function Page({
   const page = Math.max(1, Number(params.page || "1") || 1);
   const account = params.account || "";
   const type =
-    params.type === "income" || params.type === "expense" ? params.type : "";
+    params.type === "income" ||
+    params.type === "expense" ||
+    params.type === "transfer"
+      ? params.type
+      : "";
   const startDate = params.start_date || "";
   const endDate = params.end_date || "";
 
@@ -60,9 +64,14 @@ export default async function Page({
           <Text size="h2" as="h2" weight="bold">
             {i18n.t("entries_page.title")}
           </Text>
-          <AppLink href="/entries/new/expense">
-            {i18n.t("entries_page.add_entry")}
-          </AppLink>
+          <Stack direction="row" align="center" gap={12}>
+            <AppLink href="/entries/new/expense">
+              {i18n.t("entries_page.add_entry")}
+            </AppLink>
+            <AppLink href="/entries/new/multiple">
+              {i18n.t("entries_page.add_multiple_entries")}
+            </AppLink>
+          </Stack>
         </Stack>
 
         <EntriesFilters

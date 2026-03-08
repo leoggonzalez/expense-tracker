@@ -2,7 +2,7 @@
 
 import "./entries_table.scss";
 
-import { Avatar, useNavigationProgress } from "@/components";
+import { Avatar, Currency, useNavigationProgress } from "@/components";
 import { format } from "date-fns";
 import React from "react";
 
@@ -38,13 +38,6 @@ export function EntriesTable({
     );
   }
 
-  const formatAmount = (type: string, amount: number): string => {
-    const normalizedAmount =
-      type === "expense" && amount > 0 ? -amount : amount;
-    const sign = normalizedAmount < 0 ? "-" : "";
-    return `${sign}${Math.abs(normalizedAmount).toFixed(2)} €`;
-  };
-
   const formatEntryDate = (beginDate: string): string => {
     const formattedBeginDate = format(new Date(beginDate), "MMM dd, yyyy");
     return formattedBeginDate;
@@ -79,13 +72,7 @@ export function EntriesTable({
               </Text>
             </div>
             <div className="entries-table__amount">
-              <Text
-                size="sm"
-                weight="bold"
-                color={entry.type === "income" ? "success" : "danger"}
-              >
-                {formatAmount(entry.type, entry.amount)}
-              </Text>
+              <Currency value={entry.amount} size="sm" weight="bold" />
             </div>
           </div>
         ))}

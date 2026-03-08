@@ -64,7 +64,17 @@
     "updating_income": "Actualizando ingreso...",
     "updating_expense": "Actualizando gasto...",
     "edit_full_begin_date": "Editar fecha de inicio completa",
-    "edit_full_end_date": "Editar fecha de fin completa"
+    "edit_full_end_date": "Editar fecha de fin completa",
+    "transfer_from": "Cuenta origen",
+    "transfer_to": "Cuenta destino",
+    "transfer_account_placeholder": "Selecciona una cuenta",
+    "transfer_same_account": "La cuenta de origen y destino deben ser distintas.",
+    "transfer_invalid_amount": "El importe debe ser mayor que cero.",
+    "transfer_one_time_info": "Las transferencias son movimientos de una sola vez y se aplican en el mes seleccionado.",
+    "transfer_insufficient_funds_title": "Fondos insuficientes",
+    "transfer_insufficient_funds_message": "%{account} tiene %{balance} € para este mes, por debajo de %{amount} €.",
+    "add_transfer": "Añadir transferencia",
+    "adding_transfer": "Añadiendo transferencia..."
   },
   "bulk_entry_form": {
     "title": "Añadir varios movimientos",
@@ -106,6 +116,8 @@
   },
   "entry_list": {
     "empty_state": "Todavía no hay movimientos. Añade el primero.",
+    "to_account": "A %{account}",
+    "from_account": "De %{account}",
     "delete": "Eliminar",
     "delete_confirm": "¿Seguro que quieres eliminar este movimiento?"
   },
@@ -211,6 +223,9 @@
     "back_to_accounts": "Volver a cuentas",
     "back_to_account": "Volver a la cuenta",
     "edit_account": "Editar cuenta",
+    "settle": "Liquidar",
+    "settle_unavailable": "No hay importe pendiente para liquidar en esta cuenta.",
+    "settle_description": "Liquidar %{account} para %{month}",
     "archive": "Archivar",
     "archive_account": "Archivar cuenta",
     "archiving": "Archivando...",
@@ -254,9 +269,11 @@
   "new_entry_page": {
     "title_income": "Añadir nuevo ingreso",
     "title_expense": "Añadir nuevo gasto",
+    "title_transfer": "Añadir nueva transferencia",
     "title_multiple": "Añadir varios movimientos",
     "income_tab": "Ingreso",
     "expense_tab": "Gasto",
+    "transfer_tab": "Transferencia",
     "multiple_tab": "Varios",
     "recent_entries": "Movimientos recientes",
     "open_all_entries": "Ver todos los movimientos"
@@ -274,6 +291,7 @@
   "common": {
     "income": "Ingreso",
     "expense": "Gasto",
+    "transfer": "Transferencia",
     "add_entry": "Añadir movimiento"
   },
   "toast": {
@@ -284,6 +302,8 @@
     "entry_create_failed": "No se pudo crear el movimiento.",
     "income_create_failed": "No se pudo crear el movimiento de ingreso.",
     "expense_create_failed": "No se pudo crear el movimiento de gasto.",
+    "transfer_created": "Transferencia creada.",
+    "transfer_create_failed": "No se pudo crear la transferencia.",
     "entries_create_failed": "No se pudieron crear los movimientos.",
     "dismiss": "Cerrar notificación"
   },

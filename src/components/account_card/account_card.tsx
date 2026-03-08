@@ -2,7 +2,7 @@ import "./account_card.scss";
 
 import React from "react";
 
-import { AppLink } from "@/components";
+import { AppLink, Currency } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
@@ -12,12 +12,6 @@ type AccountCardProps = {
   entryCount: number;
   allTimeNet: number;
 };
-
-function formatCurrency(amount: number): string {
-  const absAmount = Math.abs(amount);
-  const sign = amount < 0 ? "-" : "";
-  return `${sign}${absAmount.toFixed(2)} €`;
-}
 
 export function AccountCard({
   id,
@@ -39,13 +33,7 @@ export function AccountCard({
                   <Text size="xs" color="secondary">
                     {i18n.t("accounts_page.total_balance")}
                   </Text>
-                  <Text
-                    size="lg"
-                    weight="bold"
-                    color={allTimeNet >= 0 ? "success" : "danger"}
-                  >
-                    {formatCurrency(allTimeNet)}
-                  </Text>
+                  <Currency value={allTimeNet} size="lg" weight="bold" />
                 </Stack>
               </div>
               <Text size="sm" color="secondary">

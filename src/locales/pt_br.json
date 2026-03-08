@@ -64,7 +64,17 @@
     "updating_income": "Atualizando receita...",
     "updating_expense": "Atualizando despesa...",
     "edit_full_begin_date": "Editar data inicial completa",
-    "edit_full_end_date": "Editar data final completa"
+    "edit_full_end_date": "Editar data final completa",
+    "transfer_from": "Conta de origem",
+    "transfer_to": "Conta de destino",
+    "transfer_account_placeholder": "Selecione uma conta",
+    "transfer_same_account": "As contas de origem e destino devem ser diferentes.",
+    "transfer_invalid_amount": "O valor deve ser maior que zero.",
+    "transfer_one_time_info": "Transferências são lançamentos únicos e são aplicadas no mês selecionado.",
+    "transfer_insufficient_funds_title": "Saldo insuficiente",
+    "transfer_insufficient_funds_message": "%{account} tem %{balance} € neste mês, abaixo de %{amount} €.",
+    "add_transfer": "Adicionar transferência",
+    "adding_transfer": "Adicionando transferência..."
   },
   "bulk_entry_form": {
     "title": "Adicionar vários lançamentos",
@@ -106,6 +116,8 @@
   },
   "entry_list": {
     "empty_state": "Ainda não há lançamentos. Adicione o primeiro.",
+    "to_account": "Para %{account}",
+    "from_account": "De %{account}",
     "delete": "Excluir",
     "delete_confirm": "Tem certeza de que deseja excluir este lançamento?"
   },
@@ -211,6 +223,9 @@
     "back_to_accounts": "Voltar para contas",
     "back_to_account": "Voltar para a conta",
     "edit_account": "Editar conta",
+    "settle": "Liquidar",
+    "settle_unavailable": "Não há valor pendente para liquidar nesta conta.",
+    "settle_description": "Liquidar %{account} em %{month}",
     "archive": "Arquivar",
     "archive_account": "Arquivar conta",
     "archiving": "Arquivando...",
@@ -254,9 +269,11 @@
   "new_entry_page": {
     "title_income": "Adicionar nova receita",
     "title_expense": "Adicionar nova despesa",
+    "title_transfer": "Adicionar nova transferência",
     "title_multiple": "Adicionar vários lançamentos",
     "income_tab": "Receita",
     "expense_tab": "Despesa",
+    "transfer_tab": "Transferência",
     "multiple_tab": "Vários",
     "recent_entries": "Lançamentos recentes",
     "open_all_entries": "Ver todos os lançamentos"
@@ -274,6 +291,7 @@
   "common": {
     "income": "Receita",
     "expense": "Despesa",
+    "transfer": "Transferência",
     "add_entry": "Adicionar lançamento"
   },
   "toast": {
@@ -284,6 +302,8 @@
     "entry_create_failed": "Não foi possível criar o lançamento.",
     "income_create_failed": "Não foi possível criar o lançamento de receita.",
     "expense_create_failed": "Não foi possível criar o lançamento de despesa.",
+    "transfer_created": "Transferência criada.",
+    "transfer_create_failed": "Não foi possível criar a transferência.",
     "entries_create_failed": "Não foi possível criar os lançamentos.",
     "dismiss": "Fechar notificação"
   },

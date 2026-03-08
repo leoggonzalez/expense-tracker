@@ -28,6 +28,8 @@ export { MonthSelector } from "./month_selector/month_selector";
 
 export { BulkEntryForm } from "./bulk_entry_form/bulk_entry_form";
 export type { BulkEntryFormProps } from "./bulk_entry_form/bulk_entry_form";
+export { TransferForm } from "./transfer_form/transfer_form";
+export { InfoBox } from "./info_box/info_box";
 
 export { Pagination } from "./pagination/pagination";
 export type { PaginationProps } from "./pagination/pagination";
@@ -38,6 +40,9 @@ export type {
   EntryListProps,
   EntryListSummaryRow,
 } from "./entry_list/entry_list";
+export { EntryCard } from "./entry_card/entry_card";
+export type { EntryCardItem } from "./entry_card/entry_card";
+export { Currency } from "./currency/currency";
 export { EntriesTable } from "./entries_table/entries_table";
 export type { EntriesTableItem } from "./entries_table/entries_table";
 export { EntriesFilters } from "./entries_filters/entries_filters";

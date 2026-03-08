@@ -23,6 +23,14 @@ export interface CreateEntryInput {
   endDate?: Date | null;
 }
 
+export interface CreateTransferInput {
+  fromAccountId: string;
+  toAccountId: string;
+  description: string;
+  amount: number;
+  beginDate: Date;
+}
+
 type AccountRecord = {
   id: string;
   userId: string;
@@ -35,6 +43,7 @@ type EntryWithAccountRecord = {
   id: string;
   type: string;
   accountId: string;
+  transferAccountId: string | null;
   description: string;
   amount: number;
   beginDate: Date;
@@ -42,6 +51,10 @@ type EntryWithAccountRecord = {
   createdAt: Date;
   updatedAt: Date;
   account: AccountRecord;
+  transferAccount?: {
+    id: string;
+    name: string;
+  } | null;
 };
 
 export type SerializedProjectionEntry = {
@@ -72,6 +85,8 @@ export type DashboardPayload = {
     amount: number;
     beginDate: string;
     endDate: string | null;
+    transferAccountId: string | null;
+    transferAccountName: string | null;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -89,6 +104,8 @@ export type ProjectionMonthEntry = {
   amount: number;
   beginDate: string;
   endDate: string | null;
+  transferAccountId: string | null;
+  transferAccountName: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -127,6 +144,9 @@ type EntryFiltersWhere = {
   };
   accountId?: string;
   type?: "income" | "expense";
+  transferAccountId?: {
+    not?: null;
+  } | null;
   description?: {
     contains: string;
     mode: "insensitive";
@@ -150,6 +170,8 @@ type EntryListWithPagination = {
 export type FilteredEntryListItem = {
   id: string;
   type: "income" | "expense";
+  transferAccountId: string | null;
+  transferAccountName: string | null;
   accountName: string;
   description: string;
   amount: number;
@@ -170,6 +192,16 @@ type EntryMutationResult =
     };
 
 type MultipleEntryMutationResult =
+  | {
+      success: true;
+      entries: EntryWithAccountRecord[];
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+type TransferMutationResult =
   | {
       success: true;
       entries: EntryWithAccountRecord[];
@@ -211,6 +243,8 @@ type ProjectionFocusedAccountEntryRow = {
   accountName: string;
   id: string;
   type: string;
+  transferAccountId: string | null;
+  transferAccountName: string | null;
   description: string;
   amount: number;
   beginDate: Date;
@@ -238,6 +272,8 @@ function serializeProjectionMonthEntryRow(
     amount: normalizeEntryAmount(entry.type, entry.amount),
     beginDate: entry.beginDate.toISOString(),
     endDate: entry.endDate?.toISOString() || null,
+    transferAccountId: entry.transferAccountId,
+    transferAccountName: entry.transferAccountName,
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   };
@@ -345,6 +381,7 @@ async function getMonthTotalsForUser(
         FROM "Entry" e
         INNER JOIN "Account" a ON a.id = e."accountId"
         WHERE a."userId" = ${userId}
+          AND e."transferAccountId" IS NULL
           AND e."beginDate" <= ${monthEnd}
           AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
       ) AS totals
@@ -427,14 +464,18 @@ function serializeProjectionEntry(
 }
 
 function serializeDashboardRecentEntry(entry: EntryWithAccountRecord) {
+  const normalizedAmount = normalizeEntryAmount(entry.type, entry.amount);
+
   return {
     id: entry.id,
     type: entry.type,
     accountName: entry.account.name,
     description: entry.description,
-    amount: entry.amount,
+    amount: normalizedAmount,
     beginDate: entry.beginDate.toISOString(),
     endDate: entry.endDate?.toISOString() || null,
+    transferAccountId: entry.transferAccountId,
+    transferAccountName: entry.transferAccount?.name || null,
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   };
@@ -464,6 +505,7 @@ export async function createEntry(
       data: {
         type: input.type,
         accountId: account.id,
+        transferAccountId: null,
         description: input.description,
         amount: input.amount,
         beginDate: input.beginDate,
@@ -485,6 +527,86 @@ export async function createEntry(
 
     console.error("Error creating entry:", error);
     return { success: false, error: "failed_to_create_entry" };
+  }
+}
+
+export async function createTransferEntry(
+  input: CreateTransferInput,
+): Promise<TransferMutationResult> {
+  const currentUser = await requireCurrentUser();
+
+  if (input.fromAccountId === input.toAccountId) {
+    return { success: false, error: "transfer_same_account" };
+  }
+
+  const absoluteAmount = Math.abs(input.amount);
+
+  if (!Number.isFinite(absoluteAmount) || absoluteAmount <= 0) {
+    return { success: false, error: "invalid_transfer_amount" };
+  }
+
+  try {
+    const [fromAccount, toAccount] = await Promise.all([
+      prisma.account.findFirst({
+        where: {
+          id: input.fromAccountId,
+          userId: currentUser.id,
+          isArchived: false,
+        },
+      }),
+      prisma.account.findFirst({
+        where: {
+          id: input.toAccountId,
+          userId: currentUser.id,
+          isArchived: false,
+        },
+      }),
+    ]);
+
+    if (!fromAccount || !toAccount) {
+      return { success: false, error: "invalid_transfer_accounts" };
+    }
+
+    const endDate = new Date(input.beginDate);
+
+    const [fromEntry, toEntry] = await prisma.$transaction([
+      prisma.entry.create({
+        data: {
+          type: "expense",
+          accountId: fromAccount.id,
+          transferAccountId: toAccount.id,
+          description: input.description,
+          amount: -absoluteAmount,
+          beginDate: input.beginDate,
+          endDate,
+        },
+        include: {
+          account: true,
+        },
+      }),
+      prisma.entry.create({
+        data: {
+          type: "income",
+          accountId: toAccount.id,
+          transferAccountId: fromAccount.id,
+          description: input.description,
+          amount: absoluteAmount,
+          beginDate: input.beginDate,
+          endDate,
+        },
+        include: {
+          account: true,
+        },
+      }),
+    ]);
+
+    await syncCurrentMonthEntryCounterForAccounts([fromAccount.id, toAccount.id]);
+    revalidateEntryPages();
+
+    return { success: true, entries: [fromEntry, toEntry] };
+  } catch (error) {
+    console.error("Error creating transfer entry:", error);
+    return { success: false, error: "failed_to_create_transfer" };
   }
 }
 
@@ -544,6 +666,12 @@ export async function getRecentEntries(
       },
       include: {
         account: true,
+        transferAccount: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -617,6 +745,7 @@ export async function getProjectionPagePayload(
       LEFT JOIN "Entry" e
         ON e."beginDate" <= (months.month_start + interval '1 month - 1 millisecond')
        AND (e."endDate" IS NULL OR e."endDate" >= months.month_start)
+       AND e."transferAccountId" IS NULL
       LEFT JOIN "Account" a
         ON a.id = e."accountId"
        AND a."userId" = ${currentUser.id}
@@ -660,6 +789,8 @@ export async function getProjectionPagePayload(
         ranked."accountName",
         ranked.id,
         ranked.type,
+        ranked."transferAccountId",
+        ranked."transferAccountName",
         ranked.description,
         ranked.amount,
         ranked."beginDate",
@@ -672,6 +803,8 @@ export async function getProjectionPagePayload(
           a.name AS "accountName",
           e.id,
           e.type,
+          e."transferAccountId",
+          transfer_account.name AS "transferAccountName",
           e.description,
           e.amount,
           e."beginDate",
@@ -684,6 +817,8 @@ export async function getProjectionPagePayload(
           ) AS row_number
         FROM "Account" a
         INNER JOIN "Entry" e ON e."accountId" = a.id
+        LEFT JOIN "Account" transfer_account
+          ON transfer_account.id = e."transferAccountId"
         WHERE a."userId" = ${currentUser.id}
           AND e."beginDate" <= ${focusedMonthEnd}
           AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
@@ -776,7 +911,7 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
 
 export async function getEntriesWithFilters(filters: {
   accountId?: string;
-  type?: "income" | "expense";
+  type?: "income" | "expense" | "transfer";
   date?: Date;
   description?: string;
   startDate?: Date;
@@ -801,8 +936,11 @@ export async function getEntriesWithFilters(filters: {
       where.accountId = filters.accountId;
     }
 
-    if (filters.type) {
+    if (filters.type === "transfer") {
+      where.transferAccountId = { not: null };
+    } else if (filters.type) {
       where.type = filters.type;
+      where.transferAccountId = null;
     }
 
     if (filters.description) {
@@ -840,6 +978,7 @@ export async function getEntriesWithFilters(filters: {
         select: {
           id: true,
           type: true,
+          transferAccountId: true,
           description: true,
           amount: true,
           beginDate: true,
@@ -847,6 +986,11 @@ export async function getEntriesWithFilters(filters: {
           createdAt: true,
           updatedAt: true,
           account: {
+            select: {
+              name: true,
+            },
+          },
+          transferAccount: {
             select: {
               name: true,
             },
@@ -865,9 +1009,11 @@ export async function getEntriesWithFilters(filters: {
       entries: entries.map((entry) => ({
         id: entry.id,
         type: entry.type as "income" | "expense",
+        transferAccountId: entry.transferAccountId,
+        transferAccountName: entry.transferAccount?.name || null,
         accountName: entry.account.name,
         description: entry.description,
-        amount: entry.amount,
+        amount: normalizeEntryAmount(entry.type, entry.amount),
         beginDate: entry.beginDate.toISOString(),
         endDate: entry.endDate?.toISOString() || null,
         createdAt: entry.createdAt.toISOString(),

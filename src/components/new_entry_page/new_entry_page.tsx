@@ -1,26 +1,30 @@
 import "./new_entry_page.scss";
 
-import React from "react";
-
 import { AppLink, Container } from "@/components";
 import { Card, Grid, Stack, Text } from "@/elements";
+
+import React from "react";
 import { i18n } from "@/model/i18n";
 
 type NewEntryPageProps = {
-  activeTab: "income" | "expense" | "multiple";
+  pageType: "income" | "expense" | "transfer" | "multiple";
   children: React.ReactNode;
+  showTabs?: boolean;
 };
 
 export function NewEntryPage({
-  activeTab,
+  pageType,
   children,
+  showTabs = true,
 }: NewEntryPageProps): React.ReactElement {
   const titleKey =
-    activeTab === "income"
+    pageType === "income"
       ? "new_entry_page.title_income"
-      : activeTab === "expense"
+      : pageType === "expense"
         ? "new_entry_page.title_expense"
-        : "new_entry_page.title_multiple";
+        : pageType === "transfer"
+          ? "new_entry_page.title_transfer"
+          : "new_entry_page.title_multiple";
 
   const tabs = [
     {
@@ -34,9 +38,9 @@ export function NewEntryPage({
       label: i18n.t("new_entry_page.expense_tab"),
     },
     {
-      key: "multiple",
-      href: "/entries/new/multiple",
-      label: i18n.t("new_entry_page.multiple_tab"),
+      key: "transfer",
+      href: "/entries/new/transfer",
+      label: i18n.t("new_entry_page.transfer_tab"),
     },
   ] as const;
 
@@ -47,26 +51,28 @@ export function NewEntryPage({
           <Text size="h2" as="h1" weight="bold">
             {i18n.t(titleKey)}
           </Text>
-          <Grid columns="repeat(3, minmax(0, 1fr))" gap={8}>
-            {tabs.map((tab) => (
-              <div
-                key={tab.key}
-                className={[
-                  "new-entry-page__tab",
-                  `new-entry-page__tab--${tab.key}`,
-                  activeTab === tab.key && "new-entry-page__tab--active",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
-                <AppLink href={tab.href}>
-                  <span className="new-entry-page__tab-content">
-                    {tab.label}
-                  </span>
-                </AppLink>
-              </div>
-            ))}
-          </Grid>
+          {showTabs ? (
+            <Grid columns="repeat(3, minmax(0, 1fr))" gap={8}>
+              {tabs.map((tab) => (
+                <div
+                  key={tab.key}
+                  className={[
+                    "new-entry-page__tab",
+                    `new-entry-page__tab--${tab.key}`,
+                    pageType === tab.key && "new-entry-page__tab--active",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  <AppLink href={tab.href}>
+                    <span className="new-entry-page__tab-content">
+                      {tab.label}
+                    </span>
+                  </AppLink>
+                </div>
+              ))}
+            </Grid>
+          ) : null}
           <div className="new-entry-page__panel">
             <Card padding={24}>{children}</Card>
           </div>

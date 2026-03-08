@@ -2,7 +2,7 @@
 
 import "./projection_table.scss";
 
-import { Input, useNavigationProgress } from "@/components";
+import { Currency, Input, useNavigationProgress } from "@/components";
 import { Entry, EntryCollection } from "@/model";
 import { i18n } from "@/model/i18n";
 import React, { useState } from "react";
@@ -76,12 +76,6 @@ export function ProjectionTable({
     startMonth,
     monthCount,
   );
-
-  const formatCurrency = (amount: number): string => {
-    const absAmount = Math.abs(amount);
-    const sign = amount < 0 ? "-" : "";
-    return `${sign}${absAmount.toFixed(2)} €`;
-  };
 
   return (
     <div className="projection-table">
@@ -167,12 +161,7 @@ export function ProjectionTable({
                                 className="projection-table__cell projection-table__cell--amount"
                               >
                                 {amount !== 0 && (
-                                  <Text
-                                    size="sm"
-                                    color={amount > 0 ? "success" : "danger"}
-                                  >
-                                    {formatCurrency(amount)}
-                                  </Text>
+                                  <Currency value={amount} size="sm" />
                                 )}
                               </td>
                             );
@@ -197,13 +186,7 @@ export function ProjectionTable({
                               key={month.toISOString()}
                               className="projection-table__cell projection-table__cell--amount projection-table__cell--total"
                             >
-                              <Text
-                                size="sm"
-                                weight="bold"
-                                color={total > 0 ? "success" : "danger"}
-                              >
-                                {formatCurrency(total)}
-                              </Text>
+                              <Currency value={total} size="sm" weight="bold" />
                             </td>
                           );
                         })}
@@ -226,9 +209,7 @@ export function ProjectionTable({
                         key={month.toISOString()}
                         className="projection-table__cell projection-table__cell--amount projection-table__cell--breakdown"
                       >
-                        <Text size="sm" color="success">
-                          {formatCurrency(totals?.income || 0)}
-                        </Text>
+                        <Currency value={totals?.income || 0} size="sm" />
                       </td>
                     );
                   })}
@@ -248,9 +229,7 @@ export function ProjectionTable({
                         key={month.toISOString()}
                         className="projection-table__cell projection-table__cell--amount projection-table__cell--breakdown"
                       >
-                        <Text size="sm" color="danger">
-                          {formatCurrency(totals?.expense || 0)}
-                        </Text>
+                        <Currency value={totals?.expense || 0} size="sm" />
                       </td>
                     );
                   })}
@@ -272,13 +251,7 @@ export function ProjectionTable({
                         key={month.toISOString()}
                         className="projection-table__cell projection-table__cell--amount projection-table__cell--grand-total"
                       >
-                        <Text
-                          size="md"
-                          weight="bold"
-                          color={net > 0 ? "success-light" : "danger-light"}
-                        >
-                          {formatCurrency(net)}
-                        </Text>
+                        <Currency value={net} size="md" weight="bold" />
                       </td>
                     );
                   })}
