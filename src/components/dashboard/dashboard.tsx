@@ -41,84 +41,78 @@ export function Dashboard({
           {i18n.t("dashboard.current_month_overview")}
         </Text>
 
-        <Grid gap={16} className="dashboard__cards">
-          <AppLink
-            href={`/entries?${currentMonthQuery}&type=income`}
-            className="dashboard__card-link"
-          >
-            <Card
-              padding={16}
-              className="dashboard__card dashboard__card--income"
-            >
-              <Stack gap={8}>
-                <Text size="sm" color="secondary" weight="medium">
-                  {i18n.t("dashboard.income")}
+        <div className="dashboard__cards">
+          <Grid gap={16}>
+            <div className="dashboard__card-link dashboard__card-link--income">
+              <AppLink href={`/entries?${currentMonthQuery}&type=income`}>
+                <Card padding={16}>
+                  <Stack gap={8}>
+                    <Text size="sm" color="secondary" weight="medium">
+                      {i18n.t("dashboard.income")}
+                    </Text>
+                    <Text size="2xl" weight="bold" color="success">
+                      {formatCurrency(totals.income)}
+                    </Text>
+                  </Stack>
+                </Card>
+              </AppLink>
+            </div>
+
+            <div className="dashboard__card-link dashboard__card-link--expense">
+              <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
+                <Card padding={16}>
+                  <Stack gap={8}>
+                    <Text size="sm" color="secondary" weight="medium">
+                      {i18n.t("dashboard.expenses")}
+                    </Text>
+                    <Text size="2xl" weight="bold" color="danger">
+                      {formatCurrency(totals.expense)}
+                    </Text>
+                  </Stack>
+                </Card>
+              </AppLink>
+            </div>
+
+            <div className="dashboard__card dashboard__card--net">
+              <Card padding={16}>
+                <Stack gap={8}>
+                  <Text size="sm" color="secondary" weight="medium">
+                    {i18n.t("dashboard.net")}
+                  </Text>
+                  <Text
+                    size="2xl"
+                    weight="bold"
+                    color={totals.net >= 0 ? "success" : "danger"}
+                  >
+                    {formatCurrency(totals.net)}
+                  </Text>
+                </Stack>
+              </Card>
+            </div>
+          </Grid>
+        </div>
+
+        <div className="dashboard__recent-section">
+          <Stack gap={16}>
+            <div className="dashboard__recent-header">
+              <Stack direction="row" align="center" justify="space-between">
+                <Text size="h4" as="h3" weight="semibold">
+                  {i18n.t("dashboard.recent_entries")}
                 </Text>
-                <Text size="2xl" weight="bold" color="success">
-                  {formatCurrency(totals.income)}
-                </Text>
+                <span className="dashboard__recent-link">
+                  <AppLink href={`/entries?${currentMonthQuery}`}>
+                    {i18n.t("dashboard.see_all_entries")}
+                  </AppLink>
+                </span>
               </Stack>
-            </Card>
-          </AppLink>
-
-          <AppLink
-            href={`/entries?${currentMonthQuery}&type=expense`}
-            className="dashboard__card-link"
-          >
-            <Card
-              padding={16}
-              className="dashboard__card dashboard__card--expense"
-            >
-              <Stack gap={8}>
-                <Text size="sm" color="secondary" weight="medium">
-                  {i18n.t("dashboard.expenses")}
-                </Text>
-                <Text size="2xl" weight="bold" color="danger">
-                  {formatCurrency(totals.expense)}
-                </Text>
-              </Stack>
-            </Card>
-          </AppLink>
-
-          <Card padding={16} className="dashboard__card dashboard__card--net">
-            <Stack gap={8}>
-              <Text size="sm" color="secondary" weight="medium">
-                {i18n.t("dashboard.net")}
-              </Text>
-              <Text
-                size="2xl"
-                weight="bold"
-                color={totals.net >= 0 ? "success" : "danger"}
-              >
-                {formatCurrency(totals.net)}
-              </Text>
-            </Stack>
-          </Card>
-        </Grid>
-
-        <Stack gap={16} className="dashboard__recent-section">
-          <Stack
-            direction="row"
-            align="center"
-            justify="space-between"
-            className="dashboard__recent-header"
-          >
-            <Text size="h4" as="h3" weight="semibold">
-              {i18n.t("dashboard.recent_entries")}
-            </Text>
-            <AppLink
-              href={`/entries?${currentMonthQuery}`}
-              className="dashboard__recent-link"
-            >
-              {i18n.t("dashboard.see_all_entries")}
-            </AppLink>
+            </div>
+            <EntryList
+              entries={recentEntries}
+              showDelete={false}
+              entryHref={(entry) => `/entries/${entry.id}`}
+            />
           </Stack>
-          <EntryList
-            entries={recentEntries}
-            showDelete={false}
-            entryHref={(entry) => `/entries/${entry.id}`}
-          />
-        </Stack>
+        </div>
       </Stack>
     </div>
   );

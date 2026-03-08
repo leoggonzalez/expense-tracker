@@ -9,7 +9,6 @@ export interface ButtonProps {
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   fullWidth?: boolean;
-  className?: string;
   startIcon?: React.ReactNode;
 }
 
@@ -21,7 +20,6 @@ export function Button({
   size = "md",
   disabled = false,
   fullWidth = false,
-  className = "",
   startIcon,
 }: ButtonProps): React.ReactElement {
   const classes = [
@@ -29,7 +27,6 @@ export function Button({
     `button--variant-${variant}`,
     `button--size-${size}`,
     fullWidth && "button--full-width",
-    className,
   ]
     .filter(Boolean)
     .join(" ");

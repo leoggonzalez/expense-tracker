@@ -62,47 +62,47 @@ export function EntriesPage({
 
   return (
     <Container maxWidth="wide">
-      <Stack gap={24} className="entries-page">
-        <Stack gap={16} className="entries-page__header">
+      <div className="entries-page">
+        <Stack gap={24}>
+          <div className="entries-page__header">
+            <Stack gap={16}>
           <Text size="h2" as="h2" weight="bold">
             {i18n.t("entries_page.title")}
           </Text>
-          <AppLink
-            href="/entries/new/expense"
-            className="entries-page__button-link"
-          >
-            <span className="entries-page__button">
-              {i18n.t("entries_page.add_entry")}
-            </span>
-          </AppLink>
+              <div className="entries-page__button-link">
+                <AppLink href="/entries/new/expense">
+                  <span className="entries-page__button">
+                    {i18n.t("entries_page.add_entry")}
+                  </span>
+                </AppLink>
+              </div>
+            </Stack>
+          </div>
+
+          <EntriesFilters accounts={accounts} filters={filters} />
+
+          <div className="entries-page__results">
+            <Stack direction="row" align="center" justify="space-between">
+              <Text size="sm" color="secondary">
+                {i18n.t("entries_page.showing_results", {
+                  count: entries.length,
+                  total: pagination.total,
+                })}
+              </Text>
+            </Stack>
+          </div>
+
+          <EntriesTable entries={entries} />
+
+          {pagination.totalPages > 1 && (
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              onPageChange={goToPage}
+            />
+          )}
         </Stack>
-
-        <EntriesFilters accounts={accounts} filters={filters} />
-
-        <Stack
-          direction="row"
-          align="center"
-          justify="space-between"
-          className="entries-page__results"
-        >
-          <Text size="sm" color="secondary">
-            {i18n.t("entries_page.showing_results", {
-              count: entries.length,
-              total: pagination.total,
-            })}
-          </Text>
-        </Stack>
-
-        <EntriesTable entries={entries} />
-
-        {pagination.totalPages > 1 && (
-          <Pagination
-            currentPage={pagination.page}
-            totalPages={pagination.totalPages}
-            onPageChange={goToPage}
-          />
-        )}
-      </Stack>
+      </div>
     </Container>
   );
 }

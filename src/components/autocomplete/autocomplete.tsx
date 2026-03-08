@@ -10,7 +10,6 @@ export interface AutocompleteProps {
   label?: React.ReactNode;
   placeholder?: string;
   required?: boolean;
-  className?: string;
 }
 
 export function Autocomplete({
@@ -20,7 +19,6 @@ export function Autocomplete({
   label,
   placeholder,
   required = false,
-  className = "",
 }: AutocompleteProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -48,7 +46,7 @@ export function Autocomplete({
   };
 
   return (
-    <div className={`autocomplete ${className}`.trim()} ref={containerRef}>
+    <div className="autocomplete" ref={containerRef}>
       {label && (
         <label className="autocomplete__label">
           {label}

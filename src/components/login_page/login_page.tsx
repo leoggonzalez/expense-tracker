@@ -36,34 +36,36 @@ export function LoginPage(): React.ReactElement {
   return (
     <Container>
       <div className="login-page">
-        <Box padding={24} maxWidth={480} className="login-page__card">
-          <form onSubmit={handleSubmit}>
-            <Stack gap={16}>
-              <Text size="h2" as="h1" weight="bold">
-                {i18n.t("auth.title")}
-              </Text>
-              <Text color="secondary">{i18n.t("auth.subtitle")}</Text>
+        <div className="login-page__card">
+          <Box padding={24} maxWidth={480}>
+            <form onSubmit={handleSubmit}>
+              <Stack gap={16}>
+                <Text size="h2" as="h1" weight="bold">
+                  {i18n.t("auth.title")}
+                </Text>
+                <Text color="secondary">{i18n.t("auth.subtitle")}</Text>
 
-              <Input
-                label={i18n.t("auth.email")}
-                type="email"
-                value={email}
-                onChange={setEmail}
-                placeholder={i18n.t("auth.email_placeholder") as string}
-                autoComplete="email"
-                required
-              />
+                <Input
+                  label={i18n.t("auth.email")}
+                  type="email"
+                  value={email}
+                  onChange={setEmail}
+                  placeholder={i18n.t("auth.email_placeholder") as string}
+                  autoComplete="email"
+                  required
+                />
 
-              {error && <Text color="danger">{i18n.t(error)}</Text>}
+                {error && <Text color="danger">{i18n.t(error)}</Text>}
 
-              <Button type="submit" disabled={loading} fullWidth>
-                {loading
-                  ? i18n.t("auth.sending_code")
-                  : i18n.t("auth.send_code")}
-              </Button>
-            </Stack>
-          </form>
-        </Box>
+                <Button type="submit" disabled={loading} fullWidth>
+                  {loading
+                    ? i18n.t("auth.sending_code")
+                    : i18n.t("auth.send_code")}
+                </Button>
+              </Stack>
+            </form>
+          </Box>
+        </div>
       </div>
     </Container>
   );

@@ -59,9 +59,11 @@ export function EntriesFilters({
   const anyFilters = Object.values(filters).some((value) => value);
 
   return (
-    <Card padding={24} variant="secondary" className="entries-filters">
-      <Stack gap={16}>
-        <Grid gap={16} className="entries-filters__grid">
+    <div className="entries-filters">
+      <Card padding={24} variant="secondary">
+        <Stack gap={16}>
+          <div className="entries-filters__grid">
+            <Grid gap={16}>
           <Select
             label={i18n.t("entries_page.account")}
             value={filters.account}
@@ -112,15 +114,19 @@ export function EntriesFilters({
             onStartDateChange={(value) => updateQuery({ start_date: value })}
             onEndDateChange={(value) => updateQuery({ end_date: value })}
           />
-        </Grid>
-        {anyFilters && (
-          <Stack direction="row" className="entries-filters__actions">
-            <Button variant="secondary" size="sm" onClick={clearFilters}>
-              {i18n.t("entries_page.clear_filters")}
-            </Button>
-          </Stack>
-        )}
-      </Stack>
-    </Card>
+            </Grid>
+          </div>
+          {anyFilters && (
+            <div className="entries-filters__actions">
+              <Stack direction="row">
+                <Button variant="secondary" size="sm" onClick={clearFilters}>
+                  {i18n.t("entries_page.clear_filters")}
+                </Button>
+              </Stack>
+            </div>
+          )}
+        </Stack>
+      </Card>
+    </div>
   );
 }

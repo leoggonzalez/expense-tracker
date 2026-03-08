@@ -13,7 +13,6 @@ export interface SelectProps {
   label?: React.ReactNode;
   placeholder?: string;
   required?: boolean;
-  className?: string;
 }
 
 export function Select({
@@ -23,10 +22,9 @@ export function Select({
   label,
   placeholder,
   required = false,
-  className = "",
 }: SelectProps): React.ReactElement {
   return (
-    <div className={`select ${className}`.trim()}>
+    <div className="select">
       {label && (
         <label className="select__label">
           {label}
