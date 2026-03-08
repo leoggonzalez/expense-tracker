@@ -1,0 +1,62 @@
+@use "@/styles/variables.scss" as *;
+
+.projection-overview {
+  &__header {
+    flex-wrap: wrap;
+  }
+
+  &__nav-button {
+    width: 36px;
+    height: 36px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  &__chart-wrapper {
+    height: 260px;
+  }
+
+  &__totals-grid {
+    --projection-totals-columns: 1;
+  }
+
+  &__total-item {
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+
+    &--net {
+      background-color: var(--color-background-secondary);
+    }
+  }
+
+  &__all-entries-link {
+    text-decoration: underline;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  &__account-link {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-decoration: underline;
+    width: fit-content;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .projection-overview {
+    &__totals-grid {
+      --projection-totals-columns: 3;
+    }
+
+    &__chart-wrapper {
+      height: 320px;
+    }
+  }
+}

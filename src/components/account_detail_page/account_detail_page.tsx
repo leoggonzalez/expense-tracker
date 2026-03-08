@@ -99,82 +99,84 @@ export function AccountDetailPage({
           {i18n.t("account_detail_page.title")}
         </Text>
 
-        <Card
-          padding={20}
-          variant="secondary"
-          className="account-detail-page__summary"
-        >
-          <Stack gap={10}>
-            <Text size="lg" weight="semibold">
-              {account.name}
-            </Text>
-            <Text size="sm" color="secondary">
-              {i18n.t("account_detail_page.total_balance")}
-            </Text>
-            <Text
-              size="h4"
-              weight="bold"
-              color={account.allTimeNet >= 0 ? "success" : "danger"}
-            >
-              {formatCurrency(account.allTimeNet)}
-            </Text>
-            <Text size="sm" color="secondary">
-              {i18n.t("accounts_page.entry_count", {
-                count: account.entryCount,
-              })}
-            </Text>
-          </Stack>
-        </Card>
-
-        <Card padding={20} className="account-detail-page__panel">
-          <form onSubmit={handleSave}>
-            <Stack gap={14}>
-              <Text size="h4" as="h2" weight="semibold">
-                {i18n.t("account_detail_page.rename_account")}
+        <div className="account-detail-page__summary">
+          <Card padding={20} variant="secondary">
+            <Stack gap={10}>
+              <Text size="lg" weight="semibold">
+                {account.name}
               </Text>
-              <Input
-                label={i18n.t("accounts_page.account_name")}
-                value={name}
-                onChange={setName}
-                placeholder={
-                  i18n.t("accounts_page.account_name_placeholder") as string
-                }
-                required
-              />
-              {error && <Text color="danger">{i18n.t(error)}</Text>}
-              {success && <Text color="success">{i18n.t(success)}</Text>}
-              <Stack direction="column" gap={12}>
-                <Button type="submit" disabled={loading} fullWidth>
-                  {loading
-                    ? i18n.t("account_detail_page.saving")
-                    : i18n.t("account_detail_page.save")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="danger"
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  fullWidth
-                >
-                  {deleting
-                    ? i18n.t("account_detail_page.deleting")
-                    : i18n.t("account_detail_page.delete_account")}
-                </Button>
-              </Stack>
+              <Text size="sm" color="secondary">
+                {i18n.t("account_detail_page.total_balance")}
+              </Text>
+              <Text
+                size="h4"
+                weight="bold"
+                color={account.allTimeNet >= 0 ? "success" : "danger"}
+              >
+                {formatCurrency(account.allTimeNet)}
+              </Text>
+              <Text size="sm" color="secondary">
+                {i18n.t("accounts_page.entry_count", {
+                  count: account.entryCount,
+                })}
+              </Text>
             </Stack>
-          </form>
-        </Card>
+          </Card>
+        </div>
 
-        <Stack gap={16} className="account-detail-page__entries">
-          <Text size="h4" as="h2" weight="semibold">
-            {i18n.t("account_detail_page.related_entries")}
-          </Text>
-          <EntryList
-            entries={entries}
-            showDelete={false}
-            entryHref={(entryItem) => `/entries/${entryItem.id}`}
-          />
-        </Stack>
+        <div className="account-detail-page__panel">
+          <Card padding={20}>
+            <form onSubmit={handleSave}>
+              <Stack gap={14}>
+                <Text size="h4" as="h2" weight="semibold">
+                  {i18n.t("account_detail_page.rename_account")}
+                </Text>
+                <Input
+                  label={i18n.t("accounts_page.account_name")}
+                  value={name}
+                  onChange={setName}
+                  placeholder={
+                    i18n.t("accounts_page.account_name_placeholder") as string
+                  }
+                  required
+                />
+                {error && <Text color="danger">{i18n.t(error)}</Text>}
+                {success && <Text color="success">{i18n.t(success)}</Text>}
+                <Stack direction="column" gap={12}>
+                  <Button type="submit" disabled={loading} fullWidth>
+                    {loading
+                      ? i18n.t("account_detail_page.saving")
+                      : i18n.t("account_detail_page.save")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    fullWidth
+                  >
+                    {deleting
+                      ? i18n.t("account_detail_page.deleting")
+                      : i18n.t("account_detail_page.delete_account")}
+                  </Button>
+                </Stack>
+              </Stack>
+            </form>
+          </Card>
+        </div>
+
+        <div className="account-detail-page__entries">
+          <Stack gap={16}>
+            <Text size="h4" as="h2" weight="semibold">
+              {i18n.t("account_detail_page.related_entries")}
+            </Text>
+            <EntryList
+              entries={entries}
+              showDelete={false}
+              entryHref={(entryItem) => `/entries/${entryItem.id}`}
+            />
+          </Stack>
+        </div>
       </Stack>
     </Container>
   );

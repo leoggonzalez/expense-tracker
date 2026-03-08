@@ -39,6 +39,15 @@
     "amount_placeholder": "0.00",
     "begin_date": "Fecha de inicio",
     "begin_date_month": "Mes de inicio",
+    "month": "Mes",
+    "year": "Año",
+    "schedule_label": "Planificación",
+    "schedule_one_time": "Una vez",
+    "schedule_installments": "Cuotas",
+    "schedule_unlimited": "Sin límite",
+    "installments": "Cuotas",
+    "calculated_end_date": "Finaliza en %{endDate}",
+    "invalid_installments": "Las cuotas deben ser un número entero entre 1 y 120.",
     "recurring": "Recurrente",
     "end_date": "Fecha de fin",
     "end_date_month": "Mes de fin",
@@ -122,6 +131,19 @@
     "total_income": "Ingresos totales",
     "total_expenses": "Gastos totales",
     "total": "Total"
+  },
+  "projection_page": {
+    "previous_month": "Mes anterior",
+    "next_month": "Mes siguiente",
+    "chart_title": "Ingresos vs gastos (próximos 6 meses)",
+    "month_totals": "Totales del mes",
+    "income": "Ingresos",
+    "expenses": "Gastos",
+    "total": "Total",
+    "accounts_with_entries": "Cuentas con movimientos este mes",
+    "empty_month_entries": "No hay movimientos para este mes.",
+    "open_account": "Abrir cuenta",
+    "see_all_entries": "Ver todos los movimientos"
   },
   "pagination": {
     "previous": "Anterior",
@@ -211,7 +233,9 @@
     "title_multiple": "Añadir varios movimientos",
     "income_tab": "Ingreso",
     "expense_tab": "Gasto",
-    "multiple_tab": "Varios"
+    "multiple_tab": "Varios",
+    "recent_entries": "Movimientos recientes",
+    "open_all_entries": "Ver todos los movimientos"
   },
   "entry_detail_page": {
     "title": "Editar movimiento",

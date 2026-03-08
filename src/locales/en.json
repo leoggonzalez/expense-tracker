@@ -39,6 +39,15 @@
     "amount_placeholder": "0.00",
     "begin_date": "Begin Date",
     "begin_date_month": "Begin Month",
+    "month": "Month",
+    "year": "Year",
+    "schedule_label": "Schedule",
+    "schedule_one_time": "One time",
+    "schedule_installments": "Installments",
+    "schedule_unlimited": "Unlimited",
+    "installments": "Installments",
+    "calculated_end_date": "Ends in %{endDate}",
+    "invalid_installments": "Installments must be a whole number between 1 and 120.",
     "recurring": "Recurring",
     "end_date": "End Date",
     "end_date_month": "End Month",
@@ -122,6 +131,19 @@
     "total_income": "Total Income",
     "total_expenses": "Total Expenses",
     "total": "Total"
+  },
+  "projection_page": {
+    "previous_month": "Previous month",
+    "next_month": "Next month",
+    "chart_title": "Income vs Expenses (Next 6 months)",
+    "month_totals": "Month Totals",
+    "income": "Income",
+    "expenses": "Expenses",
+    "total": "Total",
+    "accounts_with_entries": "Accounts with entries this month",
+    "empty_month_entries": "No entries for this month.",
+    "open_account": "Open account",
+    "see_all_entries": "See all entries"
   },
   "pagination": {
     "previous": "Previous",
@@ -211,7 +233,9 @@
     "title_multiple": "Add multiple entries",
     "income_tab": "Income",
     "expense_tab": "Expense",
-    "multiple_tab": "Multiple"
+    "multiple_tab": "Multiple",
+    "recent_entries": "Recent entries",
+    "open_all_entries": "See all entries"
   },
   "entry_detail_page": {
     "title": "Edit Entry",

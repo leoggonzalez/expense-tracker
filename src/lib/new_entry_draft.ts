@@ -5,10 +5,9 @@ export type NewEntryDraft = {
   description: string;
   amountInput: string;
   beginDate: string;
-  endDate: string;
-  isRecurring: boolean;
   beginDateMode: "month" | "date";
-  endDateMode: "month" | "date";
+  scheduleMode: "one_time" | "installments" | "unlimited";
+  installments: string;
 };
 
 const draftValue = new PersistedValue<NewEntryDraft>(

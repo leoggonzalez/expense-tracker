@@ -1,25 +1,15 @@
 @use "@/styles/variables.scss" as *;
 
 .entries-table {
-  min-width: 0;
-
-  &__scroll {
-    width: 100%;
-    min-width: 0;
-    overflow-x: auto;
-  }
-
-  &__table {
-    width: 100%;
-    min-width: 720px;
-    border-collapse: collapse;
-  }
-
-  &__head {
-    background-color: var(--color-background-secondary);
-  }
+  overflow: hidden;
 
   &__row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-height: 68px;
+    padding: var(--spacing-md);
     border-bottom: var(--border-width) solid var(--color-border);
     cursor: pointer;
     transition: background-color var(--transition-fast);
@@ -28,68 +18,51 @@
       background-color: var(--color-background-secondary);
     }
 
+    &:first-child {
+      border-top-left-radius: var(--border-radius-md);
+      border-top-right-radius: var(--border-radius-md);
+    }
+
     &:last-child {
       border-bottom: none;
+      border-bottom-left-radius: var(--border-radius-md);
+      border-bottom-right-radius: var(--border-radius-md);
     }
   }
 
-  &__cell {
-    padding: var(--spacing-md);
-    text-align: left;
-    white-space: nowrap;
-
-    &--header {
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-text-secondary);
-    }
-
-    &--details {
-      width: 100%;
-      white-space: normal;
-      min-width: 220px;
-    }
-
-    &--amount {
-      min-width: 120px;
-    }
-
-    &--date {
-      min-width: 140px;
-    }
+  &__account {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__details {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+
+    > * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
-  &__type {
-    display: inline-flex;
-    width: fit-content;
-    padding: 2px var(--spacing-sm);
-    border-radius: var(--border-radius-full);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
-
-    &--income {
-      background-color: color-mix(
-        in srgb,
-        var(--color-success) 14%,
-        var(--color-background)
-      );
-      color: var(--color-success-dark);
-    }
-
-    &--expense {
-      background-color: color-mix(
-        in srgb,
-        var(--color-danger) 14%,
-        var(--color-background)
-      );
-      color: var(--color-danger-dark);
-    }
+  &__amount {
+    text-align: right;
   }
 
   &__empty {
     text-align: center;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .entries-table {
+    &__row {
+      min-height: 72px;
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
   }
 }

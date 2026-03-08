@@ -85,6 +85,9 @@ export function Navigation(props: NavigationProps): React.ReactElement {
 - Prefer flat-design UI treatments across the app. Avoid heavy shadows, glassmorphism, decorative gradients, and lift-on-hover effects unless a change documents a clear exception.
 - Do not use inline styling in JSX or TSX. Avoid patterns such as `style={{ ... }}` and other inline style props.
 - The only allowed inline-style exception is declaring CSS custom properties inside shared layout primitives. This exception is for primitives such as `Stack`, `Box`, and `Grid`, not for page or feature components.
+- Components under `src/components/*` and shared primitives under `src/elements/*` must not expose `style` or `className` props.
+- UI component styling must be owned internally by the component via paired SCSS files and semantic props, not consumer-supplied class hooks.
+- The only allowed inline-style exception is internal CSS custom property plumbing required by shared layout primitives (`Stack`, `Box`, `Grid`) and similar internal primitive implementation details, never as a public prop.
 - If layout, spacing, or presentation is needed, express it through component markup and SCSS classes, not inline style objects or page-local wrapper styling.
 - Use the shared layout primitives for general layout work:
   - `Stack` for flex layout and wrapping
@@ -205,7 +208,8 @@ Known gaps in the current codebase:
 - `entry_list` and `all_entries_page` should be extracted into `src/components` when touched for related work.
 - `src/app/entries/page.tsx` currently uses inline styles and should move that presentation into component classes.
 - `src/app/entries/entry_list.tsx` and `src/app/entries/all/all_entries_page.tsx` currently behave like components and should not remain under `src/app`.
-- `src/elements/stack/stack.tsx` and `src/elements/box/box.tsx` still rely on inline styles internally and should be normalized to CSS custom properties only.
+- `src/elements/stack/stack.tsx` and `src/elements/box/box.tsx` rely on inline styles internally to wire CSS custom properties and should remain internal-only (no public style prop exposure).
+- Several UI components still accept `className` props and should be normalized when touched or via dedicated cleanup changesets.
 
 ## Exceptions and Framework Constraints
 
@@ -224,6 +228,7 @@ Use these scenarios when reviewing future changes against this document:
 - A contributor adding spacing or layout to a page should be able to determine that inline `style` props are disallowed and that layout belongs in component classes.
 - A contributor creating a rendered UI block under `src/app` should be able to determine that it belongs in `src/components`.
 - A reviewer should be able to reject a page-local `.scss` file under `src/app` unless it is a documented framework exception.
+- A reviewer should be able to reject any new `style` or `className` prop added to a component under `src/components/*` or `src/elements/*`.
 - A contributor needing flex, box, or grid layout should be able to choose `Stack`, `Box`, or `Grid` instead of adding ad hoc inline styles.
 - A contributor creating a responsive component should be able to determine that phone styles come first, tablet changes begin at `768px`, and desktop changes begin at `1280px`.
 

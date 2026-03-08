@@ -5,17 +5,15 @@ export interface CheckboxProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label?: React.ReactNode;
-  className?: string;
 }
 
 export function Checkbox({
   checked,
   onChange,
   label,
-  className = "",
 }: CheckboxProps): React.ReactElement {
   return (
-    <label className={`checkbox ${className}`.trim()}>
+    <label className="checkbox">
       <input
         type="checkbox"
         checked={checked}

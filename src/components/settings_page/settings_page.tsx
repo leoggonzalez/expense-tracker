@@ -67,102 +67,108 @@ export function SettingsPage({ user }: SettingsPageProps): React.ReactElement {
           {i18n.t("settings_page.title")}
         </Text>
 
-        <Card padding={20} variant="secondary" className="settings-page__panel">
-          <form onSubmit={handleSave}>
-            <Stack gap={16}>
-              <Stack gap={4} className="settings-page__field">
-                <Text size="sm" weight="semibold">
-                  {i18n.t("settings_page.email")}
-                </Text>
-                <Text color="secondary">{user.email}</Text>
-              </Stack>
+        <div className="settings-page__panel">
+          <Card padding={20} variant="secondary">
+            <form onSubmit={handleSave}>
+              <Stack gap={16}>
+                <div className="settings-page__field">
+                  <Stack gap={4}>
+                    <Text size="sm" weight="semibold">
+                      {i18n.t("settings_page.email")}
+                    </Text>
+                    <Text color="secondary">{user.email}</Text>
+                  </Stack>
+                </div>
 
-              <Input
-                label={i18n.t("settings_page.name")}
-                value={name}
-                onChange={setName}
-                placeholder={i18n.t("settings_page.name_placeholder") as string}
-              />
-
-              <Stack gap={16} className="settings-page__preferences">
-                <Text size="sm" weight="semibold">
-                  {i18n.t("settings_page.appearance")}
-                </Text>
-
-                <Select
-                  label={i18n.t("settings_page.theme")}
-                  value={themePreference}
-                  onChange={(value) =>
-                    setThemePreference(value as ThemePreference)
+                <Input
+                  label={i18n.t("settings_page.name")}
+                  value={name}
+                  onChange={setName}
+                  placeholder={
+                    i18n.t("settings_page.name_placeholder") as string
                   }
-                  options={[
-                    {
-                      value: "system",
-                      label: i18n.t("settings_page.theme_system"),
-                    },
-                    {
-                      value: "light",
-                      label: i18n.t("settings_page.theme_light"),
-                    },
-                    {
-                      value: "dark",
-                      label: i18n.t("settings_page.theme_dark"),
-                    },
-                  ]}
                 />
 
-                <Select
-                  label={i18n.t("settings_page.language")}
-                  value={languagePreference}
-                  onChange={(value) =>
-                    setLanguagePreference(value as LanguagePreference)
-                  }
-                  options={[
-                    {
-                      value: "system",
-                      label: i18n.t("settings_page.language_system"),
-                    },
-                    {
-                      value: "en",
-                      label: i18n.t("settings_page.language_en"),
-                    },
-                    {
-                      value: "es",
-                      label: i18n.t("settings_page.language_es"),
-                    },
-                    {
-                      value: "pt-BR",
-                      label: i18n.t("settings_page.language_pt_br"),
-                    },
-                  ]}
-                />
-              </Stack>
+                <div className="settings-page__preferences">
+                  <Stack gap={16}>
+                    <Text size="sm" weight="semibold">
+                      {i18n.t("settings_page.appearance")}
+                    </Text>
 
-              {error && <Text color="danger">{i18n.t(error)}</Text>}
-              {success && <Text color="success">{i18n.t(success)}</Text>}
+                    <Select
+                      label={i18n.t("settings_page.theme")}
+                      value={themePreference}
+                      onChange={(value) =>
+                        setThemePreference(value as ThemePreference)
+                      }
+                      options={[
+                        {
+                          value: "system",
+                          label: i18n.t("settings_page.theme_system"),
+                        },
+                        {
+                          value: "light",
+                          label: i18n.t("settings_page.theme_light"),
+                        },
+                        {
+                          value: "dark",
+                          label: i18n.t("settings_page.theme_dark"),
+                        },
+                      ]}
+                    />
 
-              <Stack
-                direction="column"
-                gap={12}
-                className="settings-page__actions"
-              >
-                <Button type="submit" disabled={loading} fullWidth>
-                  {loading
-                    ? i18n.t("settings_page.saving")
-                    : i18n.t("settings_page.save")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleLogout}
-                  fullWidth
-                >
-                  {i18n.t("settings_page.logout")}
-                </Button>
+                    <Select
+                      label={i18n.t("settings_page.language")}
+                      value={languagePreference}
+                      onChange={(value) =>
+                        setLanguagePreference(value as LanguagePreference)
+                      }
+                      options={[
+                        {
+                          value: "system",
+                          label: i18n.t("settings_page.language_system"),
+                        },
+                        {
+                          value: "en",
+                          label: i18n.t("settings_page.language_en"),
+                        },
+                        {
+                          value: "es",
+                          label: i18n.t("settings_page.language_es"),
+                        },
+                        {
+                          value: "pt-BR",
+                          label: i18n.t("settings_page.language_pt_br"),
+                        },
+                      ]}
+                    />
+                  </Stack>
+                </div>
+
+                {error && <Text color="danger">{i18n.t(error)}</Text>}
+                {success && <Text color="success">{i18n.t(success)}</Text>}
+
+                <div className="settings-page__actions">
+                  <Stack direction="column" gap={12}>
+                    <Button type="submit" disabled={loading} fullWidth>
+                      {loading
+                        ? i18n.t("settings_page.saving")
+                        : i18n.t("settings_page.save")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleLogout}
+                      fullWidth
+                    >
+                      {i18n.t("settings_page.logout")}
+                    </Button>
+                  </Stack>
+                </div>
               </Stack>
-            </Stack>
-          </form>
-        </Card>
+            </form>
+          </Card>
+        </div>
       </Stack>
     </Container>
   );

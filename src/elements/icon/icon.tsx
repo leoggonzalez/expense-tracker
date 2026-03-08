@@ -1,7 +1,7 @@
 import React from "react";
 
-import type { IconName } from "./icon_assets";
-import { iconAssets } from "./icon_assets";
+import type { IconName } from "@/elements/icon/icon_assets";
+import { iconAssets } from "@/elements/icon/icon_assets";
 import "./icon.scss";
 
 type IconSize = number | { width: number; height: number };
@@ -9,7 +9,6 @@ type IconSize = number | { width: number; height: number };
 export interface IconProps {
   name: IconName;
   size?: IconSize;
-  className?: string;
 }
 
 function getIconDimensions(size: IconSize): { width: string; height: string } {
@@ -26,11 +25,7 @@ function getIconDimensions(size: IconSize): { width: string; height: string } {
   };
 }
 
-export function Icon({
-  name,
-  size = 20,
-  className = "",
-}: IconProps): React.ReactElement {
+export function Icon({ name, size = 20 }: IconProps): React.ReactElement {
   const dimensions = getIconDimensions(size);
   const style = {
     "--icon-width": dimensions.width,
@@ -38,11 +33,5 @@ export function Icon({
     "--icon-mask-image": `url("${iconAssets[name]}")`,
   } as React.CSSProperties;
 
-  return (
-    <span
-      aria-hidden="true"
-      className={`icon ${className}`.trim()}
-      style={style}
-    />
-  );
+  return <span aria-hidden="true" className="icon" style={style} />;
 }

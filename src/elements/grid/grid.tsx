@@ -14,7 +14,6 @@ export interface GridProps {
   align?: "start" | "center" | "end" | "stretch";
   justify?: "start" | "center" | "end" | "stretch";
   minColumnWidth?: number;
-  className?: string;
 }
 
 export function Grid({
@@ -27,7 +26,6 @@ export function Grid({
   align,
   justify,
   minColumnWidth,
-  className = "",
 }: GridProps): React.ReactElement {
   const style: GridStyle = {};
 
@@ -63,7 +61,7 @@ export function Grid({
   }
 
   return (
-    <div className={`grid ${className}`.trim()} style={style}>
+    <div className="grid" style={style}>
       {children}
     </div>
   );

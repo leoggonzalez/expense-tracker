@@ -51,32 +51,36 @@ export function EntryDetailPage({
 
   return (
     <Container>
-      <Stack gap={24} className="entry-detail-page">
-        <Text size="h2" as="h1" weight="bold">
-          {i18n.t("entry_detail_page.title")}
-        </Text>
-        <Card padding={24} className="entry-detail-page__card">
-          <Stack gap={16}>
-            <EntryForm
-              accounts={accounts}
-              initialData={entry}
-              isEdit
-              onSuccess={refresh}
-            />
-            <Button
-              type="button"
-              variant="danger"
-              onClick={handleDelete}
-              disabled={deleting}
-              fullWidth
-            >
-              {deleting
-                ? i18n.t("entry_detail_page.deleting")
-                : i18n.t("entry_detail_page.delete")}
-            </Button>
-          </Stack>
-        </Card>
-      </Stack>
+      <div className="entry-detail-page">
+        <Stack gap={24}>
+          <Text size="h2" as="h1" weight="bold">
+            {i18n.t("entry_detail_page.title")}
+          </Text>
+          <div className="entry-detail-page__card">
+            <Card padding={24}>
+              <Stack gap={16}>
+                <EntryForm
+                  accounts={accounts}
+                  initialData={entry}
+                  isEdit
+                  onSuccess={refresh}
+                />
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  fullWidth
+                >
+                  {deleting
+                    ? i18n.t("entry_detail_page.deleting")
+                    : i18n.t("entry_detail_page.delete")}
+                </Button>
+              </Stack>
+            </Card>
+          </div>
+        </Stack>
+      </div>
     </Container>
   );
 }

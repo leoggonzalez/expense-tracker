@@ -16,7 +16,6 @@ export interface StackProps {
     | "space-between"
     | "space-around";
   wrap?: boolean;
-  className?: string;
 }
 
 export function Stack({
@@ -26,7 +25,6 @@ export function Stack({
   align,
   justify,
   wrap = false,
-  className = "",
 }: StackProps): React.ReactElement {
   const style: StackStyle = {
     "--stack-direction": direction,
@@ -43,7 +41,7 @@ export function Stack({
   }
 
   return (
-    <div className={`stack ${className}`.trim()} style={style}>
+    <div className="stack" style={style}>
       {children}
     </div>
   );

@@ -15,14 +15,12 @@ export interface BoxProps {
   children: React.ReactNode;
   padding?: number | BoxPadding;
   maxWidth?: number;
-  className?: string;
 }
 
 export function Box({
   children,
   padding,
   maxWidth,
-  className = "",
 }: BoxProps): React.ReactElement {
   const style: BoxStyle = {};
 
@@ -44,7 +42,7 @@ export function Box({
   }
 
   return (
-    <div className={`box ${className}`.trim()} style={style}>
+    <div className="box" style={style}>
       {children}
     </div>
   );

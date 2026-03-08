@@ -124,13 +124,6 @@
 
 @media (min-width: $breakpoint-tablet) {
   .projection-table {
-    &__header {
-      --stack-direction: row;
-      --stack-justify: space-between;
-      --stack-align: flex-end;
-      --stack-gap: var(--spacing-lg);
-    }
-
     &__date-selector {
       min-width: 220px;
     }

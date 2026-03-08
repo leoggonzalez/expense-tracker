@@ -33,6 +33,21 @@
   }
 
   &__link {
+    &--active .navigation__link-content {
+      color: var(--color-primary);
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 10%,
+        var(--color-background)
+      );
+    }
+
+    &--pending .navigation__link-content {
+      opacity: 0.72;
+    }
+  }
+
+  &__link-content {
     min-height: var(--navigation-height-mobile);
     padding: var(--spacing-sm) var(--spacing-xs);
     color: var(--color-text-secondary);
@@ -50,37 +65,24 @@
       background-color var(--transition-fast),
       transform var(--transition-fast),
       opacity var(--transition-fast);
+  }
 
-    &:hover {
-      color: var(--color-text-primary);
-      background-color: var(--color-background-secondary);
-    }
+  &__link:hover &__link-content {
+    color: var(--color-text-primary);
+    background-color: var(--color-background-secondary);
+  }
 
-    &:focus-visible {
-      outline: none;
-      color: var(--color-primary);
-      background-color: var(--color-background-secondary);
-      box-shadow: 0 0 0 3px
-        color-mix(in srgb, var(--color-primary) 18%, transparent);
-    }
+  &__link:focus-within &__link-content {
+    outline: none;
+    color: var(--color-primary);
+    background-color: var(--color-background-secondary);
+    box-shadow: 0 0 0 3px
+      color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
 
-    &:active {
-      transform: scale(0.98);
-      background-color: var(--color-background-tertiary);
-    }
-
-    &--active {
-      color: var(--color-primary);
-      background-color: color-mix(
-        in srgb,
-        var(--color-primary) 10%,
-        var(--color-background)
-      );
-    }
-
-    &--pending {
-      opacity: 0.72;
-    }
+  &__link:active &__link-content {
+    transform: scale(0.98);
+    background-color: var(--color-background-tertiary);
   }
 
   &__icon {
@@ -128,18 +130,20 @@
     }
 
     &__link {
+      .navigation__label {
+        display: inline;
+      }
+    }
+
+    &__link-content {
       min-height: auto;
       padding: var(--spacing-sm) var(--spacing-md);
       border-radius: var(--border-radius-full);
       font-size: var(--font-size-sm);
+    }
 
-      .navigation__label {
-        display: inline;
-      }
-
-      &--active {
-        background-color: var(--color-background-tertiary);
-      }
+    &__link--active .navigation__link-content {
+      background-color: var(--color-background-tertiary);
     }
   }
 }

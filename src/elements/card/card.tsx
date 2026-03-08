@@ -7,7 +7,6 @@ import { Box, BoxPadding } from "@/elements/box/box";
 export interface CardProps {
   children: React.ReactNode;
   padding?: number | BoxPadding;
-  className?: string;
   variant?: "default" | "secondary" | "dashed";
   as?: "div" | "section" | "article";
 }
@@ -15,13 +14,10 @@ export interface CardProps {
 export function Card({
   children,
   padding,
-  className = "",
   variant = "default",
   as: Component = "div",
 }: CardProps): React.ReactElement {
-  const classes = ["card", `card--${variant}`, className]
-    .filter(Boolean)
-    .join(" ");
+  const classes = ["card", `card--${variant}`].join(" ");
 
   return (
     <Component className={classes}>

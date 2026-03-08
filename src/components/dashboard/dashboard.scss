@@ -3,28 +3,26 @@
 .dashboard {
   width: 100%;
 
-  &__cards {
+  &__cards-grid {
+    display: grid;
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
   }
 
   &__card-link {
     display: block;
   }
 
-  &__card {
-    border-left-width: 3px;
+  &__card-surface--income {
+    border-left: 3px solid var(--color-success);
+  }
 
-    &--income {
-      border-left: 3px solid var(--color-success);
-    }
+  &__card-surface--expense {
+    border-left: 3px solid var(--color-danger);
+  }
 
-    &--expense {
-      border-left: 3px solid var(--color-danger);
-    }
-
-    &--net {
-      border-left: 3px solid var(--color-primary);
-    }
+  &__card-surface--net {
+    border-left: 3px solid var(--color-primary);
   }
 
   &__recent-link {
@@ -36,7 +34,7 @@
 
 @media (min-width: $breakpoint-tablet) {
   .dashboard {
-    &__cards {
+    &__cards-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }

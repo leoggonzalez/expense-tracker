@@ -11,7 +11,6 @@ export interface InputProps {
   min?: string | number;
   max?: string | number;
   step?: string | number;
-  className?: string;
   disabled?: boolean;
   readOnly?: boolean;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
@@ -31,7 +30,6 @@ export function Input({
   min,
   max,
   step,
-  className = "",
   disabled = false,
   readOnly = false,
   inputMode,
@@ -41,7 +39,7 @@ export function Input({
   id,
 }: InputProps): React.ReactElement {
   return (
-    <div className={`input ${className}`.trim()}>
+    <div className="input">
       {label && (
         <label className="input__label" htmlFor={id}>
           {label}

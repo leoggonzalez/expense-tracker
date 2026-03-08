@@ -45,44 +45,46 @@ export function VerifyLoginPage({
   return (
     <Container>
       <div className="verify-login-page">
-        <Box padding={24} maxWidth={480} className="verify-login-page__card">
-          <form onSubmit={handleSubmit}>
-            <Stack gap={16}>
-              <Text size="h2" as="h1" weight="bold">
-                {i18n.t("auth.verify_title")}
-              </Text>
-              <Text color="secondary">
-                {i18n.t("auth.code_sent", { email })}
-              </Text>
+        <div className="verify-login-page__card">
+          <Box padding={24} maxWidth={480}>
+            <form onSubmit={handleSubmit}>
+              <Stack gap={16}>
+                <Text size="h2" as="h1" weight="bold">
+                  {i18n.t("auth.verify_title")}
+                </Text>
+                <Text color="secondary">
+                  {i18n.t("auth.code_sent", { email })}
+                </Text>
 
-              <Input
-                label={i18n.t("auth.email")}
-                type="email"
-                value={email}
-                onChange={() => undefined}
-                placeholder={i18n.t("auth.email_placeholder") as string}
-                disabled
-                readOnly
-                required
-              />
+                <Input
+                  label={i18n.t("auth.email")}
+                  type="email"
+                  value={email}
+                  onChange={() => undefined}
+                  placeholder={i18n.t("auth.email_placeholder") as string}
+                  disabled
+                  readOnly
+                  required
+                />
 
-              <OtpInput
-                label={i18n.t("auth.code_group_label")}
-                value={code}
-                onChange={setCode}
-                required
-              />
+                <OtpInput
+                  label={i18n.t("auth.code_group_label")}
+                  value={code}
+                  onChange={setCode}
+                  required
+                />
 
-              {error && <Text color="danger">{i18n.t(error)}</Text>}
+                {error && <Text color="danger">{i18n.t(error)}</Text>}
 
-              <Button type="submit" disabled={loading} fullWidth>
-                {loading
-                  ? i18n.t("auth.verifying_code")
-                  : i18n.t("auth.verify_code")}
-              </Button>
-            </Stack>
-          </form>
-        </Box>
+                <Button type="submit" disabled={loading} fullWidth>
+                  {loading
+                    ? i18n.t("auth.verifying_code")
+                    : i18n.t("auth.verify_code")}
+                </Button>
+              </Stack>
+            </form>
+          </Box>
+        </div>
       </div>
     </Container>
   );

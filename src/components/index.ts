@@ -19,10 +19,12 @@ export type { DashboardProps } from "./dashboard/dashboard";
 
 export { ProjectionTable } from "./projection_table/projection_table";
 export type { ProjectionTableProps } from "./projection_table/projection_table";
+export { ProjectionOverview } from "./projection_overview/projection_overview";
 
 export { EntryForm } from "./entry_form/entry_form";
 export type { EntryFormProps } from "./entry_form/entry_form";
 export { EntryDateField } from "./entry_date_field/entry_date_field";
+export { MonthSelector } from "./month_selector/month_selector";
 
 export { BulkEntryForm } from "./bulk_entry_form/bulk_entry_form";
 export type { BulkEntryFormProps } from "./bulk_entry_form/bulk_entry_form";
@@ -35,12 +37,10 @@ export type { EntryListItem, EntryListProps } from "./entry_list/entry_list";
 export { EntriesTable } from "./entries_table/entries_table";
 export type { EntriesTableItem } from "./entries_table/entries_table";
 export { EntriesFilters } from "./entries_filters/entries_filters";
+export { EntriesPagination } from "./entries_pagination/entries_pagination";
 export { ToastProvider, useToast } from "./toast_provider/toast_provider";
 
 export { AllEntriesPage } from "./all_entries_page/all_entries_page";
-
-export { EntriesPage } from "./entries_page/entries_page";
-export type { EntriesPageProps } from "./entries_page/entries_page";
 
 export { LoginPage } from "./login_page/login_page";
 export { VerifyLoginPage } from "./verify_login_page/verify_login_page";
@@ -59,7 +59,9 @@ export { AppLink } from "./app_link/app_link";
 export { AccountsPage } from "./accounts_page/accounts_page";
 export { AccountDetailPage } from "./account_detail_page/account_detail_page";
 export { NewEntryPage } from "./new_entry_page/new_entry_page";
+export { NewEntryRecentEntries } from "./new_entry_recent_entries/new_entry_recent_entries";
 export { EntryDetailPage } from "./entry_detail_page/entry_detail_page";
 
 export { Container } from "./container/container";
 export type { ContainerProps } from "./container/container";
+export { Avatar } from "./avatar/avatar";

@@ -12,6 +12,14 @@ export const iconAssets = {
   plus: new URL("./icons/plus.svg", import.meta.url).toString(),
   edit: new URL("./icons/edit.svg", import.meta.url).toString(),
   close: new URL("./icons/close.svg", import.meta.url).toString(),
+  "chevron-left": new URL(
+    "./icons/chevron-left.svg",
+    import.meta.url,
+  ).toString(),
+  "chevron-right": new URL(
+    "./icons/chevron-right.svg",
+    import.meta.url,
+  ).toString(),
   check: new URL("./icons/check.svg", import.meta.url).toString(),
   alert: new URL("./icons/alert.svg", import.meta.url).toString(),
 } as const;

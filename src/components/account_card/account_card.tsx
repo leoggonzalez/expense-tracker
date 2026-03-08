@@ -26,29 +26,35 @@ export function AccountCard({
   allTimeNet,
 }: AccountCardProps): React.ReactElement {
   return (
-    <AppLink href={`/accounts/${id}`} className="account-card">
-      <Card padding={20} className="account-card__panel">
-        <Stack gap={10}>
-          <Text size="lg" weight="semibold">
-            {name}
-          </Text>
-          <Stack gap={4} className="account-card__meta">
-            <Text size="xs" color="secondary">
-              {i18n.t("accounts_page.total_balance")}
-            </Text>
-            <Text
-              size="lg"
-              weight="bold"
-              color={allTimeNet >= 0 ? "success" : "danger"}
-            >
-              {formatCurrency(allTimeNet)}
-            </Text>
-          </Stack>
-          <Text size="sm" color="secondary">
-            {i18n.t("accounts_page.entry_count", { count: entryCount })}
-          </Text>
-        </Stack>
-      </Card>
-    </AppLink>
+    <div className="account-card">
+      <AppLink href={`/accounts/${id}`}>
+        <div className="account-card__panel">
+          <Card padding={20}>
+            <Stack gap={10}>
+              <Text size="lg" weight="semibold">
+                {name}
+              </Text>
+              <div className="account-card__meta">
+                <Stack gap={4}>
+                  <Text size="xs" color="secondary">
+                    {i18n.t("accounts_page.total_balance")}
+                  </Text>
+                  <Text
+                    size="lg"
+                    weight="bold"
+                    color={allTimeNet >= 0 ? "success" : "danger"}
+                  >
+                    {formatCurrency(allTimeNet)}
+                  </Text>
+                </Stack>
+              </div>
+              <Text size="sm" color="secondary">
+                {i18n.t("accounts_page.entry_count", { count: entryCount })}
+              </Text>
+            </Stack>
+          </Card>
+        </div>
+      </AppLink>
+    </div>
   );
 }

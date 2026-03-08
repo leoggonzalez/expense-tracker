@@ -1,25 +1,37 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { useForm } from "react-use-form-library";
+import "./entry_form.scss";
 
-import { Stack, Icon } from "@/elements";
-import { AccountField, Button, Checkbox, Input, Select } from "@/components";
+import {
+  AccountField,
+  Button,
+  Input,
+  MonthSelector,
+  Select,
+} from "@/components";
+import { CreateEntryInput, createEntry, updateEntry } from "@/actions/entries";
+import {
+  EntryDateMode,
+  EntryScheduleMode,
+  deriveScheduleFromDates,
+  normalizeDateValue,
+  resolveEndDate,
+  toDate,
+} from "@/lib/entry_schedule";
+import { Icon, Stack, Text } from "@/elements";
+import React, { useEffect, useRef, useState } from "react";
 import {
   clearNewEntryDraft,
   loadNewEntryDraft,
   saveNewEntryDraft,
   setNewEntryFlowActive,
 } from "@/lib/new_entry_draft";
-import {
-  EntryDateField,
-  EntryDateFieldMode,
-} from "@/components/entry_date_field/entry_date_field";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
-import { createEntry, CreateEntryInput, updateEntry } from "@/actions/entries";
-import { useToast } from "@/components/toast_provider/toast_provider";
+
+import { format } from "date-fns";
 import { i18n } from "@/model/i18n";
-import "./entry_form.scss";
+import { useForm } from "react-use-form-library";
+import { useToast } from "@/components/toast_provider/toast_provider";
 
 export interface EntryFormProps {
   accounts?: string[];
@@ -44,10 +56,9 @@ type EntryFormModel = {
   description: string;
   amountInput: string;
   beginDate: string;
-  endDate: string;
-  isRecurring: boolean;
-  beginDateMode: EntryDateFieldMode;
-  endDateMode: EntryDateFieldMode;
+  beginDateMode: EntryDateMode;
+  scheduleMode: EntryScheduleMode;
+  installments: string;
 };
 
 function formatDateForInput(date: Date | null | undefined): string {
@@ -62,54 +73,6 @@ function formatMonthForInput(date: Date | null | undefined): string {
   return formatDateForInput(date).slice(0, 7);
 }
 
-function normalizeDateValue(value: string, mode: EntryDateFieldMode): string {
-  if (!value) {
-    return "";
-  }
-
-  return mode === "month" ? `${value}-01` : value;
-}
-
-function toDate(value: string, mode: EntryDateFieldMode): Date | null {
-  const normalizedValue = normalizeDateValue(value, mode);
-
-  if (!normalizedValue) {
-    return null;
-  }
-
-  return new Date(normalizedValue);
-}
-
-function toModeValue(value: string, mode: EntryDateFieldMode): string {
-  if (!value) {
-    return "";
-  }
-
-  return mode === "month"
-    ? value.slice(0, 7)
-    : normalizeDateValue(value, "date");
-}
-
-function getAlignedEndDate(
-  beginDate: string,
-  beginDateMode: EntryDateFieldMode,
-  endDate: string,
-  endDateMode: EntryDateFieldMode,
-): string {
-  const normalizedBeginDate = normalizeDateValue(beginDate, beginDateMode);
-  const normalizedEndDate = normalizeDateValue(endDate, endDateMode);
-
-  if (!normalizedBeginDate) {
-    return endDate;
-  }
-
-  if (!normalizedEndDate || normalizedBeginDate > normalizedEndDate) {
-    return toModeValue(normalizedBeginDate, endDateMode);
-  }
-
-  return endDate;
-}
-
 function getInitialModel(props: EntryFormProps): EntryFormModel {
   const type =
     (props.initialData?.type as "income" | "expense") ||
@@ -120,7 +83,8 @@ function getInitialModel(props: EntryFormProps): EntryFormModel {
     : new Date();
   const endDate = props.initialData?.endDate
     ? new Date(props.initialData.endDate)
-    : beginDate;
+    : null;
+  const schedule = deriveScheduleFromDates({ beginDate, endDate });
 
   return {
     type,
@@ -130,10 +94,9 @@ function getInitialModel(props: EntryFormProps): EntryFormModel {
       ? String(props.initialData.amount)
       : "",
     beginDate: formatMonthForInput(beginDate),
-    endDate: formatMonthForInput(endDate),
-    isRecurring: props.initialData ? !props.initialData.endDate : false,
     beginDateMode: "month",
-    endDateMode: "month",
+    scheduleMode: schedule.scheduleMode || "one_time",
+    installments: String(schedule.installments),
   };
 }
 
@@ -181,6 +144,20 @@ function getSubmitButtonConfig(
   };
 }
 
+function parseInstallments(value: string): number | null {
+  const parsed = Number.parseInt(value, 10);
+
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 120) {
+    return null;
+  }
+
+  return parsed;
+}
+
+function sanitizeInstallmentsInput(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
 export function EntryForm({
   accounts: initialAccounts = [],
   onSuccess,
@@ -217,6 +194,7 @@ export function EntryForm({
       : entryType === "expense"
         ? "toast.expense_create_failed"
         : "toast.entry_create_failed";
+
   const form = useForm<EntryFormModel>({
     model: initialModelRef.current,
     handleSubmit: async () => {
@@ -231,16 +209,30 @@ export function EntryForm({
         return;
       }
 
+      const beginDate =
+        toDate(form.model.beginDate, form.model.beginDateMode) || new Date();
+      const parsedInstallments = parseInstallments(form.model.installments);
+
+      if (form.model.scheduleMode === "installments" && !parsedInstallments) {
+        if (!isEdit) {
+          showError(i18n.t("entry_form.invalid_installments"), {
+            iconName: form.model.type,
+          });
+        }
+        return;
+      }
+
       const payload: CreateEntryInput = {
         type: isEdit ? form.model.type : entryType || form.model.type,
         accountName: form.model.accountName,
         description: form.model.description,
         amount: parsedAmount,
-        beginDate:
-          toDate(form.model.beginDate, form.model.beginDateMode) || new Date(),
-        endDate: form.model.isRecurring
-          ? null
-          : toDate(form.model.endDate, form.model.endDateMode),
+        beginDate,
+        endDate: resolveEndDate({
+          scheduleMode: form.model.scheduleMode,
+          beginDate,
+          installments: parsedInstallments || 1,
+        }),
       };
 
       const result =
@@ -303,10 +295,9 @@ export function EntryForm({
         description: draft.description,
         amountInput: draft.amountInput,
         beginDate: draft.beginDate,
-        endDate: draft.endDate,
-        isRecurring: draft.isRecurring,
         beginDateMode: draft.beginDateMode,
-        endDateMode: draft.endDateMode,
+        scheduleMode: draft.scheduleMode || "one_time",
+        installments: draft.installments || "1",
       });
     }
 
@@ -329,22 +320,20 @@ export function EntryForm({
       description: model.description,
       amountInput: model.amountInput,
       beginDate: model.beginDate,
-      endDate: model.endDate,
-      isRecurring: model.isRecurring,
       beginDateMode: model.beginDateMode,
-      endDateMode: model.endDateMode,
+      scheduleMode: model.scheduleMode,
+      installments: model.installments,
     });
   }, [
+    isCreateFlow,
+    isDraftReady,
     model.accountName,
     model.amountInput,
     model.beginDate,
     model.beginDateMode,
     model.description,
-    model.endDate,
-    model.endDateMode,
-    model.isRecurring,
-    isCreateFlow,
-    isDraftReady,
+    model.installments,
+    model.scheduleMode,
   ]);
 
   const showTypeField = isEdit || !hideTypeField;
@@ -358,68 +347,42 @@ export function EntryForm({
   };
 
   const handleBeginDateChange = (value: string): void => {
-    const nextEndDate = model.isRecurring
-      ? model.endDate
-      : getAlignedEndDate(
-          value,
-          model.beginDateMode,
-          model.endDate,
-          model.endDateMode,
-        );
-
     updateFields({
       beginDate: value,
-      endDate: nextEndDate,
-    });
-  };
-
-  const handleEndDateChange = (value: string): void => {
-    updateFields({
-      endDate: value,
-    });
-  };
-
-  const handleRecurringChange = (checked: boolean): void => {
-    updateFields({
-      isRecurring: checked,
-      endDate: checked
-        ? model.endDate
-        : getAlignedEndDate(
-            model.beginDate,
-            model.beginDateMode,
-            model.endDate,
-            model.endDateMode,
-          ),
     });
   };
 
   const handleBeginDateModeChange = (): void => {
-    const nextBeginDate = normalizeDateValue(
-      model.beginDate,
-      model.beginDateMode,
-    );
-    const nextEndDate = model.isRecurring
-      ? model.endDate
-      : getAlignedEndDate(
-          nextBeginDate,
-          "date",
-          model.endDate,
-          model.endDateMode,
-        );
-
     updateFields({
       beginDateMode: "date",
-      beginDate: nextBeginDate,
-      endDate: nextEndDate,
+      beginDate: normalizeDateValue(model.beginDate, model.beginDateMode),
     });
   };
 
-  const handleEndDateModeChange = (): void => {
+  const handleScheduleModeChange = (value: EntryScheduleMode): void => {
     updateFields({
-      endDateMode: "date",
-      endDate: normalizeDateValue(model.endDate, model.endDateMode),
+      scheduleMode: value,
+      installments: value === "installments" ? model.installments || "1" : "1",
     });
   };
+
+  const parsedInstallments = parseInstallments(model.installments);
+  const beginDateForPreview = toDate(model.beginDate, model.beginDateMode);
+  const calculatedEndDate =
+    beginDateForPreview && parsedInstallments
+      ? resolveEndDate({
+          scheduleMode: model.scheduleMode,
+          beginDate: beginDateForPreview,
+          installments: parsedInstallments,
+        })
+      : null;
+
+  const formattedEndDate = calculatedEndDate
+    ? format(
+        calculatedEndDate,
+        model.beginDateMode === "month" ? "MMMM yyyy" : "MMM dd, yyyy",
+      )
+    : null;
 
   return (
     <form onSubmit={onSubmit} className="entry-form">
@@ -466,7 +429,42 @@ export function EntryForm({
           required
         />
 
-        <EntryDateField
+        <Stack gap={4}>
+          <Text size="sm" weight="medium">
+            {i18n.t("entry_form.schedule_label")}
+          </Text>
+
+          <Stack direction="row" wrap gap={12}>
+            {(
+              [
+                {
+                  value: "one_time",
+                  label: i18n.t("entry_form.schedule_one_time"),
+                },
+                {
+                  value: "installments",
+                  label: i18n.t("entry_form.schedule_installments"),
+                },
+                {
+                  value: "unlimited",
+                  label: i18n.t("entry_form.schedule_unlimited"),
+                },
+              ] as const
+            ).map((option) => (
+              <label key={option.value} className="entry-form__schedule-option">
+                <input
+                  type="radio"
+                  name="entry-schedule"
+                  checked={model.scheduleMode === option.value}
+                  onChange={() => handleScheduleModeChange(option.value)}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </Stack>
+        </Stack>
+
+        <MonthSelector
           label={i18n.t(
             model.beginDateMode === "month"
               ? "entry_form.begin_date_month"
@@ -477,28 +475,34 @@ export function EntryForm({
           onChange={handleBeginDateChange}
           onEnableFullDate={handleBeginDateModeChange}
           editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
+          monthLabel={i18n.t("entry_form.month")}
+          yearLabel={i18n.t("entry_form.year")}
           required
         />
 
-        <Checkbox
-          checked={model.isRecurring}
-          onChange={handleRecurringChange}
-          label={i18n.t("entry_form.recurring")}
-        />
+        {model.scheduleMode === "installments" && (
+          <Stack gap={8}>
+            <Input
+              label={i18n.t("entry_form.installments")}
+              type="number"
+              value={fields.installments.value || "1"}
+              onChange={(value) =>
+                fields.installments.onChange(sanitizeInstallmentsInput(value))
+              }
+              min={1}
+              max={120}
+              step={1}
+              required
+            />
 
-        {!model.isRecurring && (
-          <EntryDateField
-            label={i18n.t(
-              model.endDateMode === "month"
-                ? "entry_form.end_date_month"
-                : "entry_form.end_date",
+            {formattedEndDate && (
+              <Text size="sm" color="secondary">
+                {i18n.t("entry_form.calculated_end_date", {
+                  endDate: formattedEndDate,
+                })}
+              </Text>
             )}
-            mode={model.endDateMode}
-            value={fields.endDate.value || ""}
-            onChange={handleEndDateChange}
-            onEnableFullDate={handleEndDateModeChange}
-            editLabel={String(i18n.t("entry_form.edit_full_end_date"))}
-          />
+          </Stack>
         )}
 
         <Button
