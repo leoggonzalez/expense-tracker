@@ -2,9 +2,13 @@
 
 .stack {
   display: flex;
-  flex-direction: var(--stack-direction, column);
+  flex-direction: var(--stack-direction);
   gap: var(--stack-gap, 0);
   align-items: var(--stack-align, stretch);
   justify-content: var(--stack-justify, flex-start);
   flex-wrap: var(--stack-wrap, nowrap);
+
+  @media (min-width: $breakpoint-desktop) {
+    flex-direction: var(--stack-desktop-direction);
+  }
 }

@@ -34,7 +34,9 @@ export default async function Page({
     searchParams,
   ]);
 
-  const toAccount = accounts.find((account) => account.id === params.to_account);
+  const toAccount = accounts.find(
+    (account) => account.id === params.to_account,
+  );
   const normalizedAmount = sanitizeAmountInput(params.amount || "");
   const initialValues = {
     toAccountId: toAccount?.id || "",

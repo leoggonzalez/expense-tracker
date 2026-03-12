@@ -32,7 +32,9 @@ function formatTooltipValue(value: unknown): string {
   return formatCurrency(Number.isFinite(numericValue) ? numericValue : 0);
 }
 
-export function ProjectionChart({ data }: ProjectionChartProps): React.ReactElement {
+export function ProjectionChart({
+  data,
+}: ProjectionChartProps): React.ReactElement {
   return (
     <div className="projection-chart">
       <ResponsiveContainer width="100%" height="100%">

@@ -11,12 +11,19 @@ import {
   normalizeDateValue,
   toModeValue,
 } from "@/lib/entry_schedule";
+import { i18n } from "@/model/i18n";
+
+type MonthSelectorField = {
+  value?: string;
+  onChange: (value: string) => void;
+};
 
 type MonthSelectorProps = {
   label: React.ReactNode;
   mode: EntryDateMode;
-  value: string;
-  onChange: (value: string) => void;
+  field?: MonthSelectorField;
+  value?: string;
+  onChange?: (value: string) => void;
   onEnableFullDate: () => void;
   editLabel: string;
   monthLabel: React.ReactNode;
@@ -25,10 +32,12 @@ type MonthSelectorProps = {
 };
 
 function getMonthOptions(): Array<{ value: string; label: string }> {
+  const locale = i18n.locale || "en";
+
   return Array.from({ length: 12 }, (_, index) => {
     const monthIndex = index + 1;
     const monthValue = String(monthIndex).padStart(2, "0");
-    const monthLabel = new Intl.DateTimeFormat(undefined, {
+    const monthLabel = new Intl.DateTimeFormat(locale, {
       month: "long",
     }).format(new Date(2000, index, 1));
 
@@ -65,6 +74,7 @@ function getYearOptions(
 export function MonthSelector({
   label,
   mode,
+  field,
   value,
   onChange,
   onEnableFullDate,
@@ -73,19 +83,31 @@ export function MonthSelector({
   yearLabel,
   required = false,
 }: MonthSelectorProps): React.ReactElement {
+  const fieldValue = field?.value ?? value ?? "";
+  const handleFieldChange = field?.onChange ?? onChange;
+
+  if (!handleFieldChange) {
+    throw new Error(
+      "MonthSelector requires either field.onChange or onChange to be provided.",
+    );
+  }
+
   if (mode === "date") {
     return (
       <Input
         label={label}
         type="date"
-        value={toModeValue(value, "date")}
-        onChange={onChange}
+        value={toModeValue(fieldValue, "date")}
+        onChange={handleFieldChange}
         required={required}
       />
     );
   }
 
-  const normalizedValue = toModeValue(normalizeDateValue(value, mode), "month");
+  const normalizedValue = toModeValue(
+    normalizeDateValue(fieldValue, mode),
+    "month",
+  );
   const [yearRaw, monthRaw] = normalizedValue.split("-");
   const fallbackDate = new Date();
   const year = Number(yearRaw || fallbackDate.getFullYear());
@@ -93,11 +115,11 @@ export function MonthSelector({
     monthRaw || String(fallbackDate.getMonth() + 1).padStart(2, "0");
 
   const updateMonth = (nextMonth: string): void => {
-    onChange(`${year}-${nextMonth}`);
+    handleFieldChange(`${year}-${nextMonth}`);
   };
 
   const updateYear = (nextYear: string): void => {
-    onChange(`${nextYear}-${month}`);
+    handleFieldChange(`${nextYear}-${month}`);
   };
 
   return (

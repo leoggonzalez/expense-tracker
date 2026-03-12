@@ -7,7 +7,11 @@ import React, { useMemo, useState } from "react";
 import { createTransferEntry } from "@/actions/entries";
 import { MonthSelector } from "@/components/month_selector/month_selector";
 import { Button, InfoBox, Input, Select } from "@/components";
-import { normalizeDateValue, toDate, type EntryDateMode } from "@/lib/entry_schedule";
+import {
+  normalizeDateValue,
+  toDate,
+  type EntryDateMode,
+} from "@/lib/entry_schedule";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import { Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
@@ -38,10 +42,16 @@ export function TransferForm({
 }: TransferFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
   const [fromAccountId, setFromAccountId] = useState("");
-  const [toAccountId, setToAccountId] = useState(initialValues?.toAccountId || "");
-  const [description, setDescription] = useState(initialValues?.description || "");
+  const [toAccountId, setToAccountId] = useState(
+    initialValues?.toAccountId || "",
+  );
+  const [description, setDescription] = useState(
+    initialValues?.description || "",
+  );
   const [amountInput, setAmountInput] = useState(initialValues?.amount || "");
-  const [beginDate, setBeginDate] = useState(new Date().toISOString().slice(0, 7));
+  const [beginDate, setBeginDate] = useState(
+    new Date().toISOString().slice(0, 7),
+  );
   const [beginDateMode, setBeginDateMode] = useState<EntryDateMode>("month");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -54,7 +64,9 @@ export function TransferForm({
     [accounts],
   );
   const parsedAmount = parseAmountInput(amountInput);
-  const selectedFromAccount = accounts.find((account) => account.id === fromAccountId);
+  const selectedFromAccount = accounts.find(
+    (account) => account.id === fromAccountId,
+  );
   const showInsufficientFundsWarning =
     Boolean(selectedFromAccount) &&
     parsedAmount !== null &&
@@ -68,7 +80,9 @@ export function TransferForm({
     const parsedAmount = parseAmountInput(amountInput);
 
     if (!fromAccountId || !toAccountId || !description || !parsedBeginDate) {
-      showError(i18n.t("toast.transfer_create_failed"), { iconName: "transfer" });
+      showError(i18n.t("toast.transfer_create_failed"), {
+        iconName: "transfer",
+      });
       return;
     }
 
@@ -99,7 +113,9 @@ export function TransferForm({
     setIsSubmitting(false);
 
     if (!result.success) {
-      showError(i18n.t("toast.transfer_create_failed"), { iconName: "transfer" });
+      showError(i18n.t("toast.transfer_create_failed"), {
+        iconName: "transfer",
+      });
       return;
     }
 
@@ -127,13 +143,17 @@ export function TransferForm({
           value={fromAccountId}
           onChange={setFromAccountId}
           options={transferOptions}
-          placeholder={i18n.t("entry_form.transfer_account_placeholder") as string}
+          placeholder={
+            i18n.t("entry_form.transfer_account_placeholder") as string
+          }
           required
         />
         {showInsufficientFundsWarning && selectedFromAccount ? (
           <InfoBox
             variant="warning"
-            title={String(i18n.t("entry_form.transfer_insufficient_funds_title"))}
+            title={String(
+              i18n.t("entry_form.transfer_insufficient_funds_title"),
+            )}
             message={String(
               i18n.t("entry_form.transfer_insufficient_funds_message", {
                 account: selectedFromAccount.name,
@@ -149,7 +169,9 @@ export function TransferForm({
           value={toAccountId}
           onChange={setToAccountId}
           options={transferOptions}
-          placeholder={i18n.t("entry_form.transfer_account_placeholder") as string}
+          placeholder={
+            i18n.t("entry_form.transfer_account_placeholder") as string
+          }
           required
         />
 
@@ -181,7 +203,9 @@ export function TransferForm({
           onChange={setBeginDate}
           onEnableFullDate={() => {
             setBeginDateMode("date");
-            setBeginDate((currentValue) => normalizeDateValue(currentValue, beginDateMode));
+            setBeginDate((currentValue) =>
+              normalizeDateValue(currentValue, beginDateMode),
+            );
           }}
           editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
           monthLabel={i18n.t("entry_form.month")}
