@@ -19,7 +19,9 @@ export default function Page(): React.ReactElement {
 
         <AccountCreateForm />
 
-        <AppLink href="/accounts">{i18n.t("accounts_page.back_to_accounts")}</AppLink>
+        <AppLink href="/accounts">
+          {i18n.t("accounts_page.back_to_accounts")}
+        </AppLink>
       </Stack>
     </Container>
   );

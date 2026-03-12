@@ -7,6 +7,7 @@ type StackStyle = React.CSSProperties & Record<`--${string}`, string>;
 export interface StackProps {
   children: React.ReactNode;
   direction?: "row" | "column";
+  desktopDirection?: "row" | "column";
   gap?: number;
   align?: "flex-start" | "center" | "flex-end" | "stretch";
   justify?:
@@ -21,6 +22,7 @@ export interface StackProps {
 export function Stack({
   children,
   direction = "column",
+  desktopDirection,
   gap = 0,
   align,
   justify,
@@ -28,6 +30,7 @@ export function Stack({
 }: StackProps): React.ReactElement {
   const style: StackStyle = {
     "--stack-direction": direction,
+    "--stack-desktop-direction": desktopDirection || direction,
     "--stack-gap": `${gap}px`,
     "--stack-wrap": wrap ? "wrap" : "nowrap",
   };

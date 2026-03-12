@@ -17,7 +17,10 @@ export default async function Page({
   params,
 }: EntryEditPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const [entry, accounts] = await Promise.all([getEntryById(id), getAccounts()]);
+  const [entry, accounts] = await Promise.all([
+    getEntryById(id),
+    getAccounts(),
+  ]);
 
   if (!entry) {
     notFound();

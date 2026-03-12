@@ -119,7 +119,9 @@ async function getMonthTotalForAccount(
   monthStart: Date,
   monthEnd: Date,
 ): Promise<number> {
-  const rows = await prisma.$queryRaw<Array<{ currentMonthTotal: number | null }>>`
+  const rows = await prisma.$queryRaw<
+    Array<{ currentMonthTotal: number | null }>
+  >`
     SELECT
       COALESCE(
         SUM(
@@ -151,7 +153,9 @@ async function getHistoricalTotalForAccount(
   userId: string,
   accountId: string,
 ): Promise<number> {
-  const rows = await prisma.$queryRaw<Array<{ historicalTotal: number | null }>>`
+  const rows = await prisma.$queryRaw<
+    Array<{ historicalTotal: number | null }>
+  >`
     SELECT
       COALESCE(
         SUM(
@@ -250,14 +254,22 @@ export async function getAccountDetailPageData(input: {
   const monthEnd = endOfMonth(monthStart);
 
   try {
-    const account = await findOwnedAccountOrNull(currentUser.id, input.accountId);
+    const account = await findOwnedAccountOrNull(
+      currentUser.id,
+      input.accountId,
+    );
 
     if (!account) {
       return null;
     }
 
-    const [total, allEntriesRaw, selectedMonthTotal, historicalTotal, selectedMonthRelevantRaw] =
-      await Promise.all([
+    const [
+      total,
+      allEntriesRaw,
+      selectedMonthTotal,
+      historicalTotal,
+      selectedMonthRelevantRaw,
+    ] = await Promise.all([
       prisma.entry.count({
         where: {
           accountId: account.id,
@@ -349,18 +361,18 @@ export async function getAccountDetailPageData(input: {
       createdAt: Date;
       updatedAt: Date;
     }): AccountDetailEntry => ({
-        id: entry.id,
-        type: entry.type,
-        accountName: account.name,
-        transferAccountId: entry.transferAccountId,
-        transferAccountName: entry.transferAccount?.name || null,
-        description: entry.description,
-        amount: normalizeEntryAmount(entry.type, entry.amount),
-        beginDate: entry.beginDate.toISOString(),
-        endDate: entry.endDate?.toISOString() || null,
-        createdAt: entry.createdAt.toISOString(),
-        updatedAt: entry.updatedAt.toISOString(),
-      });
+      id: entry.id,
+      type: entry.type,
+      accountName: account.name,
+      transferAccountId: entry.transferAccountId,
+      transferAccountName: entry.transferAccount?.name || null,
+      description: entry.description,
+      amount: normalizeEntryAmount(entry.type, entry.amount),
+      beginDate: entry.beginDate.toISOString(),
+      endDate: entry.endDate?.toISOString() || null,
+      createdAt: entry.createdAt.toISOString(),
+      updatedAt: entry.updatedAt.toISOString(),
+    });
 
     return {
       selectedMonth: {
@@ -374,7 +386,8 @@ export async function getAccountDetailPageData(input: {
         historicalTotal,
         selectedMonthTotal,
       },
-      selectedMonthRelevantEntries: sortedSelectedMonthRelevantRaw.map(serializeEntry),
+      selectedMonthRelevantEntries:
+        sortedSelectedMonthRelevantRaw.map(serializeEntry),
       allEntries: allEntriesRaw.map(serializeEntry),
       pagination: {
         page,
@@ -389,7 +402,9 @@ export async function getAccountDetailPageData(input: {
   }
 }
 
-export async function getAccountForEdit(id: string): Promise<AccountEditData | null> {
+export async function getAccountForEdit(
+  id: string,
+): Promise<AccountEditData | null> {
   const currentUser = await requireCurrentUser();
 
   try {
@@ -514,7 +529,9 @@ export async function archiveAccount(
   }
 }
 
-export async function unarchiveAccount(id: string): Promise<AccountActionResult> {
+export async function unarchiveAccount(
+  id: string,
+): Promise<AccountActionResult> {
   const currentUser = await requireCurrentUser();
 
   try {

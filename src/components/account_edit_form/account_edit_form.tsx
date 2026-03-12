@@ -50,7 +50,9 @@ export function AccountEditForm({
             label={i18n.t("accounts_page.account_name")}
             value={name}
             onChange={setName}
-            placeholder={i18n.t("accounts_page.account_name_placeholder") as string}
+            placeholder={
+              i18n.t("accounts_page.account_name_placeholder") as string
+            }
             required
           />
 

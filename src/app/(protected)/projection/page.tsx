@@ -150,8 +150,8 @@ export default async function ProjectionPage({
                       entries={account.entries}
                       showDelete={false}
                       entryHrefBase="/entries"
-                      topSummaryRows={
-                        hiddenEntriesCount > 0
+                      summaryRows={[
+                        ...(hiddenEntriesCount > 0
                           ? [
                               {
                                 id: `more-${account.accountId}`,
@@ -164,13 +164,17 @@ export default async function ProjectionPage({
                                 href: accountMonthHref,
                               },
                             ]
-                          : []
-                      }
-                      summaryRows={[
+                          : []),
                         {
                           id: `total-${account.accountId}`,
                           label: i18n.t("projection_page.account_month_total"),
-                          value: <Currency value={account.monthTotal} size="sm" weight="bold" />,
+                          value: (
+                            <Currency
+                              value={account.monthTotal}
+                              size="sm"
+                              weight="bold"
+                            />
+                          ),
                           tone: "emphasis",
                         },
                       ]}

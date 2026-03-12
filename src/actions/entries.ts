@@ -600,7 +600,10 @@ export async function createTransferEntry(
       }),
     ]);
 
-    await syncCurrentMonthEntryCounterForAccounts([fromAccount.id, toAccount.id]);
+    await syncCurrentMonthEntryCounterForAccounts([
+      fromAccount.id,
+      toAccount.id,
+    ]);
     revalidateEntryPages();
 
     return { success: true, entries: [fromEntry, toEntry] };
@@ -707,9 +710,13 @@ export async function getProjectionPagePayload(
     startOfMonth(new Date()),
   );
 
-  const [chartRows, focusedMonthTotals, accountSummaryRows, accountEntriesRows] =
-    await Promise.all([
-      prisma.$queryRaw<ProjectionChartMonthRow[]>`
+  const [
+    chartRows,
+    focusedMonthTotals,
+    accountSummaryRows,
+    accountEntriesRows,
+  ] = await Promise.all([
+    prisma.$queryRaw<ProjectionChartMonthRow[]>`
       WITH months AS (
         SELECT generate_series(
           ${normalizedFocusedMonthStart}::timestamp,
@@ -752,8 +759,8 @@ export async function getProjectionPagePayload(
       GROUP BY months.month_start
       ORDER BY months.month_start ASC
     `,
-      getMonthTotalsForUser(currentUser.id, normalizedFocusedMonthStart),
-      prisma.$queryRaw<ProjectionFocusedAccountSummaryRow[]>`
+    getMonthTotalsForUser(currentUser.id, normalizedFocusedMonthStart),
+    prisma.$queryRaw<ProjectionFocusedAccountSummaryRow[]>`
       SELECT
         a.id AS "accountId",
         a.name AS "accountName",
@@ -783,7 +790,7 @@ export async function getProjectionPagePayload(
       GROUP BY a.id, a.name, a."currentMonthEntryCount"
       ORDER BY a.name ASC
     `,
-      prisma.$queryRaw<ProjectionFocusedAccountEntryRow[]>`
+    prisma.$queryRaw<ProjectionFocusedAccountEntryRow[]>`
       SELECT
         ranked."accountId",
         ranked."accountName",
@@ -826,7 +833,7 @@ export async function getProjectionPagePayload(
       WHERE ranked.row_number <= 5
       ORDER BY ranked."accountName" ASC, ranked."beginDate" DESC, ranked."createdAt" DESC
     `,
-    ]);
+  ]);
 
   const chartMonths: ProjectionChartMonth[] = chartRows.map((row, index) => {
     const monthStart = addMonths(normalizedFocusedMonthStart, index);

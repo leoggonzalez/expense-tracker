@@ -59,7 +59,9 @@ function getEntryTypeLabel(type: string): string {
   return String(i18n.t("common.transfer"));
 }
 
-export function EntryDetailPage({ entry }: EntryDetailPageProps): React.ReactElement {
+export function EntryDetailPage({
+  entry,
+}: EntryDetailPageProps): React.ReactElement {
   const { push } = useNavigationProgress();
   const [deleting, setDeleting] = useState(false);
   const settleDescription = String(
@@ -72,8 +74,12 @@ export function EntryDetailPage({ entry }: EntryDetailPageProps): React.ReactEle
   const transferDirectionLabel =
     entry.transferAccountId && entry.transferAccountName
       ? entry.amount < 0
-        ? i18n.t("entry_list.to_account", { account: entry.transferAccountName })
-        : i18n.t("entry_list.from_account", { account: entry.transferAccountName })
+        ? i18n.t("entry_list.to_account", {
+            account: entry.transferAccountName,
+          })
+        : i18n.t("entry_list.from_account", {
+            account: entry.transferAccountName,
+          })
       : null;
 
   const handleDelete = async () => {
@@ -96,7 +102,12 @@ export function EntryDetailPage({ entry }: EntryDetailPageProps): React.ReactEle
     <Container>
       <div className="entry-detail-page">
         <Stack gap={24}>
-          <Stack direction="row" align="center" justify="space-between" gap={12}>
+          <Stack
+            direction="row"
+            align="center"
+            justify="space-between"
+            gap={12}
+          >
             <Text size="h2" as="h1" weight="bold">
               {entry.description}
             </Text>
@@ -151,8 +162,16 @@ export function EntryDetailPage({ entry }: EntryDetailPageProps): React.ReactEle
                   ) : null}
                 </Stack>
                 <form action="/entries/new/transfer" method="get">
-                  <input type="hidden" name="to_account" value={entry.accountId} />
-                  <input type="hidden" name="description" value={settleDescription} />
+                  <input
+                    type="hidden"
+                    name="to_account"
+                    value={entry.accountId}
+                  />
+                  <input
+                    type="hidden"
+                    name="description"
+                    value={settleDescription}
+                  />
                   <input type="hidden" name="amount" value={settleAmount} />
                   <Button type="submit" variant="transfer" fullWidth>
                     {i18n.t("entry_detail_page.settle_entry")}

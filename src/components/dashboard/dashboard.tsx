@@ -46,7 +46,11 @@ export function Dashboard({
                       <Text size="sm" color="secondary" weight="medium">
                         {i18n.t("dashboard.income")}
                       </Text>
-                      <Currency value={totals.income} size="2xl" weight="bold" />
+                      <Currency
+                        value={totals.income}
+                        size="2xl"
+                        weight="bold"
+                      />
                     </Stack>
                   </Card>
                 </div>
@@ -61,7 +65,11 @@ export function Dashboard({
                       <Text size="sm" color="secondary" weight="medium">
                         {i18n.t("dashboard.expenses")}
                       </Text>
-                      <Currency value={totals.expense} size="2xl" weight="bold" />
+                      <Currency
+                        value={totals.expense}
+                        size="2xl"
+                        weight="bold"
+                      />
                     </Stack>
                   </Card>
                 </div>

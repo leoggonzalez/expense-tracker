@@ -104,9 +104,7 @@ export function EntryList({
               entryHref?.(entry) ??
               (entryHrefBase ? `${entryHrefBase}/${entry.id}` : null);
 
-            const rowMain = (
-              <EntryCard entry={entry} />
-            );
+            const rowMain = <EntryCard entry={entry} />;
 
             const content = (
               <div className="entry-list__content">

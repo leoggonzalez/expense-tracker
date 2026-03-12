@@ -1,10 +1,18 @@
+import {
+  AccountArchiveForm,
+  AppLink,
+  Avatar,
+  Button,
+  Container,
+  Currency,
+  EntryList,
+} from "@/components";
+import { Card, Stack, Text } from "@/elements";
+import { getAccountDetailPageData, unarchiveAccount } from "@/actions/accounts";
+
+import { i18n } from "@/model/i18n";
 import { notFound } from "next/navigation";
 import { startOfMonth } from "date-fns";
-
-import { getAccountDetailPageData, unarchiveAccount } from "@/actions/accounts";
-import { AccountArchiveForm, AppLink, Avatar, Button, Container, Currency, EntryList } from "@/components";
-import { Card, Stack, Text } from "@/elements";
-import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -66,9 +74,19 @@ export default async function Page({
 
         <Card padding={20} variant="secondary">
           <Stack gap={14}>
-            <Stack direction="row" align="flex-start" justify="space-between" gap={12}>
+            <Stack
+              direction="row"
+              align="flex-start"
+              justify="space-between"
+              gap={12}
+            >
               <Stack gap={10}>
-                <Stack direction="row" align="center" justify="space-between" gap={12}>
+                <Stack
+                  direction="row"
+                  align="center"
+                  justify="space-between"
+                  gap={12}
+                >
                   <Stack direction="row" align="center" gap={10}>
                     <Avatar name={data.account.name} />
                     <Text size="h4" as="h2" weight="semibold">
@@ -76,8 +94,13 @@ export default async function Page({
                     </Text>
                   </Stack>
                   {data.account.isArchived ? null : (
-                    <form action={`/accounts/${data.account.id}/edit`} method="get">
-                      <Button type="submit">{i18n.t("accounts_page.edit_account")}</Button>
+                    <form
+                      action={`/accounts/${data.account.id}/edit`}
+                      method="get"
+                    >
+                      <Button type="submit">
+                        {i18n.t("accounts_page.edit_account")}
+                      </Button>
                     </form>
                   )}
                 </Stack>
@@ -111,12 +134,18 @@ export default async function Page({
                   {i18n.t("accounts_page.archived_badge")}
                 </Text>
                 <form action={handleUnarchiveAction}>
-                  <Button type="submit">{i18n.t("accounts_page.unarchive")}</Button>
+                  <Button type="submit">
+                    {i18n.t("accounts_page.unarchive")}
+                  </Button>
                 </form>
               </Stack>
             ) : data.account.selectedMonthTotal < 0 ? (
               <form action="/entries/new/transfer" method="get">
-                <input type="hidden" name="to_account" value={data.account.id} />
+                <input
+                  type="hidden"
+                  name="to_account"
+                  value={data.account.id}
+                />
                 <input
                   type="hidden"
                   name="amount"
@@ -190,23 +219,27 @@ export default async function Page({
 
           {data.pagination.hasMore ? (
             <form method="get">
-              <input type="hidden" name="currentMonth" value={data.selectedMonth.key} />
+              <input
+                type="hidden"
+                name="currentMonth"
+                value={data.selectedMonth.key}
+              />
               <input type="hidden" name="page" value={String(page + 1)} />
-              <Button type="submit">{i18n.t("accounts_page.load_more_entries")}</Button>
+              <Button type="submit">
+                {i18n.t("accounts_page.load_more_entries")}
+              </Button>
             </form>
           ) : null}
         </Stack>
 
-        {!data.account.isArchived ? (
-          <Stack gap={10}>
-            <Text size="sm" color="secondary">
-              {i18n.t("accounts_page.archive")}
-            </Text>
+        <Stack desktopDirection="row" justify="space-between" align="center">
+          <AppLink href="/accounts">
+            {i18n.t("accounts_page.back_to_accounts")}
+          </AppLink>
+          {!data.account.isArchived ? (
             <AccountArchiveForm accountId={data.account.id} />
-          </Stack>
-        ) : null}
-
-        <AppLink href="/accounts">{i18n.t("accounts_page.back_to_accounts")}</AppLink>
+          ) : null}
+        </Stack>
       </Stack>
     </Container>
   );
