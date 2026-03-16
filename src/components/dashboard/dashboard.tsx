@@ -3,13 +3,14 @@
 import "./dashboard.scss";
 
 import {
+  AppLink,
   EntryList,
   EntryListItem,
+  Hero,
   useAppPreferences,
 } from "@/components";
 import { Card, Icon, Stack, Text } from "@/elements";
 
-import { AppLink } from "@/components";
 import { format } from "date-fns";
 import { formatCurrency } from "@/lib/utils";
 import React from "react";
@@ -46,19 +47,27 @@ export function Dashboard({
   return (
     <div className="dashboard">
       <Stack gap={24}>
-        <section className="dashboard__hero">
-          <div className="dashboard__hero-pattern" aria-hidden="true" />
-          <div className="dashboard__hero-main">
+        <Hero
+          icon="dashboard"
+          title={String(i18n.t("dashboard.hero_label"))}
+          pattern="dashboard"
+          actions={
+            <>
+              <AppLink href="/entries/new/income">
+                <span className="dashboard__hero-action dashboard__hero-action--primary">
+                  <Icon name="plus" size={18} />
+                  <span>{i18n.t("dashboard.hero_add_action")}</span>
+                </span>
+              </AppLink>
+              <button type="button" className="dashboard__hero-action">
+                <Icon name="dots-horizontal" size={18} />
+                <span>{i18n.t("dashboard.hero_more_action")}</span>
+              </button>
+            </>
+          }
+        >
+          <div className="dashboard__hero-body">
             <Stack gap={10}>
-              <Text
-                as="span"
-                size="sm"
-                color="inverse"
-                weight="medium"
-                transform="uppercase"
-              >
-                {i18n.t("dashboard.hero_label")}
-              </Text>
               <Text as="h1" size="h1" color="inverse" weight="bold">
                 {formatCurrency(totals.net)}
               </Text>
@@ -66,46 +75,30 @@ export function Dashboard({
                 {i18n.t("dashboard.hero_caption")}
               </Text>
             </Stack>
-          </div>
-
-          <div className="dashboard__hero-actions">
-            <AppLink href="/entries/new/income">
-              <span className="dashboard__hero-action dashboard__hero-action--primary">
-                <Icon name="plus" size={18} />
-                <span>
-                  {i18n.t("dashboard.hero_add_action")}
+            <div className="dashboard__hero-stats">
+              <AppLink href={`/entries?${currentMonthQuery}&type=income`}>
+                <span className="dashboard__stat-card">
+                  <Text as="span" size="xs" color="inverse" weight="medium">
+                    {i18n.t("dashboard.income")}
+                  </Text>
+                  <Text as="span" size="lg" color="inverse" weight="semibold">
+                    {formatCurrency(totals.income)}
+                  </Text>
                 </span>
-              </span>
-            </AppLink>
-            <button type="button" className="dashboard__hero-action">
-              <Icon name="dots-horizontal" size={18} />
-              <span>{i18n.t("dashboard.hero_more_action")}</span>
-            </button>
+              </AppLink>
+              <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
+                <span className="dashboard__stat-card dashboard__stat-card--soft">
+                  <Text as="span" size="xs" color="inverse" weight="medium">
+                    {i18n.t("dashboard.expenses")}
+                  </Text>
+                  <Text as="span" size="lg" color="inverse" weight="semibold">
+                    {formatCurrency(Math.abs(totals.expense))}
+                  </Text>
+                </span>
+              </AppLink>
+            </div>
           </div>
-
-          <div className="dashboard__hero-stats">
-            <AppLink href={`/entries?${currentMonthQuery}&type=income`}>
-              <span className="dashboard__stat-card">
-                <Text as="span" size="xs" color="inverse" weight="medium">
-                  {i18n.t("dashboard.income")}
-                </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
-                  {formatCurrency(totals.income)}
-                </Text>
-              </span>
-            </AppLink>
-            <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
-              <span className="dashboard__stat-card dashboard__stat-card--soft">
-                <Text as="span" size="xs" color="inverse" weight="medium">
-                  {i18n.t("dashboard.expenses")}
-                </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
-                  {formatCurrency(Math.abs(totals.expense))}
-                </Text>
-              </span>
-            </AppLink>
-          </div>
-        </section>
+        </Hero>
 
         <div className="dashboard__grid">
           <Card

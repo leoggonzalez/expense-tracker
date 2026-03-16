@@ -9,6 +9,7 @@ import {
   AppLink,
   Currency,
   EntryList,
+  Hero,
   ProjectionChart,
   useAppPreferences,
 } from "@/components";
@@ -52,19 +53,29 @@ export function ProjectionPage({
   return (
     <div className="projection-page">
       <Stack gap={24}>
-        <section className="projection-page__hero">
-          <div className="projection-page__hero-pattern" aria-hidden="true" />
-          <div className="projection-page__hero-copy">
+        <Hero
+          icon="projection"
+          title={String(i18n.t("projection_page.title"))}
+          pattern="projection"
+          actions={
+            <>
+              <AppLink href={`/projection?month=${payload.previousMonthKey}`}>
+                <span className="projection-page__nav-pill">
+                  <Icon name="chevron-left" size={16} />
+                  <span>{i18n.t("projection_page.previous_month")}</span>
+                </span>
+              </AppLink>
+              <AppLink href={`/projection?month=${payload.nextMonthKey}`}>
+                <span className="projection-page__nav-pill">
+                  <span>{i18n.t("projection_page.next_month")}</span>
+                  <Icon name="chevron-right" size={16} />
+                </span>
+              </AppLink>
+            </>
+          }
+        >
+          <div className="projection-page__hero-body">
             <Stack gap={10}>
-              <Text
-                as="span"
-                size="sm"
-                color="inverse"
-                weight="medium"
-                transform="uppercase"
-              >
-                {i18n.t("projection_page.title")}
-              </Text>
               <Text as="h1" size="h1" color="inverse" weight="bold">
                 {focusedMonthLabel}
               </Text>
@@ -72,55 +83,37 @@ export function ProjectionPage({
                 {i18n.t("projection_page.subtitle")}
               </Text>
             </Stack>
-          </div>
 
-          <div className="projection-page__hero-actions">
-            <AppLink href={`/projection?month=${payload.previousMonthKey}`}>
-              <span className="projection-page__nav-pill">
-                <Icon name="chevron-left" size={16} />
-                <span>{i18n.t("projection_page.previous_month")}</span>
-              </span>
-            </AppLink>
-            <AppLink href={`/projection?month=${payload.nextMonthKey}`}>
-              <span className="projection-page__nav-pill">
-                <span>{i18n.t("projection_page.next_month")}</span>
-                <Icon name="chevron-right" size={16} />
-              </span>
-            </AppLink>
-          </div>
-
-          <div className="projection-page__hero-summary">
-            <div className="projection-page__hero-stat">
-              <Text as="span" size="xs" color="inverse" weight="medium">
-                {i18n.t("projection_page.income")}
-              </Text>
-              <Text as="span" size="lg" color="inverse" weight="semibold">
-                {formatCurrency(payload.focusedMonthTotals.income)}
-              </Text>
-            </div>
-            <div className="projection-page__hero-stat projection-page__hero-stat--soft">
-              <Text as="span" size="xs" color="inverse" weight="medium">
-                {i18n.t("projection_page.expenses")}
-              </Text>
-              <Text as="span" size="lg" color="inverse" weight="semibold">
-                {formatCurrency(Math.abs(payload.focusedMonthTotals.expense))}
-              </Text>
-            </div>
-            <div className="projection-page__hero-stat projection-page__hero-stat--soft">
-              <Text as="span" size="xs" color="inverse" weight="medium">
-                {i18n.t("projection_page.total")}
-              </Text>
-              <Currency
-                value={payload.focusedMonthTotals.net}
-                size="lg"
-                weight="semibold"
-                as="span"
-              />
+            <div className="projection-page__hero-summary">
+              <div className="projection-page__hero-stat">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("projection_page.income")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {formatCurrency(payload.focusedMonthTotals.income)}
+                </Text>
+              </div>
+              <div className="projection-page__hero-stat projection-page__hero-stat--soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("projection_page.expenses")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {formatCurrency(Math.abs(payload.focusedMonthTotals.expense))}
+                </Text>
+              </div>
+              <div className="projection-page__hero-stat projection-page__hero-stat--soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("projection_page.total")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {formatCurrency(payload.focusedMonthTotals.net)}
+                </Text>
+              </div>
             </div>
           </div>
-        </section>
+        </Hero>
 
-        <div className="projection-page__insights">
+        <section className="projection-page__insights">
           <Card
             as="section"
             padding={24}
@@ -129,9 +122,7 @@ export function ProjectionPage({
           >
             <ProjectionChart data={chartData} />
           </Card>
-        </div>
 
-        <section className="projection-page__accounts">
           <Stack gap={16}>
             <Text size="h4" as="h3" weight="semibold">
               {i18n.t("projection_page.accounts_with_entries")}
@@ -199,7 +190,7 @@ export function ProjectionPage({
                               id: `total-${account.accountId}`,
                               label: i18n.t(
                                 "projection_page.account_month_total",
-                              ),
+                              ) as string,
                               value: (
                                 <Currency
                                   value={account.monthTotal}

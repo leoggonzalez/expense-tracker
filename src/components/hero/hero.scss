@@ -1,0 +1,134 @@
+@use "@/styles/variables.scss" as *;
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: var(--spacing-xl);
+  padding: 24px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #025864 0%, #0d6d77 100%);
+  box-shadow: var(--shadow-lg);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  &__header,
+  &__body {
+    position: relative;
+    z-index: 1;
+  }
+
+  &__header {
+    display: grid;
+    gap: var(--spacing-md);
+  }
+
+  &__title-row,
+  &__actions {
+    min-width: 0;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: var(--color-text-inverse);
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    flex-shrink: 0;
+  }
+
+  &__title {
+    min-width: 0;
+    color: var(--color-text-inverse);
+  }
+
+  &__title .text {
+    color: var(--color-text-inverse);
+  }
+
+  &__body {
+    display: grid;
+    gap: var(--spacing-lg);
+  }
+
+  &--pattern-dashboard::before {
+    background-image: url("./patterns/dashboard.svg");
+  }
+
+  &--pattern-projection::before {
+    background-image: url("./patterns/projection.svg");
+  }
+
+  &--pattern-entries::before {
+    background-image: url("./patterns/entries.svg");
+  }
+
+  &--pattern-accounts::before {
+    background-image: url("./patterns/accounts.svg");
+  }
+
+  &--pattern-account_detail::before {
+    background-image: url("./patterns/account_detail.svg");
+  }
+
+  &--pattern-account_form::before {
+    background-image: url("./patterns/account_form.svg");
+  }
+
+  &--pattern-entry_detail::before {
+    background-image: url("./patterns/entry_detail.svg");
+  }
+
+  &--pattern-new_entry::before {
+    background-image: url("./patterns/new_entry.svg");
+  }
+
+  &--pattern-account::before {
+    background-image: url("./patterns/account.svg");
+  }
+
+  &--pattern-settings::before {
+    background-image: url("./patterns/settings.svg");
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .hero {
+    padding: 32px;
+  }
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .hero {
+    padding: 40px;
+
+    &__header {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: var(--spacing-lg);
+    }
+
+    &__actions {
+      justify-content: flex-end;
+    }
+  }
+}

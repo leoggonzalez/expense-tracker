@@ -3,45 +3,9 @@
 .entries-page {
   width: 100%;
 
-  &__hero {
-    position: relative;
-    overflow: hidden;
+  &__hero-body {
     display: grid;
     gap: var(--spacing-xl);
-    padding: 24px;
-    border-radius: 32px;
-    background: linear-gradient(135deg, #025864 0%, #0d6d77 100%);
-    box-shadow: var(--shadow-lg);
-  }
-
-  &__hero-pattern {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(
-        115deg,
-        transparent 0,
-        transparent 46%,
-        rgba(255, 255, 255, 0.08) 46%,
-        rgba(255, 255, 255, 0.08) 48%,
-        transparent 48%,
-        transparent 100%
-      ),
-      radial-gradient(circle at 84% 26%, rgba(255, 255, 255, 0.08) 0 12%, transparent 12.5%);
-    pointer-events: none;
-  }
-
-  &__hero-copy,
-  &__hero-actions,
-  &__hero-stats {
-    position: relative;
-    z-index: 1;
-  }
-
-  &__hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
   }
 
   &__hero-action {
@@ -102,39 +66,8 @@
 
 @media (min-width: $breakpoint-tablet) {
   .entries-page {
-    &__hero {
-      padding: 32px;
-    }
-
     &__hero-stats {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-}
-
-@media (min-width: $breakpoint-desktop) {
-  .entries-page {
-    &__hero {
-      grid-template-columns: minmax(0, 1.25fr) auto;
-      grid-template-areas:
-        "copy actions"
-        "stats stats";
-      align-items: start;
-      padding: 40px;
-    }
-
-    &__hero-copy {
-      grid-area: copy;
-      max-width: 640px;
-    }
-
-    &__hero-actions {
-      grid-area: actions;
-      justify-content: flex-end;
-    }
-
-    &__hero-stats {
-      grid-area: stats;
     }
   }
 }

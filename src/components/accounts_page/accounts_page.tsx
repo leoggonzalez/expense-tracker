@@ -3,8 +3,8 @@ import "./accounts_page.scss";
 import React from "react";
 
 import type { AccountCurrentMonthSummary } from "@/actions/accounts";
-import { AppLink, Button, Container } from "@/components";
 import { AccountCard } from "@/components/account_card/account_card";
+import { AppLink, Button, Hero } from "@/components";
 import { Card, Icon, Stack, Text } from "@/elements";
 import { addMonths, format } from "date-fns";
 import { i18n } from "@/model/i18n";
@@ -34,32 +34,14 @@ export function AccountsPage({
   const nextMonthKey = formatMonthKey(addMonths(selectedMonthStart, 1));
 
   return (
-    <Container>
-      <div className="accounts-page">
-        <Stack gap={24}>
-          <section className="accounts-page__hero">
-            <div className="accounts-page__hero-pattern" aria-hidden="true" />
-            <div className="accounts-page__hero-copy">
-              <Stack gap={10}>
-                <Text
-                  as="span"
-                  size="sm"
-                  color="inverse"
-                  weight="medium"
-                  transform="uppercase"
-                >
-                  {i18n.t("accounts_page.title")}
-                </Text>
-                <Text as="h1" size="h1" color="inverse" weight="bold">
-                  {selectedMonthLabel}
-                </Text>
-                <Text as="p" size="sm" color="inverse">
-                  {i18n.t("accounts_page.hero_subtitle")}
-                </Text>
-              </Stack>
-            </div>
-
-            <div className="accounts-page__hero-actions">
+    <div className="accounts-page">
+      <Stack gap={24}>
+        <Hero
+          icon="accounts"
+          title={String(i18n.t("accounts_page.title"))}
+          pattern="accounts"
+          actions={
+            <>
               <AppLink href={`/accounts?currentMonth=${previousMonthKey}`}>
                 <span className="accounts-page__nav-pill">
                   <Icon name="chevron-left" size={16} />
@@ -77,7 +59,18 @@ export function AccountsPage({
                   {i18n.t("accounts_page.create_account")}
                 </Button>
               </form>
-            </div>
+            </>
+          }
+        >
+          <div className="accounts-page__hero-body">
+            <Stack gap={10}>
+              <Text as="h1" size="h1" color="inverse" weight="bold">
+                {selectedMonthLabel}
+              </Text>
+              <Text as="p" size="sm" color="inverse">
+                {i18n.t("accounts_page.hero_subtitle")}
+              </Text>
+            </Stack>
 
             <div className="accounts-page__hero-summary">
               <div className="accounts-page__hero-stat">
@@ -97,33 +90,33 @@ export function AccountsPage({
                 </Text>
               </div>
             </div>
-          </section>
-
-          {accounts.length === 0 ? (
-            <Card padding={24} variant="dashed">
-              <Text color="secondary">{i18n.t("accounts_page.empty_state")}</Text>
-            </Card>
-          ) : (
-            <div className="accounts-page__grid">
-              {accounts.map((account) => (
-                <AccountCard
-                  key={account.id}
-                  id={account.id}
-                  name={account.name}
-                  currentMonthTotal={account.currentMonthTotal}
-                  monthLabel={selectedMonthLabel}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="accounts-page__footer-link">
-            <AppLink href="/accounts/archived">
-              {i18n.t("accounts_page.archived_accounts")}
-            </AppLink>
           </div>
-        </Stack>
-      </div>
-    </Container>
+        </Hero>
+
+        {accounts.length === 0 ? (
+          <Card padding={24} variant="dashed">
+            <Text color="secondary">{i18n.t("accounts_page.empty_state")}</Text>
+          </Card>
+        ) : (
+          <div className="accounts-page__grid">
+            {accounts.map((account) => (
+              <AccountCard
+                key={account.id}
+                id={account.id}
+                name={account.name}
+                currentMonthTotal={account.currentMonthTotal}
+                monthLabel={selectedMonthLabel}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="accounts-page__footer-link">
+          <AppLink href="/accounts/archived">
+            {i18n.t("accounts_page.archived_accounts")}
+          </AppLink>
+        </div>
+      </Stack>
+    </div>
   );
 }

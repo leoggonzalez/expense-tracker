@@ -9,6 +9,7 @@ import {
   EntriesFilters,
   EntriesPagination,
   EntriesTable,
+  Hero,
   useAppPreferences,
 } from "@/components";
 import { Card, Stack, Text } from "@/elements";
@@ -60,68 +61,58 @@ export function EntriesPage({
   return (
     <div className="entries-page">
       <Stack gap={24}>
-        <section className="entries-page__hero">
-          <div className="entries-page__hero-pattern" aria-hidden="true" />
-          <div className="entries-page__hero-copy">
-            <Stack gap={10}>
-              <Text
-                as="span"
-                size="sm"
-                color="inverse"
-                weight="medium"
-                transform="uppercase"
-              >
-                {i18n.t("entries_page.title")}
-              </Text>
-              <Text as="h1" size="h1" color="inverse" weight="bold">
-                {i18n.t("entries_page.title")}
-              </Text>
-              <Text as="p" size="sm" color="inverse">
-                {i18n.t("entries_page.subtitle")}
-              </Text>
-            </Stack>
-          </div>
+        <Hero
+          icon="entries"
+          title={String(i18n.t("entries_page.title"))}
+          pattern="entries"
+          actions={
+            <>
+              <AppLink href="/entries/new/expense">
+                <span className="entries-page__hero-action entries-page__hero-action--primary">
+                  {i18n.t("entries_page.add_entry")}
+                </span>
+              </AppLink>
+              <AppLink href="/entries/new/multiple">
+                <span className="entries-page__hero-action">
+                  {i18n.t("entries_page.add_multiple_entries")}
+                </span>
+              </AppLink>
+            </>
+          }
+        >
+          <div className="entries-page__hero-body">
+            <Text as="p" size="sm" color="inverse">
+              {i18n.t("entries_page.subtitle")}
+            </Text>
 
-          <div className="entries-page__hero-actions">
-            <AppLink href="/entries/new/expense">
-              <span className="entries-page__hero-action entries-page__hero-action--primary">
-                {i18n.t("entries_page.add_entry")}
-              </span>
-            </AppLink>
-            <AppLink href="/entries/new/multiple">
-              <span className="entries-page__hero-action">
-                {i18n.t("entries_page.add_multiple_entries")}
-              </span>
-            </AppLink>
-          </div>
-
-          <div className="entries-page__hero-stats">
-            <div className="entries-page__hero-stat">
-              <Text as="span" size="xs" color="inverse" weight="medium">
-                {i18n.t("entries_page.summary_shown")}
-              </Text>
-              <Text as="span" size="lg" color="inverse" weight="semibold">
-                {entriesData.entries.length}
-              </Text>
-            </div>
-            <div className="entries-page__hero-stat entries-page__hero-stat--soft">
-              <Text as="span" size="xs" color="inverse" weight="medium">
-                {i18n.t("entries_page.summary_total")}
-              </Text>
-              <Text as="span" size="lg" color="inverse" weight="semibold">
-                {entriesData.pagination.total}
-              </Text>
-            </div>
-            <div className="entries-page__hero-stat entries-page__hero-stat--soft">
-              <Text as="span" size="xs" color="inverse" weight="medium">
-                {i18n.t("entries_page.summary_filters")}
-              </Text>
-              <Text as="span" size="lg" color="inverse" weight="semibold">
-                {activeFilterCount}
-              </Text>
+            <div className="entries-page__hero-stats">
+              <div className="entries-page__hero-stat">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("entries_page.summary_shown")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {entriesData.entries.length}
+                </Text>
+              </div>
+              <div className="entries-page__hero-stat entries-page__hero-stat--soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("entries_page.summary_total")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {entriesData.pagination.total}
+                </Text>
+              </div>
+              <div className="entries-page__hero-stat entries-page__hero-stat--soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("entries_page.summary_filters")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {activeFilterCount}
+                </Text>
+              </div>
             </div>
           </div>
-        </section>
+        </Hero>
 
         <Card
           as="section"

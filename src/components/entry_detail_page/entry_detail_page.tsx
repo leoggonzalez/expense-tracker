@@ -5,8 +5,8 @@ import "./entry_detail_page.scss";
 import {
   AppLink,
   Button,
-  Container,
   Currency,
+  Hero,
   useAppPreferences,
   useNavigationProgress,
 } from "@/components";
@@ -126,43 +126,30 @@ export function EntryDetailPage({
   };
 
   return (
-    <Container>
-      <div className="entry-detail-page">
-        <Stack gap={24}>
-          <section className="entry-detail-page__hero">
-            <div className="entry-detail-page__hero-pattern" aria-hidden="true" />
-
-            <div className="entry-detail-page__hero-copy">
-              <Stack gap={10}>
-                <span className="entry-detail-page__hero-icon">
-                  <Icon name={getEntryIcon(entry.type)} size={20} />
-                </span>
-                <Text
-                  as="span"
-                  size="sm"
-                  color="inverse"
-                  weight="medium"
-                  transform="uppercase"
-                >
-                  {i18n.t("entry_detail_page.title")}
-                </Text>
-                <Text as="h1" size="h1" color="inverse" weight="bold">
-                  {entry.description}
-                </Text>
-                <Text as="p" size="sm" color="inverse">
-                  {formatEntryDate(entry.beginDate, entry.endDate)}
-                </Text>
-              </Stack>
-            </div>
-
-            <div className="entry-detail-page__hero-actions">
-              <AppLink href={`/entries/${entry.id}/edit`}>
-                <span className="entry-detail-page__nav-pill">
-                  <Icon name="edit" size={16} />
-                  <span>{i18n.t("entry_detail_page.edit_entry")}</span>
-                </span>
-              </AppLink>
-            </div>
+    <div className="entry-detail-page">
+      <Stack gap={24}>
+        <Hero
+          icon={getEntryIcon(entry.type)}
+          title={String(i18n.t("entry_detail_page.title"))}
+          pattern="entry_detail"
+          actions={
+            <AppLink href={`/entries/${entry.id}/edit`}>
+              <span className="entry-detail-page__nav-pill">
+                <Icon name="edit" size={16} />
+                <span>{i18n.t("entry_detail_page.edit_entry")}</span>
+              </span>
+            </AppLink>
+          }
+        >
+          <div className="entry-detail-page__hero-body">
+            <Stack gap={10}>
+              <Text as="h1" size="h1" color="inverse" weight="bold">
+                {entry.description}
+              </Text>
+              <Text as="p" size="sm" color="inverse">
+                {formatEntryDate(entry.beginDate, entry.endDate)}
+              </Text>
+            </Stack>
 
             <div className="entry-detail-page__hero-summary">
               <div className="entry-detail-page__hero-stat">
@@ -180,94 +167,94 @@ export function EntryDetailPage({
                 <Currency value={entry.amount} size="h3" weight="bold" />
               </div>
             </div>
-          </section>
-
-          <Card padding={24} title={String(i18n.t("entry_detail_page.title"))} icon="entries">
-            <Stack gap={20}>
-              <div className="entry-detail-page__details">
-                <div className="entry-detail-page__row">
-                  <Text size="sm" color="secondary">
-                    {i18n.t("entry_detail_page.type")}
-                  </Text>
-                  <Text size="sm" weight="semibold">
-                    {getEntryTypeLabel(entry.type)}
-                  </Text>
-                </div>
-                <div className="entry-detail-page__row">
-                  <Text size="sm" color="secondary">
-                    {i18n.t("entry_detail_page.account")}
-                  </Text>
-                  <Text size="sm" weight="semibold">
-                    {entry.accountName}
-                  </Text>
-                </div>
-                <div className="entry-detail-page__row">
-                  <Text size="sm" color="secondary">
-                    {i18n.t("entry_detail_page.amount")}
-                  </Text>
-                  <Currency value={entry.amount} size="sm" weight="bold" />
-                </div>
-                <div className="entry-detail-page__row">
-                  <Text size="sm" color="secondary">
-                    {i18n.t("entry_detail_page.date_range")}
-                  </Text>
-                  <Text size="sm" weight="semibold">
-                    {formatEntryDate(entry.beginDate, entry.endDate)}
-                  </Text>
-                </div>
-                {transferDirectionLabel ? (
-                  <div className="entry-detail-page__row">
-                    <Text size="sm" color="secondary">
-                      {i18n.t("entry_detail_page.transfer")}
-                    </Text>
-                    <Text size="sm" weight="semibold">
-                      {transferDirectionLabel}
-                    </Text>
-                  </div>
-                ) : null}
-              </div>
-
-              <form action="/entries/new/transfer" method="get">
-                <input type="hidden" name="to_account" value={entry.accountId} />
-                <input
-                  type="hidden"
-                  name="description"
-                  value={settleDescription}
-                />
-                <input type="hidden" name="amount" value={settleAmount} />
-                <Button type="submit" variant="transfer" fullWidth>
-                  {i18n.t("entry_detail_page.settle_entry")}
-                </Button>
-              </form>
-            </Stack>
-          </Card>
-
-          <Card padding={24}>
-            <Stack gap={16}>
-              <Text size="sm" color="secondary">
-                {i18n.t("entry_detail_page.delete_confirm")}
-              </Text>
-              <Button
-                type="button"
-                variant="danger"
-                onClick={handleDelete}
-                disabled={deleting}
-                fullWidth
-              >
-                {deleting
-                  ? i18n.t("entry_detail_page.deleting")
-                  : i18n.t("entry_detail_page.delete")}
-              </Button>
-            </Stack>
-          </Card>
-
-          <div className="entry-detail-page__back-link">
-            <AppLink href="/entries">
-              {i18n.t("entry_detail_page.back_to_entries")}
-            </AppLink>
           </div>
-        </Stack>
-      </div>
-    </Container>
+        </Hero>
+
+        <Card
+          padding={24}
+          title={String(i18n.t("entry_detail_page.title"))}
+          icon="entries"
+        >
+          <Stack gap={20}>
+            <div className="entry-detail-page__details">
+              <div className="entry-detail-page__row">
+                <Text size="sm" color="secondary">
+                  {i18n.t("entry_detail_page.type")}
+                </Text>
+                <Text size="sm" weight="semibold">
+                  {getEntryTypeLabel(entry.type)}
+                </Text>
+              </div>
+              <div className="entry-detail-page__row">
+                <Text size="sm" color="secondary">
+                  {i18n.t("entry_detail_page.account")}
+                </Text>
+                <Text size="sm" weight="semibold">
+                  {entry.accountName}
+                </Text>
+              </div>
+              <div className="entry-detail-page__row">
+                <Text size="sm" color="secondary">
+                  {i18n.t("entry_detail_page.amount")}
+                </Text>
+                <Currency value={entry.amount} size="sm" weight="bold" />
+              </div>
+              <div className="entry-detail-page__row">
+                <Text size="sm" color="secondary">
+                  {i18n.t("entry_detail_page.date_range")}
+                </Text>
+                <Text size="sm" weight="semibold">
+                  {formatEntryDate(entry.beginDate, entry.endDate)}
+                </Text>
+              </div>
+              {transferDirectionLabel ? (
+                <div className="entry-detail-page__row">
+                  <Text size="sm" color="secondary">
+                    {i18n.t("entry_detail_page.transfer")}
+                  </Text>
+                  <Text size="sm" weight="semibold">
+                    {transferDirectionLabel}
+                  </Text>
+                </div>
+              ) : null}
+            </div>
+
+            <form action="/entries/new/transfer" method="get">
+              <input type="hidden" name="to_account" value={entry.accountId} />
+              <input type="hidden" name="description" value={settleDescription} />
+              <input type="hidden" name="amount" value={settleAmount} />
+              <Button type="submit" variant="transfer" fullWidth>
+                {i18n.t("entry_detail_page.settle_entry")}
+              </Button>
+            </form>
+          </Stack>
+        </Card>
+
+        <Card padding={24}>
+          <Stack gap={16}>
+            <Text size="sm" color="secondary">
+              {i18n.t("entry_detail_page.delete_confirm")}
+            </Text>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleDelete}
+              disabled={deleting}
+              fullWidth
+            >
+              {deleting
+                ? i18n.t("entry_detail_page.deleting")
+                : i18n.t("entry_detail_page.delete")}
+            </Button>
+          </Stack>
+        </Card>
+
+        <div className="entry-detail-page__back-link">
+          <AppLink href="/entries">
+            {i18n.t("entry_detail_page.back_to_entries")}
+          </AppLink>
+        </div>
+      </Stack>
+    </div>
   );
 }
