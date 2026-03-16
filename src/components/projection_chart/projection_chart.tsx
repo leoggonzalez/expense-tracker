@@ -39,9 +39,22 @@ export function ProjectionChart({
     <div className="projection-chart">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="monthLabel" tickLine={false} axisLine={false} />
-          <YAxis tickLine={false} axisLine={false} />
+          <CartesianGrid
+            stroke="var(--color-border)"
+            strokeDasharray="3 3"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="monthLabel"
+            tickLine={false}
+            axisLine={false}
+            tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
+          />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
+          />
           <Tooltip formatter={(value) => formatTooltipValue(value)} />
           <Legend />
           <Bar
@@ -53,7 +66,7 @@ export function ProjectionChart({
           <Bar
             dataKey="expenses"
             name={i18n.t("projection_page.expenses") as string}
-            fill="var(--color-danger)"
+            fill="var(--color-primary)"
             radius={[6, 6, 0, 0]}
           />
         </BarChart>

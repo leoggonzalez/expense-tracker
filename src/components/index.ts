@@ -20,6 +20,7 @@ export type { DashboardProps } from "./dashboard/dashboard";
 export { ProjectionTable } from "./projection_table/projection_table";
 export type { ProjectionTableProps } from "./projection_table/projection_table";
 export { ProjectionChart } from "./projection_chart/projection_chart";
+export { ProjectionPage } from "./projection_page/projection_page";
 
 export { EntryForm } from "./entry_form/entry_form";
 export type { EntryFormProps } from "./entry_form/entry_form";

@@ -158,6 +158,8 @@
     "total": "Total"
   },
   "projection_page": {
+    "title": "Proyección",
+    "subtitle": "Sigue cómo evolucionan los ingresos y gastos durante los próximos meses.",
     "previous_month": "Mes anterior",
     "next_month": "Mes siguiente",
     "chart_title": "Ingresos vs gastos (próximos 6 meses)",

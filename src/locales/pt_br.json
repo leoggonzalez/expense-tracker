@@ -158,6 +158,8 @@
     "total": "Total"
   },
   "projection_page": {
+    "title": "Projeção",
+    "subtitle": "Acompanhe como receitas e despesas evoluem nos próximos meses.",
     "previous_month": "Mês anterior",
     "next_month": "Próximo mês",
     "chart_title": "Receitas vs despesas (próximos 6 meses)",

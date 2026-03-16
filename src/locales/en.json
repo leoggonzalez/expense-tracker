@@ -158,6 +158,8 @@
     "total": "Total"
   },
   "projection_page": {
+    "title": "Projection",
+    "subtitle": "Track how income and expenses evolve over the upcoming months.",
     "previous_month": "Previous month",
     "next_month": "Next month",
     "chart_title": "Income vs Expenses (Next 6 months)",
