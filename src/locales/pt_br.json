@@ -232,6 +232,11 @@
     "title": "Contas",
     "create_account": "Criar conta",
     "create_account_hint": "Crie uma conta dedicada para organizar seus lançamentos.",
+    "edit_account_hint": "Atualize o nome da conta sem perder o histórico e os lançamentos.",
+    "hero_subtitle": "Revise saldos por mês e entre em cada conta a partir de uma única visão.",
+    "detail_hero_subtitle": "Acompanhe como %{month} está se comportando nesta conta e abra os lançamentos relacionados.",
+    "active_accounts_label": "Contas ativas",
+    "month_total_overview": "Visão mensal",
     "account_name": "Nome da conta",
     "account_name_placeholder": "ex.: conta principal, investimento",
     "current_month_total": "Total do mês atual",
@@ -265,13 +270,15 @@
     "archived_accounts": "Contas arquivadas",
     "empty_archived_state": "Não há contas arquivadas.",
     "archived_badge": "Arquivada",
+    "archived_account_hint": "Esta conta está arquivada e pode ser restaurada sempre que você precisar dela novamente.",
     "cancel": "Cancelar",
     "create": "Criar conta",
     "creating": "Criando...",
     "empty_state": "Ainda não há contas. Crie a primeira.",
     "duplicate_name": "Você já possui uma conta com esse nome.",
     "name_required": "O nome da conta é obrigatório.",
-    "create_failed": "Não foi possível criar a conta."
+    "create_failed": "Não foi possível criar a conta.",
+    "settle_hint": "Crie uma transferência de ajuste quando esta conta encerrar o mês abaixo de zero."
   },
   "account_detail_page": {
     "title": "Detalhes da conta",

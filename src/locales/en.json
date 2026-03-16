@@ -232,6 +232,11 @@
     "title": "Accounts",
     "create_account": "Create account",
     "create_account_hint": "Create a dedicated account to organize your entries.",
+    "edit_account_hint": "Update the account name while keeping its history and entries intact.",
+    "hero_subtitle": "Review balances by month and move into each account from one overview.",
+    "detail_hero_subtitle": "Track how %{month} is shaping this account and jump into related entries.",
+    "active_accounts_label": "Active accounts",
+    "month_total_overview": "Monthly overview",
     "account_name": "Account name",
     "account_name_placeholder": "e.g., Main account, Investment",
     "current_month_total": "Current month total",
@@ -265,13 +270,15 @@
     "archived_accounts": "Archived accounts",
     "empty_archived_state": "No archived accounts.",
     "archived_badge": "Archived",
+    "archived_account_hint": "This account is archived and can be restored whenever you need it again.",
     "cancel": "Cancel",
     "create": "Create account",
     "creating": "Creating...",
     "empty_state": "No accounts yet. Create your first account.",
     "duplicate_name": "You already have an account with this name.",
     "name_required": "Account name is required.",
-    "create_failed": "Unable to create the account."
+    "create_failed": "Unable to create the account.",
+    "settle_hint": "Create a balancing transfer when this account finishes the month below zero."
   },
   "account_detail_page": {
     "title": "Account details",

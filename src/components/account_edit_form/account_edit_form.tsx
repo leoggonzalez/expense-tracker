@@ -1,5 +1,7 @@
 "use client";
 
+import "./account_edit_form.scss";
+
 import React, { useState } from "react";
 
 import { updateAccount } from "@/actions/accounts";
@@ -43,29 +45,31 @@ export function AccountEditForm({
   };
 
   return (
-    <Card padding={20}>
-      <form onSubmit={handleSubmit}>
-        <Stack gap={16}>
-          <Input
-            label={i18n.t("accounts_page.account_name")}
-            value={name}
-            onChange={setName}
-            placeholder={
-              i18n.t("accounts_page.account_name_placeholder") as string
-            }
-            required
-          />
+    <div className="account-edit-form">
+      <Card padding={20}>
+        <form onSubmit={handleSubmit}>
+          <Stack gap={16}>
+            <Input
+              label={i18n.t("accounts_page.account_name")}
+              value={name}
+              onChange={setName}
+              placeholder={
+                i18n.t("accounts_page.account_name_placeholder") as string
+              }
+              required
+            />
 
-          {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
-          {success ? <Text color="success">{i18n.t(success)}</Text> : null}
+            {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+            {success ? <Text color="success">{i18n.t(success)}</Text> : null}
 
-          <Button type="submit" disabled={isLoading}>
-            {isLoading
-              ? i18n.t("account_detail_page.saving")
-              : i18n.t("account_detail_page.save")}
-          </Button>
-        </Stack>
-      </form>
-    </Card>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading
+                ? i18n.t("account_detail_page.saving")
+                : i18n.t("account_detail_page.save")}
+            </Button>
+          </Stack>
+        </form>
+      </Card>
+    </div>
   );
 }

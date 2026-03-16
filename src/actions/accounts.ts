@@ -27,6 +27,8 @@ type AccountCurrentMonthSummary = {
   currentMonthTotal: number;
 };
 
+export type { AccountCurrentMonthSummary };
+
 type AccountDetailEntry = {
   id: string;
   type: string;
@@ -68,13 +70,6 @@ export type AccountEditData = {
   name: string;
   isArchived: boolean;
 };
-
-function getCurrentMonthBounds(): { monthStart: Date; monthEnd: Date } {
-  const monthStart = startOfMonth(new Date());
-  const monthEnd = endOfMonth(monthStart);
-
-  return { monthStart, monthEnd };
-}
 
 function normalizeEntryAmount(type: string, amount: number): number {
   if (type === "expense" && amount > 0) {
@@ -183,9 +178,11 @@ async function getHistoricalTotalForAccount(
 
 async function getAccountsByArchiveState(
   isArchived: boolean,
+  selectedMonthStart?: Date,
 ): Promise<AccountCurrentMonthSummary[]> {
   const currentUser = await requireCurrentUser();
-  const { monthStart, monthEnd } = getCurrentMonthBounds();
+  const monthStart = startOfMonth(selectedMonthStart || new Date());
+  const monthEnd = endOfMonth(monthStart);
 
   try {
     const rows = await prisma.$queryRaw<AccountCurrentMonthSummaryRow[]>`
@@ -227,16 +224,20 @@ async function getAccountsByArchiveState(
   }
 }
 
-export async function getAccountsCurrentMonthSummary(): Promise<
+export async function getAccountsCurrentMonthSummary(
+  selectedMonthStart?: Date,
+): Promise<
   AccountCurrentMonthSummary[]
 > {
-  return getAccountsByArchiveState(false);
+  return getAccountsByArchiveState(false, selectedMonthStart);
 }
 
-export async function getArchivedAccountsCurrentMonthSummary(): Promise<
+export async function getArchivedAccountsCurrentMonthSummary(
+  selectedMonthStart?: Date,
+): Promise<
   AccountCurrentMonthSummary[]
 > {
-  return getAccountsByArchiveState(true);
+  return getAccountsByArchiveState(true, selectedMonthStart);
 }
 
 export async function getAccountDetailPageData(input: {

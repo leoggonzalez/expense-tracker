@@ -1,5 +1,7 @@
 "use client";
 
+import "./account_create_form.scss";
+
 import React, { useState } from "react";
 
 import { createAccount } from "@/actions/accounts";
@@ -31,28 +33,30 @@ export function AccountCreateForm(): React.ReactElement {
   };
 
   return (
-    <Card padding={20}>
-      <form onSubmit={handleSubmit}>
-        <Stack gap={16}>
-          <Input
-            label={i18n.t("accounts_page.account_name")}
-            value={name}
-            onChange={setName}
-            placeholder={
-              i18n.t("accounts_page.account_name_placeholder") as string
-            }
-            required
-          />
+    <div className="account-create-form">
+      <Card padding={20}>
+        <form onSubmit={handleSubmit}>
+          <Stack gap={16}>
+            <Input
+              label={i18n.t("accounts_page.account_name")}
+              value={name}
+              onChange={setName}
+              placeholder={
+                i18n.t("accounts_page.account_name_placeholder") as string
+              }
+              required
+            />
 
-          {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+            {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
 
-          <Button type="submit" disabled={isLoading}>
-            {isLoading
-              ? i18n.t("accounts_page.creating")
-              : i18n.t("accounts_page.create")}
-          </Button>
-        </Stack>
-      </form>
-    </Card>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading
+                ? i18n.t("accounts_page.creating")
+                : i18n.t("accounts_page.create")}
+            </Button>
+          </Stack>
+        </form>
+      </Card>
+    </div>
   );
 }
