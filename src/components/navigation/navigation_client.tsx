@@ -198,17 +198,21 @@ export function NavigationClient({
 
           {currentUser ? (
             <div className="navigation__user-card">
-              <div className="navigation__user-avatar">
-                <Avatar name={displayName} />
-              </div>
-              <div className="navigation__user-copy">
-                <Text as="span" size="sm" weight="semibold">
-                  {displayName}
-                </Text>
-                <Text as="span" size="xs" color="secondary">
-                  {currentUser.email}
-                </Text>
-              </div>
+              <AppLink href="/account" ariaLabel={displayName}>
+                <span className="navigation__user-card-link">
+                  <span className="navigation__user-avatar">
+                    <Avatar name={displayName} />
+                  </span>
+                  <span className="navigation__user-copy">
+                    <Text as="span" size="sm" weight="semibold">
+                      {displayName}
+                    </Text>
+                    <Text as="span" size="xs" color="secondary">
+                      {currentUser.email}
+                    </Text>
+                  </span>
+                </span>
+              </AppLink>
             </div>
           ) : null}
         </div>

@@ -210,7 +210,8 @@
   "settings_page": {
     "title": "Configuración",
     "appearance": "Apariencia",
-    "email": "Correo electrónico",
+    "subtitle": "Elige cómo debe verse Currento y qué idioma debe usar.",
+    "appearance_hint": "Estas preferencias se aplican en toda la app y se actualizan al instante.",
     "theme": "Tema",
     "theme_system": "Sistema",
     "theme_light": "Claro",
@@ -219,7 +220,12 @@
     "language_system": "Sistema",
     "language_en": "English",
     "language_es": "Español",
-    "language_pt_br": "Português (Brasil)",
+    "language_pt_br": "Português (Brasil)"
+  },
+  "account": {
+    "title": "Cuenta",
+    "subtitle": "Gestiona tus datos personales y cierra sesión en Currento.",
+    "email": "Correo electrónico",
     "name": "Nombre",
     "name_placeholder": "Tu nombre",
     "save": "Guardar cambios",

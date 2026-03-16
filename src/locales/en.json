@@ -210,7 +210,8 @@
   "settings_page": {
     "title": "Settings",
     "appearance": "Appearance",
-    "email": "Email",
+    "subtitle": "Choose how Currento should look and which language it should use.",
+    "appearance_hint": "These preferences apply across the app and update immediately.",
     "theme": "Theme",
     "theme_system": "System",
     "theme_light": "Light",
@@ -219,7 +220,12 @@
     "language_system": "System",
     "language_en": "English",
     "language_es": "Español",
-    "language_pt_br": "Português (Brasil)",
+    "language_pt_br": "Português (Brasil)"
+  },
+  "account": {
+    "title": "Account",
+    "subtitle": "Manage your personal details and sign out of Currento.",
+    "email": "Email",
     "name": "Name",
     "name_placeholder": "Your name",
     "save": "Save changes",

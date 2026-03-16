@@ -1,16 +1,73 @@
 @use "@/styles/variables.scss" as *;
 
 .settings-page {
-  &__preferences {
-    padding-top: var(--spacing-sm);
-    border-top: var(--border-width) solid var(--color-border);
+  width: 100%;
+
+  &__hero {
+    position: relative;
+    overflow: hidden;
+    padding: 24px;
+    border-radius: 32px;
+    background: linear-gradient(135deg, #025864 0%, #0d6d77 100%);
+  }
+
+  &__hero-pattern {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        115deg,
+        transparent 0,
+        transparent 48%,
+        rgba(255, 255, 255, 0.08) 48%,
+        rgba(255, 255, 255, 0.08) 50%,
+        transparent 50%,
+        transparent 100%
+      ),
+      radial-gradient(circle at 84% 22%, rgba(255, 255, 255, 0.08) 0 13%, transparent 13.5%),
+      radial-gradient(circle at 92% 68%, rgba(255, 255, 255, 0.1) 0 18%, transparent 18.5%);
+    pointer-events: none;
+  }
+
+  &__hero > .stack {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+  }
+
+  &__hero-icon {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: var(--color-text-inverse);
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  &__panel {
+    .card {
+      border-radius: 28px;
+    }
+
+    .select__field {
+      min-height: 52px;
+      border-radius: 18px;
+      background-color: var(--color-background-secondary);
+    }
+
+    .select__label {
+      color: var(--color-text-secondary);
+    }
   }
 }
 
 @media (min-width: $breakpoint-tablet) {
   .settings-page {
-    &__actions {
-      max-width: 320px;
+    &__hero {
+      padding: 32px;
     }
   }
 }

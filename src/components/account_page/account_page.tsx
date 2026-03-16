@@ -1,10 +1,11 @@
 "use client";
 
-import { Button, Input } from "@/components";
-import { Container } from "@/components/container/container";
+import "./account_page.scss";
+
+import { Button, Container, Input } from "@/components";
 import { logout } from "@/actions/auth";
 import { updateCurrentUserProfile } from "@/actions/user";
-import { Box, Stack, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -48,43 +49,96 @@ export function AccountPage({ user }: AccountPageProps): React.ReactElement {
 
   return (
     <Container>
-      <Stack gap={24}>
-        <Box padding={24} maxWidth={640}>
-          <form onSubmit={handleSave}>
-            <Stack gap={16}>
-              <Text size="h2" as="h1" weight="bold">
-                {i18n.t("account.title")}
-              </Text>
-
-              <Text weight="semibold">{i18n.t("account.email")}</Text>
-              <Text color="secondary">{user.email}</Text>
-
-              <Input
-                label={i18n.t("account.name")}
-                value={name}
-                onChange={setName}
-                placeholder={i18n.t("account.name_placeholder") as string}
-              />
-
-              {error && <Text color="danger">{i18n.t(error)}</Text>}
-              {success && <Text color="success">{i18n.t(success)}</Text>}
-
-              <Stack direction="row" gap={12} wrap>
-                <Button type="submit" disabled={loading}>
-                  {loading ? i18n.t("account.saving") : i18n.t("account.save")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleLogout}
+      <div className="account-page">
+        <Stack gap={24}>
+          <section className="account-page__hero">
+            <div className="account-page__hero-pattern" aria-hidden="true" />
+            <div className="account-page__hero-copy">
+              <Stack gap={10}>
+                <Text
+                  as="span"
+                  size="sm"
+                  color="inverse"
+                  weight="medium"
+                  transform="uppercase"
                 >
-                  {i18n.t("account.logout")}
-                </Button>
+                  {i18n.t("account.title")}
+                </Text>
+                <Text as="h1" size="h1" color="inverse" weight="bold">
+                  {user.name || i18n.t("navigation.user_fallback_name")}
+                </Text>
+                <Text as="p" size="sm" color="inverse">
+                  {i18n.t("account.subtitle")}
+                </Text>
               </Stack>
-            </Stack>
-          </form>
-        </Box>
-      </Stack>
+            </div>
+
+            <div className="account-page__hero-summary">
+              <div className="account-page__hero-stat">
+                <Text size="sm" color="inverse">
+                  {i18n.t("account.email")}
+                </Text>
+                <Text size="lg" weight="semibold" color="inverse">
+                  {user.email}
+                </Text>
+              </div>
+              <div className="account-page__hero-stat">
+                <Text size="sm" color="inverse">
+                  {i18n.t("account.name")}
+                </Text>
+                <Text size="lg" weight="semibold" color="inverse">
+                  {user.name || i18n.t("account.name_placeholder")}
+                </Text>
+              </div>
+            </div>
+          </section>
+
+          <div className="account-page__panel">
+            <Card padding={24}>
+              <form onSubmit={handleSave}>
+                <Stack gap={20}>
+                  <div className="account-page__field">
+                    <Stack gap={4}>
+                      <Text size="sm" weight="semibold">
+                        {i18n.t("account.email")}
+                      </Text>
+                      <Text color="secondary">{user.email}</Text>
+                    </Stack>
+                  </div>
+
+                  <Input
+                    label={i18n.t("account.name")}
+                    value={name}
+                    onChange={setName}
+                    placeholder={i18n.t("account.name_placeholder") as string}
+                  />
+
+                  {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+                  {success ? <Text color="success">{i18n.t(success)}</Text> : null}
+
+                  <div className="account-page__actions">
+                    <Stack gap={12}>
+                      <Button type="submit" disabled={loading} fullWidth>
+                        {loading
+                          ? i18n.t("account.saving")
+                          : i18n.t("account.save")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleLogout}
+                        fullWidth
+                      >
+                        {i18n.t("account.logout")}
+                      </Button>
+                    </Stack>
+                  </div>
+                </Stack>
+              </form>
+            </Card>
+          </div>
+        </Stack>
+      </div>
     </Container>
   );
 }
