@@ -107,6 +107,7 @@
   },
   "entries_page": {
     "title": "Lançamentos",
+    "subtitle": "Revise a atividade, ajuste o período e abra os lançamentos que precisam de atenção.",
     "add_entry": "Adicionar lançamento",
     "account": "Conta",
     "details": "Detalhes",
@@ -121,6 +122,10 @@
     "type_all": "Todos",
     "clear_filters": "Limpar filtros",
     "showing_results": "Mostrando %{count} de %{total} lançamentos",
+    "results_title": "Lançamentos filtrados",
+    "summary_shown": "Exibidos agora",
+    "summary_total": "Correspondências totais",
+    "summary_filters": "Filtros ativos",
     "empty_state": "Nenhum lançamento corresponde aos filtros atuais.",
     "add_new_entry": "Adicionar novo lançamento",
     "add_multiple_entries": "Adicionar vários lançamentos",

@@ -1,14 +1,6 @@
 import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
 
-import {
-  AppLink,
-  Container,
-  EntriesFilters,
-  EntriesPagination,
-  EntriesTable,
-} from "@/components";
-import { Stack, Text } from "@/elements";
-import { i18n } from "@/model/i18n";
+import { Container, EntriesPage } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -53,56 +45,19 @@ export default async function Page({
 
   return (
     <Container maxWidth="wide">
-      <Stack gap={24}>
-        <Stack
-          direction="row"
-          align="center"
-          justify="space-between"
-          wrap
-          gap={16}
-        >
-          <Text size="h2" as="h2" weight="bold">
-            {i18n.t("entries_page.title")}
-          </Text>
-          <Stack direction="row" align="center" gap={12}>
-            <AppLink href="/entries/new/expense">
-              {i18n.t("entries_page.add_entry")}
-            </AppLink>
-            <AppLink href="/entries/new/multiple">
-              {i18n.t("entries_page.add_multiple_entries")}
-            </AppLink>
-          </Stack>
-        </Stack>
-
-        <EntriesFilters
-          accounts={accounts.map((entryAccount) => ({
-            id: entryAccount.id,
-            name: entryAccount.name,
-          }))}
-          filters={{
-            account,
-            type,
-            startDate,
-            endDate,
-          }}
-        />
-
-        <Text size="sm" color="secondary">
-          {i18n.t("entries_page.showing_results", {
-            count: entriesData.entries.length,
-            total: entriesData.pagination.total,
-          })}
-        </Text>
-
-        <EntriesTable entries={entriesData.entries} />
-
-        {entriesData.pagination.totalPages > 1 && (
-          <EntriesPagination
-            currentPage={entriesData.pagination.page}
-            totalPages={entriesData.pagination.totalPages}
-          />
-        )}
-      </Stack>
+      <EntriesPage
+        accounts={accounts.map((entryAccount) => ({
+          id: entryAccount.id,
+          name: entryAccount.name,
+        }))}
+        entriesData={entriesData}
+        filters={{
+          account,
+          type,
+          startDate,
+          endDate,
+        }}
+      />
     </Container>
   );
 }

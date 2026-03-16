@@ -107,6 +107,7 @@
   },
   "entries_page": {
     "title": "Movimientos",
+    "subtitle": "Revisa la actividad, acota el periodo y entra en los movimientos que necesitan atención.",
     "add_entry": "Añadir movimiento",
     "account": "Cuenta",
     "details": "Detalles",
@@ -121,6 +122,10 @@
     "type_all": "Todos",
     "clear_filters": "Limpiar filtros",
     "showing_results": "Mostrando %{count} de %{total} movimientos",
+    "results_title": "Movimientos filtrados",
+    "summary_shown": "Mostrados ahora",
+    "summary_total": "Coincidencias totales",
+    "summary_filters": "Filtros activos",
     "empty_state": "No hay movimientos que coincidan con los filtros actuales.",
     "add_new_entry": "Añadir nuevo movimiento",
     "add_multiple_entries": "Añadir varios movimientos",

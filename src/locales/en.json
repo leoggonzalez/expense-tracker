@@ -107,6 +107,7 @@
   },
   "entries_page": {
     "title": "Entries",
+    "subtitle": "Review activity, narrow the timeline, and jump into the entries that need attention.",
     "add_entry": "Add Entry",
     "account": "Account",
     "details": "Details",
@@ -121,6 +122,10 @@
     "type_all": "All",
     "clear_filters": "Clear Filters",
     "showing_results": "Showing %{count} of %{total} entries",
+    "results_title": "Filtered Entries",
+    "summary_shown": "Shown now",
+    "summary_total": "Total matches",
+    "summary_filters": "Filters active",
     "empty_state": "No entries match the current filters.",
     "add_new_entry": "Add New Entry",
     "add_multiple_entries": "Add Multiple Entries",

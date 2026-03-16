@@ -2,20 +2,21 @@
 
 .entries-table {
   overflow: hidden;
+  border-radius: var(--border-radius-lg);
 
   &__row {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: var(--spacing-md);
-    min-height: 68px;
-    padding: var(--spacing-md);
+    min-height: 74px;
+    padding: 18px var(--spacing-md);
     border-bottom: var(--border-width) solid var(--color-border);
     cursor: pointer;
     transition: background-color var(--transition-fast);
 
     &:hover {
-      background-color: var(--color-background-secondary);
+      background-color: var(--color-surface-muted);
     }
 
     &:first-child {
@@ -61,8 +62,8 @@
 @media (min-width: $breakpoint-tablet) {
   .entries-table {
     &__row {
-      min-height: 72px;
-      padding: var(--spacing-md) var(--spacing-lg);
+      min-height: 80px;
+      padding: 18px var(--spacing-lg);
     }
   }
 }

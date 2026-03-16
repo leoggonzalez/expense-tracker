@@ -48,6 +48,7 @@ export { EntriesTable } from "./entries_table/entries_table";
 export type { EntriesTableItem } from "./entries_table/entries_table";
 export { EntriesFilters } from "./entries_filters/entries_filters";
 export { EntriesPagination } from "./entries_pagination/entries_pagination";
+export { EntriesPage } from "./entries_page/entries_page";
 export { ToastProvider, useToast } from "./toast_provider/toast_provider";
 
 export { AllEntriesPage } from "./all_entries_page/all_entries_page";
