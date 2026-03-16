@@ -2,11 +2,26 @@
 
 .bulk-entry-form {
   width: 100%;
+  padding: var(--spacing-xs);
+
+  .input__field,
+  .select__field,
+  .month-selector__toggle {
+    min-height: 52px;
+    border-radius: 18px;
+    background-color: var(--color-background-secondary);
+  }
+
+  .input__label,
+  .select__label {
+    color: var(--color-text-secondary);
+  }
 
   &__shared {
     padding: var(--spacing-lg);
     background-color: var(--color-background-secondary);
-    border-radius: var(--border-radius-md);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 24px;
   }
 
   &__entries {
@@ -16,10 +31,10 @@
   }
 
   &__schedule {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
     border: var(--border-width) solid var(--color-border);
-    border-radius: var(--border-radius-md);
-    background-color: var(--color-background);
+    border-radius: 24px;
+    background-color: var(--color-background-secondary);
   }
 
   &__schedule-options {
@@ -31,23 +46,36 @@
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-sm);
+    min-height: 44px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: var(--border-width) solid transparent;
+    border-radius: 18px;
+    background-color: var(--color-surface);
     font-size: var(--font-size-sm);
     color: var(--color-text-primary);
+
+    &:has(input:checked) {
+      border-color: color-mix(in srgb, var(--color-primary) 22%, white);
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 10%,
+        var(--color-background-secondary)
+      );
+    }
   }
 
   &__entry {
-    padding: var(--spacing-md);
-    background-color: var(--color-background);
+    padding: var(--spacing-lg);
+    background-color: var(--color-surface);
     border: var(--border-width) solid var(--color-border);
-    border-radius: var(--border-radius-md);
+    border-radius: 24px;
   }
 
   &__entry-fields {
     display: grid;
-    grid-template-columns: 120px 1fr 150px auto;
+    grid-template-columns: 1fr;
     gap: var(--spacing-md);
     align-items: end;
-    grid-template-columns: 1fr;
   }
 }
 

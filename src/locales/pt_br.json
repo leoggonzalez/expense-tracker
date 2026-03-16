@@ -297,11 +297,16 @@
     "title_expense": "Adicionar nova despesa",
     "title_transfer": "Adicionar nova transferência",
     "title_multiple": "Adicionar vários lançamentos",
+    "subtitle_income": "Registre entradas com detalhes claros de conta e agendamento.",
+    "subtitle_expense": "Registre saídas com os mesmos controles de conta e período.",
+    "subtitle_transfer": "Mova valores entre contas mantendo os dois lados sincronizados.",
+    "subtitle_multiple": "Adicione vários lançamentos de uma vez para montar o mês mais rápido.",
     "income_tab": "Receita",
     "expense_tab": "Despesa",
     "transfer_tab": "Transferência",
     "multiple_tab": "Vários",
     "recent_entries": "Lançamentos recentes",
+    "recent_entries_subtitle": "Use a atividade recente como referência rápida enquanto cria novos registros.",
     "open_all_entries": "Ver todos os lançamentos"
   },
   "entry_detail_page": {

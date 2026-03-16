@@ -297,11 +297,16 @@
     "title_expense": "Añadir nuevo gasto",
     "title_transfer": "Añadir nueva transferencia",
     "title_multiple": "Añadir varios movimientos",
+    "subtitle_income": "Registra dinero entrante con datos claros de cuenta y programación.",
+    "subtitle_expense": "Registra gastos salientes con los mismos controles de cuenta y calendario.",
+    "subtitle_transfer": "Mueve fondos entre cuentas manteniendo ambos lados sincronizados.",
+    "subtitle_multiple": "Añade varios movimientos de una vez para preparar el mes más rápido.",
     "income_tab": "Ingreso",
     "expense_tab": "Gasto",
     "transfer_tab": "Transferencia",
     "multiple_tab": "Varios",
     "recent_entries": "Movimientos recientes",
+    "recent_entries_subtitle": "Usa la actividad reciente como referencia rápida mientras creas nuevos registros.",
     "open_all_entries": "Ver todos los movimientos"
   },
   "entry_detail_page": {

@@ -297,11 +297,16 @@
     "title_expense": "Add new expense",
     "title_transfer": "Add new transfer",
     "title_multiple": "Add multiple entries",
+    "subtitle_income": "Capture incoming money with clean account and schedule details.",
+    "subtitle_expense": "Register outgoing spending with the same timeline and account controls.",
+    "subtitle_transfer": "Move funds between accounts while keeping both sides in sync.",
+    "subtitle_multiple": "Add several entries at once for faster monthly setup.",
     "income_tab": "Income",
     "expense_tab": "Expense",
     "transfer_tab": "Transfer",
     "multiple_tab": "Multiple",
     "recent_entries": "Recent entries",
+    "recent_entries_subtitle": "Use recent activity as a quick reference while creating new records.",
     "open_all_entries": "See all entries"
   },
   "entry_detail_page": {

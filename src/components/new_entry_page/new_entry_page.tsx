@@ -3,9 +3,8 @@
 import "./new_entry_page.scss";
 
 import { AppLink, Container } from "@/components";
-import { Card, Grid, Stack, Text } from "@/elements";
 import { useAppPreferences } from "@/components/app_preferences_provider/app_preferences_provider";
-
+import { Card, Grid, Icon, Stack, Text } from "@/elements";
 import React from "react";
 import { i18n } from "@/model/i18n";
 
@@ -30,6 +29,22 @@ export function NewEntryPage({
         : pageType === "transfer"
           ? "new_entry_page.title_transfer"
           : "new_entry_page.title_multiple";
+  const subtitleKey =
+    pageType === "income"
+      ? "new_entry_page.subtitle_income"
+      : pageType === "expense"
+        ? "new_entry_page.subtitle_expense"
+        : pageType === "transfer"
+          ? "new_entry_page.subtitle_transfer"
+          : "new_entry_page.subtitle_multiple";
+  const pageIcon =
+    pageType === "income"
+      ? "income"
+      : pageType === "expense"
+        ? "expense"
+        : pageType === "transfer"
+          ? "transfer"
+          : "entries";
 
   const tabs = [
     {
@@ -53,31 +68,96 @@ export function NewEntryPage({
     <Container>
       <div className="new-entry-page">
         <Stack gap={24}>
-          <Text size="h2" as="h1" weight="bold">
-            {i18n.t(titleKey)}
-          </Text>
-          {showTabs ? (
-            <Grid columns="repeat(3, minmax(0, 1fr))" gap={8}>
-              {tabs.map((tab) => (
-                <div
-                  key={tab.key}
-                  className={[
-                    "new-entry-page__tab",
-                    `new-entry-page__tab--${tab.key}`,
-                    pageType === tab.key && "new-entry-page__tab--active",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  <AppLink href={tab.href}>
-                    <span className="new-entry-page__tab-content">
-                      {tab.label}
+          <div className="new-entry-page__hero-shell">
+            <section className="new-entry-page__hero">
+              <div className="new-entry-page__hero-pattern" aria-hidden="true" />
+              <Stack gap={24}>
+                <div className="new-entry-page__hero-copy">
+                  <Stack gap={10}>
+                    <span className="new-entry-page__hero-icon">
+                      <Icon name={pageIcon} size={20} />
                     </span>
-                  </AppLink>
+                    <div className="new-entry-page__eyebrow">
+                      <Text size="sm" as="p" weight="semibold" color="inverse">
+                        {i18n.t("navigation.entries")}
+                      </Text>
+                    </div>
+                    <Text size="h1" as="h1" weight="bold" color="inverse">
+                      {i18n.t(titleKey)}
+                    </Text>
+                    <Text size="sm" as="p" color="inverse">
+                      {i18n.t(subtitleKey)}
+                    </Text>
+                  </Stack>
                 </div>
-              ))}
-            </Grid>
+
+                <div className="new-entry-page__hero-summary">
+                  <Grid columns="repeat(2, minmax(0, 1fr))" gap={12}>
+                    <div className="new-entry-page__hero-metric">
+                      <Stack gap={4}>
+                        <Text size="xs" weight="semibold" color="inverse">
+                          {i18n.t("common.income")}
+                        </Text>
+                        <Text size="lg" weight="semibold" color="inverse">
+                          {i18n.t("new_entry_page.income_tab")}
+                        </Text>
+                      </Stack>
+                    </div>
+                    <div className="new-entry-page__hero-metric">
+                      <Stack gap={4}>
+                        <Text size="xs" weight="semibold" color="inverse">
+                          {i18n.t("common.expense")}
+                        </Text>
+                        <Text size="lg" weight="semibold" color="inverse">
+                          {pageType === "transfer"
+                            ? i18n.t("new_entry_page.transfer_tab")
+                            : i18n.t("entry_form.schedule_label")}
+                        </Text>
+                      </Stack>
+                    </div>
+                  </Grid>
+                </div>
+              </Stack>
+            </section>
+          </div>
+
+          {showTabs ? (
+            <div className="new-entry-page__tabs">
+              <Grid columns="repeat(3, minmax(0, 1fr))" gap={10}>
+                {tabs.map((tab) => (
+                  <div
+                    key={tab.key}
+                    className={[
+                      "new-entry-page__tab",
+                      `new-entry-page__tab--${tab.key}`,
+                      pageType === tab.key && "new-entry-page__tab--active",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <AppLink href={tab.href}>
+                      <span className="new-entry-page__tab-content">
+                        <span className="new-entry-page__tab-icon">
+                          <Icon
+                            name={
+                              tab.key === "income"
+                                ? "income"
+                                : tab.key === "expense"
+                                  ? "expense"
+                                  : "transfer"
+                            }
+                            size={16}
+                          />
+                        </span>
+                        {tab.label}
+                      </span>
+                    </AppLink>
+                  </div>
+                ))}
+              </Grid>
+            </div>
           ) : null}
+
           <div className="new-entry-page__panel">
             <Card padding={24}>{children}</Card>
           </div>
