@@ -1,7 +1,14 @@
 import { notFound } from "next/navigation";
 
 import { getAccountForEdit } from "@/actions/accounts";
-import { AccountEditForm, AccountFormPage } from "@/components";
+import {
+  AccountEditForm,
+  AppLink,
+  Container,
+  Hero,
+  PagePanel,
+} from "@/components";
+import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
@@ -23,13 +30,26 @@ export default async function Page({
   }
 
   return (
-    <AccountFormPage
-      title={String(i18n.t("accounts_page.edit_account"))}
-      subtitle={String(i18n.t("accounts_page.edit_account_hint"))}
-      backHref={`/accounts/${account.id}`}
-      backLabel={String(i18n.t("accounts_page.back_to_account"))}
-    >
-      <AccountEditForm accountId={account.id} initialName={account.name} />
-    </AccountFormPage>
+    <Container>
+      <Stack gap={24}>
+        <Hero
+          icon="accounts"
+          title={String(i18n.t("accounts_page.edit_account"))}
+          pattern="account_form"
+        >
+          <Text as="p" size="sm" color="inverse">
+            {i18n.t("accounts_page.edit_account_hint")}
+          </Text>
+        </Hero>
+
+        <PagePanel tone="form">
+          <AccountEditForm accountId={account.id} initialName={account.name} />
+        </PagePanel>
+
+        <AppLink href={`/accounts/${account.id}`}>
+          {i18n.t("accounts_page.back_to_account")}
+        </AppLink>
+      </Stack>
+    </Container>
   );
 }

@@ -1,0 +1,33 @@
+@use "@/styles/variables.scss" as *;
+
+.page-panel {
+  display: grid;
+
+  .card {
+    border-radius: 28px;
+  }
+
+  &--form {
+    .input__field {
+      min-height: 52px;
+      border-radius: 18px;
+      background-color: var(--color-background-secondary);
+    }
+
+    .input__label {
+      color: var(--color-text-secondary);
+    }
+  }
+
+  &--settings {
+    .select__field {
+      min-height: 52px;
+      border-radius: 18px;
+      background-color: var(--color-background-secondary);
+    }
+
+    .select__label {
+      color: var(--color-text-secondary);
+    }
+  }
+}

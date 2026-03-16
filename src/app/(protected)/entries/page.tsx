@@ -1,6 +1,17 @@
 import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
 
-import { Container, EntriesPage } from "@/components";
+import {
+  Container,
+  EntriesFilters,
+  EntriesPagination,
+  EntriesTable,
+  Hero,
+  HeroActionLink,
+  HeroMetric,
+  HeroMetrics,
+} from "@/components";
+import { Card, Stack, Text } from "@/elements";
+import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -42,22 +53,110 @@ export default async function Page({
     }),
     getAccounts(),
   ]);
+  const activeFilterCount = Object.values({
+    account,
+    type,
+    startDate,
+    endDate,
+  }).filter(Boolean).length;
 
   return (
-    <Container maxWidth="wide">
-      <EntriesPage
-        accounts={accounts.map((entryAccount) => ({
-          id: entryAccount.id,
-          name: entryAccount.name,
-        }))}
-        entriesData={entriesData}
-        filters={{
-          account,
-          type,
-          startDate,
-          endDate,
-        }}
-      />
+    <Container>
+      <Stack gap={24}>
+        <Hero
+          icon="entries"
+          title={String(i18n.t("entries_page.title"))}
+          pattern="entries"
+          actions={
+            <>
+              <HeroActionLink href="/entries/new/expense" variant="primary">
+                {i18n.t("entries_page.add_entry")}
+              </HeroActionLink>
+              <HeroActionLink href="/entries/new/multiple">
+                {i18n.t("entries_page.add_multiple_entries")}
+              </HeroActionLink>
+            </>
+          }
+        >
+          <Stack gap={24}>
+            <Text as="p" size="sm" color="inverse">
+              {i18n.t("entries_page.subtitle")}
+            </Text>
+
+            <HeroMetrics columns={3}>
+              <HeroMetric>
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("entries_page.summary_shown")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {entriesData.entries.length}
+                </Text>
+              </HeroMetric>
+              <HeroMetric tone="soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("entries_page.summary_total")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {entriesData.pagination.total}
+                </Text>
+              </HeroMetric>
+              <HeroMetric tone="soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("entries_page.summary_filters")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {activeFilterCount}
+                </Text>
+              </HeroMetric>
+            </HeroMetrics>
+          </Stack>
+        </Hero>
+
+        <Card
+          as="section"
+          padding={24}
+          title={String(i18n.t("entries_page.filters"))}
+          icon="entries"
+        >
+          <EntriesFilters
+            accounts={accounts.map((entryAccount) => ({
+              id: entryAccount.id,
+              name: entryAccount.name,
+            }))}
+            filters={{
+              account,
+              type,
+              startDate,
+              endDate,
+            }}
+          />
+        </Card>
+
+        <Card
+          as="section"
+          padding={24}
+          title={String(i18n.t("entries_page.results_title"))}
+          icon="activity"
+        >
+          <Stack gap={20}>
+            <Text size="sm" color="secondary">
+              {i18n.t("entries_page.showing_results", {
+                count: entriesData.entries.length,
+                total: entriesData.pagination.total,
+              })}
+            </Text>
+
+            <EntriesTable entries={entriesData.entries} />
+
+            {entriesData.pagination.totalPages > 1 ? (
+              <EntriesPagination
+                currentPage={entriesData.pagination.page}
+                totalPages={entriesData.pagination.totalPages}
+              />
+            ) : null}
+          </Stack>
+        </Card>
+      </Stack>
     </Container>
   );
 }
