@@ -57,7 +57,9 @@ export function AccountArchiveForm({
             label={i18n.t("accounts_page.archive_confirm_label")}
             value={confirmationText}
             onChange={setConfirmationText}
-            placeholder="delete"
+            placeholder={
+              i18n.t("accounts_page.archive_confirm_placeholder") as string
+            }
             required
           />
 

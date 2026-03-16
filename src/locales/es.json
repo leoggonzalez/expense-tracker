@@ -11,7 +11,10 @@
     "accounts": "Cuentas",
     "settings": "Configuración",
     "all_entries": "Todos los movimientos",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "primary_section": "General",
+    "secondary_section": "Preferencias",
+    "user_fallback_name": "Tu cuenta"
   },
   "dashboard": {
     "current_month_overview": "Resumen del mes actual",
@@ -19,7 +22,7 @@
     "expenses": "Gastos",
     "net": "Neto",
     "active_entries": "Movimientos activos",
-    "recent_entries": "Movimientos recientes",
+    "recent_entries": "Actividad reciente",
     "accounts_this_month": "Cuentas de este mes",
     "account_income": "Ingresos",
     "account_expenses": "Gastos",
@@ -27,7 +30,17 @@
     "no_accounts_this_month": "No hay cuentas activas este mes.",
     "entries_active_this_month_one": "%{count} movimiento activo este mes",
     "entries_active_this_month_other": "%{count} movimientos activos este mes",
-    "see_all_entries": "Ver todos los movimientos"
+    "see_all_entries": "Ver todos los movimientos",
+    "hero_label": "Balance de este mes",
+    "hero_caption": "Ingresos menos gastos en todas las cuentas activas.",
+    "hero_add_action": "Añadir",
+    "hero_more_action": "Más",
+    "upcoming_payments": "Próximos pagos",
+    "upcoming_payments_empty": "No quedan gastos programados para este mes.",
+    "upcoming_payments_link": "Ver todos los gastos",
+    "recent_activity_link": "Explorar movimientos",
+    "payment_due": "Vence %{date}",
+    "activity_subtitle": "Últimos cambios en tus movimientos."
   },
   "entry_form": {
     "type": "Tipo",
@@ -176,6 +189,7 @@
     "verify_subtitle": "Introduce el código de 6 dígitos que recibiste por correo",
     "code_group_label": "Código de 6 dígitos",
     "code_digit_label": "Dígito del código",
+    "code_digit_aria_label": "Dígito %{index}",
     "verify_code": "Verificar código",
     "verifying_code": "Verificando código...",
     "code_sent": "Enviamos un código de acceso a %{email}.",
@@ -235,6 +249,7 @@
     "archiving": "Archivando...",
     "archive_confirm_label": "Escribe delete para archivar",
     "archive_confirm_help": "Escribe la palabra delete para archivar esta cuenta.",
+    "archive_confirm_placeholder": "delete",
     "archive_requires_confirm": "Escribe delete exactamente para archivar la cuenta.",
     "archive_failed": "No se pudo archivar esta cuenta.",
     "unarchive": "Desarchivar",

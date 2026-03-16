@@ -1,6 +1,12 @@
+"use client";
+
 import "./dashboard.scss";
 
-import { EntryList, EntryListItem } from "@/components";
+import {
+  EntryList,
+  EntryListItem,
+  useAppPreferences,
+} from "@/components";
 import { Card, Icon, Stack, Text } from "@/elements";
 
 import { AppLink } from "@/components";
@@ -33,6 +39,8 @@ export function Dashboard({
   upcomingPayments,
   recentEntries,
 }: DashboardProps): React.ReactElement {
+  useAppPreferences();
+
   const currentMonthQuery = `start_date=${currentMonthRange.startDate}&end_date=${currentMonthRange.endDate}`;
 
   return (

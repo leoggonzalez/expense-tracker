@@ -11,7 +11,10 @@
     "accounts": "Contas",
     "settings": "Configurações",
     "all_entries": "Todos os lançamentos",
-    "login": "Entrar"
+    "login": "Entrar",
+    "primary_section": "Geral",
+    "secondary_section": "Preferências",
+    "user_fallback_name": "Sua conta"
   },
   "dashboard": {
     "current_month_overview": "Resumo do mês atual",
@@ -19,7 +22,7 @@
     "expenses": "Despesas",
     "net": "Saldo",
     "active_entries": "Lançamentos ativos",
-    "recent_entries": "Lançamentos recentes",
+    "recent_entries": "Atividade recente",
     "accounts_this_month": "Contas deste mês",
     "account_income": "Receitas",
     "account_expenses": "Despesas",
@@ -27,7 +30,17 @@
     "no_accounts_this_month": "Nenhuma conta ativa neste mês.",
     "entries_active_this_month_one": "%{count} lançamento ativo neste mês",
     "entries_active_this_month_other": "%{count} lançamentos ativos neste mês",
-    "see_all_entries": "Ver todos os lançamentos"
+    "see_all_entries": "Ver todos os lançamentos",
+    "hero_label": "Saldo deste mês",
+    "hero_caption": "Receitas menos despesas em todas as contas ativas.",
+    "hero_add_action": "Adicionar",
+    "hero_more_action": "Mais",
+    "upcoming_payments": "Próximos pagamentos",
+    "upcoming_payments_empty": "Não restam despesas programadas para este mês.",
+    "upcoming_payments_link": "Ver todas as despesas",
+    "recent_activity_link": "Explorar lançamentos",
+    "payment_due": "Vence em %{date}",
+    "activity_subtitle": "Últimas alterações nos seus lançamentos."
   },
   "entry_form": {
     "type": "Tipo",
@@ -176,6 +189,7 @@
     "verify_subtitle": "Digite o código de 6 dígitos recebido por e-mail",
     "code_group_label": "Código de 6 dígitos",
     "code_digit_label": "Dígito do código",
+    "code_digit_aria_label": "Dígito %{index}",
     "verify_code": "Verificar código",
     "verifying_code": "Verificando código...",
     "code_sent": "Enviamos um código de acesso para %{email}.",
@@ -235,6 +249,7 @@
     "archiving": "Arquivando...",
     "archive_confirm_label": "Digite delete para arquivar",
     "archive_confirm_help": "Digite a palavra delete para arquivar esta conta.",
+    "archive_confirm_placeholder": "delete",
     "archive_requires_confirm": "Digite delete exatamente para arquivar a conta.",
     "archive_failed": "Não foi possível arquivar esta conta.",
     "unarchive": "Desarquivar",
