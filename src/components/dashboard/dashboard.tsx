@@ -1,11 +1,11 @@
-"use client";
-
 import "./dashboard.scss";
 
-import { Card, Stack, Text } from "@/elements";
-import { Currency, EntryList, EntryListItem } from "@/components";
+import { EntryList, EntryListItem } from "@/components";
+import { Card, Icon, Stack, Text } from "@/elements";
 
 import { AppLink } from "@/components";
+import { format } from "date-fns";
+import { formatCurrency } from "@/lib/utils";
 import React from "react";
 import { i18n } from "@/model/i18n";
 
@@ -19,12 +19,18 @@ export interface DashboardProps {
     startDate: string;
     endDate: string;
   };
+  upcomingPayments: EntryListItem[];
   recentEntries: EntryListItem[];
+}
+
+function formatPaymentDate(beginDate: string): string {
+  return format(new Date(beginDate), "MMM d");
 }
 
 export function Dashboard({
   totals,
   currentMonthRange,
+  upcomingPayments,
   recentEntries,
 }: DashboardProps): React.ReactElement {
   const currentMonthQuery = `start_date=${currentMonthRange.startDate}&end_date=${currentMonthRange.endDate}`;
@@ -32,85 +38,138 @@ export function Dashboard({
   return (
     <div className="dashboard">
       <Stack gap={24}>
-        <Text size="h2" as="h2" weight="bold">
-          {i18n.t("dashboard.current_month_overview")}
-        </Text>
-
-        <div className="dashboard__cards">
-          <div className="dashboard__cards-grid">
-            <div className="dashboard__card-link dashboard__card-link--income">
-              <AppLink href={`/entries?${currentMonthQuery}&type=income`}>
-                <div className="dashboard__card-surface dashboard__card-surface--income">
-                  <Card padding={16}>
-                    <Stack gap={8}>
-                      <Text size="sm" color="secondary" weight="medium">
-                        {i18n.t("dashboard.income")}
-                      </Text>
-                      <Currency
-                        value={totals.income}
-                        size="2xl"
-                        weight="bold"
-                      />
-                    </Stack>
-                  </Card>
-                </div>
-              </AppLink>
-            </div>
-
-            <div className="dashboard__card-link dashboard__card-link--expense">
-              <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
-                <div className="dashboard__card-surface dashboard__card-surface--expense">
-                  <Card padding={16}>
-                    <Stack gap={8}>
-                      <Text size="sm" color="secondary" weight="medium">
-                        {i18n.t("dashboard.expenses")}
-                      </Text>
-                      <Currency
-                        value={totals.expense}
-                        size="2xl"
-                        weight="bold"
-                      />
-                    </Stack>
-                  </Card>
-                </div>
-              </AppLink>
-            </div>
-
-            <div className="dashboard__card dashboard__card--net">
-              <div className="dashboard__card-surface dashboard__card-surface--net">
-                <Card padding={16}>
-                  <Stack gap={8}>
-                    <Text size="sm" color="secondary" weight="medium">
-                      {i18n.t("dashboard.net")}
-                    </Text>
-                    <Currency value={totals.net} size="2xl" weight="bold" />
-                  </Stack>
-                </Card>
-              </div>
-            </div>
+        <section className="dashboard__hero">
+          <div className="dashboard__hero-pattern" aria-hidden="true" />
+          <div className="dashboard__hero-main">
+            <Stack gap={10}>
+              <Text
+                as="span"
+                size="sm"
+                color="inverse"
+                weight="medium"
+                transform="uppercase"
+              >
+                {i18n.t("dashboard.hero_label")}
+              </Text>
+              <Text as="h1" size="h1" color="inverse" weight="bold">
+                {formatCurrency(totals.net)}
+              </Text>
+              <Text as="p" size="sm" color="inverse">
+                {i18n.t("dashboard.hero_caption")}
+              </Text>
+            </Stack>
           </div>
-        </div>
 
-        <div className="dashboard__recent-section">
-          <Stack gap={16}>
-            <div className="dashboard__recent-header">
-              <Stack direction="row" align="center" justify="space-between">
-                <Text size="h4" as="h3" weight="semibold">
-                  {i18n.t("dashboard.recent_entries")}
-                </Text>
-                <span className="dashboard__recent-link">
-                  <AppLink href={`/entries?${currentMonthQuery}`}>
-                    {i18n.t("dashboard.see_all_entries")}
-                  </AppLink>
+          <div className="dashboard__hero-actions">
+            <AppLink href="/entries/new/income">
+              <span className="dashboard__hero-action dashboard__hero-action--primary">
+                <Icon name="plus" size={18} />
+                <span>
+                  {i18n.t("dashboard.hero_add_action")}
                 </span>
-              </Stack>
-            </div>
-            <EntryList
-              entries={recentEntries}
-              showDelete={false}
-              entryHref={(entry) => `/entries/${entry.id}`}
-            />
-          </Stack>
+              </span>
+            </AppLink>
+            <button type="button" className="dashboard__hero-action">
+              <Icon name="dots-horizontal" size={18} />
+              <span>{i18n.t("dashboard.hero_more_action")}</span>
+            </button>
+          </div>
+
+          <div className="dashboard__hero-stats">
+            <AppLink href={`/entries?${currentMonthQuery}&type=income`}>
+              <span className="dashboard__stat-card">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("dashboard.income")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {formatCurrency(totals.income)}
+                </Text>
+              </span>
+            </AppLink>
+            <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
+              <span className="dashboard__stat-card dashboard__stat-card--soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("dashboard.expenses")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {formatCurrency(Math.abs(totals.expense))}
+                </Text>
+              </span>
+            </AppLink>
+          </div>
+        </section>
+
+        <div className="dashboard__grid">
+          <Card
+            as="section"
+            padding={24}
+            title={String(i18n.t("dashboard.upcoming_payments"))}
+            icon="calendar"
+          >
+            <Stack gap={20}>
+              <div className="dashboard__section-link">
+                <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
+                  {i18n.t("dashboard.upcoming_payments_link")}
+                </AppLink>
+              </div>
+
+              {upcomingPayments.length === 0 ? (
+                <div className="dashboard__empty-state">
+                  <Text color="secondary">
+                    {i18n.t("dashboard.upcoming_payments_empty")}
+                  </Text>
+                </div>
+              ) : (
+                <div className="dashboard__payments-list">
+                  {upcomingPayments.map((entry) => (
+                    <div key={entry.id} className="dashboard__payment-row">
+                      <div className="dashboard__payment-copy">
+                        <Text as="span" size="sm" weight="semibold">
+                          {entry.description}
+                        </Text>
+                        <Text as="span" size="xs" color="secondary">
+                          {entry.accountName}
+                        </Text>
+                      </div>
+                      <div className="dashboard__payment-meta">
+                        <Text as="span" size="sm" weight="semibold">
+                          {formatCurrency(Math.abs(entry.amount))}
+                        </Text>
+                        <Text as="span" size="xs" color="secondary">
+                          {i18n.t("dashboard.payment_due", {
+                            date: formatPaymentDate(entry.beginDate),
+                          })}
+                        </Text>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Stack>
+          </Card>
+
+          <Card
+            as="section"
+            padding={24}
+            title={String(i18n.t("dashboard.recent_entries"))}
+            icon="activity"
+          >
+            <Stack gap={20}>
+              <Text size="sm" color="secondary">
+                {i18n.t("dashboard.activity_subtitle")}
+              </Text>
+              <div className="dashboard__section-link">
+                <AppLink href={`/entries?${currentMonthQuery}`}>
+                  {i18n.t("dashboard.recent_activity_link")}
+                </AppLink>
+              </div>
+              <EntryList
+                entries={recentEntries}
+                showDelete={false}
+                entryHrefBase="/entries"
+              />
+            </Stack>
+          </Card>
         </div>
       </Stack>
     </div>

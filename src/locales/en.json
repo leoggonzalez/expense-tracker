@@ -1,17 +1,20 @@
 {
   "metadata": {
-    "title": "Expense Tracker",
-    "description": "Track your income and expenses"
+    "title": "Sequence",
+    "description": "Track your income and expenses with clarity."
   },
   "navigation": {
-    "brand": "Expense Tracker",
+    "brand": "Sequence",
     "dashboard": "Dashboard",
     "projection": "Projection",
     "entries": "Entries",
     "accounts": "Accounts",
     "settings": "Settings",
     "all_entries": "All Entries",
-    "login": "Login"
+    "login": "Login",
+    "primary_section": "Overview",
+    "secondary_section": "Preferences",
+    "user_fallback_name": "Your account"
   },
   "dashboard": {
     "current_month_overview": "Current Month Overview",
@@ -19,7 +22,7 @@
     "expenses": "Expenses",
     "net": "Net",
     "active_entries": "Active Entries",
-    "recent_entries": "Recent Entries",
+    "recent_entries": "Recent Activity",
     "accounts_this_month": "Accounts This Month",
     "account_income": "Income",
     "account_expenses": "Expenses",
@@ -27,7 +30,17 @@
     "no_accounts_this_month": "No active accounts this month.",
     "entries_active_this_month_one": "%{count} entry active this month",
     "entries_active_this_month_other": "%{count} entries active this month",
-    "see_all_entries": "See all entries"
+    "see_all_entries": "See all entries",
+    "hero_label": "Balance this month",
+    "hero_caption": "Income minus expenses across all active accounts.",
+    "hero_add_action": "Add",
+    "hero_more_action": "More",
+    "upcoming_payments": "Upcoming Payments",
+    "upcoming_payments_empty": "No scheduled expenses remain for this month.",
+    "upcoming_payments_link": "View all expenses",
+    "recent_activity_link": "Browse entries",
+    "payment_due": "Due %{date}",
+    "activity_subtitle": "Latest changes across your entries."
   },
   "entry_form": {
     "type": "Type",

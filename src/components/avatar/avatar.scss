@@ -5,9 +5,17 @@
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  background-color: var(--color-background-secondary);
-  border: var(--border-width) solid var(--color-border);
-  color: var(--color-text-primary);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 18%, white),
+    color-mix(in srgb, var(--color-success) 18%, white)
+  );
+  border: var(--border-width) solid color-mix(
+      in srgb,
+      var(--color-primary) 18%,
+      var(--color-border)
+    );
+  color: var(--color-primary-dark);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.04em;

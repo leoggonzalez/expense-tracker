@@ -1,8 +1,6 @@
 import { Container, Dashboard } from "@/components";
 import { getDashboardPayload } from "@/actions/entries";
 
-import { Stack } from "@/elements";
-
 export const dynamic = "force-dynamic";
 
 export default async function HomePage(): Promise<React.ReactElement> {
@@ -10,13 +8,12 @@ export default async function HomePage(): Promise<React.ReactElement> {
 
   return (
     <Container>
-      <Stack gap={32}>
-        <Dashboard
-          totals={dashboardPayload.totals}
-          currentMonthRange={dashboardPayload.currentMonthRange}
-          recentEntries={dashboardPayload.recentEntries}
-        />
-      </Stack>
+      <Dashboard
+        totals={dashboardPayload.totals}
+        currentMonthRange={dashboardPayload.currentMonthRange}
+        recentEntries={dashboardPayload.recentEntries}
+        upcomingPayments={dashboardPayload.upcomingPayments}
+      />
     </Container>
   );
 }

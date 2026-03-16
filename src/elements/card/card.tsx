@@ -3,12 +3,17 @@ import "./card.scss";
 import React from "react";
 
 import { Box, BoxPadding } from "@/elements/box/box";
+import { Icon } from "@/elements/icon/icon";
+import type { IconName } from "@/elements/icon/icon_assets";
+import { Text } from "@/elements/text/text";
 
 export interface CardProps {
   children: React.ReactNode;
   padding?: number | BoxPadding;
   variant?: "default" | "secondary" | "dashed";
   as?: "div" | "section" | "article";
+  title?: string;
+  icon?: IconName;
 }
 
 export function Card({
@@ -16,12 +21,32 @@ export function Card({
   padding,
   variant = "default",
   as: Component = "div",
+  title,
+  icon,
 }: CardProps): React.ReactElement {
   const classes = ["card", `card--${variant}`].join(" ");
 
   return (
     <Component className={classes}>
-      <Box padding={padding}>{children}</Box>
+      <Box padding={padding}>
+        {title || icon ? (
+          <div className="card__header">
+            <div className="card__title-group">
+              {icon ? (
+                <span className="card__icon">
+                  <Icon name={icon} size={18} />
+                </span>
+              ) : null}
+              {title ? (
+                <Text as="span" size="lg" weight="semibold">
+                  {title}
+                </Text>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+        {children}
+      </Box>
     </Component>
   );
 }

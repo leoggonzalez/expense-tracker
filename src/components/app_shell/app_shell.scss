@@ -24,6 +24,16 @@
   }
 }
 
+.app-container--protected {
+  background:
+    radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--color-primary) 9%, transparent),
+      transparent 28%
+    ),
+    var(--color-background);
+}
+
 .app-container--navigating {
   .app-shell__loading-bar {
     opacity: 1;

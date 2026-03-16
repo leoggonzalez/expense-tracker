@@ -3,39 +3,191 @@
 .dashboard {
   width: 100%;
 
-  &__cards-grid {
+  &__hero {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    gap: var(--spacing-xl);
+    padding: 24px;
+    border-radius: 32px;
+    background: linear-gradient(135deg, #025864 0%, #0a6973 100%);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &__hero-pattern {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 78% 24%, var(--color-hero-pattern) 0 8%, transparent 8.5%),
+      radial-gradient(circle at 88% 66%, var(--color-hero-pattern) 0 10%, transparent 10.5%),
+      linear-gradient(
+        115deg,
+        transparent 0%,
+        transparent 48%,
+        var(--color-hero-pattern) 48%,
+        var(--color-hero-pattern) 50%,
+        transparent 50%,
+        transparent 100%
+      );
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  &__hero-main,
+  &__hero-actions,
+  &__hero-stats {
+    position: relative;
+    z-index: 1;
+  }
+
+  &__hero-main .text--size-h1 {
+    letter-spacing: -0.04em;
+  }
+
+  &__hero-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+  }
+
+  &__hero-action {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background-color: rgba(255, 255, 255, 0.14);
+    color: var(--color-text-inverse);
+    border-radius: 18px;
+    min-height: 56px;
+    padding: 0 22px;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    box-shadow: none;
+    transition:
+      transform var(--transition-fast),
+      background-color var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+
+  &__hero-action:hover {
+    transform: translateY(-1px);
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &__hero-action--primary {
+    background-color: var(--color-success);
+    border-color: transparent;
+    color: var(--color-text-inverse);
+  }
+
+  &__hero-stats {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
   }
 
-  &__card-link {
-    display: block;
+  &__stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
-  &__card-surface--income {
-    border-left: 3px solid var(--color-success);
+  &__stat-card--soft {
+    background-color: rgba(255, 255, 255, 0.08);
   }
 
-  &__card-surface--expense {
-    border-left: 3px solid var(--color-danger);
+  &__grid {
+    display: grid;
+    gap: var(--spacing-lg);
   }
 
-  &__card-surface--net {
-    border-left: 3px solid var(--color-primary);
-  }
-
-  &__recent-link {
+  &__section-link {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--color-primary);
+  }
+
+  &__payments-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  &__payment-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: 16px 18px;
+    border-radius: 20px;
+    background-color: var(--color-surface-muted);
+  }
+
+  &__payment-copy,
+  &__payment-meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__payment-meta {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  &__empty-state {
+    padding: 20px;
+    border-radius: 20px;
+    background-color: var(--color-surface-muted);
   }
 }
 
 @media (min-width: $breakpoint-tablet) {
   .dashboard {
-    &__cards-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    &__hero {
+      padding: 32px;
+    }
+
+    &__hero-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__grid {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
+    }
+  }
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .dashboard {
+    &__hero {
+      grid-template-columns: minmax(0, 1.35fr) auto;
+      grid-template-areas:
+        "main actions"
+        "stats stats";
+      align-items: start;
+      padding: 40px;
+    }
+
+    &__hero-main {
+      grid-area: main;
+      max-width: 640px;
+    }
+
+    &__hero-actions {
+      grid-area: actions;
+      justify-content: flex-end;
+    }
+
+    &__hero-stats {
+      grid-area: stats;
+      grid-template-columns: repeat(2, minmax(0, 240px));
+      justify-content: start;
     }
   }
 }

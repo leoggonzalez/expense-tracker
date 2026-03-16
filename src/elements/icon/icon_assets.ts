@@ -5,6 +5,8 @@ export const iconAssets = {
   projection: new URL("./icons/projection.svg", import.meta.url).toString(),
   entries: new URL("./icons/entries.svg", import.meta.url).toString(),
   accounts: new URL("./icons/accounts.svg", import.meta.url).toString(),
+  activity: new URL("./icons/activity.svg", import.meta.url).toString(),
+  calendar: new URL("./icons/calendar.svg", import.meta.url).toString(),
   settings: new URL("./icons/settings.svg", import.meta.url).toString(),
   login: new URL("./icons/login.svg", import.meta.url).toString(),
   income: new URL("./icons/income.svg", import.meta.url).toString(),
@@ -23,6 +25,10 @@ export const iconAssets = {
   ).toString(),
   check: new URL("./icons/check.svg", import.meta.url).toString(),
   alert: new URL("./icons/alert.svg", import.meta.url).toString(),
+  "dots-horizontal": new URL(
+    "./icons/dots-horizontal.svg",
+    import.meta.url,
+  ).toString(),
 } as const;
 
 export type IconName = keyof typeof iconAssets;

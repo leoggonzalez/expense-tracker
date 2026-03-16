@@ -90,6 +90,19 @@ export type DashboardPayload = {
     createdAt: string;
     updatedAt: string;
   }>;
+  upcomingPayments: Array<{
+    id: string;
+    type: string;
+    accountName: string;
+    description: string;
+    amount: number;
+    beginDate: string;
+    endDate: string | null;
+    transferAccountId: string | null;
+    transferAccountName: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }>;
   currentMonthRange: {
     startDate: string;
     endDate: string;
@@ -899,16 +912,42 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
   const now = new Date();
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
+  const today = startOfDay(now);
   const currentUser = await requireCurrentUser();
 
-  const [totals, recentEntries] = await Promise.all([
+  const [totals, recentEntries, upcomingPayments] = await Promise.all([
     getMonthTotalsForUser(currentUser.id, monthStart),
     getRecentEntries(10),
+    prisma.entry.findMany({
+      where: {
+        type: "expense",
+        transferAccountId: null,
+        account: {
+          userId: currentUser.id,
+        },
+        beginDate: {
+          gte: today,
+          lte: monthEnd,
+        },
+      },
+      include: {
+        account: true,
+        transferAccount: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: [{ beginDate: "asc" }, { createdAt: "desc" }],
+      take: 6,
+    }),
   ]);
 
   return {
     totals,
     recentEntries: recentEntries.map(serializeDashboardRecentEntry),
+    upcomingPayments: upcomingPayments.map(serializeDashboardRecentEntry),
     currentMonthRange: {
       startDate: format(monthStart, "yyyy-MM-dd"),
       endDate: format(monthEnd, "yyyy-MM-dd"),
