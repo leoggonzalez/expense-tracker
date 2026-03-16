@@ -1,10 +1,10 @@
 {
   "metadata": {
-    "title": "Expense Tracker",
+    "title": "Currento",
     "description": "Acompanhe suas receitas e despesas"
   },
   "navigation": {
-    "brand": "Expense Tracker",
+    "brand": "Currento",
     "dashboard": "Painel",
     "projection": "Projeção",
     "entries": "Lançamentos",

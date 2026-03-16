@@ -5,6 +5,7 @@ import "./navigation.scss";
 import { AppLink, Avatar, Container, useNavigationProgress } from "@/components";
 import { Icon, Text } from "@/elements";
 import type { IconName } from "@/elements/icon/icon_assets";
+import { CurrentoLogo } from "@/lib/currento_logo";
 import { i18n } from "@/model/i18n";
 import React from "react";
 import { usePathname } from "next/navigation";
@@ -16,36 +17,6 @@ type NavigationClientProps = {
     name: string | null;
   } | null;
 };
-
-function SequenceLogo(): React.ReactElement {
-  return (
-    <svg
-      aria-hidden="true"
-      className="navigation__logo"
-      viewBox="0 0 48 48"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M4 4h14c0 7.732-6.268 14-14 14V4Z"
-        fill="currentColor"
-      />
-      <path
-        d="M30 4h14v14c-7.732 0-14-6.268-14-14Z"
-        fill="currentColor"
-      />
-      <path
-        d="M4 30c7.732 0 14 6.268 14 14H4V30Z"
-        fill="currentColor"
-      />
-      <path
-        d="M44 44H30c0-7.732 6.268-14 14-14v14Z"
-        fill="currentColor"
-      />
-      <circle cx="24" cy="24" r="7" fill="currentColor" />
-    </svg>
-  );
-}
 
 export function NavigationClient({
   isAuthenticated,
@@ -106,7 +77,9 @@ export function NavigationClient({
           <div className="navigation__brand">
             <AppLink href="/">
               <span className="navigation__brand-link">
-                <SequenceLogo />
+                <span className="navigation__logo">
+                  <CurrentoLogo size={36} />
+                </span>
                 <span className="navigation__brand-label">
                   {i18n.t("navigation.brand")}
                 </span>

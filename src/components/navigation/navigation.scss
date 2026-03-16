@@ -134,7 +134,10 @@
   &__logo {
     width: 36px;
     height: 36px;
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 }
 
@@ -210,7 +213,8 @@
     top: 0;
     align-self: start;
     height: 100vh;
-    padding: var(--spacing-xl);
+    width: var(--sidebar-width-desktop);
+    padding: var(--spacing-xl) var(--spacing-md);
     background: transparent;
     border-bottom: 0;
 
@@ -228,7 +232,7 @@
 
     &__inner {
       height: 100%;
-      padding: var(--spacing-xl);
+      padding: var(--spacing-lg);
       border-radius: 32px;
       border: var(--border-width) solid var(--color-border);
       background-color: color-mix(
