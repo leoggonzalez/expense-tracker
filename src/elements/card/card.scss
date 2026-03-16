@@ -3,17 +3,43 @@
 .card {
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
 
   &--default {
-    background-color: var(--color-background);
+    background-color: var(--color-background-secondary);
   }
 
   &--secondary {
-    background-color: var(--color-background-secondary);
+    background-color: var(--color-surface-muted);
   }
 
   &--dashed {
     border-style: dashed;
-    background-color: var(--color-background-secondary);
+    background-color: var(--color-surface-muted);
+  }
+
+  &__header {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  &__title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--border-radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 10%,
+      var(--color-background-secondary)
+    );
   }
 }

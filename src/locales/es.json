@@ -1,17 +1,20 @@
 {
   "metadata": {
-    "title": "Expense Tracker",
+    "title": "Currento",
     "description": "Controla tus ingresos y gastos"
   },
   "navigation": {
-    "brand": "Expense Tracker",
+    "brand": "Currento",
     "dashboard": "Panel",
     "projection": "Proyección",
     "entries": "Movimientos",
     "accounts": "Cuentas",
     "settings": "Configuración",
     "all_entries": "Todos los movimientos",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "primary_section": "General",
+    "secondary_section": "Preferencias",
+    "user_fallback_name": "Tu cuenta"
   },
   "dashboard": {
     "current_month_overview": "Resumen del mes actual",
@@ -19,7 +22,7 @@
     "expenses": "Gastos",
     "net": "Neto",
     "active_entries": "Movimientos activos",
-    "recent_entries": "Movimientos recientes",
+    "recent_entries": "Actividad reciente",
     "accounts_this_month": "Cuentas de este mes",
     "account_income": "Ingresos",
     "account_expenses": "Gastos",
@@ -27,7 +30,17 @@
     "no_accounts_this_month": "No hay cuentas activas este mes.",
     "entries_active_this_month_one": "%{count} movimiento activo este mes",
     "entries_active_this_month_other": "%{count} movimientos activos este mes",
-    "see_all_entries": "Ver todos los movimientos"
+    "see_all_entries": "Ver todos los movimientos",
+    "hero_label": "Balance de este mes",
+    "hero_caption": "Ingresos menos gastos en todas las cuentas activas.",
+    "hero_add_action": "Añadir",
+    "hero_more_action": "Más",
+    "upcoming_payments": "Próximos pagos",
+    "upcoming_payments_empty": "No quedan gastos programados para este mes.",
+    "upcoming_payments_link": "Ver todos los gastos",
+    "recent_activity_link": "Explorar movimientos",
+    "payment_due": "Vence %{date}",
+    "activity_subtitle": "Últimos cambios en tus movimientos."
   },
   "entry_form": {
     "type": "Tipo",
@@ -94,6 +107,7 @@
   },
   "entries_page": {
     "title": "Movimientos",
+    "subtitle": "Revisa la actividad, acota el periodo y entra en los movimientos que necesitan atención.",
     "add_entry": "Añadir movimiento",
     "account": "Cuenta",
     "details": "Detalles",
@@ -108,6 +122,10 @@
     "type_all": "Todos",
     "clear_filters": "Limpiar filtros",
     "showing_results": "Mostrando %{count} de %{total} movimientos",
+    "results_title": "Movimientos filtrados",
+    "summary_shown": "Mostrados ahora",
+    "summary_total": "Coincidencias totales",
+    "summary_filters": "Filtros activos",
     "empty_state": "No hay movimientos que coincidan con los filtros actuales.",
     "add_new_entry": "Añadir nuevo movimiento",
     "add_multiple_entries": "Añadir varios movimientos",
@@ -145,6 +163,8 @@
     "total": "Total"
   },
   "projection_page": {
+    "title": "Proyección",
+    "subtitle": "Sigue cómo evolucionan los ingresos y gastos durante los próximos meses.",
     "previous_month": "Mes anterior",
     "next_month": "Mes siguiente",
     "chart_title": "Ingresos vs gastos (próximos 6 meses)",
@@ -176,6 +196,7 @@
     "verify_subtitle": "Introduce el código de 6 dígitos que recibiste por correo",
     "code_group_label": "Código de 6 dígitos",
     "code_digit_label": "Dígito del código",
+    "code_digit_aria_label": "Dígito %{index}",
     "verify_code": "Verificar código",
     "verifying_code": "Verificando código...",
     "code_sent": "Enviamos un código de acceso a %{email}.",
@@ -189,7 +210,8 @@
   "settings_page": {
     "title": "Configuración",
     "appearance": "Apariencia",
-    "email": "Correo electrónico",
+    "subtitle": "Elige cómo debe verse Currento y qué idioma debe usar.",
+    "appearance_hint": "Estas preferencias se aplican en toda la app y se actualizan al instante.",
     "theme": "Tema",
     "theme_system": "Sistema",
     "theme_light": "Claro",
@@ -198,7 +220,12 @@
     "language_system": "Sistema",
     "language_en": "English",
     "language_es": "Español",
-    "language_pt_br": "Português (Brasil)",
+    "language_pt_br": "Português (Brasil)"
+  },
+  "account": {
+    "title": "Cuenta",
+    "subtitle": "Gestiona tus datos personales y cierra sesión en Currento.",
+    "email": "Correo electrónico",
     "name": "Nombre",
     "name_placeholder": "Tu nombre",
     "save": "Guardar cambios",
@@ -211,6 +238,11 @@
     "title": "Cuentas",
     "create_account": "Crear cuenta",
     "create_account_hint": "Crea una cuenta dedicada para organizar tus movimientos.",
+    "edit_account_hint": "Actualiza el nombre de la cuenta manteniendo intacto su historial y movimientos.",
+    "hero_subtitle": "Revisa saldos por mes y entra en cada cuenta desde una sola vista.",
+    "detail_hero_subtitle": "Sigue cómo evoluciona %{month} en esta cuenta y accede a sus movimientos relacionados.",
+    "active_accounts_label": "Cuentas activas",
+    "month_total_overview": "Resumen mensual",
     "account_name": "Nombre de la cuenta",
     "account_name_placeholder": "p. ej., cuenta principal, inversión",
     "current_month_total": "Total del mes actual",
@@ -235,6 +267,7 @@
     "archiving": "Archivando...",
     "archive_confirm_label": "Escribe delete para archivar",
     "archive_confirm_help": "Escribe la palabra delete para archivar esta cuenta.",
+    "archive_confirm_placeholder": "delete",
     "archive_requires_confirm": "Escribe delete exactamente para archivar la cuenta.",
     "archive_failed": "No se pudo archivar esta cuenta.",
     "unarchive": "Desarchivar",
@@ -243,13 +276,15 @@
     "archived_accounts": "Cuentas archivadas",
     "empty_archived_state": "No hay cuentas archivadas.",
     "archived_badge": "Archivada",
+    "archived_account_hint": "Esta cuenta está archivada y puedes restaurarla cuando la necesites de nuevo.",
     "cancel": "Cancelar",
     "create": "Crear cuenta",
     "creating": "Creando...",
     "empty_state": "Todavía no hay cuentas. Crea la primera.",
     "duplicate_name": "Ya tienes una cuenta con ese nombre.",
     "name_required": "El nombre de la cuenta es obligatorio.",
-    "create_failed": "No se pudo crear la cuenta."
+    "create_failed": "No se pudo crear la cuenta.",
+    "settle_hint": "Crea una transferencia de ajuste cuando esta cuenta cierre el mes por debajo de cero."
   },
   "account_detail_page": {
     "title": "Detalles de la cuenta",
@@ -275,11 +310,16 @@
     "title_expense": "Añadir nuevo gasto",
     "title_transfer": "Añadir nueva transferencia",
     "title_multiple": "Añadir varios movimientos",
+    "subtitle_income": "Registra dinero entrante con datos claros de cuenta y programación.",
+    "subtitle_expense": "Registra gastos salientes con los mismos controles de cuenta y calendario.",
+    "subtitle_transfer": "Mueve fondos entre cuentas manteniendo ambos lados sincronizados.",
+    "subtitle_multiple": "Añade varios movimientos de una vez para preparar el mes más rápido.",
     "income_tab": "Ingreso",
     "expense_tab": "Gasto",
     "transfer_tab": "Transferencia",
     "multiple_tab": "Varios",
     "recent_entries": "Movimientos recientes",
+    "recent_entries_subtitle": "Usa la actividad reciente como referencia rápida mientras creas nuevos registros.",
     "open_all_entries": "Ver todos los movimientos"
   },
   "entry_detail_page": {

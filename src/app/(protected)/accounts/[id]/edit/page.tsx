@@ -1,7 +1,13 @@
 import { notFound } from "next/navigation";
 
 import { getAccountForEdit } from "@/actions/accounts";
-import { AccountEditForm, AppLink, Container } from "@/components";
+import {
+  AccountEditForm,
+  AppLink,
+  Container,
+  Hero,
+  PagePanel,
+} from "@/components";
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
@@ -26,11 +32,19 @@ export default async function Page({
   return (
     <Container>
       <Stack gap={24}>
-        <Text size="h2" as="h1" weight="bold">
-          {i18n.t("accounts_page.edit_account")}
-        </Text>
+        <Hero
+          icon="accounts"
+          title={String(i18n.t("accounts_page.edit_account"))}
+          pattern="account_form"
+        >
+          <Text as="p" size="sm" color="inverse">
+            {i18n.t("accounts_page.edit_account_hint")}
+          </Text>
+        </Hero>
 
-        <AccountEditForm accountId={account.id} initialName={account.name} />
+        <PagePanel tone="form">
+          <AccountEditForm accountId={account.id} initialName={account.name} />
+        </PagePanel>
 
         <AppLink href={`/accounts/${account.id}`}>
           {i18n.t("accounts_page.back_to_account")}

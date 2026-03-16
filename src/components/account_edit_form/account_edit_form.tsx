@@ -1,10 +1,12 @@
 "use client";
 
+import "./account_edit_form.scss";
+
 import React, { useState } from "react";
 
 import { updateAccount } from "@/actions/accounts";
 import { Button, Input, useNavigationProgress } from "@/components";
-import { Card, Stack, Text } from "@/elements";
+import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 type AccountEditFormProps = {
@@ -43,7 +45,7 @@ export function AccountEditForm({
   };
 
   return (
-    <Card padding={20}>
+    <div className="account-edit-form">
       <form onSubmit={handleSubmit}>
         <Stack gap={16}>
           <Input
@@ -66,6 +68,6 @@ export function AccountEditForm({
           </Button>
         </Stack>
       </form>
-    </Card>
+    </div>
   );
 }

@@ -15,6 +15,10 @@ body {
   height: 100%;
 }
 
+body {
+  min-height: 100%;
+}
+
 @supports (view-transition-name: root) {
   :root {
     view-transition-name: root;
@@ -48,6 +52,7 @@ body {
 .app-main {
   padding: var(--spacing-lg) 0
     calc(var(--navigation-height-mobile) + 32px + env(safe-area-inset-bottom));
+  min-width: 0;
 }
 
 .app-main--auth {
@@ -61,6 +66,20 @@ body {
   }
 
   .app-main {
+    padding: var(--spacing-xl) 0;
+  }
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .app-container {
+    grid-template-columns: var(--sidebar-width-desktop) minmax(0, 1fr);
+    grid-template-rows: minmax(100vh, auto);
+    grid-template-areas: "sidebar main";
+    align-items: stretch;
+  }
+
+  .app-main {
+    grid-area: main;
     padding: var(--spacing-xl) 0;
   }
 }

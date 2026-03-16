@@ -1,6 +1,13 @@
 @use "@/styles/variables.scss" as *;
 
 .entries-filters {
+  .select__field,
+  .input__field {
+    min-height: 48px;
+    border-radius: 16px;
+    background-color: var(--color-surface-muted);
+  }
+
   &__grid-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -8,15 +15,28 @@
   }
 
   &__type-option {
-    min-height: 40px;
+    min-height: 44px;
     padding: 0 var(--spacing-md);
     border: var(--border-width) solid var(--color-border);
-    border-radius: var(--border-radius-full);
-    background-color: var(--color-background);
+    border-radius: 16px;
+    background-color: var(--color-surface-muted);
     color: var(--color-text-primary);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     font-family: inherit;
+    transition:
+      border-color var(--transition-fast),
+      background-color var(--transition-fast),
+      transform var(--transition-fast);
+
+    &:hover {
+      transform: translateY(-1px);
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 6%,
+        var(--color-surface-muted)
+      );
+    }
 
     &--income {
       border-color: color-mix(
@@ -46,7 +66,7 @@
     }
 
     &--active {
-      background-color: var(--color-background);
+      background-color: var(--color-background-secondary);
       border-color: var(--color-primary);
       color: var(--color-primary);
     }
@@ -83,6 +103,7 @@
   }
 
   &__actions {
+    padding-top: var(--spacing-xs);
   }
 }
 

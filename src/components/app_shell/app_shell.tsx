@@ -45,6 +45,7 @@ export function AppShell({
       className={[
         "app-container",
         isAuthRoute && "app-container--auth",
+        !isAuthRoute && "app-container--protected",
         isNavigating && "app-container--navigating",
       ]
         .filter(Boolean)

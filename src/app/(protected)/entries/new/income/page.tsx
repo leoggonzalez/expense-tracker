@@ -1,5 +1,14 @@
-import { EntryForm, NewEntryPage } from "@/components";
+import {
+  Container,
+  EntryCreationIntro,
+  EntryForm,
+  EntryTypeTabs,
+  Hero,
+  PagePanel,
+} from "@/components";
 import { getAccounts } from "@/actions/entries";
+import { Stack } from "@/elements";
+import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -7,12 +16,48 @@ export default async function Page(): Promise<React.ReactElement> {
   const accounts = await getAccounts();
 
   return (
-    <NewEntryPage pageType="income">
-      <EntryForm
-        accounts={accounts.map((account) => account.name)}
-        entryType="income"
-        hideTypeField
-      />
-    </NewEntryPage>
+    <Container>
+      <Stack gap={24}>
+        <Hero
+          icon="income"
+          title={String(i18n.t("new_entry_page.title_income"))}
+          pattern="new_entry"
+        >
+          <EntryCreationIntro
+            pageType="income"
+            subtitle={i18n.t("new_entry_page.subtitle_income")}
+          />
+        </Hero>
+
+        <EntryTypeTabs
+          activeType="income"
+          tabs={[
+            {
+              key: "income",
+              href: "/entries/new/income",
+              label: i18n.t("new_entry_page.income_tab"),
+            },
+            {
+              key: "expense",
+              href: "/entries/new/expense",
+              label: i18n.t("new_entry_page.expense_tab"),
+            },
+            {
+              key: "transfer",
+              href: "/entries/new/transfer",
+              label: i18n.t("new_entry_page.transfer_tab"),
+            },
+          ]}
+        />
+
+        <PagePanel tone="form">
+          <EntryForm
+            accounts={accounts.map((account) => account.name)}
+            entryType="income"
+            hideTypeField
+          />
+        </PagePanel>
+      </Stack>
+    </Container>
   );
 }

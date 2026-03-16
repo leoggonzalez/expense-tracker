@@ -11,6 +11,14 @@ import "@/styles/globals.scss";
 export const metadata: Metadata = {
   title: i18n.t("metadata.title") as string,
   description: i18n.t("metadata.description") as string,
+  icons: {
+    icon: [
+      { url: "/icon", sizes: "32x32", type: "image/png" },
+      { url: "/icon", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: [{ url: "/icon", sizes: "32x32", type: "image/png" }],
+    apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

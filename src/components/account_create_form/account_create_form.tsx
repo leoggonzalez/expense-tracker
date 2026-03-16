@@ -1,10 +1,12 @@
 "use client";
 
+import "./account_create_form.scss";
+
 import React, { useState } from "react";
 
 import { createAccount } from "@/actions/accounts";
 import { Button, Input, useNavigationProgress } from "@/components";
-import { Card, Stack, Text } from "@/elements";
+import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export function AccountCreateForm(): React.ReactElement {
@@ -31,7 +33,7 @@ export function AccountCreateForm(): React.ReactElement {
   };
 
   return (
-    <Card padding={20}>
+    <div className="account-create-form">
       <form onSubmit={handleSubmit}>
         <Stack gap={16}>
           <Input
@@ -53,6 +55,6 @@ export function AccountCreateForm(): React.ReactElement {
           </Button>
         </Stack>
       </form>
-    </Card>
+    </div>
   );
 }

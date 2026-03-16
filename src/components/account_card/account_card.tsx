@@ -2,43 +2,49 @@ import "./account_card.scss";
 
 import React from "react";
 
-import { AppLink, Currency } from "@/components";
+import { AppLink, Avatar, Currency } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 type AccountCardProps = {
   id: string;
   name: string;
-  entryCount: number;
-  allTimeNet: number;
+  currentMonthTotal: number;
+  monthLabel: string;
 };
 
 export function AccountCard({
   id,
   name,
-  entryCount,
-  allTimeNet,
+  currentMonthTotal,
+  monthLabel,
 }: AccountCardProps): React.ReactElement {
   return (
     <div className="account-card">
       <AppLink href={`/accounts/${id}`}>
         <div className="account-card__panel">
-          <Card padding={20}>
-            <Stack gap={10}>
-              <Text size="lg" weight="semibold">
-                {name}
-              </Text>
-              <div className="account-card__meta">
-                <Stack gap={4}>
-                  <Text size="xs" color="secondary">
-                    {i18n.t("accounts_page.total_balance")}
+          <Card padding={24}>
+            <Stack gap={20}>
+              <div className="account-card__header">
+                <Stack direction="row" align="center" gap={12}>
+                  <Avatar name={name} />
+                  <Text size="lg" weight="semibold">
+                    {name}
                   </Text>
-                  <Currency value={allTimeNet} size="lg" weight="bold" />
                 </Stack>
+                <Text size="sm" color="secondary">
+                  {i18n.t("accounts_page.open_account")}
+                </Text>
               </div>
-              <Text size="sm" color="secondary">
-                {i18n.t("accounts_page.entry_count", { count: entryCount })}
-              </Text>
+
+              <div className="account-card__balance">
+                <Text size="sm" color="secondary">
+                  {i18n.t("accounts_page.month_total_label", {
+                    month: monthLabel,
+                  })}
+                </Text>
+                <Currency value={currentMonthTotal} size="h4" weight="bold" />
+              </div>
             </Stack>
           </Card>
         </div>

@@ -2,6 +2,14 @@
 
 .projection-chart {
   height: 260px;
+
+  .recharts-default-legend {
+    padding-top: var(--spacing-md) !important;
+  }
+
+  .recharts-legend-item-text {
+    color: var(--color-text-secondary) !important;
+  }
 }
 
 @media (min-width: $breakpoint-tablet) {

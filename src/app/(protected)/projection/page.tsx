@@ -3,12 +3,17 @@ import {
   Container,
   Currency,
   EntryList,
+  Hero,
+  HeroActionLink,
+  HeroMetric,
+  HeroMetrics,
   ProjectionChart,
 } from "@/components";
-import { Card, Grid, Icon, Stack, Text } from "@/elements";
-import { format, startOfMonth } from "date-fns";
+import { Card, Stack, Text } from "@/elements";
+import { startOfMonth } from "date-fns";
 
 import { getProjectionPagePayload } from "@/actions/entries";
+import { formatCurrency } from "@/lib/utils";
 import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
@@ -33,15 +38,31 @@ function getFocusedMonth(month: string | undefined): Date {
   return startOfMonth(parsed);
 }
 
+function formatMonthKey(
+  monthKey: string,
+  options: Intl.DateTimeFormatOptions,
+): string {
+  const locale = i18n.locale || "en";
+  const date = new Date(`${monthKey}-01T00:00:00`);
+
+  return new Intl.DateTimeFormat(locale, options).format(date);
+}
+
 export default async function ProjectionPage({
   searchParams,
 }: ProjectionPageProps): Promise<React.ReactElement> {
   const params = await searchParams;
   const focusedMonth = getFocusedMonth(params.month);
   const payload = await getProjectionPagePayload(focusedMonth);
-
+  const focusedMonthLabel = formatMonthKey(payload.focusedMonth.key, {
+    month: "long",
+    year: "numeric",
+  });
   const chartData = payload.chartMonths.map((month) => ({
-    monthLabel: format(new Date(`${month.monthKey}-01T00:00:00`), "MMM yyyy"),
+    monthLabel: formatMonthKey(month.monthKey, {
+      month: "short",
+      year: "numeric",
+    }),
     income: month.income,
     expenses: Math.abs(month.expense),
   }));
@@ -49,141 +70,167 @@ export default async function ProjectionPage({
   return (
     <Container>
       <Stack gap={24}>
-        <Stack direction="row" align="center" justify="space-between" gap={16}>
-          <Text size="h2" as="h2" weight="bold">
-            {payload.focusedMonth.label}
-          </Text>
-          <Stack direction="row" align="center" gap={8}>
-            <Card padding={8}>
-              <AppLink
+        <Hero
+          icon="projection"
+          title={String(i18n.t("projection_page.title"))}
+          pattern="projection"
+          actions={
+            <>
+              <HeroActionLink
                 href={`/projection?month=${payload.previousMonthKey}`}
-                ariaLabel={i18n.t("projection_page.previous_month") as string}
               >
-                <Icon name="chevron-left" />
-              </AppLink>
-            </Card>
-            <Card padding={8}>
-              <AppLink
+                <>
+                  <span>{i18n.t("projection_page.previous_month")}</span>
+                </>
+              </HeroActionLink>
+              <HeroActionLink
                 href={`/projection?month=${payload.nextMonthKey}`}
-                ariaLabel={i18n.t("projection_page.next_month") as string}
               >
-                <Icon name="chevron-right" />
-              </AppLink>
-            </Card>
+                <>
+                  <span>{i18n.t("projection_page.next_month")}</span>
+                </>
+              </HeroActionLink>
+            </>
+          }
+        >
+          <Stack gap={24}>
+            <Stack gap={10}>
+              <Text as="h1" size="h1" color="inverse" weight="bold">
+                {focusedMonthLabel}
+              </Text>
+              <Text as="p" size="sm" color="inverse">
+                {i18n.t("projection_page.subtitle")}
+              </Text>
+            </Stack>
+
+            <HeroMetrics columns={3}>
+              <HeroMetric>
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("projection_page.income")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {formatCurrency(payload.focusedMonthTotals.income)}
+                </Text>
+              </HeroMetric>
+              <HeroMetric tone="soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("projection_page.expenses")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {formatCurrency(Math.abs(payload.focusedMonthTotals.expense))}
+                </Text>
+              </HeroMetric>
+              <HeroMetric tone="soft">
+                <Text as="span" size="xs" color="inverse" weight="medium">
+                  {i18n.t("projection_page.total")}
+                </Text>
+                <Text as="span" size="lg" color="inverse" weight="semibold">
+                  {formatCurrency(payload.focusedMonthTotals.net)}
+                </Text>
+              </HeroMetric>
+            </HeroMetrics>
           </Stack>
-        </Stack>
-
-        <Stack gap={12}>
-          <Text size="h4" as="h3" weight="semibold">
-            {i18n.t("projection_page.chart_title")}
-          </Text>
-          <Card padding={20}>
-            <ProjectionChart data={chartData} />
-          </Card>
-        </Stack>
-
-        <Stack gap={12}>
-          <Text size="h4" as="h3" weight="semibold">
-            {i18n.t("projection_page.month_totals")}
-          </Text>
-          <Grid minColumnWidth={220} gap={16}>
-            <Card padding={8}>
-              <Text size="sm" color="secondary">
-                {i18n.t("projection_page.income")}
-              </Text>
-              <Currency
-                value={payload.focusedMonthTotals.income}
-                size="2xl"
-                weight="bold"
-              />
-            </Card>
-            <Card padding={8}>
-              <Text size="sm" color="secondary">
-                {i18n.t("projection_page.expenses")}
-              </Text>
-              <Currency
-                value={payload.focusedMonthTotals.expense}
-                size="2xl"
-                weight="bold"
-              />
-            </Card>
-            <Card padding={8}>
-              <Text size="sm" color="secondary">
-                {i18n.t("projection_page.total")}
-              </Text>
-              <Currency
-                value={payload.focusedMonthTotals.net}
-                size="2xl"
-                weight="bold"
-              />
-            </Card>
-          </Grid>
-        </Stack>
+        </Hero>
 
         <Stack gap={24}>
-          <Text size="h4" as="h3" weight="semibold">
-            {i18n.t("projection_page.accounts_with_entries")}
-          </Text>
-          {payload.focusedMonthAccounts.length === 0 ? (
-            <Card padding={20} variant="dashed">
-              <Text color="secondary">
-                {i18n.t("projection_page.empty_month_entries")}
-              </Text>
-            </Card>
-          ) : (
-            <Stack gap={24}>
-              {payload.focusedMonthAccounts.map((account) => {
-                const hiddenEntriesCount = Math.max(
-                  0,
-                  account.monthEntryCount - account.entries.length,
-                );
+          <Card
+            as="section"
+            padding={24}
+            title={String(i18n.t("projection_page.chart_title"))}
+            icon="projection"
+          >
+            <ProjectionChart data={chartData} />
+          </Card>
 
-                const accountMonthHref = `/accounts/${account.accountId}?currentMonth=${payload.focusedMonth.key}`;
+          <Stack gap={16}>
+            <Text size="h4" as="h3" weight="semibold">
+              {i18n.t("projection_page.accounts_with_entries")}
+            </Text>
 
-                return (
-                  <Stack key={account.accountId} gap={12}>
-                    <Text size="md" weight="bold">
-                      {account.accountName}
-                    </Text>
+            {payload.focusedMonthAccounts.length === 0 ? (
+              <Card padding={24} variant="dashed">
+                <Text color="secondary">
+                  {i18n.t("projection_page.empty_month_entries")}
+                </Text>
+              </Card>
+            ) : (
+              <Stack gap={24}>
+                {payload.focusedMonthAccounts.map((account) => {
+                  const hiddenEntriesCount = Math.max(
+                    0,
+                    account.monthEntryCount - account.entries.length,
+                  );
+                  const accountMonthHref = `/accounts/${account.accountId}?currentMonth=${payload.focusedMonth.key}`;
 
-                    <EntryList
-                      entries={account.entries}
-                      showDelete={false}
-                      entryHrefBase="/entries"
-                      summaryRows={[
-                        ...(hiddenEntriesCount > 0
-                          ? [
-                              {
-                                id: `more-${account.accountId}`,
-                                label: i18n.t(
-                                  "projection_page.more_entries_this_month",
+                  return (
+                    <Card
+                      key={account.accountId}
+                      as="section"
+                      padding={24}
+                      title={account.accountName}
+                      icon="accounts"
+                    >
+                      <Stack gap={20}>
+                        <Stack
+                          direction="column"
+                          desktopDirection="row"
+                          justify="space-between"
+                          align="flex-start"
+                          gap={12}
+                        >
+                          <AppLink href={accountMonthHref}>
+                            {i18n.t("projection_page.open_account")}
+                          </AppLink>
+                          <Currency
+                            value={account.monthTotal}
+                            size="xl"
+                            weight="bold"
+                            as="span"
+                          />
+                        </Stack>
+
+                        <EntryList
+                          entries={account.entries}
+                          showDelete={false}
+                          entryHrefBase="/entries"
+                          summaryRows={[
+                            ...(hiddenEntriesCount > 0
+                              ? [
                                   {
-                                    count: hiddenEntriesCount,
+                                    id: `more-${account.accountId}`,
+                                    label: i18n.t(
+                                      "projection_page.more_entries_this_month",
+                                      {
+                                        count: hiddenEntriesCount,
+                                      },
+                                    ) as string,
+                                    href: accountMonthHref,
                                   },
-                                ) as string,
-                                href: accountMonthHref,
-                              },
-                            ]
-                          : []),
-                        {
-                          id: `total-${account.accountId}`,
-                          label: i18n.t("projection_page.account_month_total"),
-                          value: (
-                            <Currency
-                              value={account.monthTotal}
-                              size="sm"
-                              weight="bold"
-                            />
-                          ),
-                          tone: "emphasis",
-                        },
-                      ]}
-                    />
-                  </Stack>
-                );
-              })}
-            </Stack>
-          )}
+                                ]
+                              : []),
+                            {
+                              id: `total-${account.accountId}`,
+                              label: i18n.t(
+                                "projection_page.account_month_total",
+                              ) as string,
+                              value: (
+                                <Currency
+                                  value={account.monthTotal}
+                                  size="sm"
+                                  weight="bold"
+                                />
+                              ),
+                              tone: "emphasis",
+                            },
+                          ]}
+                        />
+                      </Stack>
+                    </Card>
+                  );
+                })}
+              </Stack>
+            )}
+          </Stack>
         </Stack>
       </Stack>
     </Container>

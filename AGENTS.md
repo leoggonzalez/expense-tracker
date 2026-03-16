@@ -94,9 +94,13 @@ export function Navigation(props: NavigationProps): React.ReactElement {
   - `Box` for box layout with padding and max-width controls
   - `Grid` for CSS grid layout
 - Prefer component-owned SCSS files paired with the component that owns the markup.
-- `src/app` is for route entrypoints, data loading, and composition. Route files such as `page.tsx` and `layout.tsx` should compose components instead of owning presentational UI sections.
+- `src/app` is for route entrypoints, data loading, and page-level composition. Route files such as `page.tsx` may own the structure of the route they render.
+- Route files may compose shared components and layout primitives directly when building a page.
+- Do not create components whose purpose is to represent or style an entire route screen. Components ending in `_page` are prohibited.
+- Reusable styling abstractions must represent a repeated section or pattern, not a whole page.
 - Reusable or rendered UI sections with their own markup and styling must live under `src/components`, even when they are currently used by only one route.
 - Do not add new `.scss` files under `src/app`. Non-global styling belongs in `src/components/<component>/<component>.scss`.
+- Do not add page-specific SCSS or other route-owned styling files under `src/components/*_page`; whole-page components are not part of the architecture.
 - Global application styles imported from `src/styles` remain valid. The prohibition applies to page-local SCSS under `src/app`, not shared global styles.
 
 ## Validation Conventions
@@ -118,19 +122,35 @@ Examples:
 Preferred:
 
 ```tsx
-// src/app/entries/all/page.tsx
-import { AllEntriesPage } from "@/components/all_entries_page/all_entries_page";
+// src/app/(protected)/entries/page.tsx
+import { EntriesFilters, EntriesTable, Hero } from "@/components";
+import { Card, Stack } from "@/elements";
 
-export default function Page(): React.ReactElement {
-  return <AllEntriesPage />;
+export default async function Page(): Promise<React.ReactElement> {
+  return (
+    <Stack gap={24}>
+      <Hero icon="entries" title="..." pattern="entries">
+        ...
+      </Hero>
+      <Card padding={24}>
+        <EntriesFilters
+          accounts={[]}
+          filters={{ account: "", type: "", startDate: "", endDate: "" }}
+        />
+      </Card>
+      <Card padding={24}>
+        <EntriesTable entries={[]} />
+      </Card>
+    </Stack>
+  );
 }
 ```
 
 ```text
 src/components/entry_list/entry_list.tsx
 src/components/entry_list/entry_list.scss
-src/components/all_entries_page/all_entries_page.tsx
-src/components/all_entries_page/all_entries_page.scss
+src/components/hero_metrics/hero_metrics.tsx
+src/components/hero_metrics/hero_metrics.scss
 ```
 
 Not preferred:
@@ -139,26 +159,11 @@ Not preferred:
 <div style={{ display: "grid", gap: "32px" }} />
 ```
 
-```tsx
-function EntriesPage(): React.ReactElement {
-  return (
-    <Grid minColumnWidth={320} gap={32}>
-      <Box className="entries-page__section">
-        <EntryForm />
-      </Box>
-      <Box className="entries-page__section">
-        <BulkEntryForm />
-      </Box>
-    </Grid>
-  );
-}
-```
-
 ```text
-src/app/entries/entry_list.tsx
-src/app/entries/entry_list.scss
-src/app/entries/all/all_entries_page.tsx
-src/app/entries/all/all_entries_page.scss
+src/components/route_dashboard/route_dashboard.tsx
+src/components/route_dashboard/route_dashboard.scss
+src/components/settings_route/settings_route.tsx
+src/components/settings_route/settings_route.scss
 ```
 
 ## Localization Conventions
@@ -205,9 +210,7 @@ Known gaps in the current codebase:
 - No i18n runtime is present today.
 - Some route files still use inline JSX `style` props.
 - Some presentational UI and SCSS still live under `src/app`.
-- `entry_list` and `all_entries_page` should be extracted into `src/components` when touched for related work.
 - `src/app/entries/page.tsx` currently uses inline styles and should move that presentation into component classes.
-- `src/app/entries/entry_list.tsx` and `src/app/entries/all/all_entries_page.tsx` currently behave like components and should not remain under `src/app`.
 - `src/elements/stack/stack.tsx` and `src/elements/box/box.tsx` rely on inline styles internally to wire CSS custom properties and should remain internal-only (no public style prop exposure).
 - Several UI components still accept `className` props and should be normalized when touched or via dedicated cleanup changesets.
 
@@ -225,9 +228,10 @@ Use these scenarios when reviewing future changes against this document:
 - A contributor touching an old PascalCase component should be able to determine whether to rename it in the same change or defer it into a dedicated migration.
 - A contributor adding new UI text should be able to determine that hardcoded strings are disallowed and that the English source belongs in `src/locales/en.json`.
 - A contributor working in `src/app/layout.tsx` should be able to distinguish between a framework exception such as `layout.tsx` and a non-exception such as hardcoded metadata strings.
-- A contributor adding spacing or layout to a page should be able to determine that inline `style` props are disallowed and that layout belongs in component classes.
+- A contributor adding spacing or layout to a page should be able to determine that inline `style` props are disallowed and that page structure may be composed directly in the route from shared components and primitives.
 - A contributor creating a rendered UI block under `src/app` should be able to determine that it belongs in `src/components`.
 - A reviewer should be able to reject a page-local `.scss` file under `src/app` unless it is a documented framework exception.
+- A reviewer should be able to reject a new component whose purpose is to render or style an entire route page.
 - A reviewer should be able to reject any new `style` or `className` prop added to a component under `src/components/*` or `src/elements/*`.
 - A contributor needing flex, box, or grid layout should be able to choose `Stack`, `Box`, or `Grid` instead of adding ad hoc inline styles.
 - A contributor creating a responsive component should be able to determine that phone styles come first, tablet changes begin at `768px`, and desktop changes begin at `1280px`.

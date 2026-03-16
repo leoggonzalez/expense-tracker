@@ -3,6 +3,7 @@
 import "./otp_input.scss";
 
 import React, { useRef } from "react";
+import { i18n } from "@/model/i18n";
 
 type OtpInputProps = {
   label: React.ReactNode;
@@ -122,7 +123,11 @@ export function OtpInput({
             value={digit}
             onChange={(event) => handleChange(index, event.target.value)}
             onKeyDown={(event) => handleKeyDown(index, event)}
-            aria-label={`Digit ${index + 1}`}
+            aria-label={
+              i18n.t("auth.code_digit_aria_label", {
+                index: index + 1,
+              }) as string
+            }
             disabled={disabled}
             required={required && index === 0}
           />
