@@ -9,12 +9,12 @@ import {
   HeroMetrics,
   ProjectionChart,
 } from "@/components";
-import { Card, Stack, Text } from "@/elements";
-import { startOfMonth } from "date-fns";
+import { Card, Icon, Stack, Text } from "@/elements";
 
-import { getProjectionPagePayload } from "@/actions/entries";
 import { formatCurrency } from "@/lib/utils";
+import { getProjectionPagePayload } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
+import { startOfMonth } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
@@ -72,23 +72,19 @@ export default async function ProjectionPage({
       <Stack gap={24}>
         <Hero
           icon="projection"
-          title={String(i18n.t("projection_page.title"))}
+          title={focusedMonthLabel}
           pattern="projection"
           actions={
             <>
               <HeroActionLink
                 href={`/projection?month=${payload.previousMonthKey}`}
               >
-                <>
-                  <span>{i18n.t("projection_page.previous_month")}</span>
-                </>
+                <Icon name="chevron-left" size={18} />
               </HeroActionLink>
               <HeroActionLink
                 href={`/projection?month=${payload.nextMonthKey}`}
               >
-                <>
-                  <span>{i18n.t("projection_page.next_month")}</span>
-                </>
+                <Icon name="chevron-right" size={18} />
               </HeroActionLink>
             </>
           }
@@ -96,14 +92,14 @@ export default async function ProjectionPage({
           <Stack gap={24}>
             <Stack gap={10}>
               <Text as="h1" size="h1" color="inverse" weight="bold">
-                {focusedMonthLabel}
+                {formatCurrency(payload.focusedMonthTotals.net)}
               </Text>
               <Text as="p" size="sm" color="inverse">
                 {i18n.t("projection_page.subtitle")}
               </Text>
             </Stack>
 
-            <HeroMetrics columns={3}>
+            <HeroMetrics columns={2}>
               <HeroMetric>
                 <Text as="span" size="xs" color="inverse" weight="medium">
                   {i18n.t("projection_page.income")}
@@ -118,14 +114,6 @@ export default async function ProjectionPage({
                 </Text>
                 <Text as="span" size="lg" color="inverse" weight="semibold">
                   {formatCurrency(Math.abs(payload.focusedMonthTotals.expense))}
-                </Text>
-              </HeroMetric>
-              <HeroMetric tone="soft">
-                <Text as="span" size="xs" color="inverse" weight="medium">
-                  {i18n.t("projection_page.total")}
-                </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
-                  {formatCurrency(payload.focusedMonthTotals.net)}
                 </Text>
               </HeroMetric>
             </HeroMetrics>

@@ -298,12 +298,13 @@
     &__user-card {
       display: block;
       border-radius: 22px;
-      background-color: var(--color-surface-muted);
-      border: var(--border-width) solid color-mix(
-          in srgb,
-          var(--color-primary) 8%,
-          var(--color-border)
-        );
+      background-color: color-mix(
+        in srgb,
+        var(--color-surface-muted) 88%,
+        var(--color-background-secondary)
+      );
+      border: var(--border-width) solid
+        color-mix(in srgb, var(--color-primary) 14%, var(--color-border));
     }
 
     &__user-card-link {
@@ -313,6 +314,20 @@
       padding: var(--spacing-md);
       color: inherit;
       text-decoration: none;
+      border-radius: 22px;
+      transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+    }
+
+    &__user-card-link:hover,
+    &__user-card-link:focus-visible {
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 8%,
+        transparent
+      );
+      outline: none;
     }
 
     &__user-avatar {

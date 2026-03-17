@@ -1,5 +1,4 @@
-import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
-
+import { Card, Stack, Text } from "@/elements";
 import {
   Container,
   EntriesFilters,
@@ -10,7 +9,8 @@ import {
   HeroMetric,
   HeroMetrics,
 } from "@/components";
-import { Card, Stack, Text } from "@/elements";
+import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
+
 import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
@@ -82,33 +82,6 @@ export default async function Page({
             <Text as="p" size="sm" color="inverse">
               {i18n.t("entries_page.subtitle")}
             </Text>
-
-            <HeroMetrics columns={3}>
-              <HeroMetric>
-                <Text as="span" size="xs" color="inverse" weight="medium">
-                  {i18n.t("entries_page.summary_shown")}
-                </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
-                  {entriesData.entries.length}
-                </Text>
-              </HeroMetric>
-              <HeroMetric tone="soft">
-                <Text as="span" size="xs" color="inverse" weight="medium">
-                  {i18n.t("entries_page.summary_total")}
-                </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
-                  {entriesData.pagination.total}
-                </Text>
-              </HeroMetric>
-              <HeroMetric tone="soft">
-                <Text as="span" size="xs" color="inverse" weight="medium">
-                  {i18n.t("entries_page.summary_filters")}
-                </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
-                  {activeFilterCount}
-                </Text>
-              </HeroMetric>
-            </HeroMetrics>
           </Stack>
         </Hero>
 

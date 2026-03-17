@@ -1,21 +1,19 @@
 @use "@/styles/variables.scss" as *;
 
-.dashboard {
-  width: 100%;
-
-  &__hero-body {
+.dashboard-hero {
+  &__body {
     display: grid;
     gap: var(--spacing-xl);
   }
 
-  &__hero-body .text--size-h1 {
+  &__body .text--size-h1 {
     letter-spacing: -0.04em;
   }
 
-  &__hero-action {
+  &__action {
     border: 1px solid rgba(255, 255, 255, 0.18);
     background-color: rgba(255, 255, 255, 0.14);
-    color: var(--color-text-inverse);
+    color: var(--color-hero-foreground);
     border-radius: 18px;
     min-height: 56px;
     padding: 0 22px;
@@ -32,18 +30,18 @@
       border-color var(--transition-fast);
   }
 
-  &__hero-action:hover {
+  &__action:hover {
     transform: translateY(-1px);
     background-color: rgba(255, 255, 255, 0.2);
   }
 
-  &__hero-action--primary {
+  &__action--primary {
     background-color: var(--color-success);
     border-color: transparent;
     color: var(--color-text-inverse);
   }
 
-  &__hero-stats {
+  &__stats {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
@@ -62,61 +60,12 @@
   &__stat-card--soft {
     background-color: rgba(255, 255, 255, 0.08);
   }
-
-  &__grid {
-    display: grid;
-    gap: var(--spacing-lg);
-  }
-
-  &__section-link {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-primary);
-  }
-
-  &__payments-list {
-    display: grid;
-    gap: 14px;
-  }
-
-  &__payment-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-md);
-    padding: 16px 18px;
-    border-radius: 20px;
-    background-color: var(--color-surface-muted);
-  }
-
-  &__payment-copy,
-  &__payment-meta {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  &__payment-meta {
-    align-items: flex-end;
-    text-align: right;
-  }
-
-  &__empty-state {
-    padding: 20px;
-    border-radius: 20px;
-    background-color: var(--color-surface-muted);
-  }
 }
 
 @media (min-width: $breakpoint-tablet) {
-  .dashboard {
-    &__hero-stats {
+  .dashboard-hero {
+    &__stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    &__grid {
-      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
     }
   }
 }

@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  color: var(--color-text-inverse);
+  color: var(--color-hero-foreground);
   background-color: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
   font-size: var(--font-size-sm);
@@ -27,6 +27,7 @@
     padding: 0 20px;
     background-color: var(--color-success);
     border-color: transparent;
+    color: var(--color-text-inverse);
 
     &:hover {
       background-color: var(--color-success-dark);

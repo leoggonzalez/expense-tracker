@@ -50,7 +50,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 14px;
-    color: var(--color-text-inverse);
+    color: var(--color-hero-foreground);
     background-color: rgba(255, 255, 255, 0.14);
     border: 1px solid rgba(255, 255, 255, 0.16);
     flex-shrink: 0;
@@ -58,11 +58,19 @@
 
   &__title {
     min-width: 0;
-    color: var(--color-text-inverse);
+    color: var(--color-hero-foreground);
   }
 
   &__title .text {
-    color: var(--color-text-inverse);
+    color: var(--color-hero-foreground);
+  }
+
+  &__body .text--color-inverse {
+    color: var(--color-hero-foreground);
+  }
+
+  &__body .text--color-secondary {
+    color: var(--color-hero-foreground-muted);
   }
 
   &__body {
