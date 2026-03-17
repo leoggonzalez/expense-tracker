@@ -6,8 +6,6 @@ import {
   EntriesTable,
   Hero,
   HeroActionLink,
-  HeroMetric,
-  HeroMetrics,
 } from "@/components";
 import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
 
@@ -15,13 +13,9 @@ import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
-type EntriesPageSearchParams = Promise<{
-  page?: string;
-  account?: string;
-  type?: string;
-  start_date?: string;
-  end_date?: string;
-}>;
+type EntriesPageSearchParams = Promise<
+  Record<string, string | string[] | undefined>
+>;
 
 type EntriesPageProps = {
   searchParams: EntriesPageSearchParams;
@@ -31,21 +25,40 @@ export default async function Page({
   searchParams,
 }: EntriesPageProps): Promise<React.ReactElement> {
   const params = await searchParams;
-  const page = Math.max(1, Number(params.page || "1") || 1);
-  const account = params.account || "";
+  const page = Math.max(
+    1,
+    Number(
+      (Array.isArray(params.page) ? params.page[0] : params.page) || "1",
+    ) || 1,
+  );
+  const account = Array.isArray(params.account)
+    ? params.account[0] || ""
+    : params.account || "";
+  const rawType = Array.isArray(params.type) ? params.type[0] : params.type;
   const type =
-    params.type === "income" ||
-    params.type === "expense" ||
-    params.type === "transfer"
-      ? params.type
+    rawType === "income" || rawType === "expense" || rawType === "transfer"
+      ? rawType
       : "";
-  const startDate = params.start_date || "";
-  const endDate = params.end_date || "";
+  const startDate = Array.isArray(params.start_date)
+    ? params.start_date[0] || ""
+    : params.start_date || "";
+  const endDate = Array.isArray(params.end_date)
+    ? params.end_date[0] || ""
+    : params.end_date || "";
+  const rawSearchTerms = Array.isArray(params.search)
+    ? params.search
+    : params.search
+      ? [params.search]
+      : [];
+  const searchTerms = Array.from(
+    new Set(rawSearchTerms.map((term) => term.trim()).filter(Boolean)),
+  );
 
   const [entriesData, accounts] = await Promise.all([
     getEntriesWithFilters({
       accountId: account || undefined,
       type: type || undefined,
+      searchTerms,
       startDate: startDate ? new Date(startDate) : undefined,
       endDate: endDate ? new Date(endDate) : undefined,
       page,
@@ -53,12 +66,6 @@ export default async function Page({
     }),
     getAccounts(),
   ]);
-  const activeFilterCount = Object.values({
-    account,
-    type,
-    startDate,
-    endDate,
-  }).filter(Boolean).length;
 
   return (
     <Container>
@@ -88,30 +95,24 @@ export default async function Page({
         <Card
           as="section"
           padding={24}
-          title={String(i18n.t("entries_page.filters"))}
-          icon="entries"
-        >
-          <EntriesFilters
-            accounts={accounts.map((entryAccount) => ({
-              id: entryAccount.id,
-              name: entryAccount.name,
-            }))}
-            filters={{
-              account,
-              type,
-              startDate,
-              endDate,
-            }}
-          />
-        </Card>
-
-        <Card
-          as="section"
-          padding={24}
           title={String(i18n.t("entries_page.results_title"))}
           icon="activity"
         >
           <Stack gap={20}>
+            <EntriesFilters
+              accounts={accounts.map((entryAccount) => ({
+                id: entryAccount.id,
+                name: entryAccount.name,
+              }))}
+              filters={{
+                account,
+                type,
+                startDate,
+                endDate,
+                searchTerms,
+              }}
+            />
+
             <Text size="sm" color="secondary">
               {i18n.t("entries_page.showing_results", {
                 count: entriesData.entries.length,

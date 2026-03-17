@@ -34,6 +34,7 @@ export { InfoBox } from "./info_box/info_box";
 export { Pagination } from "./pagination/pagination";
 export type { PaginationProps } from "./pagination/pagination";
 
+export { ContextMenu } from "./context_menu/context_menu";
 export { EntryList } from "./entry_list/entry_list";
 export type {
   EntryListItem,

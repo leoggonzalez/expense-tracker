@@ -1,4 +1,3 @@
-import { getAccountsCurrentMonthSummary } from "@/actions/accounts";
 import {
   AccountCard,
   AppLink,
@@ -9,10 +8,12 @@ import {
   HeroMetric,
   HeroMetrics,
 } from "@/components";
-import { Card, Stack, Text } from "@/elements";
-import { startOfMonth } from "date-fns";
+import { Card, Icon, Stack, Text } from "@/elements";
 import { addMonths, format } from "date-fns";
+
+import { getAccountsCurrentMonthSummary } from "@/actions/accounts";
 import { i18n } from "@/model/i18n";
+import { startOfMonth } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
@@ -68,14 +69,14 @@ export default async function Page({
               <HeroActionLink
                 href={`/accounts?currentMonth=${previousMonthKey}`}
               >
-                {i18n.t("projection_page.previous_month")}
+                <Icon name="chevron-left" size={18} />
               </HeroActionLink>
               <HeroActionLink href={`/accounts?currentMonth=${nextMonthKey}`}>
-                {i18n.t("projection_page.next_month")}
+                <Icon name="chevron-right" size={18} />
               </HeroActionLink>
               <form action="/accounts/new" method="get">
                 <Button type="submit">
-                  {i18n.t("accounts_page.create_account")}
+                  <Icon name="plus" size={18} />
                 </Button>
               </form>
             </>
