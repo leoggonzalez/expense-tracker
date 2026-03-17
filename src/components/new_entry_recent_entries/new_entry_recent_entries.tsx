@@ -1,9 +1,9 @@
 import "./new_entry_recent_entries.scss";
 
-import React from "react";
-
 import { AppLink, Container, EntryList, EntryListItem } from "@/components";
 import { Card, Stack, Text } from "@/elements";
+
+import React from "react";
 import { i18n } from "@/model/i18n";
 
 type NewEntryRecentEntriesProps = {
@@ -23,7 +23,6 @@ export function NewEntryRecentEntries({
           icon="activity"
         >
           <Stack gap={20}>
-            <div className="new-entry-recent-entries__intro">
               <Stack gap={12}>
                 <Text size="sm" color="secondary">
                   {i18n.t("new_entry_page.recent_entries_subtitle")}
@@ -34,7 +33,6 @@ export function NewEntryRecentEntries({
                   </AppLink>
                 </div>
               </Stack>
-            </div>
 
             <div className="new-entry-recent-entries__list-shell">
               <EntryList

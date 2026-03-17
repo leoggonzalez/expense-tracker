@@ -50,7 +50,6 @@ export { EntriesFilters } from "./entries_filters/entries_filters";
 export { EntriesPagination } from "./entries_pagination/entries_pagination";
 export { Hero } from "./hero/hero";
 export type { HeroPattern, HeroProps } from "./hero/hero";
-export { HeroActionLink } from "./hero_action_link/hero_action_link";
 export { HeroMetric, HeroMetrics } from "./hero_metrics/hero_metrics";
 export { ToastProvider, useToast } from "./toast_provider/toast_provider";
 

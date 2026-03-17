@@ -4,7 +4,6 @@ import {
   Button,
   Container,
   Hero,
-  HeroActionLink,
   HeroMetric,
   HeroMetrics,
 } from "@/components";
@@ -66,14 +65,18 @@ export default async function Page({
           pattern="accounts"
           actions={
             <>
-              <HeroActionLink
+              <Button
                 href={`/accounts?currentMonth=${previousMonthKey}`}
+                variant="outline"
               >
                 <Icon name="chevron-left" size={18} />
-              </HeroActionLink>
-              <HeroActionLink href={`/accounts?currentMonth=${nextMonthKey}`}>
+              </Button>
+              <Button
+                href={`/accounts?currentMonth=${nextMonthKey}`}
+                variant="outline"
+              >
                 <Icon name="chevron-right" size={18} />
-              </HeroActionLink>
+              </Button>
               <form action="/accounts/new" method="get">
                 <Button type="submit">
                   <Icon name="plus" size={18} />

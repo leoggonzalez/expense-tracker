@@ -1,11 +1,11 @@
 import { Card, Stack, Text } from "@/elements";
 import {
+  Button,
   Container,
   EntriesFilters,
   EntriesPagination,
   EntriesTable,
   Hero,
-  HeroActionLink,
 } from "@/components";
 import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
 
@@ -76,12 +76,12 @@ export default async function Page({
           pattern="entries"
           actions={
             <>
-              <HeroActionLink href="/entries/new/expense" variant="primary">
+              <Button href="/entries/new/expense" variant="primary">
                 {i18n.t("entries_page.add_entry")}
-              </HeroActionLink>
-              <HeroActionLink href="/entries/new/multiple">
+              </Button>
+              <Button href="/entries/new/multiple" variant="outline">
                 {i18n.t("entries_page.add_multiple_entries")}
-              </HeroActionLink>
+              </Button>
             </>
           }
         >

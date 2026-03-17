@@ -6,16 +6,15 @@ import {
   Currency,
   EntryList,
   Hero,
-  HeroActionLink,
   HeroMetric,
   HeroMetrics,
 } from "@/components";
+import { Card, Icon, Stack, Text } from "@/elements";
+import { addMonths, format, startOfMonth } from "date-fns";
 import { getAccountDetailPageData, unarchiveAccount } from "@/actions/accounts";
 
-import { notFound } from "next/navigation";
-import { addMonths, format, startOfMonth } from "date-fns";
-import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -93,24 +92,26 @@ export default async function Page({
       <Stack gap={24}>
         <Hero
           icon="accounts"
-          title={String(i18n.t("account_detail_page.title"))}
+          title={data.account.name}
           pattern="account_detail"
           actions={
             <>
-              <HeroActionLink
+              <Button
                 href={`/accounts/${data.account.id}?currentMonth=${previousMonthKey}`}
+                variant="outline"
               >
-                {i18n.t("projection_page.previous_month")}
-              </HeroActionLink>
-              <HeroActionLink
+                <Icon name="chevron-left" size={18} />
+              </Button>
+              <Button
                 href={`/accounts/${data.account.id}?currentMonth=${nextMonthKey}`}
+                variant="outline"
               >
-                {i18n.t("projection_page.next_month")}
-              </HeroActionLink>
+                <Icon name="chevron-right" size={18} />
+              </Button>
               {data.account.isArchived ? null : (
                 <form action={`/accounts/${data.account.id}/edit`} method="get">
                   <Button type="submit">
-                    {i18n.t("accounts_page.edit_account")}
+                    <Icon name="edit" size={18} />
                   </Button>
                 </form>
               )}
@@ -119,9 +120,6 @@ export default async function Page({
         >
           <Stack gap={24}>
             <Stack gap={14}>
-              <Text as="h1" size="h2" color="inverse" weight="bold">
-                {data.account.name}
-              </Text>
               <Text as="p" size="sm" color="inverse">
                 {i18n.t("accounts_page.detail_hero_subtitle", {
                   month: selectedMonthLabel,

@@ -10,7 +10,6 @@ import {
   DetailList,
   DetailRow,
   Hero,
-  HeroActionLink,
   HeroMetric,
   HeroMetrics,
 } from "@/components";
@@ -127,9 +126,12 @@ export default async function Page({
           title={String(i18n.t("entry_detail_page.title"))}
           pattern="entry_detail"
           actions={
-            <HeroActionLink href={`/entries/${normalizedEntry.id}/edit`}>
+            <Button
+              href={`/entries/${normalizedEntry.id}/edit`}
+              variant="outline"
+            >
               {i18n.t("entry_detail_page.edit_entry")}
-            </HeroActionLink>
+            </Button>
           }
         >
           <Stack gap={24}>

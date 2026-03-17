@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-
-import { logout } from "@/actions/auth";
-import { updateCurrentUserProfile } from "@/actions/user";
 import { Button, Input } from "@/components";
 import { Card, Stack, Text } from "@/elements";
+import React, { useState } from "react";
+
 import { i18n } from "@/model/i18n";
+import { logout } from "@/actions/auth";
+import { updateCurrentUserProfile } from "@/actions/user";
 import { useRouter } from "next/navigation";
 
 type AccountProfileFormProps = {
@@ -49,17 +49,14 @@ export function AccountProfileForm({
   };
 
   return (
-    <Card padding={24}>
       <form onSubmit={handleSave}>
         <Stack gap={20}>
-          <Card padding={20} variant="secondary">
             <Stack gap={4}>
               <Text size="sm" weight="semibold">
                 {i18n.t("account.email")}
               </Text>
               <Text color="secondary">{user.email}</Text>
             </Stack>
-          </Card>
 
           <Input
             label={i18n.t("account.name")}
@@ -86,6 +83,5 @@ export function AccountProfileForm({
           </Stack>
         </Stack>
       </form>
-    </Card>
   );
 }

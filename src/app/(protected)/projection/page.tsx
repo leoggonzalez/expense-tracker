@@ -1,10 +1,10 @@
 import {
   AppLink,
+  Button,
   Container,
   Currency,
   EntryList,
   Hero,
-  HeroActionLink,
   HeroMetric,
   HeroMetrics,
   ProjectionChart,
@@ -76,16 +76,18 @@ export default async function ProjectionPage({
           pattern="projection"
           actions={
             <>
-              <HeroActionLink
+              <Button
                 href={`/projection?month=${payload.previousMonthKey}`}
+                variant="outline"
               >
                 <Icon name="chevron-left" size={18} />
-              </HeroActionLink>
-              <HeroActionLink
+              </Button>
+              <Button
                 href={`/projection?month=${payload.nextMonthKey}`}
+                variant="outline"
               >
                 <Icon name="chevron-right" size={18} />
-              </HeroActionLink>
+              </Button>
             </>
           }
         >

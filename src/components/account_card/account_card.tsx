@@ -1,9 +1,9 @@
 import "./account_card.scss";
 
-import React from "react";
-
 import { AppLink, Avatar, Currency } from "@/components";
 import { Card, Stack, Text } from "@/elements";
+
+import React from "react";
 import { i18n } from "@/model/i18n";
 
 type AccountCardProps = {
@@ -37,14 +37,12 @@ export function AccountCard({
                 </Text>
               </div>
 
-              <div className="account-card__balance">
                 <Text size="sm" color="secondary">
                   {i18n.t("accounts_page.month_total_label", {
                     month: monthLabel,
                   })}
                 </Text>
                 <Currency value={currentMonthTotal} size="h4" weight="bold" />
-              </div>
             </Stack>
           </Card>
         </div>
