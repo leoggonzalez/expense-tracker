@@ -18,6 +18,7 @@ export interface ButtonProps {
   fullWidth?: boolean;
   startIcon?: React.ReactNode;
   href?: string;
+  ariaLabel?: string;
 }
 
 export function Button({
@@ -30,6 +31,7 @@ export function Button({
   fullWidth = false,
   startIcon,
   href,
+  ariaLabel,
 }: ButtonProps): React.ReactElement {
   const classes = [
     "button",
@@ -49,7 +51,7 @@ export function Button({
 
   if (href && !disabled) {
     return (
-      <AppLink href={href}>
+      <AppLink href={href} ariaLabel={ariaLabel}>
         <span className={classes}>{content}</span>
       </AppLink>
     );
@@ -61,6 +63,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={classes}
+      aria-label={ariaLabel}
     >
       {content}
     </button>

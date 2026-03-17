@@ -136,6 +136,7 @@
     "empty_state": "No entries match the current filters.",
     "add_new_entry": "Add New Entry",
     "add_multiple_entries": "Add Multiple Entries",
+    "load_more_entries": "Load More Entries",
     "recent_entries": "Recent Entries (%{count} most recent)",
     "see_all_entries": "See all entries"
   },

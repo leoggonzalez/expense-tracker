@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   EntriesFilters,
-  EntriesPagination,
   EntriesTable,
   Hero,
 } from "@/components";
@@ -122,11 +121,35 @@ export default async function Page({
 
             <EntriesTable entries={entriesData.entries} />
 
-            {entriesData.pagination.totalPages > 1 ? (
-              <EntriesPagination
-                currentPage={entriesData.pagination.page}
-                totalPages={entriesData.pagination.totalPages}
-              />
+            {entriesData.pagination.page < entriesData.pagination.totalPages ? (
+              <form method="get">
+                {account ? (
+                  <input type="hidden" name="account" value={account} />
+                ) : null}
+                {type ? <input type="hidden" name="type" value={type} /> : null}
+                {startDate ? (
+                  <input type="hidden" name="start_date" value={startDate} />
+                ) : null}
+                {endDate ? (
+                  <input type="hidden" name="end_date" value={endDate} />
+                ) : null}
+                {searchTerms.map((searchTerm) => (
+                  <input
+                    key={searchTerm}
+                    type="hidden"
+                    name="search"
+                    value={searchTerm}
+                  />
+                ))}
+                <input
+                  type="hidden"
+                  name="page"
+                  value={String(entriesData.pagination.page + 1)}
+                />
+                <Button type="submit">
+                  {i18n.t("entries_page.load_more_entries")}
+                </Button>
+              </form>
             ) : null}
           </Stack>
         </Card>

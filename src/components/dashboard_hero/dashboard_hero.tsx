@@ -1,6 +1,6 @@
 import "./dashboard_hero.scss";
 
-import { AppLink, Hero } from "@/components";
+import { AppLink, Button, Hero } from "@/components";
 import { Icon, Stack, Text } from "@/elements";
 
 import { DashboardTotals } from "@/actions/entries";
@@ -28,14 +28,10 @@ export function DashboardHero({
       title={String(i18n.t("dashboard.hero_label"))}
       pattern="dashboard"
       actions={
-        <>
-          <AppLink href="/entries/new/expense">
-            <span className="dashboard-hero__action dashboard-hero__action--primary">
+          <Button href="/entries/new/expense" >
               <Icon name="plus" size={18} />
               <span>{i18n.t("dashboard.hero_add_action")}</span>
-            </span>
-          </AppLink>
-        </>
+          </Button>
       }
     >
       <div className="dashboard-hero__body">
