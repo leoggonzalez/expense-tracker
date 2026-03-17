@@ -1,9 +1,9 @@
 "use client";
 
+import { Button, useNavigationProgress } from "@/components";
 import React, { useState } from "react";
 
 import { deleteEntry } from "@/actions/entries";
-import { Button, useNavigationProgress } from "@/components";
 import { i18n } from "@/model/i18n";
 
 type DeleteEntryButtonProps = {

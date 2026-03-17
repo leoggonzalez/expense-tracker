@@ -42,6 +42,8 @@ $breakpoint-desktop: 1280px;
   --color-surface-muted: #edf4f6;
   --color-surface-accent: #d6f6ea;
   --color-hero-pattern: rgba(255, 255, 255, 0.11);
+  --color-hero-foreground: #ffffff;
+  --color-hero-foreground-muted: rgba(255, 255, 255, 0.88);
 
   /* Layout */
   --max-width-content: 1280px;
@@ -133,21 +135,23 @@ $breakpoint-desktop: 1280px;
   --color-info-dark: #a4cbf1;
   --color-info-light: #4e84b8;
 
-  --color-text-primary: #eef6f8;
-  --color-text-secondary: #c6d8dd;
-  --color-text-tertiary: #8eaab2;
+  --color-text-primary: #f2fafc;
+  --color-text-secondary: #d6e7eb;
+  --color-text-tertiary: #abc1c8;
   --color-text-inverse: #09363d;
 
   --color-background: #08242a;
   --color-background-secondary: #11353c;
   --color-background-tertiary: #184750;
 
-  --color-border: #1d4f58;
-  --color-border-dark: #2d6670;
-  --color-surface-strong: #245763;
-  --color-surface-muted: #15363d;
+  --color-border: #29616a;
+  --color-border-dark: #3b7a85;
+  --color-surface-strong: #2b6673;
+  --color-surface-muted: #1a434b;
   --color-surface-accent: #0f4a36;
   --color-hero-pattern: rgba(255, 255, 255, 0.08);
+  --color-hero-foreground: #f4fbfc;
+  --color-hero-foreground-muted: #dcedf1;
 
   --shadow-sm: 0 8px 24px 0 rgba(0, 0, 0, 0.18);
   --shadow-md: 0 12px 30px 0 rgba(0, 0, 0, 0.22);

@@ -14,6 +14,10 @@ export const iconAssets = {
   transfer: new URL("./icons/transfer.svg", import.meta.url).toString(),
   plus: new URL("./icons/plus.svg", import.meta.url).toString(),
   edit: new URL("./icons/edit.svg", import.meta.url).toString(),
+  "external-link": new URL(
+    "./icons/external-link.svg",
+    import.meta.url,
+  ).toString(),
   close: new URL("./icons/close.svg", import.meta.url).toString(),
   "chevron-left": new URL(
     "./icons/chevron-left.svg",

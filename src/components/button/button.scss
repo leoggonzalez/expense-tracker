@@ -8,6 +8,7 @@
   border: var(--border-width) solid transparent;
   border-radius: 18px;
   font-weight: var(--font-weight-medium);
+  text-decoration: none;
   transition:
     transform var(--transition-fast),
     box-shadow var(--transition-fast),
@@ -143,6 +144,21 @@
 
     &:active:not(:disabled) {
       background-color: #5b21b6;
+    }
+  }
+
+  &--variant-outline {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: var(--color-hero-foreground);
+
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.2);
     }
   }
 

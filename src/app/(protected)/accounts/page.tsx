@@ -1,18 +1,18 @@
-import { getAccountsCurrentMonthSummary } from "@/actions/accounts";
 import {
   AccountCard,
   AppLink,
   Button,
   Container,
   Hero,
-  HeroActionLink,
   HeroMetric,
   HeroMetrics,
 } from "@/components";
-import { Card, Stack, Text } from "@/elements";
-import { startOfMonth } from "date-fns";
+import { Card, Icon, Stack, Text } from "@/elements";
 import { addMonths, format } from "date-fns";
+
+import { getAccountsCurrentMonthSummary } from "@/actions/accounts";
 import { i18n } from "@/model/i18n";
+import { startOfMonth } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
@@ -65,17 +65,21 @@ export default async function Page({
           pattern="accounts"
           actions={
             <>
-              <HeroActionLink
+              <Button
                 href={`/accounts?currentMonth=${previousMonthKey}`}
+                variant="outline"
               >
-                {i18n.t("projection_page.previous_month")}
-              </HeroActionLink>
-              <HeroActionLink href={`/accounts?currentMonth=${nextMonthKey}`}>
-                {i18n.t("projection_page.next_month")}
-              </HeroActionLink>
+                <Icon name="chevron-left" size={18} />
+              </Button>
+              <Button
+                href={`/accounts?currentMonth=${nextMonthKey}`}
+                variant="outline"
+              >
+                <Icon name="chevron-right" size={18} />
+              </Button>
               <form action="/accounts/new" method="get">
                 <Button type="submit">
-                  {i18n.t("accounts_page.create_account")}
+                  <Icon name="plus" size={18} />
                 </Button>
               </form>
             </>

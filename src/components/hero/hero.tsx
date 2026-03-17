@@ -1,9 +1,9 @@
 import "./hero.scss";
 
-import React from "react";
+import { Icon, Stack, Text } from "@/elements";
 
-import { Icon, Stack } from "@/elements";
 import type { IconName } from "@/elements/icon/icon_assets";
+import React from "react";
 
 export type HeroPattern =
   | "dashboard"
@@ -42,7 +42,11 @@ export function Hero({
             <span className="hero__icon">
               <Icon name={icon} size={20} />
             </span>
-            <div className="hero__title">{title}</div>
+            <div className="hero__title">
+              <Text size="h3">
+                {title} 
+              </Text>
+            </div>
           </Stack>
         </div>
 

@@ -14,8 +14,8 @@ export type { CheckboxProps } from "./checkbox/checkbox";
 export { Autocomplete } from "./autocomplete/autocomplete";
 export type { AutocompleteProps } from "./autocomplete/autocomplete";
 
-export { Dashboard } from "./dashboard/dashboard";
-export type { DashboardProps } from "./dashboard/dashboard";
+export { DashboardHero } from "./dashboard_hero/dashboard_hero";
+export { DashboardPanels } from "./dashboard_panels/dashboard_panels";
 
 export { ProjectionTable } from "./projection_table/projection_table";
 export type { ProjectionTableProps } from "./projection_table/projection_table";
@@ -34,6 +34,7 @@ export { InfoBox } from "./info_box/info_box";
 export { Pagination } from "./pagination/pagination";
 export type { PaginationProps } from "./pagination/pagination";
 
+export { ContextMenu } from "./context_menu/context_menu";
 export { EntryList } from "./entry_list/entry_list";
 export type {
   EntryListItem,
@@ -49,7 +50,6 @@ export { EntriesFilters } from "./entries_filters/entries_filters";
 export { EntriesPagination } from "./entries_pagination/entries_pagination";
 export { Hero } from "./hero/hero";
 export type { HeroPattern, HeroProps } from "./hero/hero";
-export { HeroActionLink } from "./hero_action_link/hero_action_link";
 export { HeroMetric, HeroMetrics } from "./hero_metrics/hero_metrics";
 export { ToastProvider, useToast } from "./toast_provider/toast_provider";
 
@@ -79,6 +79,8 @@ export { EntryTypeTabs } from "./entry_type_tabs/entry_type_tabs";
 export { EntryCreationIntro } from "./entry_creation_intro/entry_creation_intro";
 export { DetailList, DetailRow } from "./detail_list/detail_list";
 export { DeleteEntryButton } from "./delete_entry_button/delete_entry_button";
+export { UpcomingPaymentsPanel } from "./upcoming_payments_panel/upcoming_payments_panel";
+export { RecentActivityPanel } from "./recent_activity_panel/recent_activity_panel";
 
 export { Container } from "./container/container";
 export type { ContainerProps } from "./container/container";

@@ -160,10 +160,12 @@ type EntryFiltersWhere = {
   transferAccountId?: {
     not?: null;
   } | null;
-  description?: {
-    contains: string;
-    mode: "insensitive";
-  };
+  AND?: Array<{
+    description: {
+      contains: string;
+      mode: "insensitive";
+    };
+  }>;
   beginDate?: {
     gte?: Date;
     lte?: Date;
@@ -960,6 +962,7 @@ export async function getEntriesWithFilters(filters: {
   type?: "income" | "expense" | "transfer";
   date?: Date;
   description?: string;
+  searchTerms?: string[];
   startDate?: Date;
   endDate?: Date;
   page?: number;
@@ -989,11 +992,24 @@ export async function getEntriesWithFilters(filters: {
       where.transferAccountId = null;
     }
 
-    if (filters.description) {
-      where.description = {
-        contains: filters.description,
-        mode: "insensitive",
-      };
+    const searchTerms = Array.from(
+      new Set(
+        [
+          ...(filters.searchTerms || []),
+          ...(filters.description ? [filters.description] : []),
+        ]
+          .map((term) => term.trim())
+          .filter(Boolean),
+      ),
+    );
+
+    if (searchTerms.length > 0) {
+      where.AND = searchTerms.map((term) => ({
+        description: {
+          contains: term,
+          mode: "insensitive",
+        },
+      }));
     }
 
     if (filters.date || filters.startDate || filters.endDate) {

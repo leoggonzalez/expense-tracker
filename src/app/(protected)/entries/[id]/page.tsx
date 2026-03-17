@@ -1,6 +1,3 @@
-import { notFound } from "next/navigation";
-
-import { getEntryById } from "@/actions/entries";
 import {
   AppLink,
   Button,
@@ -10,12 +7,14 @@ import {
   DetailList,
   DetailRow,
   Hero,
-  HeroActionLink,
   HeroMetric,
   HeroMetrics,
 } from "@/components";
-import { Card, Stack, Text } from "@/elements";
+import { Card, Icon, Stack, Text } from "@/elements";
+
+import { getEntryById } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -124,37 +123,30 @@ export default async function Page({
       <Stack gap={24}>
         <Hero
           icon={getEntryIcon(normalizedEntry.type)}
-          title={String(i18n.t("entry_detail_page.title"))}
+          title={normalizedEntry.description}
           pattern="entry_detail"
           actions={
-            <HeroActionLink href={`/entries/${normalizedEntry.id}/edit`}>
-              {i18n.t("entry_detail_page.edit_entry")}
-            </HeroActionLink>
+            <Stack direction="row" align="center" gap={12}>
+            <Button
+              href={`/entries/${normalizedEntry.id}/edit`}
+              variant="outline"
+            >
+              <Icon name="edit" />
+            </Button>
+              <DeleteEntryButton entryId={normalizedEntry.id} />
+            </Stack>
           }
         >
           <Stack gap={24}>
-            <Stack gap={10}>
-              <Text as="h1" size="h1" color="inverse" weight="bold">
-                {normalizedEntry.description}
-              </Text>
               <Text as="p" size="sm" color="inverse">
                 {formatEntryDate(
                   normalizedEntry.beginDate,
                   normalizedEntry.endDate,
                 )}
               </Text>
-            </Stack>
 
             <HeroMetrics columns={2}>
               <HeroMetric>
-                <Text size="sm" color="inverse">
-                  {i18n.t("entry_detail_page.type")}
-                </Text>
-                <Text size="lg" weight="semibold" color="inverse">
-                  {getEntryTypeLabel(normalizedEntry.type)}
-                </Text>
-              </HeroMetric>
-              <HeroMetric tone="soft">
                 <Text size="sm" color="inverse">
                   {i18n.t("entry_detail_page.amount")}
                 </Text>
@@ -163,6 +155,14 @@ export default async function Page({
                   size="h3"
                   weight="bold"
                 />
+              </HeroMetric>
+              <HeroMetric tone="soft">
+                <Text size="sm" color="inverse">
+                  {i18n.t("entry_detail_page.type")}
+                </Text>
+                <Text size="lg" weight="semibold" color="inverse">
+                  {getEntryTypeLabel(normalizedEntry.type)}
+                </Text>
               </HeroMetric>
             </HeroMetrics>
           </Stack>
@@ -262,16 +262,6 @@ export default async function Page({
             </form>
           </Stack>
         </Card>
-
-        <Card padding={24}>
-          <Stack gap={16}>
-            <Text size="sm" color="secondary">
-              {i18n.t("entry_detail_page.delete_confirm")}
-            </Text>
-            <DeleteEntryButton entryId={normalizedEntry.id} />
-          </Stack>
-        </Card>
-
         <AppLink href="/entries">
           {i18n.t("entry_detail_page.back_to_entries")}
         </AppLink>

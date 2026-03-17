@@ -2,16 +2,12 @@
 
 import "./entries_filters.scss";
 
-import {
-  Button,
-  DateRangeInput,
-  Select,
-  useNavigationProgress,
-} from "@/components";
-import { Stack, Text } from "@/elements";
+import { ContextMenu, useNavigationProgress } from "@/components";
+import { Icon, Text } from "@/elements";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import React from "react";
+import { format } from "date-fns";
 import { i18n } from "@/model/i18n";
 
 type EntriesFiltersProps = {
@@ -24,8 +20,37 @@ type EntriesFiltersProps = {
     type: string;
     startDate: string;
     endDate: string;
+    searchTerms: string[];
   };
 };
+
+type EntryTypeFilter = "" | "income" | "expense" | "transfer";
+
+type FilterPill = {
+  id: string;
+  label: string;
+  onRemove: () => void;
+};
+
+function formatFilterDate(date: string): string {
+  return format(new Date(`${date}T00:00:00`), "MMM d, yyyy");
+}
+
+function getUniqueSearchTerms(searchTerms: string[]): string[] {
+  const seen = new Set<string>();
+
+  return searchTerms.filter((term) => {
+    const normalizedTerm = term.trim();
+    const key = normalizedTerm.toLowerCase();
+
+    if (!normalizedTerm || seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+}
 
 export function EntriesFilters({
   accounts,
@@ -34,17 +59,62 @@ export function EntriesFilters({
   const pathname = usePathname();
   const { push } = useNavigationProgress();
   const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = React.useState("");
 
-  const updateQuery = (updates: Record<string, string>) => {
+  const updateQuery = ({
+    account,
+    type,
+    startDate,
+    endDate,
+    searchTerms,
+  }: {
+    account?: string;
+    type?: EntryTypeFilter;
+    startDate?: string;
+    endDate?: string;
+    searchTerms?: string[];
+  }): void => {
     const nextParams = new URLSearchParams(searchParams.toString());
 
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value) {
-        nextParams.set(key, value);
+    if (account !== undefined) {
+      if (account) {
+        nextParams.set("account", account);
       } else {
-        nextParams.delete(key);
+        nextParams.delete("account");
       }
-    });
+    }
+
+    if (type !== undefined) {
+      if (type) {
+        nextParams.set("type", type);
+      } else {
+        nextParams.delete("type");
+      }
+    }
+
+    if (startDate !== undefined) {
+      if (startDate) {
+        nextParams.set("start_date", startDate);
+      } else {
+        nextParams.delete("start_date");
+      }
+    }
+
+    if (endDate !== undefined) {
+      if (endDate) {
+        nextParams.set("end_date", endDate);
+      } else {
+        nextParams.delete("end_date");
+      }
+    }
+
+    if (searchTerms !== undefined) {
+      nextParams.delete("search");
+
+      getUniqueSearchTerms(searchTerms).forEach((term) => {
+        nextParams.append("search", term.trim());
+      });
+    }
 
     nextParams.delete("page");
 
@@ -56,31 +126,139 @@ export function EntriesFilters({
     push(pathname);
   };
 
-  const anyFilters = Object.values(filters).some((value) => value);
+  const addSearchTerm = (): void => {
+    const nextTerm = searchValue.trim();
+
+    if (!nextTerm) {
+      return;
+    }
+
+    if (
+      filters.searchTerms.some(
+        (existingTerm) => existingTerm.toLowerCase() === nextTerm.toLowerCase(),
+      )
+    ) {
+      setSearchValue("");
+      return;
+    }
+
+    updateQuery({ searchTerms: [...filters.searchTerms, nextTerm] });
+    setSearchValue("");
+  };
+
+  const handleSearchKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ): void => {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    event.preventDefault();
+    addSearchTerm();
+  };
+
+  const removeSearchTerm = (term: string): void => {
+    updateQuery({
+      searchTerms: filters.searchTerms.filter(
+        (existingTerm) => existingTerm !== term,
+      ),
+    });
+  };
+
+  const accountLabel =
+    accounts.find((accountOption) => accountOption.id === filters.account)
+      ?.name || filters.account;
+  const typeLabel =
+    filters.type === "income"
+      ? String(i18n.t("common.income"))
+      : filters.type === "expense"
+        ? String(i18n.t("common.expense"))
+        : filters.type === "transfer"
+          ? String(i18n.t("common.transfer"))
+          : "";
+
+  const pills: FilterPill[] = [
+    ...filters.searchTerms.map((term) => ({
+      id: `search-${term}`,
+      label: String(i18n.t("entries_page.search_pill", { term })),
+      onRemove: () => removeSearchTerm(term),
+    })),
+    ...(filters.type
+      ? [
+          {
+            id: "type",
+            label: String(
+              i18n.t("entries_page.type_pill", { type: typeLabel }),
+            ),
+            onRemove: () => updateQuery({ type: "" }),
+          },
+        ]
+      : []),
+    ...(filters.account
+      ? [
+          {
+            id: "account",
+            label: String(
+              i18n.t("entries_page.account_pill", { account: accountLabel }),
+            ),
+            onRemove: () => updateQuery({ account: "" }),
+          },
+        ]
+      : []),
+    ...(filters.startDate
+      ? [
+          {
+            id: "start-date",
+            label: String(
+              i18n.t("entries_page.start_date_pill", {
+                date: formatFilterDate(filters.startDate),
+              }),
+            ),
+            onRemove: () => updateQuery({ startDate: "" }),
+          },
+        ]
+      : []),
+    ...(filters.endDate
+      ? [
+          {
+            id: "end-date",
+            label: String(
+              i18n.t("entries_page.end_date_pill", {
+                date: formatFilterDate(filters.endDate),
+              }),
+            ),
+            onRemove: () => updateQuery({ endDate: "" }),
+          },
+        ]
+      : []),
+  ];
+
+  const anyFilters = pills.length > 0;
 
   return (
     <div className="entries-filters">
-      <Stack gap={16}>
-        <div className="entries-filters__grid">
-          <div className="entries-filters__grid-layout">
-            <Select
-              label={i18n.t("entries_page.account")}
-              value={filters.account}
-              onChange={(value) => updateQuery({ account: value })}
-              placeholder={
-                i18n.t("entries_page.account_placeholder") as string
-              }
-              options={accounts.map((account) => ({
-                value: account.id,
-                label: account.name,
-              }))}
-            />
-
-            <Stack gap={4}>
+      <div className="entries-filters__bar">
+        <div className="entries-filters__search">
+          <input
+            type="text"
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            className="entries-filters__search-input"
+            placeholder={String(i18n.t("entries_page.search_placeholder"))}
+            aria-label={String(i18n.t("entries_page.search_placeholder"))}
+          />
+        </div>
+        <ContextMenu
+          ariaLabel={String(i18n.t("entries_page.open_filters"))}
+          icon="entries"
+        >
+          <div className="entries-filters__menu">
+            <div className="entries-filters__menu-section">
               <Text size="sm" weight="medium">
                 {i18n.t("entries_page.type")}
               </Text>
-              <Stack direction="row" wrap gap={8}>
+              <div className="entries-filters__type-options">
                 {[
                   { value: "", label: i18n.t("entries_page.type_all") },
                   { value: "income", label: i18n.t("common.income") },
@@ -103,33 +281,98 @@ export function EntriesFilters({
                     ]
                       .filter(Boolean)
                       .join(" ")}
-                    onClick={() => updateQuery({ type: option.value })}
+                    onClick={() =>
+                      updateQuery({ type: option.value as EntryTypeFilter })
+                    }
                   >
                     {option.label}
                   </button>
                 ))}
-              </Stack>
-            </Stack>
+              </div>
+            </div>
 
-            <DateRangeInput
-              label={i18n.t("entries_page.date_range")}
-              startDate={filters.startDate}
-              endDate={filters.endDate}
-              onStartDateChange={(value) => updateQuery({ start_date: value })}
-              onEndDateChange={(value) => updateQuery({ end_date: value })}
-            />
+            <div className="entries-filters__menu-section">
+              <label className="entries-filters__field-label" htmlFor="account">
+                {i18n.t("entries_page.account")}
+              </label>
+              <select
+                id="account"
+                className="entries-filters__select"
+                value={filters.account}
+                onChange={(event) =>
+                  updateQuery({ account: event.target.value })
+                }
+              >
+                <option value="">
+                  {String(i18n.t("entries_page.account_placeholder"))}
+                </option>
+                {accounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="entries-filters__menu-section">
+              <Text size="sm" weight="medium">
+                {i18n.t("entries_page.date_range")}
+              </Text>
+              <div className="entries-filters__date-grid">
+                <label className="entries-filters__field">
+                  <span className="entries-filters__field-label">
+                    {i18n.t("entries_page.start_date")}
+                  </span>
+                  <input
+                    type="date"
+                    className="entries-filters__date-input"
+                    value={filters.startDate}
+                    onChange={(event) =>
+                      updateQuery({ startDate: event.target.value })
+                    }
+                  />
+                </label>
+                <label className="entries-filters__field">
+                  <span className="entries-filters__field-label">
+                    {i18n.t("entries_page.end_date")}
+                  </span>
+                  <input
+                    type="date"
+                    className="entries-filters__date-input"
+                    value={filters.endDate}
+                    onChange={(event) =>
+                      updateQuery({ endDate: event.target.value })
+                    }
+                  />
+                </label>
+              </div>
+            </div>
           </div>
+        </ContextMenu>
+      </div>
+
+      {anyFilters ? (
+        <div className="entries-filters__pills">
+          {pills.map((pill) => (
+            <button
+              key={pill.id}
+              type="button"
+              className="entries-filters__pill"
+              onClick={pill.onRemove}
+            >
+              <span>{pill.label}</span>
+              <Icon name="close" size={14} />
+            </button>
+          ))}
+          <button
+            type="button"
+            className="entries-filters__pill entries-filters__pill--clear"
+            onClick={clearFilters}
+          >
+            {i18n.t("entries_page.clear_filters")}
+          </button>
         </div>
-        {anyFilters && (
-          <div className="entries-filters__actions">
-            <Stack direction="row" justify="flex-start">
-              <Button variant="secondary" size="sm" onClick={clearFilters}>
-                {i18n.t("entries_page.clear_filters")}
-              </Button>
-            </Stack>
-          </div>
-        )}
-      </Stack>
+      ) : null}
     </div>
   );
 }

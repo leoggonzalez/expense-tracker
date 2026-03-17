@@ -7,6 +7,7 @@ import {
   PagePanel,
 } from "@/components";
 import { Stack, Text } from "@/elements";
+
 import { getCurrentUser } from "@/lib/session";
 import { i18n } from "@/model/i18n";
 
@@ -31,24 +32,6 @@ export default async function Page(): Promise<React.ReactElement> {
             <Text as="p" size="sm" color="inverse">
               {i18n.t("account.subtitle")}
             </Text>
-            <HeroMetrics columns={2}>
-              <HeroMetric>
-                <Text size="sm" color="inverse">
-                  {i18n.t("account.email")}
-                </Text>
-                <Text size="lg" weight="semibold" color="inverse">
-                  {currentUser.email}
-                </Text>
-              </HeroMetric>
-              <HeroMetric>
-                <Text size="sm" color="inverse">
-                  {i18n.t("account.name")}
-                </Text>
-                <Text size="lg" weight="semibold" color="inverse">
-                  {currentUser.name || i18n.t("navigation.user_fallback_name")}
-                </Text>
-              </HeroMetric>
-            </HeroMetrics>
           </Stack>
         </Hero>
 

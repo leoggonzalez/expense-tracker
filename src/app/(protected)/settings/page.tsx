@@ -5,6 +5,7 @@ import {
   SettingsPreferencesForm,
 } from "@/components";
 import { Stack, Text } from "@/elements";
+
 import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
