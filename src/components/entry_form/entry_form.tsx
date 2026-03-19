@@ -186,30 +186,68 @@ export function EntryForm({
     }),
   );
   const isCreateFlow = !isEdit && Boolean(entryType);
-  const successMessageKey =
-    entryType === "income"
-      ? "toast.income_created"
-      : entryType === "expense"
-        ? "toast.expense_created"
-        : "toast.entry_created";
-  const errorMessageKey =
-    entryType === "income"
-      ? "toast.income_create_failed"
-      : entryType === "expense"
-        ? "toast.expense_create_failed"
-        : "toast.entry_create_failed";
+
+  function getSuccessMessageKey(
+    type: EntryFormModel["type"],
+  ):
+    | "toast.entry_created"
+    | "toast.income_created"
+    | "toast.expense_created"
+    | "toast.income_updated"
+    | "toast.expense_updated" {
+    if (isEdit) {
+      return type === "income"
+        ? "toast.income_updated"
+        : "toast.expense_updated";
+    }
+
+    if (entryType === "income") {
+      return "toast.income_created";
+    }
+
+    if (entryType === "expense") {
+      return "toast.expense_created";
+    }
+
+    return "toast.entry_created";
+  }
+
+  function getErrorMessageKey(
+    type: EntryFormModel["type"],
+  ):
+    | "toast.entry_create_failed"
+    | "toast.income_create_failed"
+    | "toast.expense_create_failed"
+    | "toast.income_update_failed"
+    | "toast.expense_update_failed" {
+    if (isEdit) {
+      return type === "income"
+        ? "toast.income_update_failed"
+        : "toast.expense_update_failed";
+    }
+
+    if (entryType === "income") {
+      return "toast.income_create_failed";
+    }
+
+    if (entryType === "expense") {
+      return "toast.expense_create_failed";
+    }
+
+    return "toast.entry_create_failed";
+  }
 
   const form = useForm<EntryFormModel>({
     model: initialModelRef.current,
     handleSubmit: async () => {
+      const successMessageKey = getSuccessMessageKey(form.model.type);
+      const errorMessageKey = getErrorMessageKey(form.model.type);
       const parsedAmount = parseAmountInput(form.model.amountInput);
 
       if (parsedAmount === null) {
-        if (!isEdit) {
-          showError(i18n.t(errorMessageKey), {
-            iconName: form.model.type,
-          });
-        }
+        showError(i18n.t(errorMessageKey), {
+          iconName: form.model.type,
+        });
         return;
       }
 
@@ -218,11 +256,9 @@ export function EntryForm({
       const parsedInstallments = parseInstallments(form.model.installments);
 
       if (form.model.scheduleMode === "installments" && !parsedInstallments) {
-        if (!isEdit) {
-          showError(i18n.t("entry_form.invalid_installments"), {
-            iconName: form.model.type,
-          });
-        }
+        showError(i18n.t("entry_form.invalid_installments"), {
+          iconName: form.model.type,
+        });
         return;
       }
 
@@ -245,11 +281,9 @@ export function EntryForm({
           : await createEntry(payload);
 
       if (!result.success) {
-        if (!isEdit) {
-          showError(i18n.t(errorMessageKey), {
-            iconName: form.model.type,
-          });
-        }
+        showError(i18n.t(errorMessageKey), {
+          iconName: form.model.type,
+        });
         return;
       }
 
@@ -257,22 +291,22 @@ export function EntryForm({
         clearNewEntryDraft();
         skipDraftSaveRef.current = true;
         reset();
-        showSuccess(i18n.t(successMessageKey), {
-          iconName: form.model.type,
-        });
       }
+
+      showSuccess(i18n.t(successMessageKey), {
+        iconName: form.model.type,
+      });
 
       if (onSuccess) {
         onSuccess();
       }
     },
     onSubmitError: (error) => {
+      const errorMessageKey = getErrorMessageKey(form.model.type);
       console.error("Error submitting form:", error);
-      if (!isEdit) {
-        showError(i18n.t(errorMessageKey), {
-          iconName: form.model.type,
-        });
-      }
+      showError(i18n.t(errorMessageKey), {
+        iconName: form.model.type,
+      });
     },
   });
   const { fields, model, onSubmit, reset, submissionStatus, updateFields } =
