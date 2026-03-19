@@ -63,13 +63,14 @@ export default async function Page({
           icon="accounts"
           title={String(i18n.t("accounts_page.title"))}
           pattern="accounts"
-          actions={
-            <form action="/accounts/new" method="get">
-              <Button type="submit">
-                <Icon name="plus" size={18} />
-              </Button>
-            </form>
-          }
+          actions={[
+            {
+              icon: "plus",
+              ariaLabel: String(i18n.t("accounts_page.create_account")),
+              href: "/accounts/new",
+              variant: "primary",
+            },
+          ]}
         >
           <Stack gap={24}>
             <Text as="p" size="sm" color="inverse">
@@ -91,7 +92,7 @@ export default async function Page({
                     <Button
                       href={`/accounts?currentMonth=${previousMonthKey}`}
                       variant="outline"
-                      ariaLabel={String(i18n.t("common.previous"))}
+                      ariaLabel={String(i18n.t("pagination.previous"))}
                     >
                       <Icon name="chevron-left" size={18} />
                     </Button>
@@ -101,7 +102,7 @@ export default async function Page({
                     <Button
                       href={`/accounts?currentMonth=${nextMonthKey}`}
                       variant="outline"
-                      ariaLabel={String(i18n.t("common.next"))}
+                      ariaLabel={String(i18n.t("pagination.next"))}
                     >
                       <Icon name="chevron-right" size={18} />
                     </Button>

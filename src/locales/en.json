@@ -278,8 +278,13 @@
     "archive_confirm_placeholder": "delete",
     "archive_requires_confirm": "Type delete exactly to archive the account.",
     "archive_failed": "Unable to archive this account.",
+    "archive_dialog_title": "Archive account?",
+    "archive_dialog_description": "Archive %{account} and remove it from active account lists.",
     "unarchive": "Unarchive",
+    "unarchiving": "Unarchiving...",
     "unarchive_failed": "Unable to unarchive this account.",
+    "unarchive_dialog_title": "Unarchive account?",
+    "unarchive_dialog_description": "Restore %{account} to the active account list.",
     "load_more_entries": "Load more entries",
     "archived_accounts": "Archived accounts",
     "empty_archived_state": "No archived accounts.",
@@ -344,7 +349,10 @@
     "back_to_entries": "Back to entries",
     "delete": "Delete Entry",
     "deleting": "Deleting...",
-    "delete_confirm": "Are you sure you want to delete this entry?"
+    "delete_confirm": "Are you sure you want to delete this entry?",
+    "delete_dialog_title": "Delete entry?",
+    "delete_dialog_description": "This action cannot be undone.",
+    "cancel_delete": "Cancel"
   },
   "account_field": {
     "add_new_account": "Add new account",

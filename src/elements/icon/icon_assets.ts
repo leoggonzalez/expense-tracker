@@ -13,6 +13,7 @@ export const iconAssets = {
   expense: new URL("./icons/expense.svg", import.meta.url).toString(),
   transfer: new URL("./icons/transfer.svg", import.meta.url).toString(),
   plus: new URL("./icons/plus.svg", import.meta.url).toString(),
+  trash: new URL("./icons/trash.svg", import.meta.url).toString(),
   edit: new URL("./icons/edit.svg", import.meta.url).toString(),
   "external-link": new URL(
     "./icons/external-link.svg",

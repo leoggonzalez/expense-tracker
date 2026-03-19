@@ -1,5 +1,4 @@
 import {
-  AccountArchiveForm,
   AppLink,
   Button,
   Container,
@@ -9,9 +8,10 @@ import {
   HeroMetric,
   HeroMetrics,
 } from "@/components";
+import { AccountArchiveDialog } from "@/components/account_archive_dialog/account_archive_dialog";
 import { Card, Icon, Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
-import { getAccountDetailPageData, unarchiveAccount } from "@/actions/accounts";
+import { getAccountDetailPageData } from "@/actions/accounts";
 
 import { i18n } from "@/model/i18n";
 import { notFound } from "next/navigation";
@@ -25,6 +25,8 @@ type AccountRouteProps = {
   searchParams: Promise<{
     page?: string;
     currentMonth?: string;
+    confirmArchive?: string;
+    confirmUnarchive?: string;
   }>;
 };
 
@@ -76,16 +78,72 @@ export default async function Page({
     notFound();
   }
 
-  async function handleUnarchiveAction(): Promise<void> {
-    "use server";
-
-    await unarchiveAccount(id);
-  }
-
   const selectedMonthDate = parseMonthKey(data.selectedMonth.key);
   const selectedMonthLabel = formatMonthLabel(selectedMonthDate);
   const previousMonthKey = formatMonthKey(addMonths(selectedMonthDate, -1));
   const nextMonthKey = formatMonthKey(addMonths(selectedMonthDate, 1));
+  const detailSearchParams = new URLSearchParams();
+
+  if (query.currentMonth) {
+    detailSearchParams.set("currentMonth", query.currentMonth);
+  }
+
+  if (page > 1) {
+    detailSearchParams.set("page", String(page));
+  }
+
+  const detailHref =
+    detailSearchParams.size > 0
+      ? `/accounts/${data.account.id}?${detailSearchParams.toString()}`
+      : `/accounts/${data.account.id}`;
+  const confirmArchiveHref =
+    detailSearchParams.size > 0
+      ? `/accounts/${data.account.id}?${detailSearchParams.toString()}&confirmArchive=1`
+      : `/accounts/${data.account.id}?confirmArchive=1`;
+  const confirmUnarchiveHref =
+    detailSearchParams.size > 0
+      ? `/accounts/${data.account.id}?${detailSearchParams.toString()}&confirmUnarchive=1`
+      : `/accounts/${data.account.id}?confirmUnarchive=1`;
+  const settleHref = `/entries/new/transfer?${new URLSearchParams({
+    to_account: data.account.id,
+    amount: Math.abs(data.account.selectedMonthTotal).toFixed(2),
+    description: String(
+      i18n.t("accounts_page.settle_description", {
+        account: data.account.name,
+        month: selectedMonthLabel,
+      }),
+    ),
+  }).toString()}`;
+  const heroActions = data.account.isArchived
+    ? [
+        {
+          icon: "check",
+          ariaLabel: String(i18n.t("accounts_page.unarchive")),
+          href: confirmUnarchiveHref,
+          variant: "outline",
+        },
+      ]
+    : [
+        {
+          icon: "edit",
+          ariaLabel: String(i18n.t("accounts_page.edit_account")),
+          href: `/accounts/${data.account.id}/edit`,
+          variant: "outline",
+        },
+        {
+          icon: "transfer" as const,
+          ariaLabel: String(i18n.t("accounts_page.settle")),
+          href: settleHref,
+          variant: "outline",
+          disabled: data.account.selectedMonthTotal >= 0,
+        },
+        {
+          icon: "alert",
+          ariaLabel: String(i18n.t("accounts_page.archive")),
+          href: confirmArchiveHref,
+          variant: "outline-danger",
+        },
+      ];
 
   return (
     <Container>
@@ -94,29 +152,7 @@ export default async function Page({
           icon="accounts"
           title={data.account.name}
           pattern="account_detail"
-          actions={
-            <>
-              <Button
-                href={`/accounts/${data.account.id}?currentMonth=${previousMonthKey}`}
-                variant="outline"
-              >
-                <Icon name="chevron-left" size={18} />
-              </Button>
-              <Button
-                href={`/accounts/${data.account.id}?currentMonth=${nextMonthKey}`}
-                variant="outline"
-              >
-                <Icon name="chevron-right" size={18} />
-              </Button>
-              {data.account.isArchived ? null : (
-                <form action={`/accounts/${data.account.id}/edit`} method="get">
-                  <Button type="submit">
-                    <Icon name="edit" size={18} />
-                  </Button>
-                </form>
-              )}
-            </>
-          }
+          actions={heroActions}
         >
           <Stack gap={24}>
             <Stack gap={14}>
@@ -129,16 +165,42 @@ export default async function Page({
 
             <HeroMetrics columns={2}>
               <HeroMetric>
-                <Text size="sm" color="inverse">
-                  {i18n.t("accounts_page.month_total_label", {
-                    month: selectedMonthLabel,
-                  })}
-                </Text>
-                <Currency
-                  value={data.account.selectedMonthTotal}
-                  size="h3"
-                  weight="bold"
-                />
+                <Stack gap={16}>
+                  <Text size="sm" color="inverse">
+                    {i18n.t("accounts_page.month_total_label", {
+                      month: selectedMonthLabel,
+                    })}
+                  </Text>
+                  <Currency
+                    value={data.account.selectedMonthTotal}
+                    size="h3"
+                    weight="bold"
+                  />
+                  <Stack
+                    direction="row"
+                    align="center"
+                    justify="space-between"
+                    gap={12}
+                  >
+                    <Button
+                      href={`/accounts/${data.account.id}?currentMonth=${previousMonthKey}`}
+                      variant="outline"
+                      ariaLabel={String(i18n.t("pagination.previous"))}
+                    >
+                      <Icon name="chevron-left" size={18} />
+                    </Button>
+                    <Text size="sm" color="inverse" weight="medium">
+                      {selectedMonthLabel}
+                    </Text>
+                    <Button
+                      href={`/accounts/${data.account.id}?currentMonth=${nextMonthKey}`}
+                      variant="outline"
+                      ariaLabel={String(i18n.t("pagination.next"))}
+                    >
+                      <Icon name="chevron-right" size={18} />
+                    </Button>
+                  </Stack>
+                </Stack>
               </HeroMetric>
               <HeroMetric tone="soft">
                 <Text size="sm" color="inverse">
@@ -153,10 +215,19 @@ export default async function Page({
             </HeroMetrics>
           </Stack>
         </Hero>
+        <AccountArchiveDialog
+          accountId={data.account.id}
+          accountName={data.account.name}
+          isOpen={
+            query.confirmArchive === "1" || query.confirmUnarchive === "1"
+          }
+          mode={query.confirmUnarchive === "1" ? "unarchive" : "archive"}
+          closeHref={detailHref}
+        />
 
-        <Card padding={24}>
-          <Stack gap={18}>
-            {data.account.isArchived ? (
+        {data.account.isArchived ? (
+          <Card padding={24}>
+            <Stack gap={18}>
               <Stack
                 direction="column"
                 desktopDirection="row"
@@ -172,66 +243,10 @@ export default async function Page({
                     {i18n.t("accounts_page.archived_account_hint")}
                   </Text>
                 </Stack>
-                <form action={handleUnarchiveAction}>
-                  <Button type="submit">
-                    {i18n.t("accounts_page.unarchive")}
-                  </Button>
-                </form>
               </Stack>
-            ) : data.account.selectedMonthTotal < 0 ? (
-              <form action="/entries/new/transfer" method="get">
-                <Stack gap={16}>
-                  <input
-                    type="hidden"
-                    name="to_account"
-                    value={data.account.id}
-                  />
-                  <input
-                    type="hidden"
-                    name="amount"
-                    value={Math.abs(data.account.selectedMonthTotal).toFixed(2)}
-                  />
-                  <input
-                    type="hidden"
-                    name="description"
-                    value={String(
-                      i18n.t("accounts_page.settle_description", {
-                        account: data.account.name,
-                        month: selectedMonthLabel,
-                      }),
-                    )}
-                  />
-                  <Text size="sm" color="secondary">
-                    {i18n.t("accounts_page.settle_hint")}
-                  </Text>
-                  <Button type="submit">
-                    {i18n.t("accounts_page.settle")}
-                  </Button>
-                </Stack>
-              </form>
-            ) : (
-              <Stack
-                direction="column"
-                desktopDirection="row"
-                align="flex-start"
-                justify="space-between"
-                gap={16}
-              >
-                <Stack gap={8}>
-                  <Text size="sm" weight="semibold">
-                    {i18n.t("accounts_page.settle")}
-                  </Text>
-                  <Text size="sm" color="secondary">
-                    {i18n.t("accounts_page.settle_unavailable")}
-                  </Text>
-                </Stack>
-                <Button type="button" disabled>
-                  {i18n.t("accounts_page.settle")}
-                </Button>
-              </Stack>
-            )}
-          </Stack>
-        </Card>
+            </Stack>
+          </Card>
+        ) : null}
 
         <Card
           padding={24}
@@ -307,9 +322,6 @@ export default async function Page({
           <AppLink href="/accounts">
             {i18n.t("accounts_page.back_to_accounts")}
           </AppLink>
-          {!data.account.isArchived ? (
-            <AccountArchiveForm accountId={data.account.id} />
-          ) : null}
         </Stack>
       </Stack>
     </Container>

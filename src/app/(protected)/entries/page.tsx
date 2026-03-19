@@ -73,16 +73,22 @@ export default async function Page({
           icon="entries"
           title={String(i18n.t("entries_page.title"))}
           pattern="entries"
-          actions={
-            <>
-              <Button href="/entries/new/expense" variant="primary">
-                {i18n.t("entries_page.add_entry")}
-              </Button>
-              <Button href="/entries/new/multiple" variant="outline">
-                {i18n.t("entries_page.add_multiple_entries")}
-              </Button>
-            </>
-          }
+          actions={[
+            {
+              icon: "plus",
+              title: String(i18n.t("entries_page.add_entry")),
+              ariaLabel: String(i18n.t("entries_page.add_entry")),
+              href: "/entries/new/expense",
+              variant: "primary",
+            },
+            {
+              icon: "entries",
+              title: String(i18n.t("entries_page.add_multiple_entries")),
+              ariaLabel: String(i18n.t("entries_page.add_multiple_entries")),
+              href: "/entries/new/multiple",
+              variant: "outline",
+            },
+          ]}
         >
           <Stack gap={24}>
             <Text as="p" size="sm" color="inverse">
