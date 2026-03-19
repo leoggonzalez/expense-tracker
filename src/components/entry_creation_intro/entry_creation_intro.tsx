@@ -5,6 +5,7 @@ import { Text } from "@/elements";
 import React from "react";
 
 type EntryCreationIntroProps = {
+  pageType?: "income" | "expense" | "transfer" | "multiple";
   subtitle: React.ReactNode;
 };
 

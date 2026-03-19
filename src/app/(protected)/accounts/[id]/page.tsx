@@ -5,6 +5,7 @@ import {
   Currency,
   EntryList,
   Hero,
+  type HeroAction,
   HeroMetric,
   HeroMetrics,
 } from "@/components";
@@ -114,7 +115,7 @@ export default async function Page({
       }),
     ),
   }).toString()}`;
-  const heroActions = data.account.isArchived
+  const heroActions: HeroAction[] = data.account.isArchived
     ? [
         {
           icon: "check",
