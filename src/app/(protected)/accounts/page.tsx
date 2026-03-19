@@ -63,53 +63,58 @@ export default async function Page({
           icon="accounts"
           title={String(i18n.t("accounts_page.title"))}
           pattern="accounts"
-          actions={
-            <>
-              <Button
-                href={`/accounts?currentMonth=${previousMonthKey}`}
-                variant="outline"
-              >
-                <Icon name="chevron-left" size={18} />
-              </Button>
-              <Button
-                href={`/accounts?currentMonth=${nextMonthKey}`}
-                variant="outline"
-              >
-                <Icon name="chevron-right" size={18} />
-              </Button>
-              <form action="/accounts/new" method="get">
-                <Button type="submit">
-                  <Icon name="plus" size={18} />
-                </Button>
-              </form>
-            </>
-          }
+          actions={[
+            {
+              icon: "plus",
+              ariaLabel: String(i18n.t("accounts_page.create_account")),
+              href: "/accounts/new",
+              variant: "primary",
+            },
+          ]}
         >
           <Stack gap={24}>
-            <Stack gap={10}>
-              <Text as="h1" size="h1" color="inverse" weight="bold">
-                {selectedMonthLabel}
-              </Text>
-              <Text as="p" size="sm" color="inverse">
-                {i18n.t("accounts_page.hero_subtitle")}
-              </Text>
-            </Stack>
+            <Text as="p" size="sm" color="inverse">
+              {i18n.t("accounts_page.hero_subtitle")}
+            </Text>
 
             <HeroMetrics columns={2}>
+              <HeroMetric tone="soft">
+                <Stack gap={16}>
+                  <Text size="sm" color="inverse">
+                    {i18n.t("accounts_page.month_total_overview")}
+                  </Text>
+                  <Stack
+                    direction="row"
+                    align="center"
+                    justify="space-between"
+                    gap={12}
+                  >
+                    <Button
+                      href={`/accounts?currentMonth=${previousMonthKey}`}
+                      variant="outline"
+                      ariaLabel={String(i18n.t("pagination.previous"))}
+                    >
+                      <Icon name="chevron-left" size={18} />
+                    </Button>
+                    <Text size="lg" weight="semibold" color="inverse">
+                      {selectedMonthLabel}
+                    </Text>
+                    <Button
+                      href={`/accounts?currentMonth=${nextMonthKey}`}
+                      variant="outline"
+                      ariaLabel={String(i18n.t("pagination.next"))}
+                    >
+                      <Icon name="chevron-right" size={18} />
+                    </Button>
+                  </Stack>
+                </Stack>
+              </HeroMetric>
               <HeroMetric>
                 <Text size="sm" color="inverse">
                   {i18n.t("accounts_page.active_accounts_label")}
                 </Text>
                 <Text size="h3" weight="bold" color="inverse">
                   {String(accounts.length)}
-                </Text>
-              </HeroMetric>
-              <HeroMetric tone="soft">
-                <Text size="sm" color="inverse">
-                  {i18n.t("accounts_page.month_total_overview")}
-                </Text>
-                <Text size="lg" weight="semibold" color="inverse">
-                  {selectedMonthLabel}
                 </Text>
               </HeroMetric>
             </HeroMetrics>

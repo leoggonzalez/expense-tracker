@@ -19,6 +19,10 @@
   }
 
   &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
 
@@ -26,6 +30,14 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    min-width: 0;
+  }
+
+  &__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
   }
 
   &__icon {

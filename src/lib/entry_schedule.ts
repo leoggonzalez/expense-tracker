@@ -8,6 +8,10 @@ import {
 export type EntryDateMode = "month" | "date";
 export type EntryScheduleMode = "one_time" | "installments" | "unlimited";
 
+export function inferEntryDateMode(value: string): EntryDateMode {
+  return value.length > 7 ? "date" : "month";
+}
+
 export function normalizeDateValue(value: string, mode: EntryDateMode): string {
   if (!value) {
     return "";

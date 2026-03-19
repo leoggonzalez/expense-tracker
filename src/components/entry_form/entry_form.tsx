@@ -11,10 +11,9 @@ import {
 } from "@/components";
 import { CreateEntryInput, createEntry, updateEntry } from "@/actions/entries";
 import {
-  EntryDateMode,
   EntryScheduleMode,
   deriveScheduleFromDates,
-  normalizeDateValue,
+  inferEntryDateMode,
   resolveEndDate,
   toDate,
 } from "@/lib/entry_schedule";
@@ -56,7 +55,6 @@ type EntryFormModel = {
   description: string;
   amountInput: string;
   beginDate: string;
-  beginDateMode: EntryDateMode;
   scheduleMode: EntryScheduleMode;
   installments: string;
 };
@@ -98,7 +96,6 @@ function getInitialModel(props: EntryFormProps): EntryFormModel {
       ? String(props.initialData.amount)
       : "",
     beginDate: formatMonthForInput(beginDate),
-    beginDateMode: "month",
     scheduleMode: defaultScheduleMode,
     installments: String(schedule.installments),
   };
@@ -186,43 +183,80 @@ export function EntryForm({
     }),
   );
   const isCreateFlow = !isEdit && Boolean(entryType);
-  const successMessageKey =
-    entryType === "income"
-      ? "toast.income_created"
-      : entryType === "expense"
-        ? "toast.expense_created"
-        : "toast.entry_created";
-  const errorMessageKey =
-    entryType === "income"
-      ? "toast.income_create_failed"
-      : entryType === "expense"
-        ? "toast.expense_create_failed"
-        : "toast.entry_create_failed";
+
+  function getSuccessMessageKey(
+    type: EntryFormModel["type"],
+  ):
+    | "toast.entry_created"
+    | "toast.income_created"
+    | "toast.expense_created"
+    | "toast.income_updated"
+    | "toast.expense_updated" {
+    if (isEdit) {
+      return type === "income"
+        ? "toast.income_updated"
+        : "toast.expense_updated";
+    }
+
+    if (entryType === "income") {
+      return "toast.income_created";
+    }
+
+    if (entryType === "expense") {
+      return "toast.expense_created";
+    }
+
+    return "toast.entry_created";
+  }
+
+  function getErrorMessageKey(
+    type: EntryFormModel["type"],
+  ):
+    | "toast.entry_create_failed"
+    | "toast.income_create_failed"
+    | "toast.expense_create_failed"
+    | "toast.income_update_failed"
+    | "toast.expense_update_failed" {
+    if (isEdit) {
+      return type === "income"
+        ? "toast.income_update_failed"
+        : "toast.expense_update_failed";
+    }
+
+    if (entryType === "income") {
+      return "toast.income_create_failed";
+    }
+
+    if (entryType === "expense") {
+      return "toast.expense_create_failed";
+    }
+
+    return "toast.entry_create_failed";
+  }
 
   const form = useForm<EntryFormModel>({
     model: initialModelRef.current,
     handleSubmit: async () => {
+      const successMessageKey = getSuccessMessageKey(form.model.type);
+      const errorMessageKey = getErrorMessageKey(form.model.type);
       const parsedAmount = parseAmountInput(form.model.amountInput);
+      const beginDateMode = inferEntryDateMode(form.model.beginDate);
 
       if (parsedAmount === null) {
-        if (!isEdit) {
-          showError(i18n.t(errorMessageKey), {
-            iconName: form.model.type,
-          });
-        }
+        showError(i18n.t(errorMessageKey), {
+          iconName: form.model.type,
+        });
         return;
       }
 
       const beginDate =
-        toDate(form.model.beginDate, form.model.beginDateMode) || new Date();
+        toDate(form.model.beginDate, beginDateMode) || new Date();
       const parsedInstallments = parseInstallments(form.model.installments);
 
       if (form.model.scheduleMode === "installments" && !parsedInstallments) {
-        if (!isEdit) {
-          showError(i18n.t("entry_form.invalid_installments"), {
-            iconName: form.model.type,
-          });
-        }
+        showError(i18n.t("entry_form.invalid_installments"), {
+          iconName: form.model.type,
+        });
         return;
       }
 
@@ -245,11 +279,9 @@ export function EntryForm({
           : await createEntry(payload);
 
       if (!result.success) {
-        if (!isEdit) {
-          showError(i18n.t(errorMessageKey), {
-            iconName: form.model.type,
-          });
-        }
+        showError(i18n.t(errorMessageKey), {
+          iconName: form.model.type,
+        });
         return;
       }
 
@@ -257,22 +289,22 @@ export function EntryForm({
         clearNewEntryDraft();
         skipDraftSaveRef.current = true;
         reset();
-        showSuccess(i18n.t(successMessageKey), {
-          iconName: form.model.type,
-        });
       }
+
+      showSuccess(i18n.t(successMessageKey), {
+        iconName: form.model.type,
+      });
 
       if (onSuccess) {
         onSuccess();
       }
     },
     onSubmitError: (error) => {
+      const errorMessageKey = getErrorMessageKey(form.model.type);
       console.error("Error submitting form:", error);
-      if (!isEdit) {
-        showError(i18n.t(errorMessageKey), {
-          iconName: form.model.type,
-        });
-      }
+      showError(i18n.t(errorMessageKey), {
+        iconName: form.model.type,
+      });
     },
   });
   const { fields, model, onSubmit, reset, submissionStatus, updateFields } =
@@ -299,7 +331,6 @@ export function EntryForm({
         description: draft.description,
         amountInput: draft.amountInput,
         beginDate: draft.beginDate,
-        beginDateMode: draft.beginDateMode,
         scheduleMode: draft.scheduleMode || "one_time",
         installments: draft.installments || "1",
       });
@@ -324,7 +355,7 @@ export function EntryForm({
       description: model.description,
       amountInput: model.amountInput,
       beginDate: model.beginDate,
-      beginDateMode: model.beginDateMode,
+      beginDateMode: inferEntryDateMode(model.beginDate),
       scheduleMode: model.scheduleMode,
       installments: model.installments,
     });
@@ -334,7 +365,6 @@ export function EntryForm({
     model.accountName,
     model.amountInput,
     model.beginDate,
-    model.beginDateMode,
     model.description,
     model.installments,
     model.scheduleMode,
@@ -350,13 +380,6 @@ export function EntryForm({
     });
   };
 
-  const handleBeginDateModeChange = (): void => {
-    updateFields({
-      beginDateMode: "date",
-      beginDate: normalizeDateValue(model.beginDate, model.beginDateMode),
-    });
-  };
-
   const handleScheduleModeChange = (value: EntryScheduleMode): void => {
     updateFields({
       scheduleMode: value,
@@ -365,7 +388,8 @@ export function EntryForm({
   };
 
   const parsedInstallments = parseInstallments(model.installments);
-  const beginDateForPreview = toDate(model.beginDate, model.beginDateMode);
+  const beginDateMode = inferEntryDateMode(model.beginDate);
+  const beginDateForPreview = toDate(model.beginDate, beginDateMode);
   const calculatedEndDate =
     beginDateForPreview && parsedInstallments
       ? resolveEndDate({
@@ -378,7 +402,7 @@ export function EntryForm({
   const formattedEndDate = calculatedEndDate
     ? format(
         calculatedEndDate,
-        model.beginDateMode === "month" ? "MMMM yyyy" : "MMM dd, yyyy",
+        beginDateMode === "month" ? "MMMM yyyy" : "MMM dd, yyyy",
       )
     : null;
 
@@ -428,7 +452,7 @@ export function EntryForm({
         />
 
         <Stack gap={4}>
-          <Text size="sm" weight="medium">
+          <Text size="sm" weight="medium" color="secondary">
             {i18n.t("entry_form.schedule_label")}
           </Text>
 
@@ -464,14 +488,13 @@ export function EntryForm({
 
         <MonthSelector
           label={i18n.t(
-            model.beginDateMode === "month"
+            beginDateMode === "month"
               ? "entry_form.begin_date_month"
               : "entry_form.begin_date",
           )}
-          mode={model.beginDateMode}
           field={fields.beginDate}
-          onEnableFullDate={handleBeginDateModeChange}
           editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
+          closeLabel={String(i18n.t("entry_form.use_month_year_begin_date"))}
           monthLabel={i18n.t("entry_form.month")}
           yearLabel={i18n.t("entry_form.year")}
           required

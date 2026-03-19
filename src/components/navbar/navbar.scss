@@ -1,0 +1,49 @@
+@use "@/styles/variables.scss" as *;
+
+.navbar {
+  padding-top: env(safe-area-inset-top);
+  background-color: var(--color-background-secondary);
+  border-bottom: var(--border-width) solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+
+  &__content {
+    min-height: var(--navbar-height-mobile);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+  }
+
+  &__avatar-link,
+  &__settings-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-primary);
+    transition:
+      background-color var(--transition-fast),
+      color var(--transition-fast),
+      opacity var(--transition-fast);
+  }
+
+  &__settings-link:hover,
+  &__settings-link:focus-visible,
+  &__avatar-link:hover,
+  &__avatar-link:focus-visible {
+    background-color: transparent;
+    opacity: 0.78;
+    outline: none;
+    box-shadow: 0 0 0 3px
+      color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .navbar {
+    display: none;
+  }
+}

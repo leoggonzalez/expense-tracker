@@ -3,11 +3,12 @@
 .navigation {
   position: fixed;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) + var(--spacing-md));
+  bottom: max(env(safe-area-inset-bottom), var(--spacing-xs));
   transform: translateX(-50%);
   z-index: var(--z-index-dropdown);
-  width: min(calc(100vw - 24px), 420px);
-  padding: var(--spacing-xs);
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  padding: 3px 4px;
   border: var(--border-width) solid
     color-mix(in srgb, var(--color-border) 88%, white 12%);
   border-radius: 999px;
@@ -19,9 +20,22 @@
   backdrop-filter: blur(18px);
   box-shadow: var(--shadow-xl);
 
+  .container {
+    display: block;
+    width: auto;
+    min-width: 0;
+  }
+
+  .container__content {
+    grid-column: auto;
+    width: auto;
+    min-width: 0;
+  }
+
   &__inner {
     display: grid;
     grid-template-columns: 1fr;
+    width: max-content;
     padding: 0;
     gap: 0;
   }
@@ -32,6 +46,7 @@
 
   &__sections {
     min-width: 0;
+    width: max-content;
   }
 
   &__section {
@@ -44,8 +59,10 @@
 
   &__links {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: 48px;
     list-style: none;
+    width: max-content;
     margin: 0;
     padding: 0;
     gap: 2px;
@@ -72,11 +89,38 @@
     &--pending .navigation__link-content {
       opacity: 0.72;
     }
+
+    &--mobile-primary .navigation__link-content {
+      width: 48px;
+      min-width: 48px;
+      height: 48px;
+      min-height: 48px;
+      padding: 0;
+      color: var(--color-text-inverse);
+      background-color: #00bf72;
+      box-shadow: 0 10px 18px rgba(0, 191, 114, 0.22);
+    }
+
+    &--mobile-primary .navigation__icon {
+      width: 48px;
+      height: 48px;
+      color: currentColor;
+    }
+
+    &--mobile-primary:hover .navigation__link-content,
+    &--mobile-primary.navigation__link--active .navigation__link-content,
+    &--mobile-primary:active .navigation__link-content {
+      color: var(--color-text-inverse);
+      background-color: #00a965;
+    }
   }
 
   &__link-content {
-    min-height: 60px;
-    padding: var(--spacing-xs);
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
+    padding: 2px;
     color: var(--color-text-secondary);
     text-decoration: none;
     display: flex;
@@ -94,36 +138,23 @@
       opacity var(--transition-fast);
   }
 
-  &__link:hover &__link-content {
+  &__link:not(.navigation__link--mobile-primary):hover &__link-content {
     color: var(--color-text-primary);
     background-color: var(--color-surface-muted);
   }
 
-  &__link:focus-within &__link-content {
-    outline: none;
-    color: var(--color-primary-dark);
-    background-color: var(--color-surface-muted);
-    box-shadow: 0 0 0 3px
-      color-mix(in srgb, var(--color-primary) 18%, transparent);
-  }
-
-  &__link:active &__link-content {
+  &__link:not(.navigation__link--mobile-primary):active &__link-content {
     transform: scale(0.98);
     background-color: var(--color-background-tertiary);
   }
 
   &__icon {
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    background-color: color-mix(
-      in srgb,
-      var(--color-primary) 8%,
-      var(--color-background-secondary)
-    );
     color: var(--color-primary);
     flex-shrink: 0;
   }
@@ -148,6 +179,7 @@
 
 @media (min-width: $breakpoint-desktop) {
   .navigation {
+    display: block;
     grid-area: sidebar;
     position: sticky;
     top: 0;
@@ -245,11 +277,32 @@
     }
 
     &__link-content {
+      width: 100%;
+      min-width: 0;
+      height: auto;
       justify-content: flex-start;
       min-height: 56px;
       padding: var(--spacing-sm) var(--spacing-md);
       font-size: var(--font-size-md);
       gap: var(--spacing-sm);
+    }
+
+    &__link:focus-within &__link-content {
+      outline: none;
+      color: var(--color-primary-dark);
+      background-color: var(--color-surface-muted);
+      box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--color-primary) 18%, transparent);
+    }
+
+    &__icon {
+      width: 38px;
+      height: 38px;
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 8%,
+        var(--color-background-secondary)
+      );
     }
 
     &__label {

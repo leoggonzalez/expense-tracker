@@ -7,11 +7,7 @@ import React, { useMemo, useState } from "react";
 import { createTransferEntry } from "@/actions/entries";
 import { MonthSelector } from "@/components/month_selector/month_selector";
 import { Button, InfoBox, Input, Select } from "@/components";
-import {
-  normalizeDateValue,
-  toDate,
-  type EntryDateMode,
-} from "@/lib/entry_schedule";
+import { inferEntryDateMode, toDate } from "@/lib/entry_schedule";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import { Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
@@ -52,8 +48,8 @@ export function TransferForm({
   const [beginDate, setBeginDate] = useState(
     new Date().toISOString().slice(0, 7),
   );
-  const [beginDateMode, setBeginDateMode] = useState<EntryDateMode>("month");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const beginDateMode = inferEntryDateMode(beginDate);
 
   const transferOptions = useMemo(
     () =>
@@ -124,7 +120,6 @@ export function TransferForm({
     setDescription("");
     setAmountInput("");
     setBeginDate(new Date().toISOString().slice(0, 7));
-    setBeginDateMode("month");
 
     showSuccess(i18n.t("toast.transfer_created"), {
       iconName: "transfer",
@@ -198,16 +193,10 @@ export function TransferForm({
               ? "entry_form.begin_date_month"
               : "entry_form.begin_date",
           )}
-          mode={beginDateMode}
           value={beginDate}
           onChange={setBeginDate}
-          onEnableFullDate={() => {
-            setBeginDateMode("date");
-            setBeginDate((currentValue) =>
-              normalizeDateValue(currentValue, beginDateMode),
-            );
-          }}
           editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
+          closeLabel={String(i18n.t("entry_form.use_month_year_begin_date"))}
           monthLabel={i18n.t("entry_form.month")}
           yearLabel={i18n.t("entry_form.year")}
           required

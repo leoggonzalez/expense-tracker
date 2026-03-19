@@ -23,16 +23,16 @@ export function NewEntryRecentEntries({
           icon="activity"
         >
           <Stack gap={20}>
-              <Stack gap={12}>
-                <Text size="sm" color="secondary">
-                  {i18n.t("new_entry_page.recent_entries_subtitle")}
-                </Text>
-                <div className="new-entry-recent-entries__all-link">
-                  <AppLink href="/entries">
-                    {i18n.t("new_entry_page.open_all_entries")}
-                  </AppLink>
-                </div>
-              </Stack>
+            <Stack gap={12}>
+              <Text size="sm" color="secondary">
+                {i18n.t("new_entry_page.recent_entries_subtitle")}
+              </Text>
+              <div className="new-entry-recent-entries__all-link">
+                <AppLink href="/entries">
+                  {i18n.t("new_entry_page.open_all_entries")}
+                </AppLink>
+              </div>
+            </Stack>
 
             <div className="new-entry-recent-entries__list-shell">
               <EntryList

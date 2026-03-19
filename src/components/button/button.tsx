@@ -10,6 +10,7 @@ export interface ButtonProps {
     | "primary"
     | "secondary"
     | "danger"
+    | "outline-danger"
     | "success"
     | "transfer"
     | "outline";

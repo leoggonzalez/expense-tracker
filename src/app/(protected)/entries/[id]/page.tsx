@@ -1,16 +1,15 @@
 import {
   AppLink,
-  Button,
   Container,
   Currency,
-  DeleteEntryButton,
   DetailList,
   DetailRow,
   Hero,
   HeroMetric,
   HeroMetrics,
 } from "@/components";
-import { Card, Icon, Stack, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
+import { DeleteEntryDialog } from "@/components/delete_entry_dialog/delete_entry_dialog";
 
 import { getEntryById } from "@/actions/entries";
 import { i18n } from "@/model/i18n";
@@ -21,6 +20,9 @@ export const dynamic = "force-dynamic";
 type EntryPageProps = {
   params: Promise<{
     id: string;
+  }>;
+  searchParams: Promise<{
+    confirmDelete?: string;
   }>;
 };
 
@@ -80,8 +82,10 @@ function getEntryIcon(type: string): "income" | "expense" | "transfer" {
 
 export default async function Page({
   params,
+  searchParams,
 }: EntryPageProps): Promise<React.ReactElement> {
   const { id } = await params;
+  const query = await searchParams;
   const entry = await getEntryById(id);
 
   if (!entry) {
@@ -107,6 +111,12 @@ export default async function Page({
     }),
   );
   const settleAmount = Math.abs(normalizedEntry.amount).toFixed(2);
+  const settleSearchParams = new URLSearchParams({
+    to_account: normalizedEntry.accountId,
+    description: settleDescription,
+    amount: settleAmount,
+  });
+  const entryDetailHref = `/entries/${normalizedEntry.id}`;
   const transferDirectionLabel =
     normalizedEntry.transferAccountId && normalizedEntry.transferAccountName
       ? normalizedEntry.amount < 0
@@ -125,25 +135,34 @@ export default async function Page({
           icon={getEntryIcon(normalizedEntry.type)}
           title={normalizedEntry.description}
           pattern="entry_detail"
-          actions={
-            <Stack direction="row" align="center" gap={12}>
-            <Button
-              href={`/entries/${normalizedEntry.id}/edit`}
-              variant="outline"
-            >
-              <Icon name="edit" />
-            </Button>
-              <DeleteEntryButton entryId={normalizedEntry.id} />
-            </Stack>
-          }
+          actions={[
+            {
+              icon: "edit",
+              ariaLabel: String(i18n.t("entry_detail_page.edit_entry")),
+              href: `/entries/${normalizedEntry.id}/edit`,
+              variant: "outline",
+            },
+            {
+              icon: "transfer",
+              ariaLabel: String(i18n.t("entry_detail_page.settle_entry")),
+              href: `/entries/new/transfer?${settleSearchParams.toString()}`,
+              variant: "outline",
+            },
+            {
+              icon: "trash",
+              ariaLabel: String(i18n.t("entry_detail_page.delete")),
+              href: `${entryDetailHref}?confirmDelete=1`,
+              variant: "outline-danger",
+            },
+          ]}
         >
           <Stack gap={24}>
-              <Text as="p" size="sm" color="inverse">
-                {formatEntryDate(
-                  normalizedEntry.beginDate,
-                  normalizedEntry.endDate,
-                )}
-              </Text>
+            <Text as="p" size="sm" color="inverse">
+              {formatEntryDate(
+                normalizedEntry.beginDate,
+                normalizedEntry.endDate,
+              )}
+            </Text>
 
             <HeroMetrics columns={2}>
               <HeroMetric>
@@ -167,6 +186,11 @@ export default async function Page({
             </HeroMetrics>
           </Stack>
         </Hero>
+        <DeleteEntryDialog
+          entryId={normalizedEntry.id}
+          isOpen={query.confirmDelete === "1"}
+          closeHref={entryDetailHref}
+        />
 
         <Card
           padding={24}
@@ -243,23 +267,6 @@ export default async function Page({
                 />
               ) : null}
             </DetailList>
-
-            <form action="/entries/new/transfer" method="get">
-              <input
-                type="hidden"
-                name="to_account"
-                value={normalizedEntry.accountId}
-              />
-              <input
-                type="hidden"
-                name="description"
-                value={settleDescription}
-              />
-              <input type="hidden" name="amount" value={settleAmount} />
-              <Button type="submit" variant="transfer" fullWidth>
-                {i18n.t("entry_detail_page.settle_entry")}
-              </Button>
-            </form>
           </Stack>
         </Card>
         <AppLink href="/entries">

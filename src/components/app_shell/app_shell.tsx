@@ -14,13 +14,13 @@ import {
 
 type AppShellProps = {
   navigation: React.ReactNode;
-  floatingEntryButton: React.ReactNode;
+  navbar: React.ReactNode;
   children: React.ReactNode;
 };
 
 export function AppShell({
   navigation,
-  floatingEntryButton,
+  navbar,
   children,
 }: AppShellProps): React.ReactElement {
   const pathname = usePathname();
@@ -28,8 +28,6 @@ export function AppShell({
   const isAuthRoute = pathname === "/login" || pathname === "/login/verify";
   const isSingleEntryDraftRoute =
     pathname === "/entries/new/income" || pathname === "/entries/new/expense";
-  const isNewEntryRoute = pathname.startsWith("/entries/new");
-  const isFabHiddenRoute = isAuthRoute || isNewEntryRoute;
 
   useEffect(() => {
     if (!isSingleEntryDraftRoute) {
@@ -53,13 +51,13 @@ export function AppShell({
     >
       <div className="app-shell__loading-bar" aria-hidden="true" />
       {!isAuthRoute && navigation}
+      {!isAuthRoute && navbar}
       <main
         className={`app-main ${isAuthRoute ? "app-main--auth" : ""}`}
         aria-busy={isNavigating}
       >
         {children}
       </main>
-      {!isFabHiddenRoute && floatingEntryButton}
     </div>
   );
 }

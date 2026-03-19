@@ -1,5 +1,4 @@
 import {
-  AppLink,
   Button,
   Container,
   Currency,
@@ -74,22 +73,20 @@ export default async function ProjectionPage({
           icon="projection"
           title={focusedMonthLabel}
           pattern="projection"
-          actions={
-            <>
-              <Button
-                href={`/projection?month=${payload.previousMonthKey}`}
-                variant="outline"
-              >
-                <Icon name="chevron-left" size={18} />
-              </Button>
-              <Button
-                href={`/projection?month=${payload.nextMonthKey}`}
-                variant="outline"
-              >
-                <Icon name="chevron-right" size={18} />
-              </Button>
-            </>
-          }
+          actions={[
+            {
+              icon: "chevron-left",
+              ariaLabel: String(i18n.t("pagination.previous")),
+              href: `/projection?month=${payload.previousMonthKey}`,
+              variant: "outline",
+            },
+            {
+              icon: "chevron-right",
+              ariaLabel: String(i18n.t("pagination.next")),
+              href: `/projection?month=${payload.nextMonthKey}`,
+              variant: "outline",
+            },
+          ]}
         >
           <Stack gap={24}>
             <Stack gap={10}>
@@ -159,62 +156,55 @@ export default async function ProjectionPage({
                       padding={24}
                       title={account.accountName}
                       icon="accounts"
-                    >
-                      <Stack gap={20}>
-                        <Stack
-                          direction="column"
-                          desktopDirection="row"
-                          justify="space-between"
-                          align="flex-start"
-                          gap={12}
+                      actions={
+                        <Button
+                          href={accountMonthHref}
+                          variant="secondary"
+                          size="sm"
+                          startIcon={<Icon name="external-link" size={16} />}
+                          ariaLabel={String(
+                            i18n.t("projection_page.open_account"),
+                          )}
                         >
-                          <AppLink href={accountMonthHref}>
-                            {i18n.t("projection_page.open_account")}
-                          </AppLink>
-                          <Currency
-                            value={account.monthTotal}
-                            size="xl"
-                            weight="bold"
-                            as="span"
-                          />
-                        </Stack>
-
-                        <EntryList
-                          entries={account.entries}
-                          showDelete={false}
-                          entryHrefBase="/entries"
-                          summaryRows={[
-                            ...(hiddenEntriesCount > 0
-                              ? [
-                                  {
-                                    id: `more-${account.accountId}`,
-                                    label: i18n.t(
-                                      "projection_page.more_entries_this_month",
-                                      {
-                                        count: hiddenEntriesCount,
-                                      },
-                                    ) as string,
-                                    href: accountMonthHref,
-                                  },
-                                ]
-                              : []),
-                            {
-                              id: `total-${account.accountId}`,
-                              label: i18n.t(
-                                "projection_page.account_month_total",
-                              ) as string,
-                              value: (
-                                <Currency
-                                  value={account.monthTotal}
-                                  size="sm"
-                                  weight="bold"
-                                />
-                              ),
-                              tone: "emphasis",
-                            },
-                          ]}
-                        />
-                      </Stack>
+                          {null}
+                        </Button>
+                      }
+                    >
+                      <EntryList
+                        entries={account.entries}
+                        showDelete={false}
+                        entryHrefBase="/entries"
+                        summaryRows={[
+                          ...(hiddenEntriesCount > 0
+                            ? [
+                                {
+                                  id: `more-${account.accountId}`,
+                                  label: i18n.t(
+                                    "projection_page.more_entries_this_month",
+                                    {
+                                      count: hiddenEntriesCount,
+                                    },
+                                  ) as string,
+                                  href: accountMonthHref,
+                                },
+                              ]
+                            : []),
+                          {
+                            id: `total-${account.accountId}`,
+                            label: i18n.t(
+                              "projection_page.account_month_total",
+                            ) as string,
+                            value: (
+                              <Currency
+                                value={account.monthTotal}
+                                size="sm"
+                                weight="bold"
+                              />
+                            ),
+                            tone: "emphasis",
+                          },
+                        ]}
+                      />
                     </Card>
                   );
                 })}

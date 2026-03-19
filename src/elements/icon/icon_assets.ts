@@ -13,6 +13,7 @@ export const iconAssets = {
   expense: new URL("./icons/expense.svg", import.meta.url).toString(),
   transfer: new URL("./icons/transfer.svg", import.meta.url).toString(),
   plus: new URL("./icons/plus.svg", import.meta.url).toString(),
+  trash: new URL("./icons/trash.svg", import.meta.url).toString(),
   edit: new URL("./icons/edit.svg", import.meta.url).toString(),
   "external-link": new URL(
     "./icons/external-link.svg",
@@ -21,6 +22,10 @@ export const iconAssets = {
   close: new URL("./icons/close.svg", import.meta.url).toString(),
   "chevron-left": new URL(
     "./icons/chevron-left.svg",
+    import.meta.url,
+  ).toString(),
+  "chevron-down": new URL(
+    "./icons/chevron-down.svg",
     import.meta.url,
   ).toString(),
   "chevron-right": new URL(

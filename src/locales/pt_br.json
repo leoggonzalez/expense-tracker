@@ -77,6 +77,7 @@
     "updating_income": "Atualizando receita...",
     "updating_expense": "Atualizando despesa...",
     "edit_full_begin_date": "Editar data inicial completa",
+    "use_month_year_begin_date": "Usar mes e ano",
     "edit_full_end_date": "Editar data final completa",
     "transfer_from": "Conta de origem",
     "transfer_to": "Conta de destino",
@@ -339,6 +340,7 @@
     "delete_confirm": "Tem certeza de que deseja excluir este lançamento?"
   },
   "account_field": {
+    "edit_account_name": "Inserir um nome de conta personalizado",
     "add_new_account": "Adicionar nova conta",
     "use_existing_account": "Usar conta existente"
   },

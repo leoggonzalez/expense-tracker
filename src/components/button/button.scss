@@ -119,6 +119,29 @@
     }
   }
 
+  &--variant-outline-danger {
+    background-color: transparent;
+    border-color: color-mix(in srgb, var(--color-danger) 28%, white 20%);
+    color: var(--color-danger-light);
+
+    &:hover:not(:disabled) {
+      background-color: color-mix(
+        in srgb,
+        var(--color-danger) 14%,
+        transparent
+      );
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      background-color: color-mix(
+        in srgb,
+        var(--color-danger) 20%,
+        transparent
+      );
+    }
+  }
+
   &--variant-success {
     background-color: var(--color-primary);
     color: var(--color-text-inverse);
