@@ -2,7 +2,12 @@
 
 import "./navigation.scss";
 
-import { AppLink, Avatar, Container, useNavigationProgress } from "@/components";
+import {
+  AppLink,
+  Avatar,
+  Container,
+  useNavigationProgress,
+} from "@/components";
 import { Icon, Text } from "@/elements";
 import type { IconName } from "@/elements/icon/icon_assets";
 import { CurrentoLogo } from "@/lib/currento_logo";
@@ -18,17 +23,21 @@ type NavigationClientProps = {
   } | null;
 };
 
+type NavigationLink = {
+  href: string;
+  label: React.ReactNode;
+  icon: IconName;
+  isMobilePrimary?: boolean;
+  matchesPath?: (pathname: string) => boolean;
+};
+
 export function NavigationClient({
   isAuthenticated,
   currentUser,
 }: NavigationClientProps): React.ReactElement {
   const pathname = usePathname();
   const { isNavigating, targetHref } = useNavigationProgress();
-  const allLinks: Array<{
-    href: string;
-    label: React.ReactNode;
-    icon: IconName;
-  }> = isAuthenticated
+  const allLinks: NavigationLink[] = isAuthenticated
     ? [
         {
           href: "/",
@@ -57,12 +66,34 @@ export function NavigationClient({
         },
       ]
     : [{ href: "/login", label: i18n.t("navigation.login"), icon: "login" }];
+  const mobileLinks: NavigationLink[] = isAuthenticated
+    ? [
+        allLinks[0],
+        allLinks[1],
+        {
+          href: "/entries/new/expense",
+          label: i18n.t("common.add_entry"),
+          icon: "plus",
+          isMobilePrimary: true,
+          matchesPath: (currentPathname) =>
+            currentPathname.startsWith("/entries/new"),
+        },
+        allLinks[2],
+        allLinks[3],
+      ]
+    : allLinks;
   const primaryLinks = isAuthenticated ? allLinks.slice(0, 4) : allLinks;
   const secondaryLinks = isAuthenticated ? allLinks.slice(4) : [];
   const displayName =
     currentUser?.name || String(i18n.t("navigation.user_fallback_name"));
 
-  const isLinkActive = (href: string): boolean => {
+  const isLinkActive = (link: NavigationLink): boolean => {
+    if (link.matchesPath) {
+      return link.matchesPath(pathname);
+    }
+
+    const { href } = link;
+
     if (href === "/") {
       return pathname === "/";
     }
@@ -89,12 +120,14 @@ export function NavigationClient({
 
           <div className="navigation__sections">
             <ul className="navigation__links navigation__links--mobile">
-              {allLinks.map((link) => (
+              {mobileLinks.map((link) => (
                 <li key={link.href} className="navigation__item">
                   <div
                     className={[
                       "navigation__link",
-                      isLinkActive(link.href) && "navigation__link--active",
+                      isLinkActive(link) && "navigation__link--active",
+                      link.isMobilePrimary &&
+                        "navigation__link--mobile-primary",
                       isNavigating &&
                         targetHref === link.href &&
                         "navigation__link--pending",
@@ -105,7 +138,10 @@ export function NavigationClient({
                     <AppLink href={link.href} ariaLabel={String(link.label)}>
                       <span className="navigation__link-content">
                         <span className="navigation__icon">
-                          <Icon name={link.icon} size={20} />
+                          <Icon
+                            name={link.icon}
+                            size={link.isMobilePrimary ? 24 : 20}
+                          />
                         </span>
                         <span className="navigation__label">{link.label}</span>
                       </span>
@@ -131,7 +167,7 @@ export function NavigationClient({
                     <div
                       className={[
                         "navigation__link",
-                        isLinkActive(link.href) && "navigation__link--active",
+                        isLinkActive(link) && "navigation__link--active",
                         isNavigating &&
                           targetHref === link.href &&
                           "navigation__link--pending",
@@ -144,7 +180,9 @@ export function NavigationClient({
                           <span className="navigation__icon">
                             <Icon name={link.icon} size={20} />
                           </span>
-                          <span className="navigation__label">{link.label}</span>
+                          <span className="navigation__label">
+                            {link.label}
+                          </span>
                         </span>
                       </AppLink>
                     </div>
@@ -170,7 +208,7 @@ export function NavigationClient({
                       <div
                         className={[
                           "navigation__link",
-                          isLinkActive(link.href) && "navigation__link--active",
+                          isLinkActive(link) && "navigation__link--active",
                           isNavigating &&
                             targetHref === link.href &&
                             "navigation__link--pending",
@@ -178,7 +216,10 @@ export function NavigationClient({
                           .filter(Boolean)
                           .join(" ")}
                       >
-                        <AppLink href={link.href} ariaLabel={String(link.label)}>
+                        <AppLink
+                          href={link.href}
+                          ariaLabel={String(link.label)}
+                        >
                           <span className="navigation__link-content">
                             <span className="navigation__icon">
                               <Icon name={link.icon} size={20} />

@@ -1,5 +1,4 @@
 import {
-  AppLink,
   Button,
   Container,
   Currency,
@@ -159,26 +158,20 @@ export default async function ProjectionPage({
                       padding={24}
                       title={account.accountName}
                       icon="accounts"
-                    >
-                      <Stack gap={20}>
-                        <Stack
-                          direction="column"
-                          desktopDirection="row"
-                          justify="space-between"
-                          align="flex-start"
-                          gap={12}
+                      actions={
+                        <Button
+                          href={accountMonthHref}
+                          variant="secondary"
+                          size="sm"
+                          startIcon={<Icon name="external-link" size={16} />}
+                          ariaLabel={String(
+                            i18n.t("projection_page.open_account"),
+                          )}
                         >
-                          <AppLink href={accountMonthHref}>
-                            {i18n.t("projection_page.open_account")}
-                          </AppLink>
-                          <Currency
-                            value={account.monthTotal}
-                            size="xl"
-                            weight="bold"
-                            as="span"
-                          />
-                        </Stack>
-
+                          {null}
+                        </Button>
+                      }
+                    >
                         <EntryList
                           entries={account.entries}
                           showDelete={false}
@@ -214,7 +207,6 @@ export default async function ProjectionPage({
                             },
                           ]}
                         />
-                      </Stack>
                     </Card>
                   );
                 })}

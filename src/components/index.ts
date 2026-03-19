@@ -73,7 +73,6 @@ export { AccountArchiveForm } from "./account_archive_form/account_archive_form"
 export { AccountCard } from "./account_card/account_card";
 export { AccountProfileForm } from "./account_profile_form/account_profile_form";
 export { NewEntryRecentEntries } from "./new_entry_recent_entries/new_entry_recent_entries";
-export { SettingsPreferencesForm } from "./settings_preferences_form/settings_preferences_form";
 export { PagePanel } from "./page_panel/page_panel";
 export { EntryTypeTabs } from "./entry_type_tabs/entry_type_tabs";
 export { EntryCreationIntro } from "./entry_creation_intro/entry_creation_intro";

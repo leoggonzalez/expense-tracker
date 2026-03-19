@@ -14,6 +14,7 @@ export interface CardProps {
   as?: "div" | "section" | "article";
   title?: string;
   icon?: IconName;
+  actions?: React.ReactNode;
 }
 
 export function Card({
@@ -23,13 +24,14 @@ export function Card({
   as: Component = "div",
   title,
   icon,
+  actions,
 }: CardProps): React.ReactElement {
   const classes = ["card", `card--${variant}`].join(" ");
 
   return (
     <Component className={classes}>
       <Box padding={padding}>
-        {title || icon ? (
+        {title || icon || actions ? (
           <div className="card__header">
             <div className="card__title-group">
               {icon ? (
@@ -43,6 +45,7 @@ export function Card({
                 </Text>
               ) : null}
             </div>
+            {actions ? <div className="card__actions">{actions}</div> : null}
           </div>
         ) : null}
         {children}
