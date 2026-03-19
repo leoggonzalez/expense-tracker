@@ -77,6 +77,7 @@
     "updating_income": "Updating Income...",
     "updating_expense": "Updating Expense...",
     "edit_full_begin_date": "Edit full begin date",
+    "use_month_year_begin_date": "Use month and year",
     "edit_full_end_date": "Edit full end date",
     "transfer_from": "From account",
     "transfer_to": "To account",
@@ -355,7 +356,7 @@
     "cancel_delete": "Cancel"
   },
   "account_field": {
-    "add_new_account": "Add new account",
+    "edit_account_name": "Enter a custom account name",
     "use_existing_account": "Use existing account"
   },
   "common": {

@@ -45,9 +45,9 @@ export function AccountField({
 
   return (
     <div className="account-field">
-      <div className="account-field__control">
-        <div className="account-field__input">
-          {isCustomMode ? (
+      <div className="account-field__input">
+        {isCustomMode ? (
+          <div className="account-field__text-mode">
             <Input
               label={label}
               value={value}
@@ -55,32 +55,38 @@ export function AccountField({
               placeholder={placeholder}
               required={required}
             />
-          ) : (
-            <Select
-              label={label}
-              value={value}
-              onChange={onChange}
-              options={accounts.map((account) => ({
-                value: account,
-                label: account,
-              }))}
-              placeholder={placeholder}
-              required={required}
-            />
-          )}
-        </div>
-        <button
-          type="button"
-          className="account-field__toggle"
-          onClick={handleToggle}
-          aria-label={String(
-            isCustomMode
-              ? i18n.t("account_field.use_existing_account")
-              : i18n.t("account_field.add_new_account"),
-          )}
-        >
-          <Icon name={isCustomMode ? "close" : "plus"} size={18} />
-        </button>
+            <button
+              type="button"
+              className="account-field__toggle"
+              onClick={handleToggle}
+              aria-label={String(i18n.t("account_field.use_existing_account"))}
+            >
+              <Icon name="close" size={18} />
+            </button>
+          </div>
+        ) : (
+          <Select
+            label={label}
+            value={value}
+            onChange={onChange}
+            options={accounts.map((account) => ({
+              value: account,
+              label: account,
+            }))}
+            placeholder={placeholder}
+            required={required}
+            trailingContent={
+              <button
+                type="button"
+                className="account-field__toggle"
+                onClick={handleToggle}
+                aria-label={String(i18n.t("account_field.edit_account_name"))}
+              >
+                <Icon name="edit" size={16} />
+              </button>
+            }
+          />
+        )}
       </div>
     </div>
   );

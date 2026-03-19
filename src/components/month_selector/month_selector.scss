@@ -3,34 +3,134 @@
 .month-selector {
   width: 100%;
 
-  &__month-field {
-    min-width: 170px;
+  &__label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
   }
 
-  &__year-field {
-    min-width: 120px;
+  &__required {
+    color: var(--color-danger);
+    margin-left: var(--spacing-xs);
+  }
+
+  &__control {
+    min-height: 52px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 18px;
+    background-color: var(--color-background);
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast),
+      background-color var(--transition-fast);
+  }
+
+  &__date-mode {
+    position: relative;
+    width: 100%;
+
+    .input {
+      width: 100%;
+    }
+
+    .input__field {
+      width: 100%;
+      min-height: 52px;
+      padding-right: calc(var(--spacing-md) + 48px);
+      border-radius: 18px;
+      background-color: var(--color-background-secondary);
+    }
+  }
+
+  &__control:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px
+      color-mix(in srgb, var(--color-primary) 18%, transparent);
+    background-color: var(--color-background);
+  }
+
+  &__tag {
+    position: relative;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background-color: color-mix(
+      in srgb,
+      var(--color-text-primary) 10%,
+      var(--color-background-secondary)
+    );
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
+
+  &__tag-value {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
   }
 
   &__toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--border-radius-md);
-    background-color: var(--color-background);
-    color: var(--color-text-secondary);
+    width: 32px;
+    height: 32px;
+    margin-left: auto;
+    border: 0;
+    border-radius: 999px;
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 10%,
+      var(--color-background)
+    );
+    color: var(--color-primary);
     cursor: pointer;
     transition:
-      border-color var(--transition-base),
+      background-color var(--transition-base),
       color var(--transition-base);
 
     &:hover,
     &:focus-visible {
-      border-color: var(--color-primary);
-      color: var(--color-primary);
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 16%,
+        var(--color-background)
+      );
+      color: var(--color-primary-dark);
       outline: none;
+    }
+  }
+
+  &__date-mode &__toggle {
+    position: absolute;
+    right: var(--spacing-sm);
+    bottom: calc(var(--spacing-sm) + 1px);
+    margin-left: 0;
+    z-index: 1;
+  }
+
+  &__native-select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    appearance: none;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .month-selector {
+    &__control {
+      gap: var(--spacing-md);
     }
   }
 }

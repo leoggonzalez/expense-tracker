@@ -1,26 +1,53 @@
 @use "@/styles/variables.scss" as *;
 
 .account-field {
-  &__control {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--spacing-sm);
-    align-items: end;
-  }
-
   &__input {
     min-width: 0;
   }
 
+  &__text-mode {
+    position: relative;
+
+    .input__field {
+      padding-right: calc(var(--spacing-md) + 48px);
+    }
+  }
+
   &__toggle {
-    width: 44px;
-    height: 44px;
-    border-radius: var(--border-radius-md);
-    border: var(--border-width) solid var(--color-border);
-    background-color: var(--color-background);
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 0;
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 10%,
+      var(--color-background)
+    );
     color: var(--color-primary);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    pointer-events: auto;
+    transition:
+      background-color var(--transition-fast),
+      color var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 16%,
+        var(--color-background)
+      );
+      color: var(--color-primary-dark);
+      outline: none;
+    }
+  }
+
+  &__text-mode &__toggle {
+    position: absolute;
+    right: var(--spacing-sm);
+    bottom: calc(var(--spacing-sm) + 1px);
   }
 }

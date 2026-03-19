@@ -226,17 +226,13 @@ async function getAccountsByArchiveState(
 
 export async function getAccountsCurrentMonthSummary(
   selectedMonthStart?: Date,
-): Promise<
-  AccountCurrentMonthSummary[]
-> {
+): Promise<AccountCurrentMonthSummary[]> {
   return getAccountsByArchiveState(false, selectedMonthStart);
 }
 
 export async function getArchivedAccountsCurrentMonthSummary(
   selectedMonthStart?: Date,
-): Promise<
-  AccountCurrentMonthSummary[]
-> {
+): Promise<AccountCurrentMonthSummary[]> {
   return getAccountsByArchiveState(true, selectedMonthStart);
 }
 

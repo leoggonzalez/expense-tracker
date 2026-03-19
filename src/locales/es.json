@@ -77,6 +77,7 @@
     "updating_income": "Actualizando ingreso...",
     "updating_expense": "Actualizando gasto...",
     "edit_full_begin_date": "Editar fecha de inicio completa",
+    "use_month_year_begin_date": "Usar mes y ano",
     "edit_full_end_date": "Editar fecha de fin completa",
     "transfer_from": "Cuenta origen",
     "transfer_to": "Cuenta destino",
@@ -339,6 +340,7 @@
     "delete_confirm": "¿Seguro que quieres eliminar este movimiento?"
   },
   "account_field": {
+    "edit_account_name": "Introducir un nombre de cuenta personalizado",
     "add_new_account": "Añadir cuenta nueva",
     "use_existing_account": "Usar cuenta existente"
   },

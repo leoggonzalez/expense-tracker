@@ -10,11 +10,8 @@
     color-mix(in srgb, var(--color-primary) 18%, white),
     color-mix(in srgb, var(--color-success) 18%, white)
   );
-  border: var(--border-width) solid color-mix(
-      in srgb,
-      var(--color-primary) 18%,
-      var(--color-border)
-    );
+  border: var(--border-width) solid
+    color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
   color: var(--color-primary-dark);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);

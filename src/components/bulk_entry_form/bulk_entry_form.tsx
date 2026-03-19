@@ -11,9 +11,8 @@ import {
 } from "@/components";
 import { CreateEntryInput, createMultipleEntries } from "@/actions/entries";
 import {
-  EntryDateMode,
   EntryScheduleMode,
-  normalizeDateValue,
+  inferEntryDateMode,
   resolveEndDate,
   toDate,
 } from "@/lib/entry_schedule";
@@ -40,7 +39,6 @@ export interface BulkEntryFormProps {
 type SharedScheduleState = {
   accountName: string;
   beginDate: string;
-  beginDateMode: EntryDateMode;
   scheduleMode: EntryScheduleMode;
   installments: string;
 };
@@ -53,7 +51,6 @@ function getInitialSharedState(): SharedScheduleState {
   return {
     accountName: "",
     beginDate: formatDateForInput(new Date()).slice(0, 7),
-    beginDateMode: "month",
     scheduleMode: "one_time",
     installments: "1",
   };
@@ -89,9 +86,10 @@ export function BulkEntryForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nextIdRef = useRef(2);
 
+  const beginDateMode = inferEntryDateMode(shared.beginDate);
   const beginDate = useMemo(
-    () => toDate(shared.beginDate, shared.beginDateMode),
-    [shared.beginDate, shared.beginDateMode],
+    () => toDate(shared.beginDate, beginDateMode),
+    [shared.beginDate, beginDateMode],
   );
   const parsedInstallments = useMemo(
     () => parseInstallments(shared.installments),
@@ -116,7 +114,7 @@ export function BulkEntryForm({
   const formattedEndDate = calculatedEndDate
     ? format(
         calculatedEndDate,
-        shared.beginDateMode === "month" ? "MMMM yyyy" : "MMM dd, yyyy",
+        beginDateMode === "month" ? "MMMM yyyy" : "MMM dd, yyyy",
       )
     : null;
 
@@ -161,7 +159,7 @@ export function BulkEntryForm({
   const onSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
 
-    const parsedBeginDate = toDate(shared.beginDate, shared.beginDateMode);
+    const parsedBeginDate = toDate(shared.beginDate, beginDateMode);
     const installments = parseInstallments(shared.installments);
 
     if (!shared.accountName || !parsedBeginDate) {
@@ -249,7 +247,7 @@ export function BulkEntryForm({
           />
 
           <Stack gap={4}>
-            <Text size="sm" weight="medium">
+            <Text size="sm" weight="medium" color="secondary">
               {i18n.t("entry_form.schedule_label")}
             </Text>
 
@@ -297,26 +295,16 @@ export function BulkEntryForm({
 
           <MonthSelector
             label={i18n.t(
-              shared.beginDateMode === "month"
+              beginDateMode === "month"
                 ? "entry_form.begin_date_month"
                 : "entry_form.begin_date",
             )}
-            mode={shared.beginDateMode}
             value={shared.beginDate}
             onChange={(value) =>
               setShared((current) => ({ ...current, beginDate: value }))
             }
-            onEnableFullDate={() =>
-              setShared((current) => ({
-                ...current,
-                beginDateMode: "date",
-                beginDate: normalizeDateValue(
-                  current.beginDate,
-                  current.beginDateMode,
-                ),
-              }))
-            }
             editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
+            closeLabel={String(i18n.t("entry_form.use_month_year_begin_date"))}
             monthLabel={i18n.t("entry_form.month")}
             yearLabel={i18n.t("entry_form.year")}
             required

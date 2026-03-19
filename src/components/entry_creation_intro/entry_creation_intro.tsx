@@ -17,9 +17,9 @@ export function EntryCreationIntro({
 }: EntryCreationIntroProps): React.ReactElement {
   return (
     <div className="entry-creation-intro">
-        <Text size="sm" as="p" color="inverse">
-          {subtitle}
-        </Text>
+      <Text size="sm" as="p" color="inverse">
+        {subtitle}
+      </Text>
     </div>
   );
 }

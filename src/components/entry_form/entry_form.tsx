@@ -11,10 +11,9 @@ import {
 } from "@/components";
 import { CreateEntryInput, createEntry, updateEntry } from "@/actions/entries";
 import {
-  EntryDateMode,
   EntryScheduleMode,
   deriveScheduleFromDates,
-  normalizeDateValue,
+  inferEntryDateMode,
   resolveEndDate,
   toDate,
 } from "@/lib/entry_schedule";
@@ -56,7 +55,6 @@ type EntryFormModel = {
   description: string;
   amountInput: string;
   beginDate: string;
-  beginDateMode: EntryDateMode;
   scheduleMode: EntryScheduleMode;
   installments: string;
 };
@@ -98,7 +96,6 @@ function getInitialModel(props: EntryFormProps): EntryFormModel {
       ? String(props.initialData.amount)
       : "",
     beginDate: formatMonthForInput(beginDate),
-    beginDateMode: "month",
     scheduleMode: defaultScheduleMode,
     installments: String(schedule.installments),
   };
@@ -243,6 +240,7 @@ export function EntryForm({
       const successMessageKey = getSuccessMessageKey(form.model.type);
       const errorMessageKey = getErrorMessageKey(form.model.type);
       const parsedAmount = parseAmountInput(form.model.amountInput);
+      const beginDateMode = inferEntryDateMode(form.model.beginDate);
 
       if (parsedAmount === null) {
         showError(i18n.t(errorMessageKey), {
@@ -252,7 +250,7 @@ export function EntryForm({
       }
 
       const beginDate =
-        toDate(form.model.beginDate, form.model.beginDateMode) || new Date();
+        toDate(form.model.beginDate, beginDateMode) || new Date();
       const parsedInstallments = parseInstallments(form.model.installments);
 
       if (form.model.scheduleMode === "installments" && !parsedInstallments) {
@@ -333,7 +331,6 @@ export function EntryForm({
         description: draft.description,
         amountInput: draft.amountInput,
         beginDate: draft.beginDate,
-        beginDateMode: draft.beginDateMode,
         scheduleMode: draft.scheduleMode || "one_time",
         installments: draft.installments || "1",
       });
@@ -358,7 +355,7 @@ export function EntryForm({
       description: model.description,
       amountInput: model.amountInput,
       beginDate: model.beginDate,
-      beginDateMode: model.beginDateMode,
+      beginDateMode: inferEntryDateMode(model.beginDate),
       scheduleMode: model.scheduleMode,
       installments: model.installments,
     });
@@ -368,7 +365,6 @@ export function EntryForm({
     model.accountName,
     model.amountInput,
     model.beginDate,
-    model.beginDateMode,
     model.description,
     model.installments,
     model.scheduleMode,
@@ -384,13 +380,6 @@ export function EntryForm({
     });
   };
 
-  const handleBeginDateModeChange = (): void => {
-    updateFields({
-      beginDateMode: "date",
-      beginDate: normalizeDateValue(model.beginDate, model.beginDateMode),
-    });
-  };
-
   const handleScheduleModeChange = (value: EntryScheduleMode): void => {
     updateFields({
       scheduleMode: value,
@@ -399,7 +388,8 @@ export function EntryForm({
   };
 
   const parsedInstallments = parseInstallments(model.installments);
-  const beginDateForPreview = toDate(model.beginDate, model.beginDateMode);
+  const beginDateMode = inferEntryDateMode(model.beginDate);
+  const beginDateForPreview = toDate(model.beginDate, beginDateMode);
   const calculatedEndDate =
     beginDateForPreview && parsedInstallments
       ? resolveEndDate({
@@ -412,7 +402,7 @@ export function EntryForm({
   const formattedEndDate = calculatedEndDate
     ? format(
         calculatedEndDate,
-        model.beginDateMode === "month" ? "MMMM yyyy" : "MMM dd, yyyy",
+        beginDateMode === "month" ? "MMMM yyyy" : "MMM dd, yyyy",
       )
     : null;
 
@@ -462,7 +452,7 @@ export function EntryForm({
         />
 
         <Stack gap={4}>
-          <Text size="sm" weight="medium">
+          <Text size="sm" weight="medium" color="secondary">
             {i18n.t("entry_form.schedule_label")}
           </Text>
 
@@ -498,14 +488,13 @@ export function EntryForm({
 
         <MonthSelector
           label={i18n.t(
-            model.beginDateMode === "month"
+            beginDateMode === "month"
               ? "entry_form.begin_date_month"
               : "entry_form.begin_date",
           )}
-          mode={model.beginDateMode}
           field={fields.beginDate}
-          onEnableFullDate={handleBeginDateModeChange}
           editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
+          closeLabel={String(i18n.t("entry_form.use_month_year_begin_date"))}
           monthLabel={i18n.t("entry_form.month")}
           yearLabel={i18n.t("entry_form.year")}
           required

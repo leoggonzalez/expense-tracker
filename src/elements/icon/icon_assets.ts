@@ -24,6 +24,10 @@ export const iconAssets = {
     "./icons/chevron-left.svg",
     import.meta.url,
   ).toString(),
+  "chevron-down": new URL(
+    "./icons/chevron-down.svg",
+    import.meta.url,
+  ).toString(),
   "chevron-right": new URL(
     "./icons/chevron-right.svg",
     import.meta.url,

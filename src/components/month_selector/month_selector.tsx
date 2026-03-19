@@ -4,10 +4,10 @@ import "./month_selector.scss";
 
 import React from "react";
 
-import { Input, Select } from "@/components";
+import { Input } from "@/components";
 import { Icon, Stack } from "@/elements";
 import {
-  EntryDateMode,
+  inferEntryDateMode,
   normalizeDateValue,
   toModeValue,
 } from "@/lib/entry_schedule";
@@ -20,12 +20,11 @@ type MonthSelectorField = {
 
 type MonthSelectorProps = {
   label: React.ReactNode;
-  mode: EntryDateMode;
   field?: MonthSelectorField;
   value?: string;
   onChange?: (value: string) => void;
-  onEnableFullDate: () => void;
   editLabel: string;
+  closeLabel: string;
   monthLabel: React.ReactNode;
   yearLabel: React.ReactNode;
   required?: boolean;
@@ -73,12 +72,11 @@ function getYearOptions(
 
 export function MonthSelector({
   label,
-  mode,
   field,
   value,
   onChange,
-  onEnableFullDate,
   editLabel,
+  closeLabel,
   monthLabel,
   yearLabel,
   required = false,
@@ -92,15 +90,38 @@ export function MonthSelector({
     );
   }
 
+  const mode = inferEntryDateMode(fieldValue);
+
   if (mode === "date") {
     return (
-      <Input
-        label={label}
-        type="date"
-        value={toModeValue(fieldValue, "date")}
-        onChange={handleFieldChange}
-        required={required}
-      />
+      <div className="month-selector">
+        <Stack gap={8}>
+          <div className="month-selector__label">
+            {label}
+            {required && <span className="month-selector__required">*</span>}
+          </div>
+          <div className="month-selector__date-mode">
+            <Input
+              type="date"
+              value={toModeValue(fieldValue, "date")}
+              onChange={handleFieldChange}
+              required={required}
+            />
+            <button
+              type="button"
+              className="month-selector__toggle"
+              onClick={() =>
+                handleFieldChange(
+                  toModeValue(normalizeDateValue(fieldValue, "date"), "month"),
+                )
+              }
+              aria-label={closeLabel}
+            >
+              <Icon name="close" size={16} />
+            </button>
+          </div>
+        </Stack>
+      </div>
     );
   }
 
@@ -121,41 +142,63 @@ export function MonthSelector({
   const updateYear = (nextYear: string): void => {
     handleFieldChange(`${nextYear}-${month}`);
   };
+  const monthOptions = getMonthOptions();
+  const yearOptions = getYearOptions(year);
+  const selectedMonthLabel =
+    monthOptions.find((option) => option.value === month)?.label || month;
 
   return (
     <div className="month-selector">
       <Stack gap={8}>
         <div className="month-selector__label">{label}</div>
-        <Stack direction="row" gap={8} align="flex-end" wrap>
-          <div className="month-selector__month-field">
-            <Select
-              label={monthLabel}
+        <div className="month-selector__control">
+          <label className="month-selector__tag">
+            <span className="month-selector__tag-value">
+              {selectedMonthLabel}
+            </span>
+            <select
+              className="month-selector__native-select"
               value={month}
-              onChange={updateMonth}
-              options={getMonthOptions()}
+              onChange={(event) => updateMonth(event.target.value)}
               required={required}
-            />
-          </div>
+              aria-label={String(monthLabel)}
+            >
+              {monthOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <div className="month-selector__year-field">
-            <Select
-              label={yearLabel}
+          <label className="month-selector__tag">
+            <span className="month-selector__tag-value">{year}</span>
+            <select
+              className="month-selector__native-select"
               value={String(year)}
-              onChange={updateYear}
-              options={getYearOptions(year)}
+              onChange={(event) => updateYear(event.target.value)}
               required={required}
-            />
-          </div>
+              aria-label={String(yearLabel)}
+            >
+              {yearOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <button
             type="button"
             className="month-selector__toggle"
-            onClick={onEnableFullDate}
+            onClick={() =>
+              handleFieldChange(normalizeDateValue(fieldValue, "month"))
+            }
             aria-label={editLabel}
           >
             <Icon name="edit" size={16} />
           </button>
-        </Stack>
+        </div>
       </Stack>
     </div>
   );
