@@ -1,11 +1,4 @@
-import {
-  AccountProfileForm,
-  Container,
-  Hero,
-  HeroMetric,
-  HeroMetrics,
-  PagePanel,
-} from "@/components";
+import { AccountProfileForm, Container, Hero, PagePanel } from "@/components";
 import { Stack, Text } from "@/elements";
 
 import { getCurrentUser } from "@/lib/session";

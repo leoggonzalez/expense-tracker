@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Input } from "@/components";
-import { Card, Stack, Text } from "@/elements";
+import { Stack, Text } from "@/elements";
 import React, { useState } from "react";
 
 import { i18n } from "@/model/i18n";
