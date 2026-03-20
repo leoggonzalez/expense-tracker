@@ -1,9 +1,6 @@
 @use "@/styles/variables.scss" as *;
 
 .checkbox {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-sm);
   cursor: pointer;
   user-select: none;
 
@@ -12,11 +9,5 @@
     height: 18px;
     cursor: pointer;
     accent-color: var(--color-primary);
-  }
-
-  &__label {
-    font-size: var(--font-size-md);
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-medium);
   }
 }

@@ -1,14 +1,8 @@
 @use "@/styles/variables.scss" as *;
 
 .input {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-
-  &__label {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
+  label {
+    display: block;
   }
 
   &__required {

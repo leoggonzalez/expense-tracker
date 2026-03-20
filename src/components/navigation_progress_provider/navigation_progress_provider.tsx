@@ -63,6 +63,7 @@ export function NavigationProgressProvider({
     };
   }, []);
 
+  // eslint-disable-next-line warn-use-effect -- This effect synchronizes the transient navigation state with pathname changes and clears the fallback timer.
   useEffect(() => {
     if (!isNavigating) {
       return;

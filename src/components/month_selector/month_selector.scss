@@ -3,12 +3,6 @@
 .month-selector {
   width: 100%;
 
-  &__label {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
-  }
-
   &__required {
     color: var(--color-danger);
     margin-left: var(--spacing-xs);
@@ -17,10 +11,6 @@
   &__control {
     min-height: 52px;
     width: 100%;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm);
     border: var(--border-width) solid var(--color-border);
     border-radius: 18px;
     background-color: var(--color-background);
@@ -57,8 +47,6 @@
   &__tag {
     position: relative;
     min-width: 0;
-    display: inline-flex;
-    align-items: center;
     padding: 8px 14px;
     border-radius: 999px;
     background-color: color-mix(
@@ -70,16 +58,7 @@
     cursor: pointer;
   }
 
-  &__tag-value {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
-    line-height: 1;
-  }
-
   &__toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     width: 32px;
     height: 32px;
     margin-left: auto;
@@ -124,13 +103,5 @@
     opacity: 0;
     cursor: pointer;
     appearance: none;
-  }
-}
-
-@media (min-width: $breakpoint-tablet) {
-  .month-selector {
-    &__control {
-      gap: var(--spacing-md);
-    }
   }
 }

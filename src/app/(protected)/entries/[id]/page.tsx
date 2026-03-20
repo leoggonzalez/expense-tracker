@@ -173,6 +173,7 @@ export default async function Page({
                   value={normalizedEntry.amount}
                   size="h3"
                   weight="bold"
+                  color="inverse"
                 />
               </HeroMetric>
               <HeroMetric tone="soft">

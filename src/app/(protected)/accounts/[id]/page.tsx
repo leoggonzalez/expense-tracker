@@ -176,6 +176,7 @@ export default async function Page({
                     value={data.account.selectedMonthTotal}
                     size="h3"
                     weight="bold"
+                    color="inverse"
                   />
                   <Stack
                     direction="row"
@@ -211,6 +212,7 @@ export default async function Page({
                   value={data.account.historicalTotal}
                   size="h3"
                   weight="bold"
+                  color="inverse"
                 />
               </HeroMetric>
             </HeroMetrics>

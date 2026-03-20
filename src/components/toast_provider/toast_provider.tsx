@@ -10,7 +10,7 @@ import React, {
   useState,
 } from "react";
 
-import { Icon } from "@/elements";
+import { Box, Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import type { IconName } from "@/elements/icon/icon_assets";
 
@@ -127,25 +127,49 @@ export function ToastProvider({
               .join(" ")}
             role="status"
           >
-            <span className="toast-provider__activity-icon" aria-hidden="true">
-              <Icon
-                name={
-                  toast.iconName ||
-                  (toast.kind === "success" ? "check" : "alert")
-                }
-                size={18}
-              />
-            </span>
-            <span className="toast-provider__divider" aria-hidden="true" />
-            <span className="toast-provider__message">{toast.message}</span>
-            <button
-              type="button"
-              className="toast-provider__dismiss"
-              onClick={dismissToast}
-              aria-label={i18n.t("toast.dismiss") as string}
+            <Box
+              padding={{
+                paddingTop: 16,
+                paddingRight: 24,
+                paddingBottom: 16,
+                paddingLeft: 24,
+              }}
             >
-              <Icon name="close" size={16} />
-            </button>
+              <Stack
+                direction="row"
+                align="center"
+                justify="space-between"
+                gap={12}
+                fullWidth
+              >
+                <span
+                  className="toast-provider__activity-icon"
+                  aria-hidden="true"
+                >
+                  <Icon
+                    name={
+                      toast.iconName ||
+                      (toast.kind === "success" ? "check" : "alert")
+                    }
+                    size={18}
+                  />
+                </span>
+                <span className="toast-provider__divider" aria-hidden="true" />
+                <span className="toast-provider__message">
+                  <Text as="span" size="sm">
+                    {toast.message}
+                  </Text>
+                </span>
+                <button
+                  type="button"
+                  className="toast-provider__dismiss"
+                  onClick={dismissToast}
+                  aria-label={i18n.t("toast.dismiss") as string}
+                >
+                  <Icon name="close" size={16} />
+                </button>
+              </Stack>
+            </Box>
           </div>
         )}
       </div>

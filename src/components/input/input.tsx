@@ -1,4 +1,5 @@
 import React from "react";
+import { Stack, Text } from "@/elements";
 import "./input.scss";
 
 export interface InputProps {
@@ -40,30 +41,34 @@ export function Input({
 }: InputProps): React.ReactElement {
   return (
     <div className="input">
-      {label && (
-        <label className="input__label" htmlFor={id}>
-          {label}
-          {required && <span className="input__required">*</span>}
-        </label>
-      )}
-      <input
-        id={id}
-        name={name}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        required={required}
-        min={min}
-        max={max}
-        step={step}
-        disabled={disabled}
-        readOnly={readOnly}
-        inputMode={inputMode}
-        autoComplete={autoComplete}
-        pattern={pattern}
-        className="input__field"
-      />
+      <Stack gap={4}>
+        {label && (
+          <label htmlFor={id}>
+            <Text as="span" size="sm" weight="medium">
+              {label}
+            </Text>
+            {required && <span className="input__required">*</span>}
+          </label>
+        )}
+        <input
+          id={id}
+          name={name}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          required={required}
+          min={min}
+          max={max}
+          step={step}
+          disabled={disabled}
+          readOnly={readOnly}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
+          pattern={pattern}
+          className="input__field"
+        />
+      </Stack>
     </div>
   );
 }

@@ -12,10 +12,6 @@
 
   &__toast {
     pointer-events: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-sm);
     border: var(--border-width) solid var(--color-border);
     border-radius: var(--border-radius-full);
     background-color: color-mix(
@@ -25,7 +21,6 @@
     );
     box-shadow: var(--shadow-lg);
     color: var(--color-text-primary);
-    padding: var(--spacing-md) var(--spacing-lg);
     transform: translateY(-120%);
     opacity: 0;
     transition:
@@ -73,9 +68,6 @@
   }
 
   &__dismiss {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     flex: 0 0 auto;
     border: 0;
     background: transparent;

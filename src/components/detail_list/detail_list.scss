@@ -9,11 +9,6 @@
   background-color: var(--color-surface);
 
   &__row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md) var(--spacing-lg);
     border-bottom: var(--border-width) solid var(--color-border);
 
     &:last-child {

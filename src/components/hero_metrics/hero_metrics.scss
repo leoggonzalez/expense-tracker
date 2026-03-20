@@ -7,19 +7,9 @@
 }
 
 .hero-metric {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 18px 20px;
   border-radius: 20px;
   background-color: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.12);
-
-  .text--color-primary,
-  .text--color-success,
-  .text--color-danger {
-    color: var(--color-text-inverse);
-  }
 
   &--soft {
     background-color: rgba(255, 255, 255, 0.08);

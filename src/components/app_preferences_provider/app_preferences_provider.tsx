@@ -81,6 +81,7 @@ export function AppPreferencesProvider({
     };
   }, []);
 
+  // eslint-disable-next-line warn-use-effect -- This effect synchronizes document-level theme and locale state with browser and i18n globals whenever preferences change.
   useEffect(() => {
     document.documentElement.dataset.theme = effectiveTheme;
     document.documentElement.lang = effectiveLanguage;

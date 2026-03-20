@@ -9,5 +9,8 @@ else
   echo "Vercel env is '${VERCEL_ENV:-unknown}': skipping Prisma migrate deploy."
 fi
 
+echo "Running repo lint and type checks..."
+yarn lint
+
 echo "Running Next.js build..."
 yarn build

@@ -1,44 +1,25 @@
 @use "@/styles/variables.scss" as *;
 
 .upcoming-payments-panel {
-  &__link {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-primary);
-  }
-
   &__list {
     display: grid;
     gap: 14px;
   }
 
   &__row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-md);
-    padding: 16px 18px;
     border-radius: 20px;
     background-color: var(--color-surface-muted);
     border: var(--border-width) solid
       color-mix(in srgb, var(--color-border) 82%, white);
   }
 
-  &__copy,
-  &__meta {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  &__meta {
-    align-items: flex-end;
-    text-align: right;
+  &__row-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
   }
 
   &__empty-state {
-    padding: 20px;
     border-radius: 20px;
     background-color: var(--color-surface-muted);
     border: var(--border-width) solid

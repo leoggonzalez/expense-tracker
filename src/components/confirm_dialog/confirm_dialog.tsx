@@ -33,6 +33,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps): React.ReactElement {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  // eslint-disable-next-line warn-use-effect -- This effect synchronizes the native dialog element with the controlled isOpen prop.
   useEffect(() => {
     const dialog = dialogRef.current;
 

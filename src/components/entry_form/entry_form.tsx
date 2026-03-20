@@ -310,6 +310,7 @@ export function EntryForm({
   const { fields, model, onSubmit, reset, submissionStatus, updateFields } =
     form;
 
+  // eslint-disable-next-line warn-use-effect -- This effect hydrates the persisted draft once for create flows and syncs it into the form library state.
   useEffect(() => {
     if (!isCreateFlow || initialData) {
       setIsDraftReady(true);
@@ -340,6 +341,7 @@ export function EntryForm({
     setIsDraftReady(true);
   }, [initialData, isCreateFlow, updateFields]);
 
+  // eslint-disable-next-line warn-use-effect -- This effect persists draft changes to browser storage while the create flow is active.
   useEffect(() => {
     if (!isCreateFlow || !isDraftReady) {
       return;

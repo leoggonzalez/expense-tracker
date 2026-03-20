@@ -6,6 +6,8 @@ import { Card, Stack, Text } from "@/elements";
 
 import { i18n } from "@/model/i18n";
 
+export const dynamic = "force-dynamic";
+
 export default function Page(): React.ReactElement {
   const {
     languagePreference,

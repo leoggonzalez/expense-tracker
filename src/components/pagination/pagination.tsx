@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components";
+import { Box, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import "./pagination.scss";
 
@@ -34,61 +35,71 @@ export function Pagination({
 
   return (
     <div className="pagination">
-      <Button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        size="sm"
-      >
-        {i18n.t("pagination.previous")}
-      </Button>
-
-      <div className="pagination__pages">
-        {startPage > 1 && (
-          <>
-            <button
-              className="pagination__page"
-              onClick={() => onPageChange(1)}
-            >
-              1
-            </button>
-            {startPage > 2 && <span className="pagination__ellipsis">...</span>}
-          </>
-        )}
-
-        {pages.map((page) => (
-          <button
-            key={page}
-            className={`pagination__page ${
-              page === currentPage ? "pagination__page--active" : ""
-            }`}
-            onClick={() => onPageChange(page)}
+      <Box padding={{ paddingTop: 24, paddingBottom: 24 }}>
+        <Stack direction="row" align="center" justify="center" gap={16} wrap>
+          <Button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            size="sm"
           >
-            {page}
-          </button>
-        ))}
+            {i18n.t("pagination.previous")}
+          </Button>
 
-        {endPage < totalPages && (
-          <>
-            {endPage < totalPages - 1 && (
-              <span className="pagination__ellipsis">...</span>
+          <Stack direction="row" align="center" gap={4} wrap>
+            {startPage > 1 && (
+              <>
+                <button
+                  className="pagination__page"
+                  onClick={() => onPageChange(1)}
+                >
+                  1
+                </button>
+                {startPage > 2 && (
+                  <Text as="span" size="sm" color="tertiary">
+                    ...
+                  </Text>
+                )}
+              </>
             )}
-            <button
-              className="pagination__page"
-              onClick={() => onPageChange(totalPages)}
-            >
-              {totalPages}
-            </button>
-          </>
-        )}
-      </div>
 
-      <Button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        size="sm"
-      >
-        {i18n.t("pagination.next")}
-      </Button>
+            {pages.map((page) => (
+              <button
+                key={page}
+                className={`pagination__page ${
+                  page === currentPage ? "pagination__page--active" : ""
+                }`}
+                onClick={() => onPageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+
+            {endPage < totalPages && (
+              <>
+                {endPage < totalPages - 1 && (
+                  <Text as="span" size="sm" color="tertiary">
+                    ...
+                  </Text>
+                )}
+                <button
+                  className="pagination__page"
+                  onClick={() => onPageChange(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              </>
+            )}
+          </Stack>
+
+          <Button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            size="sm"
+          >
+            {i18n.t("pagination.next")}
+          </Button>
+        </Stack>
+      </Box>
     </div>
   );
 }
