@@ -16,22 +16,6 @@
       transform var(--transition-fast);
   }
 
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-md);
-  }
-
-  &__balance {
-    display: grid;
-    gap: 6px;
-    padding: var(--spacing-md) var(--spacing-lg);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: 22px;
-    background-color: var(--color-background-secondary);
-  }
-
   &__sr-only {
     position: absolute;
     width: 1px;

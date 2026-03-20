@@ -24,7 +24,12 @@ export function AccountCard({
       <div className="account-card__panel">
         <Card padding={24}>
           <Stack gap={20}>
-            <div className="account-card__header">
+            <Stack
+              direction="row"
+              align="center"
+              justify="space-between"
+              gap={16}
+            >
               <Stack direction="row" align="center" gap={12}>
                 <Avatar name={name} />
                 <Text size="lg" weight="semibold">
@@ -37,12 +42,12 @@ export function AccountCard({
                 size="sm"
                 startIcon={<Icon name="external-link" size={16} />}
                 ariaLabel={String(i18n.t("accounts_page.open_account"))}
-              >
-                <span className="account-card__sr-only">
-                  {i18n.t("accounts_page.open_account")}
-                </span>
-              </Button>
-            </div>
+                >
+                  <span className="account-card__sr-only">
+                    {i18n.t("accounts_page.open_account")}
+                  </span>
+                </Button>
+            </Stack>
 
             <Text size="sm" color="secondary">
               {i18n.t("accounts_page.month_total_label", {

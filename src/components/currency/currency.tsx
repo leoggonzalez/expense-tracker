@@ -8,6 +8,7 @@ type CurrencyProps = {
   size?: TextProps["size"];
   weight?: TextProps["weight"];
   as?: TextProps["as"];
+  color?: TextProps["color"];
 };
 
 function resolveColor(value: number): TextProps["color"] {
@@ -27,9 +28,15 @@ export function Currency({
   size = "md",
   weight = "normal",
   as = "span",
+  color,
 }: CurrencyProps): React.ReactElement {
   return (
-    <Text size={size} weight={weight} color={resolveColor(value)} as={as}>
+    <Text
+      size={size}
+      weight={weight}
+      color={color || resolveColor(value)}
+      as={as}
+    >
       {formatCurrency(value)}
     </Text>
   );

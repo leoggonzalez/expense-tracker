@@ -97,7 +97,7 @@ function reviewPair(scssPath, tsxPath) {
   }
 
   if (
-    /\b(font-size|color)\s*:/.test(scssContent) &&
+    /(^|[\s;{])(font-size|color)\s*:/.test(scssContent) &&
     !imports.usesText
   ) {
     findings.push(

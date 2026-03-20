@@ -1,18 +1,6 @@
 @use "@/styles/variables.scss" as *;
 
 .pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg) 0;
-
-  &__pages {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-  }
-
   &__page {
     min-width: 36px;
     height: 36px;
@@ -37,10 +25,5 @@
       border-color: var(--color-primary);
       cursor: default;
     }
-  }
-
-  &__ellipsis {
-    padding: 0 var(--spacing-xs);
-    color: var(--color-text-tertiary);
   }
 }

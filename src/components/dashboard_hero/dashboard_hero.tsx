@@ -1,7 +1,7 @@
 import "./dashboard_hero.scss";
 
 import { AppLink, Hero } from "@/components";
-import { Stack, Text } from "@/elements";
+import { Box, Grid, Stack, Text } from "@/elements";
 
 import { DashboardTotals } from "@/actions/entries";
 import React from "react";
@@ -46,28 +46,50 @@ export function DashboardHero({
             {i18n.t("dashboard.hero_caption")}
           </Text>
         </Stack>
-        <div className="dashboard-hero__stats">
+        <Grid minColumnWidth={220} gap={12}>
           <AppLink href={`/entries?${currentMonthQuery}&type=income`}>
             <span className="dashboard-hero__stat-card">
-              <Text as="span" size="xs" color="inverse" weight="medium">
-                {i18n.t("dashboard.income")}
-              </Text>
-              <Text as="span" size="lg" color="inverse" weight="semibold">
-                {formatCurrency(totals.income)}
-              </Text>
+              <Box
+                padding={{
+                  paddingTop: 18,
+                  paddingRight: 20,
+                  paddingBottom: 18,
+                  paddingLeft: 20,
+                }}
+              >
+                <Stack gap={6}>
+                  <Text as="span" size="xs" color="inverse" weight="medium">
+                    {i18n.t("dashboard.income")}
+                  </Text>
+                  <Text as="span" size="lg" color="inverse" weight="semibold">
+                    {formatCurrency(totals.income)}
+                  </Text>
+                </Stack>
+              </Box>
             </span>
           </AppLink>
           <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
             <span className="dashboard-hero__stat-card dashboard-hero__stat-card--soft">
-              <Text as="span" size="xs" color="inverse" weight="medium">
-                {i18n.t("dashboard.expenses")}
-              </Text>
-              <Text as="span" size="lg" color="inverse" weight="semibold">
-                {formatCurrency(Math.abs(totals.expense))}
-              </Text>
+              <Box
+                padding={{
+                  paddingTop: 18,
+                  paddingRight: 20,
+                  paddingBottom: 18,
+                  paddingLeft: 20,
+                }}
+              >
+                <Stack gap={6}>
+                  <Text as="span" size="xs" color="inverse" weight="medium">
+                    {i18n.t("dashboard.expenses")}
+                  </Text>
+                  <Text as="span" size="lg" color="inverse" weight="semibold">
+                    {formatCurrency(Math.abs(totals.expense))}
+                  </Text>
+                </Stack>
+              </Box>
             </span>
           </AppLink>
-        </div>
+        </Grid>
       </div>
     </Hero>
   );

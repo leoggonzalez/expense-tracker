@@ -1,6 +1,7 @@
 import "./hero_metrics.scss";
 
 import React from "react";
+import { Box, Stack } from "@/elements";
 
 type HeroMetricsProps = {
   children: React.ReactNode;
@@ -27,5 +28,18 @@ export function HeroMetric({
   children,
   tone = "default",
 }: HeroMetricProps): React.ReactElement {
-  return <div className={`hero-metric hero-metric--${tone}`}>{children}</div>;
+  return (
+    <div className={`hero-metric hero-metric--${tone}`}>
+      <Box
+        padding={{
+          paddingTop: 18,
+          paddingRight: 20,
+          paddingBottom: 18,
+          paddingLeft: 20,
+        }}
+      >
+        <Stack gap={6}>{children}</Stack>
+      </Box>
+    </div>
+  );
 }
