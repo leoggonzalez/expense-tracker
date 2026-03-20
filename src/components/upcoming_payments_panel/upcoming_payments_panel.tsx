@@ -1,7 +1,7 @@
 import "./upcoming_payments_panel.scss";
 
 import { AppLink } from "@/components";
-import { EntryListItem } from "@/components/entry_list/entry_list";
+import { TransactionListItem } from "@/components/transaction_list/transaction_list";
 import { Box, Card, Stack, Text } from "@/elements";
 import { formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
@@ -13,7 +13,7 @@ type UpcomingPaymentsPanelProps = {
     startDate: string;
     endDate: string;
   };
-  upcomingPayments: EntryListItem[];
+  upcomingPayments: TransactionListItem[];
 };
 
 function formatPaymentDate(beginDate: string): string {
@@ -35,7 +35,7 @@ export function UpcomingPaymentsPanel({
     >
       <Stack gap={20}>
         <Text as="div" size="sm" weight="medium">
-          <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
+          <AppLink href={`/transactions?${currentMonthQuery}&type=expense`}>
             {i18n.t("dashboard.upcoming_payments_link")}
           </AppLink>
         </Text>
@@ -50,11 +50,11 @@ export function UpcomingPaymentsPanel({
           </div>
         ) : (
           <div className="upcoming-payments-panel__list">
-            {upcomingPayments.map((entry) => (
-              <div key={entry.id} className="upcoming-payments-panel__row">
+            {upcomingPayments.map((transaction) => (
+              <div key={transaction.id} className="upcoming-payments-panel__row">
                 <AppLink
-                  href={`/entries/${entry.id}`}
-                  ariaLabel={entry.description}
+                  href={`/transactions/${transaction.id}`}
+                  ariaLabel={transaction.description}
                 >
                   <div className="upcoming-payments-panel__row-link">
                     <Box
@@ -74,19 +74,19 @@ export function UpcomingPaymentsPanel({
                       >
                         <Stack gap={4} align="flex-start">
                           <Text as="span" size="sm" weight="semibold">
-                            {entry.description}
+                            {transaction.description}
                           </Text>
                           <Text as="span" size="xs" color="secondary">
-                            {entry.spaceName}
+                            {transaction.spaceName}
                           </Text>
                         </Stack>
                         <Stack gap={4} align="flex-end">
                           <Text as="span" size="sm" weight="semibold">
-                            {formatCurrency(Math.abs(entry.amount))}
+                            {formatCurrency(Math.abs(transaction.amount))}
                           </Text>
                           <Text as="span" size="xs" color="secondary">
                             {i18n.t("dashboard.payment_due", {
-                              date: formatPaymentDate(entry.beginDate),
+                              date: formatPaymentDate(transaction.beginDate),
                             })}
                           </Text>
                         </Stack>

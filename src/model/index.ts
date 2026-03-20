@@ -1,9 +1,9 @@
-export { Entry } from "./entry";
-export type { IEntry } from "./entry";
+export { Transaction } from "./transaction";
+export type { ITransaction } from "./transaction";
 
-export { EntryCollection } from "./entry_collection";
+export { TransactionCollection } from "./transaction_collection";
 export type {
   MonthlyData,
   SpaceProjectionGroup,
   SpaceMonthBreakdown,
-} from "./entry_collection";
+} from "./transaction_collection";

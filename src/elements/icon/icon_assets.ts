@@ -3,7 +3,7 @@ export const iconAssets = {
   "example-2": new URL("./icons/example-2.svg", import.meta.url).toString(),
   dashboard: new URL("./icons/dashboard.svg", import.meta.url).toString(),
   projection: new URL("./icons/projection.svg", import.meta.url).toString(),
-  entries: new URL("./icons/entries.svg", import.meta.url).toString(),
+  transactions: new URL("./icons/transactions.svg", import.meta.url).toString(),
   spaces: new URL("./icons/spaces.svg", import.meta.url).toString(),
   activity: new URL("./icons/activity.svg", import.meta.url).toString(),
   calendar: new URL("./icons/calendar.svg", import.meta.url).toString(),

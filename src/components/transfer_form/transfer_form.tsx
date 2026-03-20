@@ -4,10 +4,10 @@ import "./transfer_form.scss";
 
 import React, { useMemo, useState } from "react";
 
-import { createTransferEntry } from "@/actions/entries";
+import { createTransferTransaction } from "@/actions/transactions";
 import { MonthSelector } from "@/components/month_selector/month_selector";
 import { Button, InfoBox, Input, Select } from "@/components";
-import { inferEntryDateMode, toDate } from "@/lib/entry_schedule";
+import { inferTransactionDateMode, toDate } from "@/lib/transaction_schedule";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import { Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
@@ -49,7 +49,7 @@ export function TransferForm({
     new Date().toISOString().slice(0, 7),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const beginDateMode = inferEntryDateMode(beginDate);
+  const beginDateMode = inferTransactionDateMode(beginDate);
 
   const transferOptions = useMemo(
     () =>
@@ -83,14 +83,14 @@ export function TransferForm({
     }
 
     if (fromSpaceId === toSpaceId) {
-      showError(i18n.t("entry_form.transfer_same_space"), {
+      showError(i18n.t("transaction_form.transfer_same_space"), {
         iconName: "transfer",
       });
       return;
     }
 
     if (parsedAmount === null || Math.abs(parsedAmount) === 0) {
-      showError(i18n.t("entry_form.transfer_invalid_amount"), {
+      showError(i18n.t("transaction_form.transfer_invalid_amount"), {
         iconName: "transfer",
       });
       return;
@@ -98,7 +98,7 @@ export function TransferForm({
 
     setIsSubmitting(true);
 
-    const result = await createTransferEntry({
+    const result = await createTransferTransaction({
       fromSpaceId,
       toSpaceId,
       description,
@@ -134,12 +134,12 @@ export function TransferForm({
     <form onSubmit={onSubmit} className="transfer-form">
       <Stack gap={16}>
         <Select
-          label={i18n.t("entry_form.transfer_from")}
+          label={i18n.t("transaction_form.transfer_from")}
           value={fromSpaceId}
           onChange={setFromSpaceId}
           options={transferOptions}
           placeholder={
-            i18n.t("entry_form.transfer_space_placeholder") as string
+            i18n.t("transaction_form.transfer_space_placeholder") as string
           }
           required
         />
@@ -147,10 +147,10 @@ export function TransferForm({
           <InfoBox
             variant="warning"
             title={String(
-              i18n.t("entry_form.transfer_insufficient_funds_title"),
+              i18n.t("transaction_form.transfer_insufficient_funds_title"),
             )}
             message={String(
-              i18n.t("entry_form.transfer_insufficient_funds_message", {
+              i18n.t("transaction_form.transfer_insufficient_funds_message", {
                 space: selectedFromSpace.name,
                 amount: parsedAmount?.toFixed(2) || "0.00",
                 balance: selectedFromSpace.currentMonthTotal.toFixed(2),
@@ -160,29 +160,29 @@ export function TransferForm({
         ) : null}
 
         <Select
-          label={i18n.t("entry_form.transfer_to")}
+          label={i18n.t("transaction_form.transfer_to")}
           value={toSpaceId}
           onChange={setToSpaceId}
           options={transferOptions}
           placeholder={
-            i18n.t("entry_form.transfer_space_placeholder") as string
+            i18n.t("transaction_form.transfer_space_placeholder") as string
           }
           required
         />
 
         <Input
-          label={i18n.t("entry_form.description")}
+          label={i18n.t("transaction_form.description")}
           value={description}
           onChange={setDescription}
-          placeholder={i18n.t("entry_form.description_placeholder") as string}
+          placeholder={i18n.t("transaction_form.description_placeholder") as string}
           required
         />
 
         <Input
-          label={i18n.t("entry_form.amount")}
+          label={i18n.t("transaction_form.amount")}
           value={amountInput}
           onChange={(value) => setAmountInput(sanitizeAmountInput(value))}
-          placeholder={i18n.t("entry_form.amount_placeholder") as string}
+          placeholder={i18n.t("transaction_form.amount_placeholder") as string}
           required
           inputMode="decimal"
         />
@@ -190,20 +190,20 @@ export function TransferForm({
         <MonthSelector
           label={i18n.t(
             beginDateMode === "month"
-              ? "entry_form.begin_date_month"
-              : "entry_form.begin_date",
+              ? "transaction_form.begin_date_month"
+              : "transaction_form.begin_date",
           )}
           value={beginDate}
           onChange={setBeginDate}
-          editLabel={String(i18n.t("entry_form.edit_full_begin_date"))}
-          closeLabel={String(i18n.t("entry_form.use_month_year_begin_date"))}
-          monthLabel={i18n.t("entry_form.month")}
-          yearLabel={i18n.t("entry_form.year")}
+          editLabel={String(i18n.t("transaction_form.edit_full_begin_date"))}
+          closeLabel={String(i18n.t("transaction_form.use_month_year_begin_date"))}
+          monthLabel={i18n.t("transaction_form.month")}
+          yearLabel={i18n.t("transaction_form.year")}
           required
         />
 
         <Text size="sm" color="secondary">
-          {i18n.t("entry_form.transfer_one_time_info")}
+          {i18n.t("transaction_form.transfer_one_time_info")}
         </Text>
 
         <Button
@@ -213,8 +213,8 @@ export function TransferForm({
           startIcon={<Icon name="transfer" />}
         >
           {isSubmitting
-            ? i18n.t("entry_form.adding_transfer")
-            : i18n.t("entry_form.add_transfer")}
+            ? i18n.t("transaction_form.adding_transfer")
+            : i18n.t("transaction_form.add_transfer")}
         </Button>
       </Stack>
     </form>

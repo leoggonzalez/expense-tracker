@@ -1,4 +1,4 @@
-import { AppLink, EntryList, EntryListItem } from "@/components";
+import { AppLink, TransactionList, TransactionListItem } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 
 import React from "react";
@@ -9,12 +9,12 @@ type RecentActivityPanelProps = {
     startDate: string;
     endDate: string;
   };
-  recentEntries: EntryListItem[];
+  recentTransactions: TransactionListItem[];
 };
 
 export function RecentActivityPanel({
   currentMonthRange,
-  recentEntries,
+  recentTransactions,
 }: RecentActivityPanelProps): React.ReactElement {
   const currentMonthQuery = `start_date=${currentMonthRange.startDate}&end_date=${currentMonthRange.endDate}`;
 
@@ -22,7 +22,7 @@ export function RecentActivityPanel({
     <Card
       as="section"
       padding={24}
-      title={String(i18n.t("dashboard.recent_entries"))}
+      title={String(i18n.t("dashboard.recent_transactions"))}
       icon="activity"
     >
       <Stack gap={20}>
@@ -30,14 +30,14 @@ export function RecentActivityPanel({
           {i18n.t("dashboard.activity_subtitle")}
         </Text>
         <Text as="div" size="sm" weight="medium">
-          <AppLink href={`/entries?${currentMonthQuery}`}>
+          <AppLink href={`/transactions?${currentMonthQuery}`}>
             {i18n.t("dashboard.recent_activity_link")}
           </AppLink>
         </Text>
-        <EntryList
-          entries={recentEntries}
+        <TransactionList
+          transactions={recentTransactions}
           showDelete={false}
-          entryHrefBase="/entries"
+          transactionHrefBase="/transactions"
         />
       </Stack>
     </Card>

@@ -21,13 +21,13 @@ export { ProjectionTable } from "./projection_table/projection_table";
 export type { ProjectionTableProps } from "./projection_table/projection_table";
 export { ProjectionChart } from "./projection_chart/projection_chart";
 
-export { EntryForm } from "./entry_form/entry_form";
-export type { EntryFormProps } from "./entry_form/entry_form";
-export { EntryDateField } from "./entry_date_field/entry_date_field";
+export { TransactionForm } from "./transaction_form/transaction_form";
+export type { TransactionFormProps } from "./transaction_form/transaction_form";
+export { TransactionDateField } from "./transaction_date_field/transaction_date_field";
 export { MonthSelector } from "./month_selector/month_selector";
 
-export { BulkEntryForm } from "./bulk_entry_form/bulk_entry_form";
-export type { BulkEntryFormProps } from "./bulk_entry_form/bulk_entry_form";
+export { BulkTransactionForm } from "./bulk_transaction_form/bulk_transaction_form";
+export type { BulkTransactionFormProps } from "./bulk_transaction_form/bulk_transaction_form";
 export { TransferForm } from "./transfer_form/transfer_form";
 export { InfoBox } from "./info_box/info_box";
 
@@ -35,19 +35,19 @@ export { Pagination } from "./pagination/pagination";
 export type { PaginationProps } from "./pagination/pagination";
 
 export { ContextMenu } from "./context_menu/context_menu";
-export { EntryList } from "./entry_list/entry_list";
+export { TransactionList } from "./transaction_list/transaction_list";
 export type {
-  EntryListItem,
-  EntryListProps,
-  EntryListSummaryRow,
-} from "./entry_list/entry_list";
-export { EntryCard } from "./entry_card/entry_card";
-export type { EntryCardItem } from "./entry_card/entry_card";
+  TransactionListItem,
+  TransactionListProps,
+  TransactionListSummaryRow,
+} from "./transaction_list/transaction_list";
+export { TransactionCard } from "./transaction_card/transaction_card";
+export type { TransactionCardItem } from "./transaction_card/transaction_card";
 export { Currency } from "./currency/currency";
-export { EntriesTable } from "./entries_table/entries_table";
-export type { EntriesTableItem } from "./entries_table/entries_table";
-export { EntriesFilters } from "./entries_filters/entries_filters";
-export { EntriesPagination } from "./entries_pagination/entries_pagination";
+export { TransactionsTable } from "./transactions_table/transactions_table";
+export type { TransactionsTableItem } from "./transactions_table/transactions_table";
+export { TransactionsFilters } from "./transactions_filters/transactions_filters";
+export { TransactionsPagination } from "./transactions_pagination/transactions_pagination";
 export { Hero } from "./hero/hero";
 export type { HeroAction, HeroPattern, HeroProps } from "./hero/hero";
 export { HeroMetric, HeroMetrics } from "./hero_metrics/hero_metrics";
@@ -71,10 +71,10 @@ export { SpaceCreateForm } from "./space_create_form/space_create_form";
 export { SpaceEditForm } from "./space_edit_form/space_edit_form";
 export { SpaceCard } from "./space_card/space_card";
 export { AccountProfileForm } from "./account_profile_form/account_profile_form";
-export { NewEntryRecentEntries } from "./new_entry_recent_entries/new_entry_recent_entries";
+export { NewTransactionRecentTransactions } from "./new_transaction_recent_transactions/new_transaction_recent_transactions";
 export { PagePanel } from "./page_panel/page_panel";
-export { EntryTypeTabs } from "./entry_type_tabs/entry_type_tabs";
-export { EntryCreationIntro } from "./entry_creation_intro/entry_creation_intro";
+export { TransactionTypeTabs } from "./transaction_type_tabs/transaction_type_tabs";
+export { TransactionCreationIntro } from "./transaction_creation_intro/transaction_creation_intro";
 export { DetailList, DetailRow } from "./detail_list/detail_list";
 export { UpcomingPaymentsPanel } from "./upcoming_payments_panel/upcoming_payments_panel";
 export { RecentActivityPanel } from "./recent_activity_panel/recent_activity_panel";

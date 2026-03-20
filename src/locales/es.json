@@ -7,10 +7,10 @@
     "brand": "Currento",
     "dashboard": "Panel",
     "projection": "Proyección",
-    "entries": "Movimientos",
+    "transactions": "Movimientos",
     "spaces": "Espacios",
     "settings": "Configuración",
-    "all_entries": "Todos los movimientos",
+    "all_transactions": "Todos los movimientos",
     "login": "Iniciar sesión",
     "primary_section": "General",
     "secondary_section": "Preferencias",
@@ -21,16 +21,16 @@
     "income": "Ingresos",
     "expenses": "Gastos",
     "net": "Neto",
-    "active_entries": "Movimientos activos",
-    "recent_entries": "Actividad reciente",
+    "active_transactions": "Movimientos activos",
+    "recent_transactions": "Actividad reciente",
     "spaces_this_month": "Espacios de este mes",
     "space_income": "Ingresos",
     "space_expenses": "Gastos",
     "space_net": "Neto",
     "no_spaces_this_month": "No hay espacios activos este mes.",
-    "entries_active_this_month_one": "%{count} movimiento activo este mes",
-    "entries_active_this_month_other": "%{count} movimientos activos este mes",
-    "see_all_entries": "Ver todos los movimientos",
+    "transactions_active_this_month_one": "%{count} movimiento activo este mes",
+    "transactions_active_this_month_other": "%{count} movimientos activos este mes",
+    "see_all_transactions": "Ver todos los movimientos",
     "hero_label": "Balance de este mes",
     "hero_caption": "Ingresos menos gastos en todos los espacios activos.",
     "hero_add_action": "Añadir",
@@ -42,7 +42,7 @@
     "payment_due": "Vence %{date}",
     "activity_subtitle": "Últimos cambios en tus movimientos."
   },
-  "entry_form": {
+  "transaction_form": {
     "type": "Tipo",
     "space": "Espacio",
     "space_placeholder": "p. ej., salario, espacio principal, inversión",
@@ -64,13 +64,13 @@
     "recurring": "Recurrente",
     "end_date": "Fecha de fin",
     "end_date_month": "Mes de fin",
-    "add_entry": "Añadir movimiento",
+    "add_transaction": "Añadir movimiento",
     "add_income": "Añadir ingreso",
     "add_expense": "Añadir gasto",
     "adding": "Añadiendo...",
     "adding_income": "Añadiendo ingreso...",
     "adding_expense": "Añadiendo gasto...",
-    "update_entry": "Actualizar movimiento",
+    "update_transaction": "Actualizar movimiento",
     "update_income": "Actualizar ingreso",
     "update_expense": "Actualizar gasto",
     "updating": "Actualizando...",
@@ -90,26 +90,26 @@
     "add_transfer": "Añadir transferencia",
     "adding_transfer": "Añadiendo transferencia..."
   },
-  "bulk_entry_form": {
+  "bulk_transaction_form": {
     "title": "Añadir varios movimientos",
     "shared_space": "Espacio (compartido para todos los movimientos)",
     "shared_space_placeholder": "p. ej., espacio principal, inversión",
     "shared_begin_date": "Fecha de inicio (compartida)",
     "recurring": "Recurrente",
     "shared_end_date": "Fecha de fin (compartida)",
-    "entries": "Movimientos",
+    "transactions": "Movimientos",
     "description_placeholder": "Descripción",
     "amount_placeholder": "Importe",
     "remove": "Eliminar",
-    "add_another_entry": "+ Añadir otro movimiento",
-    "add_entries_loading": "Añadiendo movimientos...",
-    "add_entries_one": "Añadir %{count} movimiento",
-    "add_entries_other": "Añadir %{count} movimientos"
+    "add_another_transaction": "+ Añadir otro movimiento",
+    "add_transactions_loading": "Añadiendo movimientos...",
+    "add_transactions_one": "Añadir %{count} movimiento",
+    "add_transactions_other": "Añadir %{count} movimientos"
   },
-  "entries_page": {
+  "transactions_page": {
     "title": "Movimientos",
     "subtitle": "Revisa la actividad, acota el periodo y entra en los movimientos que necesitan atención.",
-    "add_entry": "Añadir movimiento",
+    "add_transaction": "Añadir movimiento",
     "space": "Espacio",
     "details": "Detalles",
     "amount": "Importe",
@@ -128,19 +128,19 @@
     "summary_total": "Coincidencias totales",
     "summary_filters": "Filtros activos",
     "empty_state": "No hay movimientos que coincidan con los filtros actuales.",
-    "add_new_entry": "Añadir nuevo movimiento",
-    "add_multiple_entries": "Añadir varios movimientos",
-    "recent_entries": "Movimientos recientes (%{count} más recientes)",
-    "see_all_entries": "Ver todos los movimientos"
+    "add_new_transaction": "Añadir nuevo movimiento",
+    "add_multiple_transactions": "Añadir varios movimientos",
+    "recent_transactions": "Movimientos recientes (%{count} más recientes)",
+    "see_all_transactions": "Ver todos los movimientos"
   },
-  "entry_list": {
+  "transaction_list": {
     "empty_state": "Todavía no hay movimientos. Añade el primero.",
     "to_space": "A %{space}",
     "from_space": "De %{space}",
     "delete": "Eliminar",
     "delete_confirm": "¿Seguro que quieres eliminar este movimiento?"
   },
-  "all_entries_page": {
+  "all_transactions_page": {
     "title": "Todos los movimientos",
     "filters": "Filtros",
     "space": "Espacio",
@@ -151,7 +151,7 @@
     "end_date": "Fecha final",
     "clear_filters": "Limpiar filtros",
     "loading": "Cargando...",
-    "loading_entries": "Cargando movimientos...",
+    "loading_transactions": "Cargando movimientos...",
     "showing_results": "Mostrando %{count} de %{total} movimientos"
   },
   "projection_table": {
@@ -173,12 +173,12 @@
     "income": "Ingresos",
     "expenses": "Gastos",
     "total": "Total",
-    "spaces_with_entries": "Espacios con movimientos este mes",
-    "empty_month_entries": "No hay movimientos para este mes.",
-    "more_entries_this_month": "%{count} movimientos más para este mes",
+    "spaces_with_transactions": "Espacios con movimientos este mes",
+    "empty_month_transactions": "No hay movimientos para este mes.",
+    "more_transactions_this_month": "%{count} movimientos más para este mes",
     "space_month_total": "Total del mes",
     "open_space": "Abrir espacio",
-    "see_all_entries": "Ver todos los movimientos"
+    "see_all_transactions": "Ver todos los movimientos"
   },
   "pagination": {
     "previous": "Anterior",
@@ -248,14 +248,14 @@
     "space_name_placeholder": "p. ej., espacio principal, inversión",
     "current_month_total": "Total del mes actual",
     "month_total_label": "Total de %{month}",
-    "current_month_relevant_entries": "Movimientos relevantes del mes actual",
-    "month_relevant_entries_label": "Movimientos relevantes de %{month}",
+    "current_month_relevant_transactions": "Movimientos relevantes del mes actual",
+    "month_relevant_transactions_label": "Movimientos relevantes de %{month}",
     "current_month_relevant_total": "Total relevante del mes actual",
     "month_relevant_total_label": "Total relevante de %{month}",
-    "all_entries": "Todos los movimientos",
+    "all_transactions": "Todos los movimientos",
     "total_balance": "Saldo total",
     "historical_total": "Total histórico",
-    "entry_count": "%{count} movimientos",
+    "transaction_count": "%{count} movimientos",
     "open_space": "Abrir espacio",
     "back_to_spaces": "Volver a espacios",
     "back_to_space": "Volver al espacio",
@@ -273,7 +273,7 @@
     "archive_failed": "No se pudo archivar este espacio.",
     "unarchive": "Desarchivar",
     "unarchive_failed": "No se pudo desarchivar este espacio.",
-    "load_more_entries": "Cargar más movimientos",
+    "load_more_transactions": "Cargar más movimientos",
     "archived_spaces": "Espacios archivados",
     "empty_archived_state": "No hay espacios archivados.",
     "archived_badge": "Archivada",
@@ -289,13 +289,13 @@
   },
   "space_detail_page": {
     "title": "Detalles del espacio",
-    "related_entries": "Movimientos relacionados",
+    "related_transactions": "Movimientos relacionados",
     "rename_space": "Renombrar espacio",
     "delete_space": "Eliminar espacio",
     "delete_confirm": "¿Seguro que quieres eliminar este espacio?",
     "delete_success": "Espacio eliminado.",
     "delete_failed": "No se pudo eliminar este espacio.",
-    "delete_blocked_has_entries": "Los espacios con movimientos aún no se pueden eliminar.",
+    "delete_blocked_has_transactions": "Los espacios con movimientos aún no se pueden eliminar.",
     "total_balance": "Saldo total",
     "save": "Guardar cambios",
     "saving": "Guardando...",
@@ -306,7 +306,7 @@
     "name_required": "El nombre del espacio es obligatorio.",
     "not_found": "Espacio no encontrado."
   },
-  "new_entry_page": {
+  "new_transaction_page": {
     "title_income": "Añadir nuevo ingreso",
     "title_expense": "Añadir nuevo gasto",
     "title_transfer": "Añadir nueva transferencia",
@@ -319,14 +319,14 @@
     "expense_tab": "Gasto",
     "transfer_tab": "Transferencia",
     "multiple_tab": "Varios",
-    "recent_entries": "Movimientos recientes",
-    "recent_entries_subtitle": "Usa la actividad reciente como referencia rápida mientras creas nuevos registros.",
-    "open_all_entries": "Ver todos los movimientos"
+    "recent_transactions": "Movimientos recientes",
+    "recent_transactions_subtitle": "Usa la actividad reciente como referencia rápida mientras creas nuevos registros.",
+    "open_all_transactions": "Ver todos los movimientos"
   },
-  "entry_detail_page": {
+  "transaction_detail_page": {
     "title": "Detalles del movimiento",
-    "edit_entry": "Editar movimiento",
-    "settle_entry": "Liquidar movimiento",
+    "edit_transaction": "Editar movimiento",
+    "settle_transaction": "Liquidar movimiento",
     "settle_description": "Liquidar %{description} para %{month}",
     "type": "Tipo",
     "space": "Espacio",
@@ -334,7 +334,7 @@
     "date_range": "Rango de fechas",
     "transfer": "Transferencia",
     "back_to_details": "Volver a detalles del movimiento",
-    "back_to_entries": "Volver a movimientos",
+    "back_to_transactions": "Volver a movimientos",
     "delete": "Eliminar movimiento",
     "deleting": "Eliminando...",
     "delete_confirm": "¿Seguro que quieres eliminar este movimiento?"
@@ -348,26 +348,26 @@
     "income": "Ingreso",
     "expense": "Gasto",
     "transfer": "Transferencia",
-    "add_entry": "Añadir movimiento"
+    "add_transaction": "Añadir movimiento"
   },
   "toast": {
-    "entry_created": "Movimiento creado.",
+    "transaction_created": "Movimiento creado.",
     "income_created": "Movimiento de ingreso creado.",
     "expense_created": "Movimiento de gasto creado.",
-    "entries_created": "Movimientos creados.",
-    "entry_create_failed": "No se pudo crear el movimiento.",
+    "transactions_created": "Movimientos creados.",
+    "transaction_create_failed": "No se pudo crear el movimiento.",
     "income_create_failed": "No se pudo crear el movimiento de ingreso.",
     "expense_create_failed": "No se pudo crear el movimiento de gasto.",
     "transfer_created": "Transferencia creada.",
     "transfer_create_failed": "No se pudo crear la transferencia.",
-    "entries_create_failed": "No se pudieron crear los movimientos.",
+    "transactions_create_failed": "No se pudieron crear los movimientos.",
     "dismiss": "Cerrar notificación"
   },
   "errors": {
-    "failed_to_create_entry": "No se pudo crear el movimiento",
-    "failed_to_create_entries": "No se pudieron crear los movimientos",
-    "failed_to_update_entry": "No se pudo actualizar el movimiento",
-    "failed_to_delete_entry": "No se pudo eliminar el movimiento",
+    "failed_to_create_transaction": "No se pudo crear el movimiento",
+    "failed_to_create_transactions": "No se pudieron crear los movimientos",
+    "failed_to_update_transaction": "No se pudo actualizar el movimiento",
+    "failed_to_delete_transaction": "No se pudo eliminar el movimiento",
     "space_is_archived": "Este espacio está archivado y no puede recibir movimientos nuevos."
   }
 }

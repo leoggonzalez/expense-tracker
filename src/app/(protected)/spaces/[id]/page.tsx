@@ -3,7 +3,7 @@ import {
   Button,
   Container,
   Currency,
-  EntryList,
+  TransactionList,
   Hero,
   type HeroAction,
   HeroMetric,
@@ -105,7 +105,7 @@ export default async function Page({
     detailSearchParams.size > 0
       ? `/spaces/${data.space.id}?${detailSearchParams.toString()}&confirmUnarchive=1`
       : `/spaces/${data.space.id}?confirmUnarchive=1`;
-  const settleHref = `/entries/new/transfer?${new URLSearchParams({
+  const settleHref = `/transactions/new/transfer?${new URLSearchParams({
     to_space: data.space.id,
     amount: Math.abs(data.space.selectedMonthTotal).toFixed(2),
     description: String(
@@ -254,16 +254,16 @@ export default async function Page({
         <Card
           padding={24}
           title={String(
-            i18n.t("spaces_page.month_relevant_entries_label", {
+            i18n.t("spaces_page.month_relevant_transactions_label", {
               month: selectedMonthLabel,
             }),
           )}
-          icon="entries"
+          icon="transactions"
         >
-          <EntryList
-            entries={data.selectedMonthRelevantEntries}
+          <TransactionList
+            transactions={data.selectedMonthRelevantTransactions}
             showDelete={false}
-            entryHrefBase="/entries"
+            transactionHrefBase="/transactions"
             summaryRows={[
               {
                 id: "selected-month-relevant-total",
@@ -285,14 +285,14 @@ export default async function Page({
 
         <Card
           padding={24}
-          title={String(i18n.t("spaces_page.all_entries"))}
+          title={String(i18n.t("spaces_page.all_transactions"))}
           icon="activity"
         >
           <Stack gap={20}>
-            <EntryList
-              entries={data.allEntries}
+            <TransactionList
+              transactions={data.allTransactions}
               showDelete={false}
-              entryHrefBase="/entries"
+              transactionHrefBase="/transactions"
             />
 
             {data.pagination.hasMore ? (
@@ -308,7 +308,7 @@ export default async function Page({
                   value={String(data.pagination.page + 1)}
                 />
                 <Button type="submit">
-                  {i18n.t("spaces_page.load_more_entries")}
+                  {i18n.t("spaces_page.load_more_transactions")}
                 </Button>
               </form>
             ) : null}

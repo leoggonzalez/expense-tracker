@@ -25,23 +25,23 @@ model Space {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   isArchived Boolean @default(false)
-  currentMonthEntryCount Int @default(0)
+  currentMonthTransactionCount Int @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  entries   Entry[]
-  transferEntries Entry[] @relation("EntryTransferSpace")
+  transactions   Transaction[]
+  transferTransactions Transaction[] @relation("TransactionTransferSpace")
 
   @@unique([userId, name])
   @@index([userId])
 }
 
-model Entry {
+model Transaction {
   id          String    @id @default(cuid())
   type        String    // "income" or "expense"
   spaceId   String
   space     Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   transferSpaceId String?
-  transferSpace Space? @relation("EntryTransferSpace", fields: [transferSpaceId], references: [id], onDelete: SetNull)
+  transferSpace Space? @relation("TransactionTransferSpace", fields: [transferSpaceId], references: [id], onDelete: SetNull)
   description String
   amount      Float
   beginDate   DateTime

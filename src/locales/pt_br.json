@@ -7,10 +7,10 @@
     "brand": "Currento",
     "dashboard": "Painel",
     "projection": "Projeção",
-    "entries": "Lançamentos",
+    "transactions": "Lançamentos",
     "spaces": "Espaços",
     "settings": "Configurações",
-    "all_entries": "Todos os lançamentos",
+    "all_transactions": "Todos os lançamentos",
     "login": "Entrar",
     "primary_section": "Geral",
     "secondary_section": "Preferências",
@@ -21,16 +21,16 @@
     "income": "Receitas",
     "expenses": "Despesas",
     "net": "Saldo",
-    "active_entries": "Lançamentos ativos",
-    "recent_entries": "Atividade recente",
+    "active_transactions": "Lançamentos ativos",
+    "recent_transactions": "Atividade recente",
     "spaces_this_month": "Espaços deste mês",
     "space_income": "Receitas",
     "space_expenses": "Despesas",
     "space_net": "Saldo",
     "no_spaces_this_month": "Nenhum espaço ativo neste mês.",
-    "entries_active_this_month_one": "%{count} lançamento ativo neste mês",
-    "entries_active_this_month_other": "%{count} lançamentos ativos neste mês",
-    "see_all_entries": "Ver todos os lançamentos",
+    "transactions_active_this_month_one": "%{count} lançamento ativo neste mês",
+    "transactions_active_this_month_other": "%{count} lançamentos ativos neste mês",
+    "see_all_transactions": "Ver todos os lançamentos",
     "hero_label": "Saldo deste mês",
     "hero_caption": "Receitas menos despesas em todos os espaços ativos.",
     "hero_add_action": "Adicionar",
@@ -42,7 +42,7 @@
     "payment_due": "Vence em %{date}",
     "activity_subtitle": "Últimas alterações nos seus lançamentos."
   },
-  "entry_form": {
+  "transaction_form": {
     "type": "Tipo",
     "space": "Espaço",
     "space_placeholder": "ex.: salário, espaço principal, investimento",
@@ -64,13 +64,13 @@
     "recurring": "Recorrente",
     "end_date": "Data final",
     "end_date_month": "Mês final",
-    "add_entry": "Adicionar lançamento",
+    "add_transaction": "Adicionar lançamento",
     "add_income": "Adicionar receita",
     "add_expense": "Adicionar despesa",
     "adding": "Adicionando...",
     "adding_income": "Adicionando receita...",
     "adding_expense": "Adicionando despesa...",
-    "update_entry": "Atualizar lançamento",
+    "update_transaction": "Atualizar lançamento",
     "update_income": "Atualizar receita",
     "update_expense": "Atualizar despesa",
     "updating": "Atualizando...",
@@ -90,26 +90,26 @@
     "add_transfer": "Adicionar transferência",
     "adding_transfer": "Adicionando transferência..."
   },
-  "bulk_entry_form": {
+  "bulk_transaction_form": {
     "title": "Adicionar vários lançamentos",
     "shared_space": "Espaço (compartilhado para todos os lançamentos)",
     "shared_space_placeholder": "ex.: espaço principal, investimento",
     "shared_begin_date": "Data inicial (compartilhada)",
     "recurring": "Recorrente",
     "shared_end_date": "Data final (compartilhada)",
-    "entries": "Lançamentos",
+    "transactions": "Lançamentos",
     "description_placeholder": "Descrição",
     "amount_placeholder": "Valor",
     "remove": "Remover",
-    "add_another_entry": "+ Adicionar outro lançamento",
-    "add_entries_loading": "Adicionando lançamentos...",
-    "add_entries_one": "Adicionar %{count} lançamento",
-    "add_entries_other": "Adicionar %{count} lançamentos"
+    "add_another_transaction": "+ Adicionar outro lançamento",
+    "add_transactions_loading": "Adicionando lançamentos...",
+    "add_transactions_one": "Adicionar %{count} lançamento",
+    "add_transactions_other": "Adicionar %{count} lançamentos"
   },
-  "entries_page": {
+  "transactions_page": {
     "title": "Lançamentos",
     "subtitle": "Revise a atividade, ajuste o período e abra os lançamentos que precisam de atenção.",
-    "add_entry": "Adicionar lançamento",
+    "add_transaction": "Adicionar lançamento",
     "space": "Espaço",
     "details": "Detalhes",
     "amount": "Valor",
@@ -128,19 +128,19 @@
     "summary_total": "Correspondências totais",
     "summary_filters": "Filtros ativos",
     "empty_state": "Nenhum lançamento corresponde aos filtros atuais.",
-    "add_new_entry": "Adicionar novo lançamento",
-    "add_multiple_entries": "Adicionar vários lançamentos",
-    "recent_entries": "Lançamentos recentes (%{count} mais recentes)",
-    "see_all_entries": "Ver todos os lançamentos"
+    "add_new_transaction": "Adicionar novo lançamento",
+    "add_multiple_transactions": "Adicionar vários lançamentos",
+    "recent_transactions": "Lançamentos recentes (%{count} mais recentes)",
+    "see_all_transactions": "Ver todos os lançamentos"
   },
-  "entry_list": {
+  "transaction_list": {
     "empty_state": "Ainda não há lançamentos. Adicione o primeiro.",
     "to_space": "Para %{space}",
     "from_space": "De %{space}",
     "delete": "Excluir",
     "delete_confirm": "Tem certeza de que deseja excluir este lançamento?"
   },
-  "all_entries_page": {
+  "all_transactions_page": {
     "title": "Todos os lançamentos",
     "filters": "Filtros",
     "space": "Espaço",
@@ -151,7 +151,7 @@
     "end_date": "Data final",
     "clear_filters": "Limpar filtros",
     "loading": "Carregando...",
-    "loading_entries": "Carregando lançamentos...",
+    "loading_transactions": "Carregando lançamentos...",
     "showing_results": "Mostrando %{count} de %{total} lançamentos"
   },
   "projection_table": {
@@ -173,12 +173,12 @@
     "income": "Receitas",
     "expenses": "Despesas",
     "total": "Total",
-    "spaces_with_entries": "Espaços com lançamentos neste mês",
-    "empty_month_entries": "Não há lançamentos para este mês.",
-    "more_entries_this_month": "%{count} lançamentos a mais neste mês",
+    "spaces_with_transactions": "Espaços com lançamentos neste mês",
+    "empty_month_transactions": "Não há lançamentos para este mês.",
+    "more_transactions_this_month": "%{count} lançamentos a mais neste mês",
     "space_month_total": "Total do mês",
     "open_space": "Abrir espaço",
-    "see_all_entries": "Ver todos os lançamentos"
+    "see_all_transactions": "Ver todos os lançamentos"
   },
   "pagination": {
     "previous": "Anterior",
@@ -248,14 +248,14 @@
     "space_name_placeholder": "ex.: espaço principal, investimento",
     "current_month_total": "Total do mês atual",
     "month_total_label": "Total de %{month}",
-    "current_month_relevant_entries": "Lançamentos relevantes do mês atual",
-    "month_relevant_entries_label": "Lançamentos relevantes de %{month}",
+    "current_month_relevant_transactions": "Lançamentos relevantes do mês atual",
+    "month_relevant_transactions_label": "Lançamentos relevantes de %{month}",
     "current_month_relevant_total": "Total relevante do mês atual",
     "month_relevant_total_label": "Total relevante de %{month}",
-    "all_entries": "Todos os lançamentos",
+    "all_transactions": "Todos os lançamentos",
     "total_balance": "Saldo total",
     "historical_total": "Total histórico",
-    "entry_count": "%{count} lançamentos",
+    "transaction_count": "%{count} lançamentos",
     "open_space": "Abrir espaço",
     "back_to_spaces": "Voltar para espaços",
     "back_to_space": "Voltar para o espaço",
@@ -273,7 +273,7 @@
     "archive_failed": "Não foi possível arquivar este espaço.",
     "unarchive": "Desarquivar",
     "unarchive_failed": "Não foi possível desarquivar este espaço.",
-    "load_more_entries": "Carregar mais lançamentos",
+    "load_more_transactions": "Carregar mais lançamentos",
     "archived_spaces": "Espaços arquivados",
     "empty_archived_state": "Não há espaços arquivados.",
     "archived_badge": "Arquivada",
@@ -289,13 +289,13 @@
   },
   "space_detail_page": {
     "title": "Detalhes do espaço",
-    "related_entries": "Lançamentos relacionados",
+    "related_transactions": "Lançamentos relacionados",
     "rename_space": "Renomear espaço",
     "delete_space": "Excluir espaço",
     "delete_confirm": "Tem certeza de que deseja excluir este espaço?",
     "delete_success": "Espaço excluído.",
     "delete_failed": "Não foi possível excluir este espaço.",
-    "delete_blocked_has_entries": "Espaços com lançamentos ainda não podem ser excluídos.",
+    "delete_blocked_has_transactions": "Espaços com lançamentos ainda não podem ser excluídos.",
     "total_balance": "Saldo total",
     "save": "Salvar alterações",
     "saving": "Salvando...",
@@ -306,7 +306,7 @@
     "name_required": "O nome do espaço é obrigatório.",
     "not_found": "Espaço não encontrado."
   },
-  "new_entry_page": {
+  "new_transaction_page": {
     "title_income": "Adicionar nova receita",
     "title_expense": "Adicionar nova despesa",
     "title_transfer": "Adicionar nova transferência",
@@ -319,14 +319,14 @@
     "expense_tab": "Despesa",
     "transfer_tab": "Transferência",
     "multiple_tab": "Vários",
-    "recent_entries": "Lançamentos recentes",
-    "recent_entries_subtitle": "Use a atividade recente como referência rápida enquanto cria novos registros.",
-    "open_all_entries": "Ver todos os lançamentos"
+    "recent_transactions": "Lançamentos recentes",
+    "recent_transactions_subtitle": "Use a atividade recente como referência rápida enquanto cria novos registros.",
+    "open_all_transactions": "Ver todos os lançamentos"
   },
-  "entry_detail_page": {
+  "transaction_detail_page": {
     "title": "Detalhes do lançamento",
-    "edit_entry": "Editar lançamento",
-    "settle_entry": "Liquidar lançamento",
+    "edit_transaction": "Editar lançamento",
+    "settle_transaction": "Liquidar lançamento",
     "settle_description": "Liquidar %{description} em %{month}",
     "type": "Tipo",
     "space": "Espaço",
@@ -334,7 +334,7 @@
     "date_range": "Período",
     "transfer": "Transferência",
     "back_to_details": "Voltar para detalhes do lançamento",
-    "back_to_entries": "Voltar para lançamentos",
+    "back_to_transactions": "Voltar para lançamentos",
     "delete": "Excluir lançamento",
     "deleting": "Excluindo...",
     "delete_confirm": "Tem certeza de que deseja excluir este lançamento?"
@@ -348,26 +348,26 @@
     "income": "Receita",
     "expense": "Despesa",
     "transfer": "Transferência",
-    "add_entry": "Adicionar lançamento"
+    "add_transaction": "Adicionar lançamento"
   },
   "toast": {
-    "entry_created": "Lançamento criado.",
+    "transaction_created": "Lançamento criado.",
     "income_created": "Lançamento de receita criado.",
     "expense_created": "Lançamento de despesa criado.",
-    "entries_created": "Lançamentos criados.",
-    "entry_create_failed": "Não foi possível criar o lançamento.",
+    "transactions_created": "Lançamentos criados.",
+    "transaction_create_failed": "Não foi possível criar o lançamento.",
     "income_create_failed": "Não foi possível criar o lançamento de receita.",
     "expense_create_failed": "Não foi possível criar o lançamento de despesa.",
     "transfer_created": "Transferência criada.",
     "transfer_create_failed": "Não foi possível criar a transferência.",
-    "entries_create_failed": "Não foi possível criar os lançamentos.",
+    "transactions_create_failed": "Não foi possível criar os lançamentos.",
     "dismiss": "Fechar notificação"
   },
   "errors": {
-    "failed_to_create_entry": "Não foi possível criar o lançamento",
-    "failed_to_create_entries": "Não foi possível criar os lançamentos",
-    "failed_to_update_entry": "Não foi possível atualizar o lançamento",
-    "failed_to_delete_entry": "Não foi possível excluir o lançamento",
+    "failed_to_create_transaction": "Não foi possível criar o lançamento",
+    "failed_to_create_transactions": "Não foi possível criar os lançamentos",
+    "failed_to_update_transaction": "Não foi possível atualizar o lançamento",
+    "failed_to_delete_transaction": "Não foi possível excluir o lançamento",
     "space_is_archived": "Este espaço está arquivado e não pode receber novos lançamentos."
   }
 }

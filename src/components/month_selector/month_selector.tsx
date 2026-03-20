@@ -7,10 +7,10 @@ import React from "react";
 import { Input } from "@/components";
 import { Box, Icon, Stack, Text } from "@/elements";
 import {
-  inferEntryDateMode,
+  inferTransactionDateMode,
   normalizeDateValue,
   toModeValue,
-} from "@/lib/entry_schedule";
+} from "@/lib/transaction_schedule";
 import { i18n } from "@/model/i18n";
 
 type MonthSelectorField = {
@@ -90,7 +90,7 @@ export function MonthSelector({
     );
   }
 
-  const mode = inferEntryDateMode(fieldValue);
+  const mode = inferTransactionDateMode(fieldValue);
 
   if (mode === "date") {
     return (

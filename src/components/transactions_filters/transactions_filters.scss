@@ -1,0 +1,209 @@
+@use "@/styles/variables.scss" as *;
+
+.transactions-filters {
+  display: grid;
+  gap: var(--spacing-md);
+
+  &__bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+
+  &__search {
+    min-width: 0;
+  }
+
+  &__search-input,
+  &__select,
+  &__date-input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 var(--spacing-md);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 16px;
+    background-color: var(--color-surface-muted);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+    transition:
+      border-color var(--transition-fast),
+      background-color var(--transition-fast),
+      box-shadow var(--transition-fast),
+      transform var(--transition-fast);
+
+    &::placeholder {
+      color: var(--color-text-tertiary);
+    }
+
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 6%,
+        var(--color-surface-muted)
+      );
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--color-primary) 18%, transparent);
+      background-color: var(--color-background-secondary);
+    }
+  }
+
+  &__select {
+    cursor: pointer;
+  }
+
+  &__date-input {
+    padding-right: var(--spacing-sm);
+  }
+
+  &__menu {
+    display: grid;
+    gap: var(--spacing-lg);
+  }
+
+  &__menu-section {
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+
+  &__field {
+    display: grid;
+    gap: var(--spacing-xs);
+  }
+
+  &__field-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+
+  &__date-grid {
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+
+  &__type-options,
+  &__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  &__type-option,
+  &__pill {
+    min-height: 40px;
+    padding: 0 var(--spacing-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 999px;
+    background-color: var(--color-surface-muted);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    font-family: inherit;
+    transition:
+      border-color var(--transition-fast),
+      background-color var(--transition-fast),
+      transform var(--transition-fast);
+
+    &:hover {
+      transform: translateY(-1px);
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 6%,
+        var(--color-surface-muted)
+      );
+    }
+  }
+
+  &__pill--clear {
+    background-color: color-mix(
+      in srgb,
+      var(--color-danger) 10%,
+      var(--color-background-secondary)
+    );
+    border-color: color-mix(in srgb, var(--color-danger) 18%, transparent);
+    color: var(--color-danger-dark);
+  }
+
+  &__type-option--income {
+    border-color: color-mix(
+      in srgb,
+      var(--color-success) 45%,
+      var(--color-background)
+    );
+    color: var(--color-success-dark);
+  }
+
+  &__type-option--expense {
+    border-color: color-mix(
+      in srgb,
+      var(--color-danger) 45%,
+      var(--color-background)
+    );
+    color: var(--color-danger-dark);
+  }
+
+  &__type-option--transfer {
+    border-color: color-mix(
+      in srgb,
+      var(--color-primary) 45%,
+      var(--color-background)
+    );
+    color: var(--color-primary);
+  }
+
+  &__type-option--active {
+    background-color: var(--color-background-secondary);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  &__type-option--income.transactions-filters__type-option--active {
+    background-color: color-mix(
+      in srgb,
+      var(--color-success) 14%,
+      var(--color-background)
+    );
+    border-color: var(--color-success);
+    color: var(--color-success-dark);
+  }
+
+  &__type-option--expense.transactions-filters__type-option--active {
+    background-color: color-mix(
+      in srgb,
+      var(--color-danger) 14%,
+      var(--color-background)
+    );
+    border-color: var(--color-danger);
+    color: var(--color-danger-dark);
+  }
+
+  &__type-option--transfer.transactions-filters__type-option--active {
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 14%,
+      var(--color-background)
+    );
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .transactions-filters {
+    &__date-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}

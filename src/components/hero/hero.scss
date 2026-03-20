@@ -90,8 +90,8 @@
     background-image: url("./patterns/projection.svg");
   }
 
-  &--pattern-entries::before {
-    background-image: url("./patterns/entries.svg");
+  &--pattern-transactions::before {
+    background-image: url("./patterns/transactions.svg");
   }
 
   &--pattern-spaces::before {
@@ -106,12 +106,12 @@
     background-image: url("./patterns/space_form.svg");
   }
 
-  &--pattern-entry_detail::before {
-    background-image: url("./patterns/entry_detail.svg");
+  &--pattern-transaction_detail::before {
+    background-image: url("./patterns/transaction_detail.svg");
   }
 
-  &--pattern-new_entry::before {
-    background-image: url("./patterns/new_entry.svg");
+  &--pattern-new_transaction::before {
+    background-image: url("./patterns/new_transaction.svg");
   }
 
   &--pattern-space::before {

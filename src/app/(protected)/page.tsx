@@ -6,7 +6,7 @@ import {
   UpcomingPaymentsPanel,
 } from "@/components";
 import { Stack } from "@/elements";
-import { getDashboardPayload } from "@/actions/entries";
+import { getDashboardPayload } from "@/actions/transactions";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +27,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
           />
           <RecentActivityPanel
             currentMonthRange={dashboardPayload.currentMonthRange}
-            recentEntries={dashboardPayload.recentEntries}
+            recentTransactions={dashboardPayload.recentTransactions}
           />
         </DashboardPanels>
       </Stack>

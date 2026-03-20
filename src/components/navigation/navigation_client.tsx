@@ -50,9 +50,9 @@ export function NavigationClient({
           icon: "projection",
         },
         {
-          href: "/entries",
-          label: i18n.t("navigation.entries"),
-          icon: "entries",
+          href: "/transactions",
+          label: i18n.t("navigation.transactions"),
+          icon: "transactions",
         },
         {
           href: "/spaces",
@@ -71,12 +71,12 @@ export function NavigationClient({
         allLinks[0],
         allLinks[1],
         {
-          href: "/entries/new/expense",
-          label: i18n.t("common.add_entry"),
+          href: "/transactions/new/expense",
+          label: i18n.t("common.add_transaction"),
           icon: "plus",
           isMobilePrimary: true,
           matchesPath: (currentPathname) =>
-            currentPathname.startsWith("/entries/new"),
+            currentPathname.startsWith("/transactions/new"),
         },
         allLinks[2],
         allLinks[3],

@@ -1,0 +1,70 @@
+@use "@/styles/variables.scss" as *;
+
+.transaction-form {
+  width: 100%;
+  padding: var(--spacing-xs);
+
+  .input__field,
+  .select__field,
+  .month-selector__control {
+    min-height: 52px;
+    border-radius: 18px;
+    background-color: var(--color-background-secondary);
+  }
+
+  .input__label,
+  .select__label {
+    color: var(--color-text-secondary);
+  }
+
+  .button {
+    margin-top: var(--spacing-sm);
+  }
+
+  &__schedule {
+    padding: var(--spacing-lg);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 24px;
+    background-color: var(--color-background-secondary);
+  }
+
+  &__schedule-options {
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+
+  &__schedule-option {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    position: relative;
+    min-height: 44px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: var(--border-width) solid transparent;
+    border-radius: 18px;
+    background-color: var(--color-surface);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+
+    input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      margin: 0;
+    }
+
+    &:has(input:checked) {
+      border-color: color-mix(in srgb, var(--color-primary) 22%, white);
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 10%,
+        var(--color-background-secondary)
+      );
+    }
+
+    &:has(input:focus-visible) {
+      outline: 2px solid color-mix(in srgb, var(--color-primary) 36%, white);
+      outline-offset: 2px;
+    }
+  }
+}

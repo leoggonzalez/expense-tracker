@@ -10,12 +10,12 @@ import React from "react";
 export type HeroPattern =
   | "dashboard"
   | "projection"
-  | "entries"
+  | "transactions"
   | "spaces"
   | "space_detail"
   | "space_form"
-  | "entry_detail"
-  | "new_entry"
+  | "transaction_detail"
+  | "new_transaction"
   | "space"
   | "settings";
 

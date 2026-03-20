@@ -2,7 +2,7 @@ import {
   Button,
   Container,
   Currency,
-  EntryList,
+  TransactionList,
   Hero,
   HeroMetric,
   HeroMetrics,
@@ -11,7 +11,7 @@ import {
 import { Card, Icon, Stack, Text } from "@/elements";
 
 import { formatCurrency } from "@/lib/utils";
-import { getProjectionPagePayload } from "@/actions/entries";
+import { getProjectionPagePayload } from "@/actions/transactions";
 import { i18n } from "@/model/i18n";
 import { startOfMonth } from "date-fns";
 
@@ -131,21 +131,21 @@ export default async function ProjectionPage({
 
           <Stack gap={16}>
             <Text size="h4" as="h3" weight="semibold">
-              {i18n.t("projection_page.spaces_with_entries")}
+              {i18n.t("projection_page.spaces_with_transactions")}
             </Text>
 
             {payload.focusedMonthSpaces.length === 0 ? (
               <Card padding={24} variant="dashed">
                 <Text color="secondary">
-                  {i18n.t("projection_page.empty_month_entries")}
+                  {i18n.t("projection_page.empty_month_transactions")}
                 </Text>
               </Card>
             ) : (
               <Stack gap={24}>
                 {payload.focusedMonthSpaces.map((space) => {
-                  const hiddenEntriesCount = Math.max(
+                  const hiddenTransactionsCount = Math.max(
                     0,
-                    space.monthEntryCount - space.entries.length,
+                    space.monthTransactionCount - space.transactions.length,
                   );
                   const spaceMonthHref = `/spaces/${space.spaceId}?currentMonth=${payload.focusedMonth.key}`;
 
@@ -170,19 +170,19 @@ export default async function ProjectionPage({
                         </Button>
                       }
                     >
-                      <EntryList
-                        entries={space.entries}
+                      <TransactionList
+                        transactions={space.transactions}
                         showDelete={false}
-                        entryHrefBase="/entries"
+                        transactionHrefBase="/transactions"
                         summaryRows={[
-                          ...(hiddenEntriesCount > 0
+                          ...(hiddenTransactionsCount > 0
                             ? [
                                 {
                                   id: `more-${space.spaceId}`,
                                   label: i18n.t(
-                                    "projection_page.more_entries_this_month",
+                                    "projection_page.more_transactions_this_month",
                                     {
-                                      count: hiddenEntriesCount,
+                                      count: hiddenTransactionsCount,
                                     },
                                   ) as string,
                                   href: spaceMonthHref,

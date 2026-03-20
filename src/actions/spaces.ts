@@ -29,7 +29,7 @@ type SpaceCurrentMonthSummary = {
 
 export type { SpaceCurrentMonthSummary };
 
-type SpaceDetailEntry = {
+type SpaceDetailTransaction = {
   id: string;
   type: string;
   spaceName: string;
@@ -55,8 +55,8 @@ export type SpaceDetailPageData = {
     historicalTotal: number;
     selectedMonthTotal: number;
   };
-  selectedMonthRelevantEntries: SpaceDetailEntry[];
-  allEntries: SpaceDetailEntry[];
+  selectedMonthRelevantTransactions: SpaceDetailTransaction[];
+  allTransactions: SpaceDetailTransaction[];
   pagination: {
     page: number;
     limit: number;
@@ -71,7 +71,7 @@ export type SpaceEditData = {
   isArchived: boolean;
 };
 
-function normalizeEntryAmount(type: string, amount: number): number {
+function normalizeTransactionAmount(type: string, amount: number): number {
   if (type === "expense" && amount > 0) {
     return -amount;
   }
@@ -90,8 +90,8 @@ function isPrismaErrorWithCode(error: unknown): error is PrismaErrorWithCode {
 
 function revalidateSpacePages(): void {
   revalidatePath("/");
-  revalidatePath("/entries");
-  revalidatePath("/entries/all");
+  revalidatePath("/transactions");
+  revalidatePath("/transactions/all");
   revalidatePath("/projection");
   revalidatePath("/spaces");
   revalidatePath("/spaces/new");
@@ -132,7 +132,7 @@ async function getMonthTotalForSpace(
         0
       ) AS "currentMonthTotal"
     FROM "Space" a
-    LEFT JOIN "Entry" e
+    LEFT JOIN "Transaction" e
       ON e."spaceId" = a.id
      AND e."beginDate" <= ${monthEnd}
      AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
@@ -166,7 +166,7 @@ async function getHistoricalTotalForSpace(
         0
       ) AS "historicalTotal"
     FROM "Space" a
-    LEFT JOIN "Entry" e
+    LEFT JOIN "Transaction" e
       ON e."spaceId" = a.id
     WHERE a.id = ${spaceId}
       AND a."userId" = ${userId}
@@ -203,7 +203,7 @@ async function getSpacesByArchiveState(
           0
         ) AS "currentMonthTotal"
       FROM "Space" a
-      LEFT JOIN "Entry" e
+      LEFT JOIN "Transaction" e
         ON e."spaceId" = a.id
        AND e."beginDate" <= ${monthEnd}
        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
@@ -262,17 +262,17 @@ export async function getSpaceDetailPageData(input: {
 
     const [
       total,
-      allEntriesRaw,
+      allTransactionsRaw,
       selectedMonthTotal,
       historicalTotal,
       selectedMonthRelevantRaw,
     ] = await Promise.all([
-      prisma.entry.count({
+      prisma.transaction.count({
         where: {
           spaceId: space.id,
         },
       }),
-      prisma.entry.findMany({
+      prisma.transaction.findMany({
         where: {
           spaceId: space.id,
         },
@@ -297,7 +297,7 @@ export async function getSpaceDetailPageData(input: {
       }),
       getMonthTotalForSpace(currentUser.id, space.id, monthStart, monthEnd),
       getHistoricalTotalForSpace(currentUser.id, space.id),
-      prisma.entry.findMany({
+      prisma.transaction.findMany({
         where: {
           spaceId: space.id,
           beginDate: {
@@ -344,7 +344,7 @@ export async function getSpaceDetailPageData(input: {
       },
     );
 
-    const serializeEntry = (entry: {
+    const serializeTransaction = (transaction: {
       id: string;
       type: string;
       transferSpaceId: string | null;
@@ -357,18 +357,18 @@ export async function getSpaceDetailPageData(input: {
       endDate: Date | null;
       createdAt: Date;
       updatedAt: Date;
-    }): SpaceDetailEntry => ({
-      id: entry.id,
-      type: entry.type,
+    }): SpaceDetailTransaction => ({
+      id: transaction.id,
+      type: transaction.type,
       spaceName: space.name,
-      transferSpaceId: entry.transferSpaceId,
-      transferSpaceName: entry.transferSpace?.name || null,
-      description: entry.description,
-      amount: normalizeEntryAmount(entry.type, entry.amount),
-      beginDate: entry.beginDate.toISOString(),
-      endDate: entry.endDate?.toISOString() || null,
-      createdAt: entry.createdAt.toISOString(),
-      updatedAt: entry.updatedAt.toISOString(),
+      transferSpaceId: transaction.transferSpaceId,
+      transferSpaceName: transaction.transferSpace?.name || null,
+      description: transaction.description,
+      amount: normalizeTransactionAmount(transaction.type, transaction.amount),
+      beginDate: transaction.beginDate.toISOString(),
+      endDate: transaction.endDate?.toISOString() || null,
+      createdAt: transaction.createdAt.toISOString(),
+      updatedAt: transaction.updatedAt.toISOString(),
     });
 
     return {
@@ -383,14 +383,14 @@ export async function getSpaceDetailPageData(input: {
         historicalTotal,
         selectedMonthTotal,
       },
-      selectedMonthRelevantEntries:
-        sortedSelectedMonthRelevantRaw.map(serializeEntry),
-      allEntries: allEntriesRaw.map(serializeEntry),
+      selectedMonthRelevantTransactions:
+        sortedSelectedMonthRelevantRaw.map(serializeTransaction),
+      allTransactions: allTransactionsRaw.map(serializeTransaction),
       pagination: {
         page,
         limit,
         total,
-        hasMore: total > allEntriesRaw.length,
+        hasMore: total > allTransactionsRaw.length,
       },
     };
   } catch (error) {
