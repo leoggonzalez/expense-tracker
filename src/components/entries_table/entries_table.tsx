@@ -12,7 +12,7 @@ import { i18n } from "@/model/i18n";
 export type EntriesTableItem = {
   id: string;
   type: string;
-  accountName: string;
+  spaceName: string;
   description: string;
   amount: number;
   beginDate: string;
@@ -60,8 +60,8 @@ export function EntriesTable({
             role="link"
             tabIndex={0}
           >
-            <div className="entries-table__account">
-              <Avatar name={entry.accountName} />
+            <div className="entries-table__space">
+              <Avatar name={entry.spaceName} />
             </div>
             <div className="entries-table__details">
               <Text size="sm" weight="semibold">

@@ -58,39 +58,39 @@ async function main() {
     },
   });
 
-  // Step 1: Get all unique account names
-  const uniqueAccounts = [...new Set(oldEntries.map((entry) => entry.group))];
+  // Step 1: Get all unique space names
+  const uniqueSpaces = [...new Set(oldEntries.map((entry) => entry.group))];
   console.log(
-    `Found ${uniqueAccounts.length} unique accounts:`,
-    uniqueAccounts,
+    `Found ${uniqueSpaces.length} unique spaces:`,
+    uniqueSpaces,
   );
 
-  // Step 2: Create accounts and build a mapping
-  const accountMap = new Map<string, string>();
+  // Step 2: Create spaces and build a mapping
+  const spaceMap = new Map<string, string>();
   
-  for (const accountName of uniqueAccounts) {
-    let account = await prisma.account.findUnique({
+  for (const spaceName of uniqueSpaces) {
+    let space = await prisma.space.findUnique({
       where: {
         userId_name: {
           userId: user.id,
-          name: accountName,
+          name: spaceName,
         },
       },
     });
 
-    if (!account) {
-      account = await prisma.account.create({
+    if (!space) {
+      space = await prisma.space.create({
         data: {
           userId: user.id,
-          name: accountName,
+          name: spaceName,
         },
       });
-      console.log(`Created account: ${accountName}`);
+      console.log(`Created space: ${spaceName}`);
     } else {
-      console.log(`Account already exists: ${accountName}`);
+      console.log(`Space already exists: ${spaceName}`);
     }
 
-    accountMap.set(accountName, account.id);
+    spaceMap.set(spaceName, space.id);
   }
 
   console.log("\nMigrating entries...");
@@ -100,10 +100,10 @@ async function main() {
   let skipped = 0;
 
   for (const entry of oldEntries) {
-    const accountId = accountMap.get(entry.group);
+    const spaceId = spaceMap.get(entry.group);
     
-    if (!accountId) {
-      console.log(`Skipping entry ${entry.id}: account not found`);
+    if (!spaceId) {
+      console.log(`Skipping entry ${entry.id}: space not found`);
       skipped++;
       continue;
     }
@@ -124,7 +124,7 @@ async function main() {
         data: {
           id: entry.id,
           type: entry.type as "income" | "expense",
-          accountId,
+          spaceId,
           description: entry.description,
           amount: entry.amount,
           beginDate: new Date(entry.beginDate),
@@ -141,7 +141,7 @@ async function main() {
   }
 
   console.log("\n=== Migration Summary ===");
-  console.log(`Accounts created: ${uniqueAccounts.length}`);
+  console.log(`Spaces created: ${uniqueSpaces.length}`);
   console.log(`Entries created: ${created}`);
   console.log(`Entries skipped: ${skipped}`);
   console.log(`Total entries processed: ${oldEntries.length}`);

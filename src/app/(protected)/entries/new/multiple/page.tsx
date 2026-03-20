@@ -5,14 +5,14 @@ import {
   Hero,
   PagePanel,
 } from "@/components";
-import { getAccounts } from "@/actions/entries";
+import { getSpaces } from "@/actions/entries";
 import { Stack } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page(): Promise<React.ReactElement> {
-  const accounts = await getAccounts();
+  const spaces = await getSpaces();
 
   return (
     <Container>
@@ -29,7 +29,7 @@ export default async function Page(): Promise<React.ReactElement> {
         </Hero>
 
         <PagePanel tone="form">
-          <BulkEntryForm accounts={accounts.map((account) => account.name)} />
+          <BulkEntryForm spaces={spaces.map((space) => space.name)} />
         </PagePanel>
       </Stack>
     </Container>

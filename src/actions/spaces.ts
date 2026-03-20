@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireCurrentUser } from "@/lib/session";
 
-type AccountActionResult = {
+type SpaceActionResult = {
   success: boolean;
   error?: string;
 };
@@ -15,26 +15,26 @@ type PrismaErrorWithCode = {
   code: string;
 };
 
-type AccountCurrentMonthSummaryRow = {
+type SpaceCurrentMonthSummaryRow = {
   id: string;
   name: string;
   currentMonthTotal: number | null;
 };
 
-type AccountCurrentMonthSummary = {
+type SpaceCurrentMonthSummary = {
   id: string;
   name: string;
   currentMonthTotal: number;
 };
 
-export type { AccountCurrentMonthSummary };
+export type { SpaceCurrentMonthSummary };
 
-type AccountDetailEntry = {
+type SpaceDetailEntry = {
   id: string;
   type: string;
-  accountName: string;
-  transferAccountId: string | null;
-  transferAccountName: string | null;
+  spaceName: string;
+  transferSpaceId: string | null;
+  transferSpaceName: string | null;
   description: string;
   amount: number;
   beginDate: string;
@@ -43,20 +43,20 @@ type AccountDetailEntry = {
   updatedAt: string;
 };
 
-export type AccountDetailPageData = {
+export type SpaceDetailPageData = {
   selectedMonth: {
     key: string;
     label: string;
   };
-  account: {
+  space: {
     id: string;
     name: string;
     isArchived: boolean;
     historicalTotal: number;
     selectedMonthTotal: number;
   };
-  selectedMonthRelevantEntries: AccountDetailEntry[];
-  allEntries: AccountDetailEntry[];
+  selectedMonthRelevantEntries: SpaceDetailEntry[];
+  allEntries: SpaceDetailEntry[];
   pagination: {
     page: number;
     limit: number;
@@ -65,7 +65,7 @@ export type AccountDetailPageData = {
   };
 };
 
-export type AccountEditData = {
+export type SpaceEditData = {
   id: string;
   name: string;
   isArchived: boolean;
@@ -88,19 +88,19 @@ function isPrismaErrorWithCode(error: unknown): error is PrismaErrorWithCode {
   );
 }
 
-function revalidateAccountPages(): void {
+function revalidateSpacePages(): void {
   revalidatePath("/");
   revalidatePath("/entries");
   revalidatePath("/entries/all");
   revalidatePath("/projection");
-  revalidatePath("/accounts");
-  revalidatePath("/accounts/new");
-  revalidatePath("/accounts/archived");
+  revalidatePath("/spaces");
+  revalidatePath("/spaces/new");
+  revalidatePath("/spaces/archived");
   revalidatePath("/settings");
 }
 
-async function findOwnedAccountOrNull(userId: string, id: string) {
-  return prisma.account.findFirst({
+async function findOwnedSpaceOrNull(userId: string, id: string) {
+  return prisma.space.findFirst({
     where: {
       id,
       userId,
@@ -108,9 +108,9 @@ async function findOwnedAccountOrNull(userId: string, id: string) {
   });
 }
 
-async function getMonthTotalForAccount(
+async function getMonthTotalForSpace(
   userId: string,
-  accountId: string,
+  spaceId: string,
   monthStart: Date,
   monthEnd: Date,
 ): Promise<number> {
@@ -131,12 +131,12 @@ async function getMonthTotalForAccount(
         ),
         0
       ) AS "currentMonthTotal"
-    FROM "Account" a
+    FROM "Space" a
     LEFT JOIN "Entry" e
-      ON e."accountId" = a.id
+      ON e."spaceId" = a.id
      AND e."beginDate" <= ${monthEnd}
      AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
-    WHERE a.id = ${accountId}
+    WHERE a.id = ${spaceId}
       AND a."userId" = ${userId}
     GROUP BY a.id
   `;
@@ -144,9 +144,9 @@ async function getMonthTotalForAccount(
   return Number(rows[0]?.currentMonthTotal || 0);
 }
 
-async function getHistoricalTotalForAccount(
+async function getHistoricalTotalForSpace(
   userId: string,
-  accountId: string,
+  spaceId: string,
 ): Promise<number> {
   const rows = await prisma.$queryRaw<
     Array<{ historicalTotal: number | null }>
@@ -165,10 +165,10 @@ async function getHistoricalTotalForAccount(
         ),
         0
       ) AS "historicalTotal"
-    FROM "Account" a
+    FROM "Space" a
     LEFT JOIN "Entry" e
-      ON e."accountId" = a.id
-    WHERE a.id = ${accountId}
+      ON e."spaceId" = a.id
+    WHERE a.id = ${spaceId}
       AND a."userId" = ${userId}
     GROUP BY a.id
   `;
@@ -176,16 +176,16 @@ async function getHistoricalTotalForAccount(
   return Number(rows[0]?.historicalTotal || 0);
 }
 
-async function getAccountsByArchiveState(
+async function getSpacesByArchiveState(
   isArchived: boolean,
   selectedMonthStart?: Date,
-): Promise<AccountCurrentMonthSummary[]> {
+): Promise<SpaceCurrentMonthSummary[]> {
   const currentUser = await requireCurrentUser();
   const monthStart = startOfMonth(selectedMonthStart || new Date());
   const monthEnd = endOfMonth(monthStart);
 
   try {
-    const rows = await prisma.$queryRaw<AccountCurrentMonthSummaryRow[]>`
+    const rows = await prisma.$queryRaw<SpaceCurrentMonthSummaryRow[]>`
       SELECT
         a.id,
         a.name,
@@ -202,9 +202,9 @@ async function getAccountsByArchiveState(
           ),
           0
         ) AS "currentMonthTotal"
-      FROM "Account" a
+      FROM "Space" a
       LEFT JOIN "Entry" e
-        ON e."accountId" = a.id
+        ON e."spaceId" = a.id
        AND e."beginDate" <= ${monthEnd}
        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
       WHERE a."userId" = ${currentUser.id}
@@ -219,29 +219,29 @@ async function getAccountsByArchiveState(
       currentMonthTotal: Number(row.currentMonthTotal || 0),
     }));
   } catch (error) {
-    console.error("Error fetching accounts summary:", error);
+    console.error("Error fetching spaces summary:", error);
     return [];
   }
 }
 
-export async function getAccountsCurrentMonthSummary(
+export async function getSpacesCurrentMonthSummary(
   selectedMonthStart?: Date,
-): Promise<AccountCurrentMonthSummary[]> {
-  return getAccountsByArchiveState(false, selectedMonthStart);
+): Promise<SpaceCurrentMonthSummary[]> {
+  return getSpacesByArchiveState(false, selectedMonthStart);
 }
 
-export async function getArchivedAccountsCurrentMonthSummary(
+export async function getArchivedSpacesCurrentMonthSummary(
   selectedMonthStart?: Date,
-): Promise<AccountCurrentMonthSummary[]> {
-  return getAccountsByArchiveState(true, selectedMonthStart);
+): Promise<SpaceCurrentMonthSummary[]> {
+  return getSpacesByArchiveState(true, selectedMonthStart);
 }
 
-export async function getAccountDetailPageData(input: {
-  accountId: string;
+export async function getSpaceDetailPageData(input: {
+  spaceId: string;
   page?: number;
   limit?: number;
   selectedMonthStart?: Date;
-}): Promise<AccountDetailPageData | null> {
+}): Promise<SpaceDetailPageData | null> {
   const currentUser = await requireCurrentUser();
 
   const page = Math.max(1, input.page || 1);
@@ -251,12 +251,12 @@ export async function getAccountDetailPageData(input: {
   const monthEnd = endOfMonth(monthStart);
 
   try {
-    const account = await findOwnedAccountOrNull(
+    const space = await findOwnedSpaceOrNull(
       currentUser.id,
-      input.accountId,
+      input.spaceId,
     );
 
-    if (!account) {
+    if (!space) {
       return null;
     }
 
@@ -269,18 +269,18 @@ export async function getAccountDetailPageData(input: {
     ] = await Promise.all([
       prisma.entry.count({
         where: {
-          accountId: account.id,
+          spaceId: space.id,
         },
       }),
       prisma.entry.findMany({
         where: {
-          accountId: account.id,
+          spaceId: space.id,
         },
         select: {
           id: true,
           type: true,
-          transferAccountId: true,
-          transferAccount: {
+          transferSpaceId: true,
+          transferSpace: {
             select: {
               name: true,
             },
@@ -295,11 +295,11 @@ export async function getAccountDetailPageData(input: {
         orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
         take,
       }),
-      getMonthTotalForAccount(currentUser.id, account.id, monthStart, monthEnd),
-      getHistoricalTotalForAccount(currentUser.id, account.id),
+      getMonthTotalForSpace(currentUser.id, space.id, monthStart, monthEnd),
+      getHistoricalTotalForSpace(currentUser.id, space.id),
       prisma.entry.findMany({
         where: {
-          accountId: account.id,
+          spaceId: space.id,
           beginDate: {
             lte: monthEnd,
           },
@@ -317,8 +317,8 @@ export async function getAccountDetailPageData(input: {
         select: {
           id: true,
           type: true,
-          transferAccountId: true,
-          transferAccount: {
+          transferSpaceId: true,
+          transferSpace: {
             select: {
               name: true,
             },
@@ -347,8 +347,8 @@ export async function getAccountDetailPageData(input: {
     const serializeEntry = (entry: {
       id: string;
       type: string;
-      transferAccountId: string | null;
-      transferAccount: {
+      transferSpaceId: string | null;
+      transferSpace: {
         name: string;
       } | null;
       description: string;
@@ -357,12 +357,12 @@ export async function getAccountDetailPageData(input: {
       endDate: Date | null;
       createdAt: Date;
       updatedAt: Date;
-    }): AccountDetailEntry => ({
+    }): SpaceDetailEntry => ({
       id: entry.id,
       type: entry.type,
-      accountName: account.name,
-      transferAccountId: entry.transferAccountId,
-      transferAccountName: entry.transferAccount?.name || null,
+      spaceName: space.name,
+      transferSpaceId: entry.transferSpaceId,
+      transferSpaceName: entry.transferSpace?.name || null,
       description: entry.description,
       amount: normalizeEntryAmount(entry.type, entry.amount),
       beginDate: entry.beginDate.toISOString(),
@@ -376,10 +376,10 @@ export async function getAccountDetailPageData(input: {
         key: format(monthStart, "yyyy-MM"),
         label: format(monthStart, "MMMM yyyy"),
       },
-      account: {
-        id: account.id,
-        name: account.name,
-        isArchived: account.isArchived,
+      space: {
+        id: space.id,
+        name: space.name,
+        isArchived: space.isArchived,
         historicalTotal,
         selectedMonthTotal,
       },
@@ -394,84 +394,84 @@ export async function getAccountDetailPageData(input: {
       },
     };
   } catch (error) {
-    console.error("Error fetching account detail page data:", error);
+    console.error("Error fetching space detail page data:", error);
     return null;
   }
 }
 
-export async function getAccountForEdit(
+export async function getSpaceForEdit(
   id: string,
-): Promise<AccountEditData | null> {
+): Promise<SpaceEditData | null> {
   const currentUser = await requireCurrentUser();
 
   try {
-    const account = await findOwnedAccountOrNull(currentUser.id, id);
+    const space = await findOwnedSpaceOrNull(currentUser.id, id);
 
-    if (!account) {
+    if (!space) {
       return null;
     }
 
     return {
-      id: account.id,
-      name: account.name,
-      isArchived: account.isArchived,
+      id: space.id,
+      name: space.name,
+      isArchived: space.isArchived,
     };
   } catch (error) {
-    console.error("Error fetching account for edit:", error);
+    console.error("Error fetching space for edit:", error);
     return null;
   }
 }
 
-export async function createAccount(input: {
+export async function createSpace(input: {
   name: string;
-}): Promise<AccountActionResult> {
+}): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUser();
   const name = input.name.trim();
 
   if (!name) {
-    return { success: false, error: "accounts_page.name_required" };
+    return { success: false, error: "spaces_page.name_required" };
   }
 
   try {
-    await prisma.account.create({
+    await prisma.space.create({
       data: {
         userId: currentUser.id,
         name,
       },
     });
 
-    revalidateAccountPages();
+    revalidateSpacePages();
 
     return { success: true };
   } catch (error) {
     if (isPrismaErrorWithCode(error) && error.code === "P2002") {
-      return { success: false, error: "accounts_page.duplicate_name" };
+      return { success: false, error: "spaces_page.duplicate_name" };
     }
 
-    console.error("Error creating account:", error);
-    return { success: false, error: "accounts_page.create_failed" };
+    console.error("Error creating space:", error);
+    return { success: false, error: "spaces_page.create_failed" };
   }
 }
 
-export async function updateAccount(
+export async function updateSpace(
   id: string,
   input: { name: string },
-): Promise<AccountActionResult> {
+): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUser();
   const name = input.name.trim();
 
   if (!name) {
-    return { success: false, error: "account_detail_page.name_required" };
+    return { success: false, error: "space_detail_page.name_required" };
   }
 
   try {
-    const existingAccount = await findOwnedAccountOrNull(currentUser.id, id);
+    const existingSpace = await findOwnedSpaceOrNull(currentUser.id, id);
 
-    if (!existingAccount) {
-      return { success: false, error: "account_detail_page.not_found" };
+    if (!existingSpace) {
+      return { success: false, error: "space_detail_page.not_found" };
     }
 
-    await prisma.account.update({
+    await prisma.space.update({
       where: {
         id,
       },
@@ -480,76 +480,76 @@ export async function updateAccount(
       },
     });
 
-    revalidateAccountPages();
+    revalidateSpacePages();
 
     return { success: true };
   } catch (error) {
     if (isPrismaErrorWithCode(error) && error.code === "P2002") {
-      return { success: false, error: "account_detail_page.duplicate_name" };
+      return { success: false, error: "space_detail_page.duplicate_name" };
     }
 
-    console.error("Error updating account:", error);
-    return { success: false, error: "account_detail_page.update_failed" };
+    console.error("Error updating space:", error);
+    return { success: false, error: "space_detail_page.update_failed" };
   }
 }
 
-export async function archiveAccount(
+export async function archiveSpace(
   id: string,
   confirmationText: string,
-): Promise<AccountActionResult> {
+): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUser();
 
   if (confirmationText !== "delete") {
-    return { success: false, error: "accounts_page.archive_requires_confirm" };
+    return { success: false, error: "spaces_page.archive_requires_confirm" };
   }
 
   try {
-    const existingAccount = await findOwnedAccountOrNull(currentUser.id, id);
+    const existingSpace = await findOwnedSpaceOrNull(currentUser.id, id);
 
-    if (!existingAccount) {
-      return { success: false, error: "account_detail_page.not_found" };
+    if (!existingSpace) {
+      return { success: false, error: "space_detail_page.not_found" };
     }
 
-    await prisma.account.update({
+    await prisma.space.update({
       where: { id },
       data: {
         isArchived: true,
       },
     });
 
-    revalidateAccountPages();
+    revalidateSpacePages();
 
     return { success: true };
   } catch (error) {
-    console.error("Error archiving account:", error);
-    return { success: false, error: "accounts_page.archive_failed" };
+    console.error("Error archiving space:", error);
+    return { success: false, error: "spaces_page.archive_failed" };
   }
 }
 
-export async function unarchiveAccount(
+export async function unarchiveSpace(
   id: string,
-): Promise<AccountActionResult> {
+): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUser();
 
   try {
-    const existingAccount = await findOwnedAccountOrNull(currentUser.id, id);
+    const existingSpace = await findOwnedSpaceOrNull(currentUser.id, id);
 
-    if (!existingAccount) {
-      return { success: false, error: "account_detail_page.not_found" };
+    if (!existingSpace) {
+      return { success: false, error: "space_detail_page.not_found" };
     }
 
-    await prisma.account.update({
+    await prisma.space.update({
       where: { id },
       data: {
         isArchived: false,
       },
     });
 
-    revalidateAccountPages();
+    revalidateSpacePages();
 
     return { success: true };
   } catch (error) {
-    console.error("Error unarchiving account:", error);
-    return { success: false, error: "accounts_page.unarchive_failed" };
+    console.error("Error unarchiving space:", error);
+    return { success: false, error: "spaces_page.unarchive_failed" };
   }
 }

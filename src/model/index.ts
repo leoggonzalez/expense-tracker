@@ -4,6 +4,6 @@ export type { IEntry } from "./entry";
 export { EntryCollection } from "./entry_collection";
 export type {
   MonthlyData,
-  AccountProjectionGroup,
-  AccountMonthBreakdown,
+  SpaceProjectionGroup,
+  SpaceMonthBreakdown,
 } from "./entry_collection";

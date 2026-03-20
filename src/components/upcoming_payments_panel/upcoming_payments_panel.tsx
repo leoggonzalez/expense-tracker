@@ -77,7 +77,7 @@ export function UpcomingPaymentsPanel({
                             {entry.description}
                           </Text>
                           <Text as="span" size="xs" color="secondary">
-                            {entry.accountName}
+                            {entry.spaceName}
                           </Text>
                         </Stack>
                         <Stack gap={4} align="flex-end">

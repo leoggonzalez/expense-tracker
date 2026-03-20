@@ -11,12 +11,12 @@ export type HeroPattern =
   | "dashboard"
   | "projection"
   | "entries"
-  | "accounts"
-  | "account_detail"
-  | "account_form"
+  | "spaces"
+  | "space_detail"
+  | "space_form"
   | "entry_detail"
   | "new_entry"
-  | "account"
+  | "space"
   | "settings";
 
 export type HeroProps = {

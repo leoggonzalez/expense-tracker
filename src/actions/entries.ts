@@ -16,7 +16,7 @@ import { revalidatePath } from "next/cache";
 
 export interface CreateEntryInput {
   type: "income" | "expense";
-  accountName: string;
+  spaceName: string;
   description: string;
   amount: number;
   beginDate: Date;
@@ -24,14 +24,14 @@ export interface CreateEntryInput {
 }
 
 export interface CreateTransferInput {
-  fromAccountId: string;
-  toAccountId: string;
+  fromSpaceId: string;
+  toSpaceId: string;
   description: string;
   amount: number;
   beginDate: Date;
 }
 
-type AccountRecord = {
+type SpaceRecord = {
   id: string;
   userId: string;
   name: string;
@@ -39,19 +39,19 @@ type AccountRecord = {
   updatedAt: Date;
 };
 
-type EntryWithAccountRecord = {
+type EntryWithSpaceRecord = {
   id: string;
   type: string;
-  accountId: string;
-  transferAccountId: string | null;
+  spaceId: string;
+  transferSpaceId: string | null;
   description: string;
   amount: number;
   beginDate: Date;
   endDate: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  account: AccountRecord;
-  transferAccount?: {
+  space: SpaceRecord;
+  transferSpace?: {
     id: string;
     name: string;
   } | null;
@@ -60,7 +60,7 @@ type EntryWithAccountRecord = {
 export type SerializedProjectionEntry = {
   id: string;
   type: string;
-  account: string;
+  space: string;
   description: string;
   amount: number;
   beginDate: string;
@@ -80,26 +80,26 @@ export type DashboardPayload = {
   recentEntries: Array<{
     id: string;
     type: string;
-    accountName: string;
+    spaceName: string;
     description: string;
     amount: number;
     beginDate: string;
     endDate: string | null;
-    transferAccountId: string | null;
-    transferAccountName: string | null;
+    transferSpaceId: string | null;
+    transferSpaceName: string | null;
     createdAt: string;
     updatedAt: string;
   }>;
   upcomingPayments: Array<{
     id: string;
     type: string;
-    accountName: string;
+    spaceName: string;
     description: string;
     amount: number;
     beginDate: string;
     endDate: string | null;
-    transferAccountId: string | null;
-    transferAccountName: string | null;
+    transferSpaceId: string | null;
+    transferSpaceName: string | null;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -112,13 +112,13 @@ export type DashboardPayload = {
 export type ProjectionMonthEntry = {
   id: string;
   type: string;
-  accountName: string;
+  spaceName: string;
   description: string;
   amount: number;
   beginDate: string;
   endDate: string | null;
-  transferAccountId: string | null;
-  transferAccountName: string | null;
+  transferSpaceId: string | null;
+  transferSpaceName: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -131,9 +131,9 @@ export type ProjectionChartMonth = {
   net: number;
 };
 
-export type ProjectionFocusedAccount = {
-  accountId: string;
-  accountName: string;
+export type ProjectionFocusedSpace = {
+  spaceId: string;
+  spaceName: string;
   monthTotal: number;
   monthEntryCount: number;
   entries: ProjectionMonthEntry[];
@@ -148,16 +148,16 @@ export type ProjectionPagePayload = {
   nextMonthKey: string;
   chartMonths: ProjectionChartMonth[];
   focusedMonthTotals: DashboardTotals;
-  focusedMonthAccounts: ProjectionFocusedAccount[];
+  focusedMonthSpaces: ProjectionFocusedSpace[];
 };
 
 type EntryFiltersWhere = {
-  account: {
+  space: {
     userId: string;
   };
-  accountId?: string;
+  spaceId?: string;
   type?: "income" | "expense";
-  transferAccountId?: {
+  transferSpaceId?: {
     not?: null;
   } | null;
   AND?: Array<{
@@ -185,9 +185,9 @@ type EntryListWithPagination = {
 export type FilteredEntryListItem = {
   id: string;
   type: "income" | "expense";
-  transferAccountId: string | null;
-  transferAccountName: string | null;
-  accountName: string;
+  transferSpaceId: string | null;
+  transferSpaceName: string | null;
+  spaceName: string;
   description: string;
   amount: number;
   beginDate: string;
@@ -199,7 +199,7 @@ export type FilteredEntryListItem = {
 type EntryMutationResult =
   | {
       success: true;
-      entry: EntryWithAccountRecord;
+      entry: EntryWithSpaceRecord;
     }
   | {
       success: false;
@@ -209,7 +209,7 @@ type EntryMutationResult =
 type MultipleEntryMutationResult =
   | {
       success: true;
-      entries: EntryWithAccountRecord[];
+      entries: EntryWithSpaceRecord[];
     }
   | {
       success: false;
@@ -219,7 +219,7 @@ type MultipleEntryMutationResult =
 type TransferMutationResult =
   | {
       success: true;
-      entries: EntryWithAccountRecord[];
+      entries: EntryWithSpaceRecord[];
     }
   | {
       success: false;
@@ -238,28 +238,28 @@ type ProjectionChartMonthRow = {
   expense: number | null;
 };
 
-type ProjectionFocusedAccountAccumulator = {
-  accountId: string;
-  accountName: string;
+type ProjectionFocusedSpaceAccumulator = {
+  spaceId: string;
+  spaceName: string;
   monthTotal: number;
   monthEntryCount: number;
   entries: ProjectionMonthEntry[];
 };
 
-type ProjectionFocusedAccountSummaryRow = {
-  accountId: string;
-  accountName: string;
+type ProjectionFocusedSpaceSummaryRow = {
+  spaceId: string;
+  spaceName: string;
   monthTotal: number | null;
   monthEntryCount: number | null;
 };
 
-type ProjectionFocusedAccountEntryRow = {
-  accountId: string;
-  accountName: string;
+type ProjectionFocusedSpaceEntryRow = {
+  spaceId: string;
+  spaceName: string;
   id: string;
   type: string;
-  transferAccountId: string | null;
-  transferAccountName: string | null;
+  transferSpaceId: string | null;
+  transferSpaceName: string | null;
   description: string;
   amount: number;
   beginDate: Date;
@@ -277,18 +277,18 @@ function normalizeEntryAmount(type: string, amount: number): number {
 }
 
 function serializeProjectionMonthEntryRow(
-  entry: ProjectionFocusedAccountEntryRow,
+  entry: ProjectionFocusedSpaceEntryRow,
 ): ProjectionMonthEntry {
   return {
     id: entry.id,
     type: entry.type,
-    accountName: entry.accountName,
+    spaceName: entry.spaceName,
     description: entry.description,
     amount: normalizeEntryAmount(entry.type, entry.amount),
     beginDate: entry.beginDate.toISOString(),
     endDate: entry.endDate?.toISOString() || null,
-    transferAccountId: entry.transferAccountId,
-    transferAccountName: entry.transferAccountName,
+    transferSpaceId: entry.transferSpaceId,
+    transferSpaceName: entry.transferSpaceName,
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   };
@@ -301,36 +301,36 @@ function getCurrentMonthBounds(): { monthStart: Date; monthEnd: Date } {
   return { monthStart, monthEnd };
 }
 
-async function syncCurrentMonthEntryCounterForAccount(
-  accountId: string,
+async function syncCurrentMonthEntryCounterForSpace(
+  spaceId: string,
 ): Promise<void> {
   const { monthStart, monthEnd } = getCurrentMonthBounds();
 
   await prisma.$executeRaw`
-    UPDATE "Account" a
+    UPDATE "Space" a
     SET "currentMonthEntryCount" = (
       SELECT COUNT(e.id)::integer
       FROM "Entry" e
-      WHERE e."accountId" = a.id
+      WHERE e."spaceId" = a.id
         AND e."beginDate" <= ${monthEnd}
         AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
     )
-    WHERE a.id = ${accountId}
+    WHERE a.id = ${spaceId}
   `;
 }
 
-async function syncCurrentMonthEntryCounterForAccounts(
-  accountIds: string[],
+async function syncCurrentMonthEntryCounterForSpaces(
+  spaceIds: string[],
 ): Promise<void> {
-  const uniqueAccountIds = Array.from(new Set(accountIds.filter(Boolean)));
+  const uniqueSpaceIds = Array.from(new Set(spaceIds.filter(Boolean)));
 
-  if (uniqueAccountIds.length === 0) {
+  if (uniqueSpaceIds.length === 0) {
     return;
   }
 
   await Promise.all(
-    uniqueAccountIds.map((accountId) =>
-      syncCurrentMonthEntryCounterForAccount(accountId),
+    uniqueSpaceIds.map((spaceId) =>
+      syncCurrentMonthEntryCounterForSpace(spaceId),
     ),
   );
 }
@@ -339,20 +339,20 @@ export async function syncAllCurrentMonthEntryCounters(): Promise<void> {
   const { monthStart, monthEnd } = getCurrentMonthBounds();
 
   await prisma.$executeRaw`
-    UPDATE "Account" a
+    UPDATE "Space" a
     SET "currentMonthEntryCount" = COALESCE(month_counts."entryCount", 0)
     FROM (
       SELECT
-        a2.id AS "accountId",
+        a2.id AS "spaceId",
         COUNT(e.id)::integer AS "entryCount"
-      FROM "Account" a2
+      FROM "Space" a2
       LEFT JOIN "Entry" e
-        ON e."accountId" = a2.id
+        ON e."spaceId" = a2.id
        AND e."beginDate" <= ${monthEnd}
        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
       GROUP BY a2.id
     ) month_counts
-    WHERE a.id = month_counts."accountId"
+    WHERE a.id = month_counts."spaceId"
   `;
 }
 
@@ -394,9 +394,9 @@ async function getMonthTotalsForUser(
             0
           ) AS expense
         FROM "Entry" e
-        INNER JOIN "Account" a ON a.id = e."accountId"
+        INNER JOIN "Space" a ON a.id = e."spaceId"
         WHERE a."userId" = ${userId}
-          AND e."transferAccountId" IS NULL
+          AND e."transferSpaceId" IS NULL
           AND e."beginDate" <= ${monthEnd}
           AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
       ) AS totals
@@ -426,20 +426,20 @@ export async function getMonthTotals(
   return getMonthTotalsForUser(currentUser.id, monthStart);
 }
 
-async function findOrCreateAccount(userId: string, accountName: string) {
-  let account = await prisma.account.findFirst({
+async function findOrCreateSpace(userId: string, spaceName: string) {
+  let space = await prisma.space.findFirst({
     where: {
       userId,
-      name: accountName,
+      name: spaceName,
       isArchived: false,
     },
   });
 
-  if (!account) {
-    const archivedAccount = await prisma.account.findFirst({
+  if (!space) {
+    const archivedSpace = await prisma.space.findFirst({
       where: {
         userId,
-        name: accountName,
+        name: spaceName,
         isArchived: true,
       },
       select: {
@@ -447,28 +447,28 @@ async function findOrCreateAccount(userId: string, accountName: string) {
       },
     });
 
-    if (archivedAccount) {
-      throw new Error("account_is_archived");
+    if (archivedSpace) {
+      throw new Error("space_is_archived");
     }
 
-    account = await prisma.account.create({
+    space = await prisma.space.create({
       data: {
         userId,
-        name: accountName,
+        name: spaceName,
       },
     });
   }
 
-  return account;
+  return space;
 }
 
 function serializeProjectionEntry(
-  entry: EntryWithAccountRecord,
+  entry: EntryWithSpaceRecord,
 ): SerializedProjectionEntry {
   return {
     id: entry.id,
     type: entry.type,
-    account: entry.account.name,
+    space: entry.space.name,
     description: entry.description,
     amount: entry.amount,
     beginDate: entry.beginDate.toISOString(),
@@ -478,19 +478,19 @@ function serializeProjectionEntry(
   };
 }
 
-function serializeDashboardRecentEntry(entry: EntryWithAccountRecord) {
+function serializeDashboardRecentEntry(entry: EntryWithSpaceRecord) {
   const normalizedAmount = normalizeEntryAmount(entry.type, entry.amount);
 
   return {
     id: entry.id,
     type: entry.type,
-    accountName: entry.account.name,
+    spaceName: entry.space.name,
     description: entry.description,
     amount: normalizedAmount,
     beginDate: entry.beginDate.toISOString(),
     endDate: entry.endDate?.toISOString() || null,
-    transferAccountId: entry.transferAccountId,
-    transferAccountName: entry.transferAccount?.name || null,
+    transferSpaceId: entry.transferSpaceId,
+    transferSpaceName: entry.transferSpace?.name || null,
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   };
@@ -501,7 +501,7 @@ function revalidateEntryPages() {
   revalidatePath("/projection");
   revalidatePath("/entries");
   revalidatePath("/entries/all");
-  revalidatePath("/account");
+  revalidatePath("/space");
   revalidatePath("/settings");
 }
 
@@ -511,33 +511,33 @@ export async function createEntry(
   const currentUser = await requireCurrentUser();
 
   try {
-    const account = await findOrCreateAccount(
+    const space = await findOrCreateSpace(
       currentUser.id,
-      input.accountName,
+      input.spaceName,
     );
 
     const entry = await prisma.entry.create({
       data: {
         type: input.type,
-        accountId: account.id,
-        transferAccountId: null,
+        spaceId: space.id,
+        transferSpaceId: null,
         description: input.description,
         amount: input.amount,
         beginDate: input.beginDate,
         endDate: input.endDate || null,
       },
       include: {
-        account: true,
+        space: true,
       },
     });
 
-    await syncCurrentMonthEntryCounterForAccount(account.id);
+    await syncCurrentMonthEntryCounterForSpace(space.id);
     revalidateEntryPages();
 
     return { success: true, entry };
   } catch (error) {
-    if (error instanceof Error && error.message === "account_is_archived") {
-      return { success: false, error: "account_is_archived" };
+    if (error instanceof Error && error.message === "space_is_archived") {
+      return { success: false, error: "space_is_archived" };
     }
 
     console.error("Error creating entry:", error);
@@ -550,8 +550,8 @@ export async function createTransferEntry(
 ): Promise<TransferMutationResult> {
   const currentUser = await requireCurrentUser();
 
-  if (input.fromAccountId === input.toAccountId) {
-    return { success: false, error: "transfer_same_account" };
+  if (input.fromSpaceId === input.toSpaceId) {
+    return { success: false, error: "transfer_same_space" };
   }
 
   const absoluteAmount = Math.abs(input.amount);
@@ -561,25 +561,25 @@ export async function createTransferEntry(
   }
 
   try {
-    const [fromAccount, toAccount] = await Promise.all([
-      prisma.account.findFirst({
+    const [fromSpace, toSpace] = await Promise.all([
+      prisma.space.findFirst({
         where: {
-          id: input.fromAccountId,
+          id: input.fromSpaceId,
           userId: currentUser.id,
           isArchived: false,
         },
       }),
-      prisma.account.findFirst({
+      prisma.space.findFirst({
         where: {
-          id: input.toAccountId,
+          id: input.toSpaceId,
           userId: currentUser.id,
           isArchived: false,
         },
       }),
     ]);
 
-    if (!fromAccount || !toAccount) {
-      return { success: false, error: "invalid_transfer_accounts" };
+    if (!fromSpace || !toSpace) {
+      return { success: false, error: "invalid_transfer_spaces" };
     }
 
     const endDate = new Date(input.beginDate);
@@ -588,36 +588,36 @@ export async function createTransferEntry(
       prisma.entry.create({
         data: {
           type: "expense",
-          accountId: fromAccount.id,
-          transferAccountId: toAccount.id,
+          spaceId: fromSpace.id,
+          transferSpaceId: toSpace.id,
           description: input.description,
           amount: -absoluteAmount,
           beginDate: input.beginDate,
           endDate,
         },
         include: {
-          account: true,
+          space: true,
         },
       }),
       prisma.entry.create({
         data: {
           type: "income",
-          accountId: toAccount.id,
-          transferAccountId: fromAccount.id,
+          spaceId: toSpace.id,
+          transferSpaceId: fromSpace.id,
           description: input.description,
           amount: absoluteAmount,
           beginDate: input.beginDate,
           endDate,
         },
         include: {
-          account: true,
+          space: true,
         },
       }),
     ]);
 
-    await syncCurrentMonthEntryCounterForAccounts([
-      fromAccount.id,
-      toAccount.id,
+    await syncCurrentMonthEntryCounterForSpaces([
+      fromSpace.id,
+      toSpace.id,
     ]);
     revalidateEntryPages();
 
@@ -632,7 +632,7 @@ export async function createMultipleEntries(
   inputs: CreateEntryInput[],
 ): Promise<MultipleEntryMutationResult> {
   try {
-    const results: EntryWithAccountRecord[] = [];
+    const results: EntryWithSpaceRecord[] = [];
 
     for (const input of inputs) {
       const result = await createEntry(input);
@@ -649,20 +649,20 @@ export async function createMultipleEntries(
   }
 }
 
-export async function getEntries(): Promise<EntryWithAccountRecord[]> {
+export async function getEntries(): Promise<EntryWithSpaceRecord[]> {
   const currentUser = await requireCurrentUser();
 
   try {
     return await prisma.entry.findMany({
       where: {
-        account: {
+        space: {
           userId: currentUser.id,
         },
       },
       include: {
-        account: true,
+        space: true,
       },
-      orderBy: [{ account: { name: "asc" } }, { beginDate: "asc" }],
+      orderBy: [{ space: { name: "asc" } }, { beginDate: "asc" }],
     });
   } catch (error) {
     console.error("Error fetching entries:", error);
@@ -672,19 +672,19 @@ export async function getEntries(): Promise<EntryWithAccountRecord[]> {
 
 export async function getRecentEntries(
   limit: number = 10,
-): Promise<EntryWithAccountRecord[]> {
+): Promise<EntryWithSpaceRecord[]> {
   const currentUser = await requireCurrentUser();
 
   try {
     return await prisma.entry.findMany({
       where: {
-        account: {
+        space: {
           userId: currentUser.id,
         },
       },
       include: {
-        account: true,
-        transferAccount: {
+        space: true,
+        transferSpace: {
           select: {
             id: true,
             name: true,
@@ -728,8 +728,8 @@ export async function getProjectionPagePayload(
   const [
     chartRows,
     focusedMonthTotals,
-    accountSummaryRows,
-    accountEntriesRows,
+    spaceSummaryRows,
+    spaceEntriesRows,
   ] = await Promise.all([
     prisma.$queryRaw<ProjectionChartMonthRow[]>`
       WITH months AS (
@@ -767,18 +767,18 @@ export async function getProjectionPagePayload(
       LEFT JOIN "Entry" e
         ON e."beginDate" <= (months.month_start + interval '1 month - 1 millisecond')
        AND (e."endDate" IS NULL OR e."endDate" >= months.month_start)
-       AND e."transferAccountId" IS NULL
-      LEFT JOIN "Account" a
-        ON a.id = e."accountId"
+       AND e."transferSpaceId" IS NULL
+      LEFT JOIN "Space" a
+        ON a.id = e."spaceId"
        AND a."userId" = ${currentUser.id}
       GROUP BY months.month_start
       ORDER BY months.month_start ASC
     `,
     getMonthTotalsForUser(currentUser.id, normalizedFocusedMonthStart),
-    prisma.$queryRaw<ProjectionFocusedAccountSummaryRow[]>`
+    prisma.$queryRaw<ProjectionFocusedSpaceSummaryRow[]>`
       SELECT
-        a.id AS "accountId",
-        a.name AS "accountName",
+        a.id AS "spaceId",
+        a.name AS "spaceName",
         COALESCE(
           SUM(
             CASE
@@ -797,22 +797,22 @@ export async function getProjectionPagePayload(
           WHEN ${focusedMonthIsCurrent} THEN a."currentMonthEntryCount"
           ELSE COUNT(e.id)::integer
         END AS "monthEntryCount"
-      FROM "Account" a
-      INNER JOIN "Entry" e ON e."accountId" = a.id
+      FROM "Space" a
+      INNER JOIN "Entry" e ON e."spaceId" = a.id
       WHERE a."userId" = ${currentUser.id}
         AND e."beginDate" <= ${focusedMonthEnd}
         AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
       GROUP BY a.id, a.name, a."currentMonthEntryCount"
       ORDER BY a.name ASC
     `,
-    prisma.$queryRaw<ProjectionFocusedAccountEntryRow[]>`
+    prisma.$queryRaw<ProjectionFocusedSpaceEntryRow[]>`
       SELECT
-        ranked."accountId",
-        ranked."accountName",
+        ranked."spaceId",
+        ranked."spaceName",
         ranked.id,
         ranked.type,
-        ranked."transferAccountId",
-        ranked."transferAccountName",
+        ranked."transferSpaceId",
+        ranked."transferSpaceName",
         ranked.description,
         ranked.amount,
         ranked."beginDate",
@@ -821,12 +821,12 @@ export async function getProjectionPagePayload(
         ranked."updatedAt"
       FROM (
         SELECT
-          a.id AS "accountId",
-          a.name AS "accountName",
+          a.id AS "spaceId",
+          a.name AS "spaceName",
           e.id,
           e.type,
-          e."transferAccountId",
-          transfer_account.name AS "transferAccountName",
+          e."transferSpaceId",
+          transfer_space.name AS "transferSpaceName",
           e.description,
           e.amount,
           e."beginDate",
@@ -837,16 +837,16 @@ export async function getProjectionPagePayload(
             PARTITION BY a.id
             ORDER BY e."beginDate" DESC, e."createdAt" DESC
           ) AS row_number
-        FROM "Account" a
-        INNER JOIN "Entry" e ON e."accountId" = a.id
-        LEFT JOIN "Account" transfer_account
-          ON transfer_account.id = e."transferAccountId"
+        FROM "Space" a
+        INNER JOIN "Entry" e ON e."spaceId" = a.id
+        LEFT JOIN "Space" transfer_space
+          ON transfer_space.id = e."transferSpaceId"
         WHERE a."userId" = ${currentUser.id}
           AND e."beginDate" <= ${focusedMonthEnd}
           AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
       ) ranked
       WHERE ranked.row_number <= 5
-      ORDER BY ranked."accountName" ASC, ranked."beginDate" DESC, ranked."createdAt" DESC
+      ORDER BY ranked."spaceName" ASC, ranked."beginDate" DESC, ranked."createdAt" DESC
     `,
   ]);
 
@@ -864,21 +864,21 @@ export async function getProjectionPagePayload(
     };
   });
 
-  const accountMap = new Map<string, ProjectionFocusedAccountAccumulator>(
-    accountSummaryRows.map((account) => [
-      account.accountId,
+  const spaceMap = new Map<string, ProjectionFocusedSpaceAccumulator>(
+    spaceSummaryRows.map((space) => [
+      space.spaceId,
       {
-        accountId: account.accountId,
-        accountName: account.accountName,
-        monthTotal: Number(account.monthTotal || 0),
-        monthEntryCount: Number(account.monthEntryCount || 0),
+        spaceId: space.spaceId,
+        spaceName: space.spaceName,
+        monthTotal: Number(space.monthTotal || 0),
+        monthEntryCount: Number(space.monthEntryCount || 0),
         entries: [],
       },
     ]),
   );
 
-  accountEntriesRows.forEach((entry) => {
-    const existing = accountMap.get(entry.accountId);
+  spaceEntriesRows.forEach((entry) => {
+    const existing = spaceMap.get(entry.spaceId);
     if (!existing) {
       return;
     }
@@ -898,14 +898,14 @@ export async function getProjectionPagePayload(
     nextMonthKey: format(addMonths(normalizedFocusedMonthStart, 1), "yyyy-MM"),
     chartMonths,
     focusedMonthTotals,
-    focusedMonthAccounts: Array.from(accountMap.values())
-      .sort((a, b) => a.accountName.localeCompare(b.accountName))
-      .map((account) => ({
-        accountId: account.accountId,
-        accountName: account.accountName,
-        monthTotal: account.monthTotal,
-        monthEntryCount: account.monthEntryCount,
-        entries: account.entries,
+    focusedMonthSpaces: Array.from(spaceMap.values())
+      .sort((a, b) => a.spaceName.localeCompare(b.spaceName))
+      .map((space) => ({
+        spaceId: space.spaceId,
+        spaceName: space.spaceName,
+        monthTotal: space.monthTotal,
+        monthEntryCount: space.monthEntryCount,
+        entries: space.entries,
       })),
   };
 }
@@ -923,8 +923,8 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
     prisma.entry.findMany({
       where: {
         type: "expense",
-        transferAccountId: null,
-        account: {
+        transferSpaceId: null,
+        space: {
           userId: currentUser.id,
         },
         beginDate: {
@@ -933,8 +933,8 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
         },
       },
       include: {
-        account: true,
-        transferAccount: {
+        space: true,
+        transferSpace: {
           select: {
             id: true,
             name: true,
@@ -958,7 +958,7 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
 }
 
 export async function getEntriesWithFilters(filters: {
-  accountId?: string;
+  spaceId?: string;
   type?: "income" | "expense" | "transfer";
   date?: Date;
   description?: string;
@@ -976,20 +976,20 @@ export async function getEntriesWithFilters(filters: {
     const skip = (page - 1) * limit;
 
     const where: EntryFiltersWhere = {
-      account: {
+      space: {
         userId: currentUser.id,
       },
     };
 
-    if (filters.accountId) {
-      where.accountId = filters.accountId;
+    if (filters.spaceId) {
+      where.spaceId = filters.spaceId;
     }
 
     if (filters.type === "transfer") {
-      where.transferAccountId = { not: null };
+      where.transferSpaceId = { not: null };
     } else if (filters.type) {
       where.type = filters.type;
-      where.transferAccountId = null;
+      where.transferSpaceId = null;
     }
 
     const searchTerms = Array.from(
@@ -1040,19 +1040,19 @@ export async function getEntriesWithFilters(filters: {
         select: {
           id: true,
           type: true,
-          transferAccountId: true,
+          transferSpaceId: true,
           description: true,
           amount: true,
           beginDate: true,
           endDate: true,
           createdAt: true,
           updatedAt: true,
-          account: {
+          space: {
             select: {
               name: true,
             },
           },
-          transferAccount: {
+          transferSpace: {
             select: {
               name: true,
             },
@@ -1071,9 +1071,9 @@ export async function getEntriesWithFilters(filters: {
       entries: entries.map((entry) => ({
         id: entry.id,
         type: entry.type as "income" | "expense",
-        transferAccountId: entry.transferAccountId,
-        transferAccountName: entry.transferAccount?.name || null,
-        accountName: entry.account.name,
+        transferSpaceId: entry.transferSpaceId,
+        transferSpaceName: entry.transferSpace?.name || null,
+        spaceName: entry.space.name,
         description: entry.description,
         amount: normalizeEntryAmount(entry.type, entry.amount),
         beginDate: entry.beginDate.toISOString(),
@@ -1097,11 +1097,11 @@ export async function getEntriesWithFilters(filters: {
   }
 }
 
-export async function getAccounts(): Promise<AccountRecord[]> {
+export async function getSpaces(): Promise<SpaceRecord[]> {
   const currentUser = await requireCurrentUser();
 
   try {
-    return await prisma.account.findMany({
+    return await prisma.space.findMany({
       where: {
         userId: currentUser.id,
         isArchived: false,
@@ -1111,27 +1111,27 @@ export async function getAccounts(): Promise<AccountRecord[]> {
       },
     });
   } catch (error) {
-    console.error("Error fetching accounts:", error);
+    console.error("Error fetching spaces:", error);
     return [];
   }
 }
 
 export async function getEntryById(
   id: string,
-): Promise<EntryWithAccountRecord | null> {
+): Promise<EntryWithSpaceRecord | null> {
   const currentUser = await requireCurrentUser();
 
   try {
     return await prisma.entry.findFirst({
       where: {
         id,
-        account: {
+        space: {
           userId: currentUser.id,
         },
       },
       include: {
-        account: true,
-        transferAccount: {
+        space: true,
+        transferSpace: {
           select: {
             id: true,
             name: true,
@@ -1155,12 +1155,12 @@ export async function updateEntry(
     const existingEntry = await prisma.entry.findFirst({
       where: {
         id,
-        account: {
+        space: {
           userId: currentUser.id,
         },
       },
       include: {
-        account: true,
+        space: true,
       },
     });
 
@@ -1168,34 +1168,34 @@ export async function updateEntry(
       return { success: false, error: "failed_to_update_entry" };
     }
 
-    let accountId: string | undefined;
+    let spaceId: string | undefined;
 
-    if (input.accountName) {
-      const account = await findOrCreateAccount(
+    if (input.spaceName) {
+      const space = await findOrCreateSpace(
         currentUser.id,
-        input.accountName,
+        input.spaceName,
       );
-      accountId = account.id;
+      spaceId = space.id;
     }
 
     const entry = await prisma.entry.update({
       where: { id },
       data: {
         ...(input.type && { type: input.type }),
-        ...(accountId && { accountId }),
+        ...(spaceId && { spaceId }),
         ...(input.description && { description: input.description }),
         ...(input.amount !== undefined && { amount: input.amount }),
         ...(input.beginDate && { beginDate: input.beginDate }),
         ...(input.endDate !== undefined && { endDate: input.endDate }),
       },
       include: {
-        account: true,
+        space: true,
       },
     });
 
-    await syncCurrentMonthEntryCounterForAccounts([
-      existingEntry.accountId,
-      entry.accountId,
+    await syncCurrentMonthEntryCounterForSpaces([
+      existingEntry.spaceId,
+      entry.spaceId,
     ]);
     revalidateEntryPages();
 
@@ -1213,13 +1213,13 @@ export async function deleteEntry(id: string) {
     const existingEntry = await prisma.entry.findFirst({
       where: {
         id,
-        account: {
+        space: {
           userId: currentUser.id,
         },
       },
       select: {
         id: true,
-        accountId: true,
+        spaceId: true,
       },
     });
 
@@ -1231,7 +1231,7 @@ export async function deleteEntry(id: string) {
       where: { id },
     });
 
-    await syncCurrentMonthEntryCounterForAccount(existingEntry.accountId);
+    await syncCurrentMonthEntryCounterForSpace(existingEntry.spaceId);
     revalidateEntryPages();
 
     return { success: true };

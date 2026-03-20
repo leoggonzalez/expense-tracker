@@ -10,13 +10,13 @@ import { i18n } from "@/model/i18n";
 export type EntryCardItem = {
   id: string;
   type: string;
-  accountName: string;
+  spaceName: string;
   description: string;
   amount: number;
   beginDate: string;
   endDate: string | null;
-  transferAccountId?: string | null;
-  transferAccountName?: string | null;
+  transferSpaceId?: string | null;
+  transferSpaceName?: string | null;
 };
 
 type EntryCardProps = {
@@ -24,21 +24,21 @@ type EntryCardProps = {
 };
 
 function getTransferDirectionLabel(entry: EntryCardItem): string | null {
-  if (!entry.transferAccountId || !entry.transferAccountName) {
+  if (!entry.transferSpaceId || !entry.transferSpaceName) {
     return null;
   }
 
   if (entry.amount < 0) {
     return String(
-      i18n.t("entry_list.to_account", {
-        account: entry.transferAccountName,
+      i18n.t("entry_list.to_space", {
+        space: entry.transferSpaceName,
       }),
     );
   }
 
   return String(
-    i18n.t("entry_list.from_account", {
-      account: entry.transferAccountName,
+    i18n.t("entry_list.from_space", {
+      space: entry.transferSpaceName,
     }),
   );
 }
@@ -65,8 +65,8 @@ export function EntryCard({ entry }: EntryCardProps): React.ReactElement {
 
   return (
     <div className="entry-card">
-      <div className="entry-card__account">
-        <Avatar name={entry.accountName} />
+      <div className="entry-card__space">
+        <Avatar name={entry.spaceName} />
       </div>
       <div className="entry-card__details">
         <div className="entry-card__detail-line">

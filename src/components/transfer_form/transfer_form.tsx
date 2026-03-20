@@ -13,33 +13,33 @@ import { Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import { useToast } from "@/components/toast_provider/toast_provider";
 
-type TransferAccount = {
+type TransferSpace = {
   id: string;
   name: string;
   currentMonthTotal: number;
 };
 
 type TransferFormInitialValues = {
-  toAccountId?: string;
+  toSpaceId?: string;
   description?: string;
   amount?: string;
 };
 
 type TransferFormProps = {
-  accounts: TransferAccount[];
+  spaces: TransferSpace[];
   initialValues?: TransferFormInitialValues;
   onSuccess?: () => void;
 };
 
 export function TransferForm({
-  accounts,
+  spaces,
   initialValues,
   onSuccess,
 }: TransferFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
-  const [fromAccountId, setFromAccountId] = useState("");
-  const [toAccountId, setToAccountId] = useState(
-    initialValues?.toAccountId || "",
+  const [fromSpaceId, setFromSpaceId] = useState("");
+  const [toSpaceId, setToSpaceId] = useState(
+    initialValues?.toSpaceId || "",
   );
   const [description, setDescription] = useState(
     initialValues?.description || "",
@@ -53,21 +53,21 @@ export function TransferForm({
 
   const transferOptions = useMemo(
     () =>
-      accounts.map((account) => ({
-        value: account.id,
-        label: account.name,
+      spaces.map((space) => ({
+        value: space.id,
+        label: space.name,
       })),
-    [accounts],
+    [spaces],
   );
   const parsedAmount = parseAmountInput(amountInput);
-  const selectedFromAccount = accounts.find(
-    (account) => account.id === fromAccountId,
+  const selectedFromSpace = spaces.find(
+    (space) => space.id === fromSpaceId,
   );
   const showInsufficientFundsWarning =
-    Boolean(selectedFromAccount) &&
+    Boolean(selectedFromSpace) &&
     parsedAmount !== null &&
     parsedAmount > 0 &&
-    parsedAmount > (selectedFromAccount?.currentMonthTotal || 0);
+    parsedAmount > (selectedFromSpace?.currentMonthTotal || 0);
 
   const onSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -75,15 +75,15 @@ export function TransferForm({
     const parsedBeginDate = toDate(beginDate, beginDateMode);
     const parsedAmount = parseAmountInput(amountInput);
 
-    if (!fromAccountId || !toAccountId || !description || !parsedBeginDate) {
+    if (!fromSpaceId || !toSpaceId || !description || !parsedBeginDate) {
       showError(i18n.t("toast.transfer_create_failed"), {
         iconName: "transfer",
       });
       return;
     }
 
-    if (fromAccountId === toAccountId) {
-      showError(i18n.t("entry_form.transfer_same_account"), {
+    if (fromSpaceId === toSpaceId) {
+      showError(i18n.t("entry_form.transfer_same_space"), {
         iconName: "transfer",
       });
       return;
@@ -99,8 +99,8 @@ export function TransferForm({
     setIsSubmitting(true);
 
     const result = await createTransferEntry({
-      fromAccountId,
-      toAccountId,
+      fromSpaceId,
+      toSpaceId,
       description,
       amount: Math.abs(parsedAmount),
       beginDate: parsedBeginDate,
@@ -115,8 +115,8 @@ export function TransferForm({
       return;
     }
 
-    setFromAccountId("");
-    setToAccountId("");
+    setFromSpaceId("");
+    setToSpaceId("");
     setDescription("");
     setAmountInput("");
     setBeginDate(new Date().toISOString().slice(0, 7));
@@ -135,15 +135,15 @@ export function TransferForm({
       <Stack gap={16}>
         <Select
           label={i18n.t("entry_form.transfer_from")}
-          value={fromAccountId}
-          onChange={setFromAccountId}
+          value={fromSpaceId}
+          onChange={setFromSpaceId}
           options={transferOptions}
           placeholder={
-            i18n.t("entry_form.transfer_account_placeholder") as string
+            i18n.t("entry_form.transfer_space_placeholder") as string
           }
           required
         />
-        {showInsufficientFundsWarning && selectedFromAccount ? (
+        {showInsufficientFundsWarning && selectedFromSpace ? (
           <InfoBox
             variant="warning"
             title={String(
@@ -151,9 +151,9 @@ export function TransferForm({
             )}
             message={String(
               i18n.t("entry_form.transfer_insufficient_funds_message", {
-                account: selectedFromAccount.name,
+                space: selectedFromSpace.name,
                 amount: parsedAmount?.toFixed(2) || "0.00",
-                balance: selectedFromAccount.currentMonthTotal.toFixed(2),
+                balance: selectedFromSpace.currentMonthTotal.toFixed(2),
               }),
             )}
           />
@@ -161,11 +161,11 @@ export function TransferForm({
 
         <Select
           label={i18n.t("entry_form.transfer_to")}
-          value={toAccountId}
-          onChange={setToAccountId}
+          value={toSpaceId}
+          onChange={setToSpaceId}
           options={transferOptions}
           placeholder={
-            i18n.t("entry_form.transfer_account_placeholder") as string
+            i18n.t("entry_form.transfer_space_placeholder") as string
           }
           required
         />

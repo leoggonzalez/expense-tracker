@@ -17,9 +17,9 @@ export default async function Page(): Promise<React.ReactElement> {
     <Container>
       <Stack gap={24}>
         <Hero
-          icon="accounts"
+          icon="settings"
           title={String(i18n.t("account.title"))}
-          pattern="account"
+          pattern="settings"
         >
           <Stack gap={24}>
             <Text as="p" size="sm" color="inverse">

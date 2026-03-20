@@ -131,10 +131,10 @@ export default async function ProjectionPage({
 
           <Stack gap={16}>
             <Text size="h4" as="h3" weight="semibold">
-              {i18n.t("projection_page.accounts_with_entries")}
+              {i18n.t("projection_page.spaces_with_entries")}
             </Text>
 
-            {payload.focusedMonthAccounts.length === 0 ? (
+            {payload.focusedMonthSpaces.length === 0 ? (
               <Card padding={24} variant="dashed">
                 <Text color="secondary">
                   {i18n.t("projection_page.empty_month_entries")}
@@ -142,28 +142,28 @@ export default async function ProjectionPage({
               </Card>
             ) : (
               <Stack gap={24}>
-                {payload.focusedMonthAccounts.map((account) => {
+                {payload.focusedMonthSpaces.map((space) => {
                   const hiddenEntriesCount = Math.max(
                     0,
-                    account.monthEntryCount - account.entries.length,
+                    space.monthEntryCount - space.entries.length,
                   );
-                  const accountMonthHref = `/accounts/${account.accountId}?currentMonth=${payload.focusedMonth.key}`;
+                  const spaceMonthHref = `/spaces/${space.spaceId}?currentMonth=${payload.focusedMonth.key}`;
 
                   return (
                     <Card
-                      key={account.accountId}
+                      key={space.spaceId}
                       as="section"
                       padding={24}
-                      title={account.accountName}
-                      icon="accounts"
+                      title={space.spaceName}
+                      icon="spaces"
                       actions={
                         <Button
-                          href={accountMonthHref}
+                          href={spaceMonthHref}
                           variant="secondary"
                           size="sm"
                           startIcon={<Icon name="external-link" size={16} />}
                           ariaLabel={String(
-                            i18n.t("projection_page.open_account"),
+                            i18n.t("projection_page.open_space"),
                           )}
                         >
                           {null}
@@ -171,32 +171,32 @@ export default async function ProjectionPage({
                       }
                     >
                       <EntryList
-                        entries={account.entries}
+                        entries={space.entries}
                         showDelete={false}
                         entryHrefBase="/entries"
                         summaryRows={[
                           ...(hiddenEntriesCount > 0
                             ? [
                                 {
-                                  id: `more-${account.accountId}`,
+                                  id: `more-${space.spaceId}`,
                                   label: i18n.t(
                                     "projection_page.more_entries_this_month",
                                     {
                                       count: hiddenEntriesCount,
                                     },
                                   ) as string,
-                                  href: accountMonthHref,
+                                  href: spaceMonthHref,
                                 },
                               ]
                             : []),
                           {
-                            id: `total-${account.accountId}`,
+                            id: `total-${space.spaceId}`,
                             label: i18n.t(
-                              "projection_page.account_month_total",
+                              "projection_page.space_month_total",
                             ) as string,
                             value: (
                               <Currency
-                                value={account.monthTotal}
+                                value={space.monthTotal}
                                 size="sm"
                                 weight="bold"
                               />

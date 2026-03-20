@@ -9,14 +9,14 @@ export interface MonthlyData {
   net: number;
 }
 
-export interface AccountProjectionGroup {
-  account: string;
+export interface SpaceProjectionGroup {
+  space: string;
   entries: Entry[];
   monthlyTotals: Map<string, number>;
 }
 
-export interface AccountMonthBreakdown {
-  account: string;
+export interface SpaceMonthBreakdown {
+  space: string;
   income: number;
   expense: number;
   net: number;
@@ -89,28 +89,28 @@ export class EntryCollection {
   }
 
   /**
-   * Get all unique accounts
+   * Get all unique spaces
    */
-  getAccounts(): string[] {
-    const accounts = new Set<string>();
-    this.entries.forEach((entry) => accounts.add(entry.account));
-    return Array.from(accounts).sort();
+  getSpaces(): string[] {
+    const spaces = new Set<string>();
+    this.entries.forEach((entry) => spaces.add(entry.space));
+    return Array.from(spaces).sort();
   }
 
   /**
-   * Get entries grouped by their account property
+   * Get entries grouped by their space property
    */
-  getEntriesByAccount(): AccountProjectionGroup[] {
-    const accounts = this.getAccounts();
+  getEntriesBySpace(): SpaceProjectionGroup[] {
+    const spaces = this.getSpaces();
 
-    return accounts.map((account) => {
-      const accountEntries = this.entries.filter(
-        (entry) => entry.account === account,
+    return spaces.map((space) => {
+      const spaceEntries = this.entries.filter(
+        (entry) => entry.space === space,
       );
 
       return {
-        account,
-        entries: accountEntries,
+        space,
+        entries: spaceEntries,
         monthlyTotals: new Map(),
       };
     });
@@ -123,7 +123,7 @@ export class EntryCollection {
     startDate: Date,
     monthCount: number,
   ): {
-    accounts: AccountProjectionGroup[];
+    spaces: SpaceProjectionGroup[];
     monthlyTotals: Map<
       string,
       { income: number; expense: number; net: number }
@@ -137,16 +137,16 @@ export class EntryCollection {
       months.push(startOfMonth(month));
     }
 
-    const accounts = this.getEntriesByAccount();
+    const spaces = this.getEntriesBySpace();
 
-    // Calculate monthly totals for each account
-    accounts.forEach((account) => {
+    // Calculate monthly totals for each space
+    spaces.forEach((space) => {
       months.forEach((month) => {
         const monthKey = format(month, "yyyy-MM");
-        const total = account.entries.reduce((sum, entry) => {
+        const total = space.entries.reduce((sum, entry) => {
           return sum + entry.getAmountForMonth(month);
         }, 0);
-        account.monthlyTotals.set(monthKey, total);
+        space.monthlyTotals.set(monthKey, total);
       });
     });
 
@@ -166,13 +166,13 @@ export class EntryCollection {
       });
     });
 
-    return { accounts, monthlyTotals, months };
+    return { spaces, monthlyTotals, months };
   }
 
-  getCurrentMonthBreakdownByAccount(targetDate: Date): AccountMonthBreakdown[] {
-    return this.getEntriesByAccount()
-      .map((accountGroup) => {
-        const activeEntries = accountGroup.entries.filter((entry) =>
+  getCurrentMonthBreakdownBySpace(targetDate: Date): SpaceMonthBreakdown[] {
+    return this.getEntriesBySpace()
+      .map((spaceGroup) => {
+        const activeEntries = spaceGroup.entries.filter((entry) =>
           entry.isActiveInMonth(targetDate),
         );
 
@@ -185,17 +185,17 @@ export class EntryCollection {
         const net = income + expense;
 
         return {
-          account: accountGroup.account,
+          space: spaceGroup.space,
           income,
           expense,
           net,
         };
       })
       .filter(
-        (accountBreakdown) =>
-          accountBreakdown.income !== 0 ||
-          accountBreakdown.expense !== 0 ||
-          accountBreakdown.net !== 0,
+        (spaceBreakdown) =>
+          spaceBreakdown.income !== 0 ||
+          spaceBreakdown.expense !== 0 ||
+          spaceBreakdown.net !== 0,
       );
   }
 

@@ -13,7 +13,7 @@ export default async function Layout({
   const serializedEntries = recentEntries.map((entry) => ({
     id: entry.id,
     type: entry.type,
-    accountName: entry.account.name,
+    spaceName: entry.space.name,
     description: entry.description,
     amount:
       entry.type === "expense" && entry.amount > 0
@@ -21,8 +21,8 @@ export default async function Layout({
         : entry.amount,
     beginDate: entry.beginDate.toISOString(),
     endDate: entry.endDate?.toISOString() || null,
-    transferAccountId: entry.transferAccountId,
-    transferAccountName: entry.transferAccount?.name || null,
+    transferSpaceId: entry.transferSpaceId,
+    transferSpaceName: entry.transferSpace?.name || null,
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   }));

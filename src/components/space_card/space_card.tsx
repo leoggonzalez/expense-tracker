@@ -1,4 +1,4 @@
-import "./account_card.scss";
+import "./space_card.scss";
 
 import { Avatar, Button, Currency } from "@/components";
 import { Card, Icon, Stack, Text } from "@/elements";
@@ -6,22 +6,22 @@ import { Card, Icon, Stack, Text } from "@/elements";
 import React from "react";
 import { i18n } from "@/model/i18n";
 
-type AccountCardProps = {
+type SpaceCardProps = {
   id: string;
   name: string;
   currentMonthTotal: number;
   monthLabel: string;
 };
 
-export function AccountCard({
+export function SpaceCard({
   id,
   name,
   currentMonthTotal,
   monthLabel,
-}: AccountCardProps): React.ReactElement {
+}: SpaceCardProps): React.ReactElement {
   return (
-    <div className="account-card">
-      <div className="account-card__panel">
+    <div className="space-card">
+      <div className="space-card__panel">
         <Card padding={24}>
           <Stack gap={20}>
             <Stack
@@ -37,20 +37,20 @@ export function AccountCard({
                 </Text>
               </Stack>
               <Button
-                href={`/accounts/${id}`}
+                href={`/spaces/${id}`}
                 variant="secondary"
                 size="sm"
                 startIcon={<Icon name="external-link" size={16} />}
-                ariaLabel={String(i18n.t("accounts_page.open_account"))}
+                ariaLabel={String(i18n.t("spaces_page.open_space"))}
               >
-                <span className="account-card__sr-only">
-                  {i18n.t("accounts_page.open_account")}
+                <span className="space-card__sr-only">
+                  {i18n.t("spaces_page.open_space")}
                 </span>
               </Button>
             </Stack>
 
             <Text size="sm" color="secondary">
-              {i18n.t("accounts_page.month_total_label", {
+              {i18n.t("spaces_page.month_total_label", {
                 month: monthLabel,
               })}
             </Text>

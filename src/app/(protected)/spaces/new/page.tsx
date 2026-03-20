@@ -1,5 +1,5 @@
 import {
-  AccountCreateForm,
+  SpaceCreateForm,
   AppLink,
   Container,
   Hero,
@@ -15,21 +15,21 @@ export default function Page(): React.ReactElement {
     <Container>
       <Stack gap={24}>
         <Hero
-          icon="accounts"
-          title={String(i18n.t("accounts_page.create_account"))}
-          pattern="account_form"
+          icon="spaces"
+          title={String(i18n.t("spaces_page.create_space"))}
+          pattern="space_form"
         >
           <Text as="p" size="sm" color="inverse">
-            {i18n.t("accounts_page.create_account_hint")}
+            {i18n.t("spaces_page.create_space_hint")}
           </Text>
         </Hero>
 
         <PagePanel tone="form">
-          <AccountCreateForm />
+          <SpaceCreateForm />
         </PagePanel>
 
-        <AppLink href="/accounts">
-          {i18n.t("accounts_page.back_to_accounts")}
+        <AppLink href="/spaces">
+          {i18n.t("spaces_page.back_to_spaces")}
         </AppLink>
       </Stack>
     </Container>

@@ -57,7 +57,7 @@ export { AuthFormShell } from "./auth_form_shell/auth_form_shell";
 export { LoginForm } from "./login_form/login_form";
 export { VerifyLoginForm } from "./verify_login_form/verify_login_form";
 export { OtpInput } from "./otp_input/otp_input";
-export { AccountField } from "./account_field/account_field";
+export { SpaceField } from "./space_field/space_field";
 export {
   AppPreferencesProvider,
   useAppPreferences,
@@ -67,9 +67,9 @@ export {
   useNavigationProgress,
 } from "./navigation_progress_provider/navigation_progress_provider";
 export { AppLink } from "./app_link/app_link";
-export { AccountCreateForm } from "./account_create_form/account_create_form";
-export { AccountEditForm } from "./account_edit_form/account_edit_form";
-export { AccountCard } from "./account_card/account_card";
+export { SpaceCreateForm } from "./space_create_form/space_create_form";
+export { SpaceEditForm } from "./space_edit_form/space_edit_form";
+export { SpaceCard } from "./space_card/space_card";
 export { AccountProfileForm } from "./account_profile_form/account_profile_form";
 export { NewEntryRecentEntries } from "./new_entry_recent_entries/new_entry_recent_entries";
 export { PagePanel } from "./page_panel/page_panel";

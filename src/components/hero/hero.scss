@@ -94,16 +94,16 @@
     background-image: url("./patterns/entries.svg");
   }
 
-  &--pattern-accounts::before {
-    background-image: url("./patterns/accounts.svg");
+  &--pattern-spaces::before {
+    background-image: url("./patterns/spaces.svg");
   }
 
-  &--pattern-account_detail::before {
-    background-image: url("./patterns/account_detail.svg");
+  &--pattern-space_detail::before {
+    background-image: url("./patterns/space_detail.svg");
   }
 
-  &--pattern-account_form::before {
-    background-image: url("./patterns/account_form.svg");
+  &--pattern-space_form::before {
+    background-image: url("./patterns/space_form.svg");
   }
 
   &--pattern-entry_detail::before {
@@ -114,8 +114,8 @@
     background-image: url("./patterns/new_entry.svg");
   }
 
-  &--pattern-account::before {
-    background-image: url("./patterns/account.svg");
+  &--pattern-space::before {
+    background-image: url("./patterns/space.svg");
   }
 
   &--pattern-settings::before {

@@ -11,13 +11,13 @@ import React from "react";
 export type EntryListItem = {
   id: string;
   type: string;
-  accountName: string;
+  spaceName: string;
   description: string;
   amount: number;
   beginDate: string;
   endDate: string | null;
-  transferAccountId?: string | null;
-  transferAccountName?: string | null;
+  transferSpaceId?: string | null;
+  transferSpaceName?: string | null;
   createdAt: string;
   updatedAt: string;
 };

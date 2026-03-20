@@ -3,7 +3,7 @@
 import "./entry_form.scss";
 
 import {
-  AccountField,
+  SpaceField,
   Button,
   Input,
   MonthSelector,
@@ -33,12 +33,12 @@ import { useForm } from "react-use-form-library";
 import { useToast } from "@/components/toast_provider/toast_provider";
 
 export interface EntryFormProps {
-  accounts?: string[];
+  spaces?: string[];
   onSuccess?: () => void;
   initialData?: {
     id: string;
     type: string;
-    accountName: string;
+    spaceName: string;
     description: string;
     amount: number;
     beginDate: string;
@@ -51,7 +51,7 @@ export interface EntryFormProps {
 
 type EntryFormModel = {
   type: "income" | "expense";
-  accountName: string;
+  spaceName: string;
   description: string;
   amountInput: string;
   beginDate: string;
@@ -90,7 +90,7 @@ function getInitialModel(props: EntryFormProps): EntryFormModel {
 
   return {
     type,
-    accountName: props.initialData?.accountName || "",
+    spaceName: props.initialData?.spaceName || "",
     description: props.initialData?.description || "",
     amountInput: props.initialData?.amount
       ? String(props.initialData.amount)
@@ -160,7 +160,7 @@ function sanitizeInstallmentsInput(value: string): string {
 }
 
 export function EntryForm({
-  accounts: initialAccounts = [],
+  spaces: initialSpaces = [],
   onSuccess,
   initialData,
   isEdit = false,
@@ -262,7 +262,7 @@ export function EntryForm({
 
       const payload: CreateEntryInput = {
         type: isEdit ? form.model.type : entryType || form.model.type,
-        accountName: form.model.accountName,
+        spaceName: form.model.spaceName,
         description: form.model.description,
         amount: parsedAmount,
         beginDate,
@@ -328,7 +328,7 @@ export function EntryForm({
 
     if (draft) {
       updateFields({
-        accountName: draft.accountName,
+        spaceName: draft.spaceName,
         description: draft.description,
         amountInput: draft.amountInput,
         beginDate: draft.beginDate,
@@ -353,7 +353,7 @@ export function EntryForm({
     }
 
     saveNewEntryDraft({
-      accountName: model.accountName,
+      spaceName: model.spaceName,
       description: model.description,
       amountInput: model.amountInput,
       beginDate: model.beginDate,
@@ -364,7 +364,7 @@ export function EntryForm({
   }, [
     isCreateFlow,
     isDraftReady,
-    model.accountName,
+    model.spaceName,
     model.amountInput,
     model.beginDate,
     model.description,
@@ -424,12 +424,12 @@ export function EntryForm({
           />
         )}
 
-        <AccountField
-          label={i18n.t("entry_form.account")}
-          value={fields.accountName.value || ""}
-          onChange={(value) => fields.accountName.onChange(value)}
-          accounts={initialAccounts}
-          placeholder={i18n.t("entry_form.account_placeholder") as string}
+        <SpaceField
+          label={i18n.t("entry_form.space")}
+          value={fields.spaceName.value || ""}
+          onChange={(value) => fields.spaceName.onChange(value)}
+          spaces={initialSpaces}
+          placeholder={i18n.t("entry_form.space_placeholder") as string}
           required
         />
 

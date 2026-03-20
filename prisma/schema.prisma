@@ -14,12 +14,12 @@ model User {
   name       String?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
-  accounts   Account[]
+  spaces   Space[]
   loginCodes LoginCode[]
   sessions   Session[]
 }
 
-model Account {
+model Space {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -29,7 +29,7 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   entries   Entry[]
-  transferEntries Entry[] @relation("EntryTransferAccount")
+  transferEntries Entry[] @relation("EntryTransferSpace")
 
   @@unique([userId, name])
   @@index([userId])
@@ -38,10 +38,10 @@ model Account {
 model Entry {
   id          String    @id @default(cuid())
   type        String    // "income" or "expense"
-  accountId   String
-  account     Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  transferAccountId String?
-  transferAccount Account? @relation("EntryTransferAccount", fields: [transferAccountId], references: [id], onDelete: SetNull)
+  spaceId   String
+  space     Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  transferSpaceId String?
+  transferSpace Space? @relation("EntryTransferSpace", fields: [transferSpaceId], references: [id], onDelete: SetNull)
   description String
   amount      Float
   beginDate   DateTime
@@ -49,8 +49,8 @@ model Entry {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  @@index([accountId])
-  @@index([transferAccountId])
+  @@index([spaceId])
+  @@index([transferSpaceId])
   @@index([beginDate])
 }
 

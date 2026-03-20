@@ -1,7 +1,7 @@
 import { PersistedValue } from "@/lib/persisted_value";
 
 export type NewEntryDraft = {
-  accountName: string;
+  spaceName: string;
   description: string;
   amountInput: string;
   beginDate: string;

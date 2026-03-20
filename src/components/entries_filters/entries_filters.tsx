@@ -11,12 +11,12 @@ import { format } from "date-fns";
 import { i18n } from "@/model/i18n";
 
 type EntriesFiltersProps = {
-  accounts: Array<{
+  spaces: Array<{
     id: string;
     name: string;
   }>;
   filters: {
-    account: string;
+    space: string;
     type: string;
     startDate: string;
     endDate: string;
@@ -53,7 +53,7 @@ function getUniqueSearchTerms(searchTerms: string[]): string[] {
 }
 
 export function EntriesFilters({
-  accounts,
+  spaces,
   filters,
 }: EntriesFiltersProps): React.ReactElement {
   const pathname = usePathname();
@@ -62,13 +62,13 @@ export function EntriesFilters({
   const [searchValue, setSearchValue] = React.useState("");
 
   const updateQuery = ({
-    account,
+    space,
     type,
     startDate,
     endDate,
     searchTerms,
   }: {
-    account?: string;
+    space?: string;
     type?: EntryTypeFilter;
     startDate?: string;
     endDate?: string;
@@ -76,11 +76,11 @@ export function EntriesFilters({
   }): void => {
     const nextParams = new URLSearchParams(searchParams.toString());
 
-    if (account !== undefined) {
-      if (account) {
-        nextParams.set("account", account);
+    if (space !== undefined) {
+      if (space) {
+        nextParams.set("space", space);
       } else {
-        nextParams.delete("account");
+        nextParams.delete("space");
       }
     }
 
@@ -165,9 +165,9 @@ export function EntriesFilters({
     });
   };
 
-  const accountLabel =
-    accounts.find((accountOption) => accountOption.id === filters.account)
-      ?.name || filters.account;
+  const spaceLabel =
+    spaces.find((spaceOption) => spaceOption.id === filters.space)
+      ?.name || filters.space;
   const typeLabel =
     filters.type === "income"
       ? String(i18n.t("common.income"))
@@ -194,14 +194,14 @@ export function EntriesFilters({
           },
         ]
       : []),
-    ...(filters.account
+    ...(filters.space
       ? [
           {
-            id: "account",
+            id: "space",
             label: String(
-              i18n.t("entries_page.account_pill", { account: accountLabel }),
+              i18n.t("entries_page.space_pill", { space: spaceLabel }),
             ),
-            onRemove: () => updateQuery({ account: "" }),
+            onRemove: () => updateQuery({ space: "" }),
           },
         ]
       : []),
@@ -292,23 +292,23 @@ export function EntriesFilters({
             </div>
 
             <div className="entries-filters__menu-section">
-              <label className="entries-filters__field-label" htmlFor="account">
-                {i18n.t("entries_page.account")}
+              <label className="entries-filters__field-label" htmlFor="space">
+                {i18n.t("entries_page.space")}
               </label>
               <select
-                id="account"
+                id="space"
                 className="entries-filters__select"
-                value={filters.account}
+                value={filters.space}
                 onChange={(event) =>
-                  updateQuery({ account: event.target.value })
+                  updateQuery({ space: event.target.value })
                 }
               >
                 <option value="">
-                  {String(i18n.t("entries_page.account_placeholder"))}
+                  {String(i18n.t("entries_page.space_placeholder"))}
                 </option>
-                {accounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name}
+                {spaces.map((space) => (
+                  <option key={space.id} value={space.id}>
+                    {space.name}
                   </option>
                 ))}
               </select>

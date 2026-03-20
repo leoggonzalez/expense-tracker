@@ -3,8 +3,8 @@ import { endOfMonth, startOfMonth } from "date-fns";
 export interface IEntry {
   id: string;
   type: "income" | "expense";
-  account: string;
-  accountName: string;
+  space: string;
+  spaceName: string;
   description: string;
   amount: number;
   beginDate: Date;
@@ -16,8 +16,8 @@ export interface IEntry {
 type EntryJSON = {
   id: string;
   type: string;
-  account?: string;
-  accountName?: string;
+  space?: string;
+  spaceName?: string;
   description: string;
   amount: number;
   beginDate: Date | string;
@@ -41,12 +41,12 @@ export class Entry {
     return this.data.type;
   }
 
-  get account(): string {
-    return this.data.account;
+  get space(): string {
+    return this.data.space;
   }
 
-  get accountName(): string {
-    return this.data.accountName;
+  get spaceName(): string {
+    return this.data.spaceName;
   }
 
   get description(): string {
@@ -136,8 +136,8 @@ export class Entry {
     return new Entry({
       ...data,
       type: data.type as IEntry["type"],
-      account: data.account ?? data.accountName ?? "",
-      accountName: data.accountName ?? data.account ?? "",
+      space: data.space ?? data.spaceName ?? "",
+      spaceName: data.spaceName ?? data.space ?? "",
       beginDate: new Date(data.beginDate),
       endDate: data.endDate ? new Date(data.endDate) : null,
       createdAt: new Date(data.createdAt),

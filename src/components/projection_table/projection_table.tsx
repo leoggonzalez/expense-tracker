@@ -13,7 +13,7 @@ export interface ProjectionTableProps {
   entries: Array<{
     id: string;
     type: string;
-    account: string;
+    space: string;
     description: string;
     amount: number;
     beginDate: string;
@@ -72,7 +72,7 @@ export function ProjectionTable({
 
   const monthCount = Math.max(1, monthsDiff);
 
-  const { accounts, monthlyTotals, months } = collection.getProjectionData(
+  const { spaces, monthlyTotals, months } = collection.getProjectionData(
     startMonth,
     monthCount,
   );
@@ -109,7 +109,7 @@ export function ProjectionTable({
               <thead className="projection-table__thead">
                 <tr className="projection-table__row">
                   <th className="projection-table__cell projection-table__cell--header projection-table__cell--sticky projection-table__cell--header-sticky">
-                    {i18n.t("projection_table.account_description")}
+                    {i18n.t("projection_table.space_description")}
                   </th>
                   {months.map((month) => (
                     <th
@@ -122,13 +122,13 @@ export function ProjectionTable({
                 </tr>
               </thead>
               <tbody className="projection-table__tbody">
-                {accounts.map((account) => {
+                {spaces.map((space) => {
                   return (
-                    <React.Fragment key={account.account}>
+                    <React.Fragment key={space.space}>
                       <tr className="projection-table__row projection-table__row--group-header">
                         <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--group-header">
                           <Text size="md" weight="bold">
-                            {account.account}
+                            {space.space}
                           </Text>
                         </td>
                         {months.map((month) => (
@@ -138,7 +138,7 @@ export function ProjectionTable({
                           />
                         ))}
                       </tr>
-                      {account.entries.map((entry) => (
+                      {space.entries.map((entry) => (
                         <tr
                           key={entry.id}
                           className="projection-table__row projection-table__row--interactive"
@@ -172,15 +172,15 @@ export function ProjectionTable({
                       <tr className="projection-table__row projection-table__row--group-total">
                         <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--total">
                           <Text size="sm" weight="bold">
-                            {i18n.t("projection_table.account_total", {
-                              account: account.account,
+                            {i18n.t("projection_table.space_total", {
+                              space: space.space,
                             })}
                           </Text>
                         </td>
                         {months.map((month) => {
                           const monthKey = format(month, "yyyy-MM");
                           const total =
-                            account.monthlyTotals.get(monthKey) || 0;
+                            space.monthlyTotals.get(monthKey) || 0;
                           return (
                             <td
                               key={month.toISOString()}

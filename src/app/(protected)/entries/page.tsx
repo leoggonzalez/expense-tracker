@@ -6,7 +6,7 @@ import {
   EntriesTable,
   Hero,
 } from "@/components";
-import { getAccounts, getEntriesWithFilters } from "@/actions/entries";
+import { getSpaces, getEntriesWithFilters } from "@/actions/entries";
 
 import { i18n } from "@/model/i18n";
 
@@ -30,9 +30,9 @@ export default async function Page({
       (Array.isArray(params.page) ? params.page[0] : params.page) || "1",
     ) || 1,
   );
-  const account = Array.isArray(params.account)
-    ? params.account[0] || ""
-    : params.account || "";
+  const space = Array.isArray(params.space)
+    ? params.space[0] || ""
+    : params.space || "";
   const rawType = Array.isArray(params.type) ? params.type[0] : params.type;
   const type =
     rawType === "income" || rawType === "expense" || rawType === "transfer"
@@ -53,9 +53,9 @@ export default async function Page({
     new Set(rawSearchTerms.map((term) => term.trim()).filter(Boolean)),
   );
 
-  const [entriesData, accounts] = await Promise.all([
+  const [entriesData, spaces] = await Promise.all([
     getEntriesWithFilters({
-      accountId: account || undefined,
+      spaceId: space || undefined,
       type: type || undefined,
       searchTerms,
       startDate: startDate ? new Date(startDate) : undefined,
@@ -63,7 +63,7 @@ export default async function Page({
       page,
       limit: 20,
     }),
-    getAccounts(),
+    getSpaces(),
   ]);
 
   return (
@@ -105,12 +105,12 @@ export default async function Page({
         >
           <Stack gap={20}>
             <EntriesFilters
-              accounts={accounts.map((entryAccount) => ({
-                id: entryAccount.id,
-                name: entryAccount.name,
+              spaces={spaces.map((entrySpace) => ({
+                id: entrySpace.id,
+                name: entrySpace.name,
               }))}
               filters={{
-                account,
+                space,
                 type,
                 startDate,
                 endDate,
@@ -129,8 +129,8 @@ export default async function Page({
 
             {entriesData.pagination.page < entriesData.pagination.totalPages ? (
               <form method="get">
-                {account ? (
-                  <input type="hidden" name="account" value={account} />
+                {space ? (
+                  <input type="hidden" name="space" value={space} />
                 ) : null}
                 {type ? <input type="hidden" name="type" value={type} /> : null}
                 {startDate ? (

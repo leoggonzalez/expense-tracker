@@ -55,9 +55,9 @@ export function NavigationClient({
           icon: "entries",
         },
         {
-          href: "/accounts",
-          label: i18n.t("navigation.accounts"),
-          icon: "accounts",
+          href: "/spaces",
+          label: i18n.t("navigation.spaces"),
+          icon: "spaces",
         },
         {
           href: "/settings",

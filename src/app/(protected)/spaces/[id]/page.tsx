@@ -9,17 +9,17 @@ import {
   HeroMetric,
   HeroMetrics,
 } from "@/components";
-import { AccountArchiveDialog } from "@/components/account_archive_dialog/account_archive_dialog";
+import { SpaceArchiveDialog } from "@/components/space_archive_dialog/space_archive_dialog";
 import { Card, Icon, Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
-import { getAccountDetailPageData } from "@/actions/accounts";
+import { getSpaceDetailPageData } from "@/actions/spaces";
 
 import { i18n } from "@/model/i18n";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-type AccountRouteProps = {
+type SpaceRouteProps = {
   params: Promise<{
     id: string;
   }>;
@@ -62,14 +62,14 @@ function formatMonthKey(date: Date): string {
 export default async function Page({
   params,
   searchParams,
-}: AccountRouteProps): Promise<React.ReactElement> {
+}: SpaceRouteProps): Promise<React.ReactElement> {
   const { id } = await params;
   const query = await searchParams;
   const page = Math.max(1, Number(query.page || "1") || 1);
   const selectedMonthStart = parseCurrentMonthOrNow(query.currentMonth);
 
-  const data = await getAccountDetailPageData({
-    accountId: id,
+  const data = await getSpaceDetailPageData({
+    spaceId: id,
     page,
     limit: 10,
     selectedMonthStart,
@@ -95,31 +95,31 @@ export default async function Page({
 
   const detailHref =
     detailSearchParams.size > 0
-      ? `/accounts/${data.account.id}?${detailSearchParams.toString()}`
-      : `/accounts/${data.account.id}`;
+      ? `/spaces/${data.space.id}?${detailSearchParams.toString()}`
+      : `/spaces/${data.space.id}`;
   const confirmArchiveHref =
     detailSearchParams.size > 0
-      ? `/accounts/${data.account.id}?${detailSearchParams.toString()}&confirmArchive=1`
-      : `/accounts/${data.account.id}?confirmArchive=1`;
+      ? `/spaces/${data.space.id}?${detailSearchParams.toString()}&confirmArchive=1`
+      : `/spaces/${data.space.id}?confirmArchive=1`;
   const confirmUnarchiveHref =
     detailSearchParams.size > 0
-      ? `/accounts/${data.account.id}?${detailSearchParams.toString()}&confirmUnarchive=1`
-      : `/accounts/${data.account.id}?confirmUnarchive=1`;
+      ? `/spaces/${data.space.id}?${detailSearchParams.toString()}&confirmUnarchive=1`
+      : `/spaces/${data.space.id}?confirmUnarchive=1`;
   const settleHref = `/entries/new/transfer?${new URLSearchParams({
-    to_account: data.account.id,
-    amount: Math.abs(data.account.selectedMonthTotal).toFixed(2),
+    to_space: data.space.id,
+    amount: Math.abs(data.space.selectedMonthTotal).toFixed(2),
     description: String(
-      i18n.t("accounts_page.settle_description", {
-        account: data.account.name,
+      i18n.t("spaces_page.settle_description", {
+        space: data.space.name,
         month: selectedMonthLabel,
       }),
     ),
   }).toString()}`;
-  const heroActions: HeroAction[] = data.account.isArchived
+  const heroActions: HeroAction[] = data.space.isArchived
     ? [
         {
           icon: "check",
-          ariaLabel: String(i18n.t("accounts_page.unarchive")),
+          ariaLabel: String(i18n.t("spaces_page.unarchive")),
           href: confirmUnarchiveHref,
           variant: "outline",
         },
@@ -127,20 +127,20 @@ export default async function Page({
     : [
         {
           icon: "edit",
-          ariaLabel: String(i18n.t("accounts_page.edit_account")),
-          href: `/accounts/${data.account.id}/edit`,
+          ariaLabel: String(i18n.t("spaces_page.edit_space")),
+          href: `/spaces/${data.space.id}/edit`,
           variant: "outline",
         },
         {
           icon: "transfer" as const,
-          ariaLabel: String(i18n.t("accounts_page.settle")),
+          ariaLabel: String(i18n.t("spaces_page.settle")),
           href: settleHref,
           variant: "outline",
-          disabled: data.account.selectedMonthTotal >= 0,
+          disabled: data.space.selectedMonthTotal >= 0,
         },
         {
           icon: "alert",
-          ariaLabel: String(i18n.t("accounts_page.archive")),
+          ariaLabel: String(i18n.t("spaces_page.archive")),
           href: confirmArchiveHref,
           variant: "outline-danger",
         },
@@ -150,15 +150,15 @@ export default async function Page({
     <Container>
       <Stack gap={24}>
         <Hero
-          icon="accounts"
-          title={data.account.name}
-          pattern="account_detail"
+          icon="spaces"
+          title={data.space.name}
+          pattern="space_detail"
           actions={heroActions}
         >
           <Stack gap={24}>
             <Stack gap={14}>
               <Text as="p" size="sm" color="inverse">
-                {i18n.t("accounts_page.detail_hero_subtitle", {
+                {i18n.t("spaces_page.detail_hero_subtitle", {
                   month: selectedMonthLabel,
                 })}
               </Text>
@@ -168,12 +168,12 @@ export default async function Page({
               <HeroMetric>
                 <Stack gap={16}>
                   <Text size="sm" color="inverse">
-                    {i18n.t("accounts_page.month_total_label", {
+                    {i18n.t("spaces_page.month_total_label", {
                       month: selectedMonthLabel,
                     })}
                   </Text>
                   <Currency
-                    value={data.account.selectedMonthTotal}
+                    value={data.space.selectedMonthTotal}
                     size="h3"
                     weight="bold"
                     color="inverse"
@@ -185,7 +185,7 @@ export default async function Page({
                     gap={12}
                   >
                     <Button
-                      href={`/accounts/${data.account.id}?currentMonth=${previousMonthKey}`}
+                      href={`/spaces/${data.space.id}?currentMonth=${previousMonthKey}`}
                       variant="outline"
                       ariaLabel={String(i18n.t("pagination.previous"))}
                     >
@@ -195,7 +195,7 @@ export default async function Page({
                       {selectedMonthLabel}
                     </Text>
                     <Button
-                      href={`/accounts/${data.account.id}?currentMonth=${nextMonthKey}`}
+                      href={`/spaces/${data.space.id}?currentMonth=${nextMonthKey}`}
                       variant="outline"
                       ariaLabel={String(i18n.t("pagination.next"))}
                     >
@@ -206,10 +206,10 @@ export default async function Page({
               </HeroMetric>
               <HeroMetric tone="soft">
                 <Text size="sm" color="inverse">
-                  {i18n.t("accounts_page.historical_total")}
+                  {i18n.t("spaces_page.historical_total")}
                 </Text>
                 <Currency
-                  value={data.account.historicalTotal}
+                  value={data.space.historicalTotal}
                   size="h3"
                   weight="bold"
                   color="inverse"
@@ -218,9 +218,9 @@ export default async function Page({
             </HeroMetrics>
           </Stack>
         </Hero>
-        <AccountArchiveDialog
-          accountId={data.account.id}
-          accountName={data.account.name}
+        <SpaceArchiveDialog
+          spaceId={data.space.id}
+          spaceName={data.space.name}
           isOpen={
             query.confirmArchive === "1" || query.confirmUnarchive === "1"
           }
@@ -228,7 +228,7 @@ export default async function Page({
           closeHref={detailHref}
         />
 
-        {data.account.isArchived ? (
+        {data.space.isArchived ? (
           <Card padding={24}>
             <Stack gap={18}>
               <Stack
@@ -240,10 +240,10 @@ export default async function Page({
               >
                 <Stack gap={8}>
                   <Text size="sm" weight="semibold" color="warning">
-                    {i18n.t("accounts_page.archived_badge")}
+                    {i18n.t("spaces_page.archived_badge")}
                   </Text>
                   <Text size="sm" color="secondary">
-                    {i18n.t("accounts_page.archived_account_hint")}
+                    {i18n.t("spaces_page.archived_space_hint")}
                   </Text>
                 </Stack>
               </Stack>
@@ -254,7 +254,7 @@ export default async function Page({
         <Card
           padding={24}
           title={String(
-            i18n.t("accounts_page.month_relevant_entries_label", {
+            i18n.t("spaces_page.month_relevant_entries_label", {
               month: selectedMonthLabel,
             }),
           )}
@@ -267,12 +267,12 @@ export default async function Page({
             summaryRows={[
               {
                 id: "selected-month-relevant-total",
-                label: i18n.t("accounts_page.month_relevant_total_label", {
+                label: i18n.t("spaces_page.month_relevant_total_label", {
                   month: selectedMonthLabel,
                 }) as string,
                 value: (
                   <Currency
-                    value={data.account.selectedMonthTotal}
+                    value={data.space.selectedMonthTotal}
                     size="sm"
                     weight="bold"
                   />
@@ -285,7 +285,7 @@ export default async function Page({
 
         <Card
           padding={24}
-          title={String(i18n.t("accounts_page.all_entries"))}
+          title={String(i18n.t("spaces_page.all_entries"))}
           icon="activity"
         >
           <Stack gap={20}>
@@ -308,7 +308,7 @@ export default async function Page({
                   value={String(data.pagination.page + 1)}
                 />
                 <Button type="submit">
-                  {i18n.t("accounts_page.load_more_entries")}
+                  {i18n.t("spaces_page.load_more_entries")}
                 </Button>
               </form>
             ) : null}
@@ -322,8 +322,8 @@ export default async function Page({
           justify="space-between"
           gap={16}
         >
-          <AppLink href="/accounts">
-            {i18n.t("accounts_page.back_to_accounts")}
+          <AppLink href="/spaces">
+            {i18n.t("spaces_page.back_to_spaces")}
           </AppLink>
         </Stack>
       </Stack>

@@ -1,4 +1,4 @@
-import { getAccountsCurrentMonthSummary } from "@/actions/accounts";
+import { getSpacesCurrentMonthSummary } from "@/actions/spaces";
 import {
   Container,
   EntryCreationIntro,
@@ -15,7 +15,7 @@ import { i18n } from "@/model/i18n";
 export const dynamic = "force-dynamic";
 
 type TransferPageSearchParams = Promise<{
-  to_account?: string;
+  to_space?: string;
   description?: string;
   amount?: string;
 }>;
@@ -24,11 +24,11 @@ type TransferPageProps = {
   searchParams: TransferPageSearchParams;
 };
 
-function getDefaultDescription(accountName: string): string {
+function getDefaultDescription(spaceName: string): string {
   const monthLabel = format(new Date(), "MMMM yyyy");
   return String(
-    i18n.t("accounts_page.settle_description", {
-      account: accountName,
+    i18n.t("spaces_page.settle_description", {
+      space: spaceName,
       month: monthLabel,
     }),
   );
@@ -37,20 +37,20 @@ function getDefaultDescription(accountName: string): string {
 export default async function Page({
   searchParams,
 }: TransferPageProps): Promise<React.ReactElement> {
-  const [accounts, params] = await Promise.all([
-    getAccountsCurrentMonthSummary(),
+  const [spaces, params] = await Promise.all([
+    getSpacesCurrentMonthSummary(),
     searchParams,
   ]);
 
-  const toAccount = accounts.find(
-    (account) => account.id === params.to_account,
+  const toSpace = spaces.find(
+    (space) => space.id === params.to_space,
   );
   const normalizedAmount = sanitizeAmountInput(params.amount || "");
   const initialValues = {
-    toAccountId: toAccount?.id || "",
+    toSpaceId: toSpace?.id || "",
     description:
       params.description ||
-      (toAccount ? getDefaultDescription(toAccount.name) : ""),
+      (toSpace ? getDefaultDescription(toSpace.name) : ""),
     amount: normalizedAmount,
   };
 
@@ -91,10 +91,10 @@ export default async function Page({
 
         <PagePanel tone="form">
           <TransferForm
-            accounts={accounts.map((account) => ({
-              id: account.id,
-              name: account.name,
-              currentMonthTotal: account.currentMonthTotal,
+            spaces={spaces.map((space) => ({
+              id: space.id,
+              name: space.name,
+              currentMonthTotal: space.currentMonthTotal,
             }))}
             initialValues={initialValues}
           />

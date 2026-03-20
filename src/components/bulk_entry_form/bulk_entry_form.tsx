@@ -3,7 +3,7 @@
 import "./bulk_entry_form.scss";
 
 import {
-  AccountField,
+  SpaceField,
   Button,
   Input,
   MonthSelector,
@@ -32,12 +32,12 @@ interface BulkEntryItem {
 }
 
 export interface BulkEntryFormProps {
-  accounts?: string[];
+  spaces?: string[];
   onSuccess?: () => void;
 }
 
 type SharedScheduleState = {
-  accountName: string;
+  spaceName: string;
   beginDate: string;
   scheduleMode: EntryScheduleMode;
   installments: string;
@@ -49,7 +49,7 @@ function formatDateForInput(date: Date): string {
 
 function getInitialSharedState(): SharedScheduleState {
   return {
-    accountName: "",
+    spaceName: "",
     beginDate: formatDateForInput(new Date()).slice(0, 7),
     scheduleMode: "one_time",
     installments: "1",
@@ -75,7 +75,7 @@ function sanitizeInstallmentsInput(value: string): string {
 }
 
 export function BulkEntryForm({
-  accounts: initialAccounts = [],
+  spaces: initialSpaces = [],
   onSuccess,
 }: BulkEntryFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
@@ -162,7 +162,7 @@ export function BulkEntryForm({
     const parsedBeginDate = toDate(shared.beginDate, beginDateMode);
     const installments = parseInstallments(shared.installments);
 
-    if (!shared.accountName || !parsedBeginDate) {
+    if (!shared.spaceName || !parsedBeginDate) {
       showError(i18n.t("toast.entries_create_failed"), {
         iconName: "entries",
       });
@@ -196,7 +196,7 @@ export function BulkEntryForm({
 
       inputs.push({
         type: entry.type,
-        accountName: shared.accountName,
+        spaceName: shared.spaceName,
         description: entry.description,
         amount: parsedAmount,
         beginDate: parsedBeginDate,
@@ -233,15 +233,15 @@ export function BulkEntryForm({
         </Text>
 
         <Stack gap={16}>
-          <AccountField
-            label={i18n.t("bulk_entry_form.shared_account")}
-            value={shared.accountName}
+          <SpaceField
+            label={i18n.t("bulk_entry_form.shared_space")}
+            value={shared.spaceName}
             onChange={(value) =>
-              setShared((current) => ({ ...current, accountName: value }))
+              setShared((current) => ({ ...current, spaceName: value }))
             }
-            accounts={initialAccounts}
+            spaces={initialSpaces}
             placeholder={
-              i18n.t("bulk_entry_form.shared_account_placeholder") as string
+              i18n.t("bulk_entry_form.shared_space_placeholder") as string
             }
             required
           />

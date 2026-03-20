@@ -14,7 +14,7 @@ type RecurringTemplate = {
   durationMonthRange?: [number, number];
 };
 
-type AccountSeedSpec = {
+type SpaceSeedSpec = {
   name: string;
   targetEntries: number;
   oneTimeIncomeRatio: number;
@@ -25,7 +25,7 @@ type AccountSeedSpec = {
   oneTimeIncomeRange: [number, number];
 };
 
-const ACCOUNT_SPECS: AccountSeedSpec[] = [
+const ACCOUNT_SPECS: SpaceSeedSpec[] = [
   {
     name: "Amex credit card",
     targetEntries: 35,
@@ -111,7 +111,7 @@ const ACCOUNT_SPECS: AccountSeedSpec[] = [
     oneTimeIncomeRange: [10, 80],
   },
   {
-    name: "Main account",
+    name: "Main space",
     targetEntries: 38,
     oneTimeIncomeRatio: 0.45,
     recurringTemplates: [
@@ -401,20 +401,20 @@ async function refreshCurrentMonthCounters(): Promise<void> {
   monthEnd.setMilliseconds(-1);
 
   await prisma.$executeRaw`
-    UPDATE "Account" a
+    UPDATE "Space" a
     SET "currentMonthEntryCount" = COALESCE(month_counts."entryCount", 0)
     FROM (
       SELECT
-        a2.id AS "accountId",
+        a2.id AS "spaceId",
         COUNT(e.id)::integer AS "entryCount"
-      FROM "Account" a2
+      FROM "Space" a2
       LEFT JOIN "Entry" e
-        ON e."accountId" = a2.id
+        ON e."spaceId" = a2.id
        AND e."beginDate" <= ${monthEnd}
        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
       GROUP BY a2.id
     ) month_counts
-    WHERE a.id = month_counts."accountId"
+    WHERE a.id = month_counts."spaceId"
   `;
 }
 
@@ -424,7 +424,7 @@ async function main() {
   await prisma.loginCode.deleteMany();
   await prisma.session.deleteMany();
   await prisma.entry.deleteMany();
-  await prisma.account.deleteMany();
+  await prisma.space.deleteMany();
   await prisma.user.deleteMany();
 
   const seedEmail = getSeedEmail();
@@ -436,15 +436,15 @@ async function main() {
     },
   });
 
-  await prisma.account.createMany({
-    data: ACCOUNT_SPECS.map((accountSpec) => ({
+  await prisma.space.createMany({
+    data: ACCOUNT_SPECS.map((spaceSpec) => ({
       userId: user.id,
-      name: accountSpec.name,
+      name: spaceSpec.name,
       isArchived: false,
     })),
   });
 
-  const accounts = await prisma.account.findMany({
+  const spaces = await prisma.space.findMany({
     where: {
       userId: user.id,
     },
@@ -457,17 +457,17 @@ async function main() {
     },
   });
 
-  const accountByName = new Map(accounts.map((account) => [account.name, account.id]));
+  const spaceByName = new Map(spaces.map((space) => [space.name, space.id]));
 
-  const entriesData = ACCOUNT_SPECS.flatMap((accountSpec, accountIndex) => {
-    const random = mulberry32(94731 + accountIndex * 103);
-    const accountId = accountByName.get(accountSpec.name);
+  const entriesData = ACCOUNT_SPECS.flatMap((spaceSpec, spaceIndex) => {
+    const random = mulberry32(94731 + spaceIndex * 103);
+    const spaceId = spaceByName.get(spaceSpec.name);
 
-    if (!accountId) {
-      throw new Error(`Missing seeded account: ${accountSpec.name}`);
+    if (!spaceId) {
+      throw new Error(`Missing seeded space: ${spaceSpec.name}`);
     }
 
-    const recurringEntries = accountSpec.recurringTemplates.map((template) => {
+    const recurringEntries = spaceSpec.recurringTemplates.map((template) => {
       const monthOffset = pickInteger(
         random,
         template.startMonthOffsetRange[0],
@@ -483,7 +483,7 @@ async function main() {
       );
 
       return {
-        accountId,
+        spaceId,
         type: template.type,
         description: template.description,
         amount: randomAmount(random, template.type, template.amountRange),
@@ -492,32 +492,32 @@ async function main() {
       };
     });
 
-    const oneTimeCount = Math.max(0, accountSpec.targetEntries - recurringEntries.length);
+    const oneTimeCount = Math.max(0, spaceSpec.targetEntries - recurringEntries.length);
 
     const oneTimeEntries = Array.from({ length: oneTimeCount }, (_, entryIndex) => {
-      const isIncome = random() < accountSpec.oneTimeIncomeRatio;
+      const isIncome = random() < spaceSpec.oneTimeIncomeRatio;
       const type: EntryType = isIncome ? "income" : "expense";
 
       const descriptionPool = isIncome
-        ? accountSpec.oneTimeIncomeDescriptions
-        : accountSpec.oneTimeExpenseDescriptions;
+        ? spaceSpec.oneTimeIncomeDescriptions
+        : spaceSpec.oneTimeExpenseDescriptions;
 
       const descriptionBase =
-        descriptionPool[(entryIndex + accountIndex * 5) % descriptionPool.length];
+        descriptionPool[(entryIndex + spaceIndex * 5) % descriptionPool.length];
 
       const monthOffset = pickInteger(random, -22, 2);
       const beginDate = buildDateFromMonthOffset(monthOffset, pickInteger(random, 1, 28));
 
       return {
-        accountId,
+        spaceId,
         type,
         description: `${descriptionBase} ${entryIndex + 1}`,
         amount: randomAmount(
           random,
           type,
           type === "income"
-            ? accountSpec.oneTimeIncomeRange
-            : accountSpec.oneTimeExpenseRange,
+            ? spaceSpec.oneTimeIncomeRange
+            : spaceSpec.oneTimeExpenseRange,
         ),
         beginDate,
         endDate: new Date(beginDate),
@@ -533,9 +533,9 @@ async function main() {
 
   await refreshCurrentMonthCounters();
 
-  const [userCount, accountCount, entryCount, recurringEntries] = await Promise.all([
+  const [userCount, spaceCount, entryCount, recurringEntries] = await Promise.all([
     prisma.user.count(),
-    prisma.account.count(),
+    prisma.space.count(),
     prisma.entry.count(),
     prisma.entry.findMany({
       select: {
@@ -555,7 +555,7 @@ async function main() {
 
   console.log(`Seed user: ${seedEmail}`);
   console.log(`Users: ${userCount}`);
-  console.log(`Accounts: ${accountCount}`);
+  console.log(`Spaces: ${spaceCount}`);
   console.log(`Entries: ${entryCount}`);
   console.log(`Recurring entries: ${recurringCount}`);
 }

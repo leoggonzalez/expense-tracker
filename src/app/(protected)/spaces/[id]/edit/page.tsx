@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 
-import { getAccountForEdit } from "@/actions/accounts";
+import { getSpaceForEdit } from "@/actions/spaces";
 import {
-  AccountEditForm,
+  SpaceEditForm,
   AppLink,
   Container,
   Hero,
@@ -13,7 +13,7 @@ import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
-type AccountEditPageProps = {
+type SpaceEditPageProps = {
   params: Promise<{
     id: string;
   }>;
@@ -21,11 +21,11 @@ type AccountEditPageProps = {
 
 export default async function Page({
   params,
-}: AccountEditPageProps): Promise<React.ReactElement> {
+}: SpaceEditPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const account = await getAccountForEdit(id);
+  const space = await getSpaceForEdit(id);
 
-  if (!account) {
+  if (!space) {
     notFound();
   }
 
@@ -33,21 +33,21 @@ export default async function Page({
     <Container>
       <Stack gap={24}>
         <Hero
-          icon="accounts"
-          title={String(i18n.t("accounts_page.edit_account"))}
-          pattern="account_form"
+          icon="spaces"
+          title={String(i18n.t("spaces_page.edit_space"))}
+          pattern="space_form"
         >
           <Text as="p" size="sm" color="inverse">
-            {i18n.t("accounts_page.edit_account_hint")}
+            {i18n.t("spaces_page.edit_space_hint")}
           </Text>
         </Hero>
 
         <PagePanel tone="form">
-          <AccountEditForm accountId={account.id} initialName={account.name} />
+          <SpaceEditForm spaceId={space.id} initialName={space.name} />
         </PagePanel>
 
-        <AppLink href={`/accounts/${account.id}`}>
-          {i18n.t("accounts_page.back_to_account")}
+        <AppLink href={`/spaces/${space.id}`}>
+          {i18n.t("spaces_page.back_to_space")}
         </AppLink>
       </Stack>
     </Container>

@@ -1,18 +1,27 @@
 "use client";
 
-import "./account_create_form.scss";
+import "./space_edit_form.scss";
 
 import React, { useState } from "react";
 
-import { createAccount } from "@/actions/accounts";
+import { updateSpace } from "@/actions/spaces";
 import { Button, Input, useNavigationProgress } from "@/components";
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
-export function AccountCreateForm(): React.ReactElement {
-  const [name, setName] = useState("");
+type SpaceEditFormProps = {
+  spaceId: string;
+  initialName: string;
+};
+
+export function SpaceEditForm({
+  spaceId,
+  initialName,
+}: SpaceEditFormProps): React.ReactElement {
+  const [name, setName] = useState(initialName);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const { push } = useNavigationProgress();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -20,38 +29,42 @@ export function AccountCreateForm(): React.ReactElement {
 
     setIsLoading(true);
     setError(null);
+    setSuccess(null);
 
-    const result = await createAccount({ name });
+    const result = await updateSpace(spaceId, { name });
 
     if (!result.success) {
-      setError(result.error || "accounts_page.create_failed");
+      setError(result.error || "space_detail_page.update_failed");
       setIsLoading(false);
       return;
     }
 
-    push("/accounts");
+    setSuccess("space_detail_page.update_success");
+    setIsLoading(false);
+    push(`/spaces/${spaceId}`);
   };
 
   return (
-    <div className="account-create-form">
+    <div className="space-edit-form">
       <form onSubmit={handleSubmit}>
         <Stack gap={16}>
           <Input
-            label={i18n.t("accounts_page.account_name")}
+            label={i18n.t("spaces_page.space_name")}
             value={name}
             onChange={setName}
             placeholder={
-              i18n.t("accounts_page.account_name_placeholder") as string
+              i18n.t("spaces_page.space_name_placeholder") as string
             }
             required
           />
 
           {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+          {success ? <Text color="success">{i18n.t(success)}</Text> : null}
 
           <Button type="submit" disabled={isLoading}>
             {isLoading
-              ? i18n.t("accounts_page.creating")
-              : i18n.t("accounts_page.create")}
+              ? i18n.t("space_detail_page.saving")
+              : i18n.t("space_detail_page.save")}
           </Button>
         </Stack>
       </form>

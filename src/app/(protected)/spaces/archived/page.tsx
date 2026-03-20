@@ -1,7 +1,7 @@
 import {
-  getArchivedAccountsCurrentMonthSummary,
-  unarchiveAccount,
-} from "@/actions/accounts";
+  getArchivedSpacesCurrentMonthSummary,
+  unarchiveSpace,
+} from "@/actions/spaces";
 import { AppLink, Avatar, Button, Container, Currency } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
@@ -9,37 +9,37 @@ import { i18n } from "@/model/i18n";
 export const dynamic = "force-dynamic";
 
 export default async function Page(): Promise<React.ReactElement> {
-  const accounts = await getArchivedAccountsCurrentMonthSummary();
+  const spaces = await getArchivedSpacesCurrentMonthSummary();
 
   async function handleUnarchiveAction(formData: FormData): Promise<void> {
     "use server";
 
-    const accountId = String(formData.get("accountId") || "");
+    const spaceId = String(formData.get("spaceId") || "");
 
-    if (!accountId) {
+    if (!spaceId) {
       return;
     }
 
-    await unarchiveAccount(accountId);
+    await unarchiveSpace(spaceId);
   }
 
   return (
     <Container>
       <Stack gap={24}>
         <Text size="h2" as="h1" weight="bold">
-          {i18n.t("accounts_page.archived_accounts")}
+          {i18n.t("spaces_page.archived_spaces")}
         </Text>
 
-        {accounts.length === 0 ? (
+        {spaces.length === 0 ? (
           <Card padding={24} variant="dashed">
             <Text color="secondary">
-              {i18n.t("accounts_page.empty_archived_state")}
+              {i18n.t("spaces_page.empty_archived_state")}
             </Text>
           </Card>
         ) : (
           <Stack gap={16}>
-            {accounts.map((account) => (
-              <Card key={account.id} padding={16}>
+            {spaces.map((space) => (
+              <Card key={space.id} padding={16}>
                 <Stack
                   direction="row"
                   align="center"
@@ -47,13 +47,13 @@ export default async function Page(): Promise<React.ReactElement> {
                   gap={12}
                 >
                   <Stack direction="row" align="center" gap={12}>
-                    <Avatar name={account.name} />
+                    <Avatar name={space.name} />
                     <Stack gap={4}>
                       <Text size="md" weight="semibold">
-                        {account.name}
+                        {space.name}
                       </Text>
                       <Currency
-                        value={account.currentMonthTotal}
+                        value={space.currentMonthTotal}
                         size="sm"
                         weight="bold"
                       />
@@ -61,9 +61,9 @@ export default async function Page(): Promise<React.ReactElement> {
                   </Stack>
 
                   <form action={handleUnarchiveAction}>
-                    <input type="hidden" name="accountId" value={account.id} />
+                    <input type="hidden" name="spaceId" value={space.id} />
                     <Button type="submit">
-                      {i18n.t("accounts_page.unarchive")}
+                      {i18n.t("spaces_page.unarchive")}
                     </Button>
                   </form>
                 </Stack>
@@ -72,8 +72,8 @@ export default async function Page(): Promise<React.ReactElement> {
           </Stack>
         )}
 
-        <AppLink href="/accounts">
-          {i18n.t("accounts_page.back_to_accounts")}
+        <AppLink href="/spaces">
+          {i18n.t("spaces_page.back_to_spaces")}
         </AppLink>
       </Stack>
     </Container>

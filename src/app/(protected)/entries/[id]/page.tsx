@@ -95,10 +95,10 @@ export default async function Page({
   const normalizedEntry = {
     id: entry.id,
     type: entry.type,
-    accountId: entry.accountId,
-    accountName: entry.account.name,
-    transferAccountId: entry.transferAccountId,
-    transferAccountName: entry.transferAccount?.name || null,
+    spaceId: entry.spaceId,
+    spaceName: entry.space.name,
+    transferSpaceId: entry.transferSpaceId,
+    transferSpaceName: entry.transferSpace?.name || null,
     description: entry.description,
     amount: entry.amount,
     beginDate: entry.beginDate.toISOString(),
@@ -112,19 +112,19 @@ export default async function Page({
   );
   const settleAmount = Math.abs(normalizedEntry.amount).toFixed(2);
   const settleSearchParams = new URLSearchParams({
-    to_account: normalizedEntry.accountId,
+    to_space: normalizedEntry.spaceId,
     description: settleDescription,
     amount: settleAmount,
   });
   const entryDetailHref = `/entries/${normalizedEntry.id}`;
   const transferDirectionLabel =
-    normalizedEntry.transferAccountId && normalizedEntry.transferAccountName
+    normalizedEntry.transferSpaceId && normalizedEntry.transferSpaceName
       ? normalizedEntry.amount < 0
-        ? i18n.t("entry_list.to_account", {
-            account: normalizedEntry.transferAccountName,
+        ? i18n.t("entry_list.to_space", {
+            space: normalizedEntry.transferSpaceName,
           })
-        : i18n.t("entry_list.from_account", {
-            account: normalizedEntry.transferAccountName,
+        : i18n.t("entry_list.from_space", {
+            space: normalizedEntry.transferSpaceName,
           })
       : null;
 
@@ -215,12 +215,12 @@ export default async function Page({
               <DetailRow
                 label={
                   <Text size="sm" color="secondary">
-                    {i18n.t("entry_detail_page.account")}
+                    {i18n.t("entry_detail_page.space")}
                   </Text>
                 }
                 value={
                   <Text size="sm" weight="semibold">
-                    {normalizedEntry.accountName}
+                    {normalizedEntry.spaceName}
                   </Text>
                 }
               />

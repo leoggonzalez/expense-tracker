@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getAccounts, getEntryById } from "@/actions/entries";
+import { getSpaces, getEntryById } from "@/actions/entries";
 import { AppLink, Container, EntryForm } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
@@ -17,9 +17,9 @@ export default async function Page({
   params,
 }: EntryEditPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const [entry, accounts] = await Promise.all([
+  const [entry, spaces] = await Promise.all([
     getEntryById(id),
-    getAccounts(),
+    getSpaces(),
   ]);
 
   if (!entry) {
@@ -34,11 +34,11 @@ export default async function Page({
         </Text>
         <Card padding={24}>
           <EntryForm
-            accounts={accounts.map((account) => account.name)}
+            spaces={spaces.map((space) => space.name)}
             initialData={{
               id: entry.id,
               type: entry.type,
-              accountName: entry.account.name,
+              spaceName: entry.space.name,
               description: entry.description,
               amount: entry.amount,
               beginDate: entry.beginDate.toISOString(),
