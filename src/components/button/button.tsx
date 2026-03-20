@@ -1,6 +1,7 @@
 import React from "react";
 import "./button.scss";
 import { AppLink } from "@/components/app_link/app_link";
+import { Stack } from "@/elements";
 
 export interface ButtonProps {
   children: React.ReactNode;
@@ -44,10 +45,16 @@ export function Button({
     .join(" ");
 
   const content = (
-    <>
+    <Stack
+      direction="row"
+      align="center"
+      justify="center"
+      gap={4}
+      inline
+    >
       {startIcon && <span className="button__icon">{startIcon}</span>}
       {children}
-    </>
+    </Stack>
   );
 
   if (href && !disabled) {

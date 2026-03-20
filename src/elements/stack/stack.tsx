@@ -10,6 +10,8 @@ export interface StackProps {
   desktopDirection?: "row" | "column";
   gap?: number;
   fullWidth?: boolean;
+  fullHeight?: boolean;
+  inline?: boolean;
   align?: "flex-start" | "center" | "flex-end" | "stretch";
   justify?:
     | "flex-start"
@@ -26,6 +28,8 @@ export function Stack({
   desktopDirection,
   gap = 0,
   fullWidth = false,
+  fullHeight = false,
+  inline = false,
   align,
   justify,
   wrap = false,
@@ -47,7 +51,14 @@ export function Stack({
 
   return (
     <div
-      className={["stack", fullWidth && "stack--full-width"].filter(Boolean).join(" ")}
+      className={[
+        "stack",
+        fullWidth && "stack--full-width",
+        fullHeight && "stack--full-height",
+        inline && "stack--inline",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={style}
     >
       {children}

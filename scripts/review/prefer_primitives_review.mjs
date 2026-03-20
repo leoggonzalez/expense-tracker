@@ -96,8 +96,14 @@ function reviewPair(scssPath, tsxPath) {
     );
   }
 
+  const hasTypographyRules =
+    /\bfont-size\s*:/.test(scssContent) ||
+    /\bfont-weight\s*:/.test(scssContent) ||
+    /\bletter-spacing\s*:/.test(scssContent) ||
+    /\btext-transform\s*:/.test(scssContent);
+
   if (
-    /(^|[\s;{])(font-size|color)\s*:/.test(scssContent) &&
+    hasTypographyRules &&
     !imports.usesText
   ) {
     findings.push(

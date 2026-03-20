@@ -1,10 +1,7 @@
 @use "@/styles/variables.scss" as *;
 
 .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
+  display: inline-block;
   border: var(--border-width) solid transparent;
   border-radius: 18px;
   font-weight: var(--font-weight-medium);
