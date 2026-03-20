@@ -8,7 +8,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model User {
+model UserAccount {
   id         String      @id @default(cuid())
   email      String      @unique
   name       String?
@@ -21,8 +21,8 @@ model User {
 
 model Space {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAccountId    String
+  userAccount      UserAccount     @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
   name      String
   isArchived Boolean @default(false)
   currentMonthTransactionCount Int @default(0)
@@ -31,8 +31,8 @@ model Space {
   transactions   Transaction[]
   transferTransactions Transaction[] @relation("TransactionTransferSpace")
 
-  @@unique([userId, name])
-  @@index([userId])
+  @@unique([userAccountId, name])
+  @@index([userAccountId])
 }
 
 model Transaction {
@@ -56,27 +56,27 @@ model Transaction {
 
 model LoginCode {
   id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAccountId     String
+  userAccount       UserAccount     @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
   email      String
   codeHash   String
   expiresAt  DateTime
   consumedAt DateTime?
   createdAt  DateTime @default(now())
 
-  @@index([userId])
+  @@index([userAccountId])
   @@index([email])
   @@index([expiresAt])
 }
 
 model Session {
   id               String   @id @default(cuid())
-  userId           String
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAccountId           String
+  userAccount             UserAccount     @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
   sessionTokenHash String   @unique
   expiresAt        DateTime
   createdAt        DateTime @default(now())
 
-  @@index([userId])
+  @@index([userAccountId])
   @@index([expiresAt])
 }

@@ -1,16 +1,16 @@
 import { AccountProfileForm, Container, Hero, PagePanel } from "@/components";
 import { Stack, Text } from "@/elements";
 
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUserAccount } from "@/lib/session";
 import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page(): Promise<React.ReactElement> {
-  const currentUser = await getCurrentUser();
+  const currentUser = await getCurrentUserAccount();
 
   if (!currentUser) {
-    throw new Error("Expected authenticated user in protected account route.");
+    throw new Error("Expected authenticated userAccount in protected account route.");
   }
 
   return (
@@ -30,7 +30,7 @@ export default async function Page(): Promise<React.ReactElement> {
 
         <PagePanel tone="form">
           <AccountProfileForm
-            user={{
+            userAccount={{
               email: currentUser.email,
               name: currentUser.name,
             }}

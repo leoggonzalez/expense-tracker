@@ -4,7 +4,7 @@ import { endOfMonth, format, startOfMonth } from "date-fns";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
-import { requireCurrentUser } from "@/lib/session";
+import { requireCurrentUserAccount } from "@/lib/session";
 
 type SpaceActionResult = {
   success: boolean;
@@ -99,17 +99,17 @@ function revalidateSpacePages(): void {
   revalidatePath("/settings");
 }
 
-async function findOwnedSpaceOrNull(userId: string, id: string) {
+async function findOwnedSpaceOrNull(userAccountId: string, id: string) {
   return prisma.space.findFirst({
     where: {
       id,
-      userId,
+      userAccountId,
     },
   });
 }
 
 async function getMonthTotalForSpace(
-  userId: string,
+  userAccountId: string,
   spaceId: string,
   monthStart: Date,
   monthEnd: Date,
@@ -137,7 +137,7 @@ async function getMonthTotalForSpace(
      AND e."beginDate" <= ${monthEnd}
      AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
     WHERE a.id = ${spaceId}
-      AND a."userId" = ${userId}
+      AND a."userAccountId" = ${userAccountId}
     GROUP BY a.id
   `;
 
@@ -145,7 +145,7 @@ async function getMonthTotalForSpace(
 }
 
 async function getHistoricalTotalForSpace(
-  userId: string,
+  userAccountId: string,
   spaceId: string,
 ): Promise<number> {
   const rows = await prisma.$queryRaw<
@@ -169,7 +169,7 @@ async function getHistoricalTotalForSpace(
     LEFT JOIN "Transaction" e
       ON e."spaceId" = a.id
     WHERE a.id = ${spaceId}
-      AND a."userId" = ${userId}
+      AND a."userAccountId" = ${userAccountId}
     GROUP BY a.id
   `;
 
@@ -180,7 +180,7 @@ async function getSpacesByArchiveState(
   isArchived: boolean,
   selectedMonthStart?: Date,
 ): Promise<SpaceCurrentMonthSummary[]> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
   const monthStart = startOfMonth(selectedMonthStart || new Date());
   const monthEnd = endOfMonth(monthStart);
 
@@ -207,7 +207,7 @@ async function getSpacesByArchiveState(
         ON e."spaceId" = a.id
        AND e."beginDate" <= ${monthEnd}
        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
-      WHERE a."userId" = ${currentUser.id}
+      WHERE a."userAccountId" = ${currentUser.id}
         AND a."isArchived" = ${isArchived}
       GROUP BY a.id, a.name
       ORDER BY a.name ASC
@@ -242,7 +242,7 @@ export async function getSpaceDetailPageData(input: {
   limit?: number;
   selectedMonthStart?: Date;
 }): Promise<SpaceDetailPageData | null> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   const page = Math.max(1, input.page || 1);
   const limit = Math.max(1, input.limit || 10);
@@ -402,7 +402,7 @@ export async function getSpaceDetailPageData(input: {
 export async function getSpaceForEdit(
   id: string,
 ): Promise<SpaceEditData | null> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     const space = await findOwnedSpaceOrNull(currentUser.id, id);
@@ -425,7 +425,7 @@ export async function getSpaceForEdit(
 export async function createSpace(input: {
   name: string;
 }): Promise<SpaceActionResult> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
   const name = input.name.trim();
 
   if (!name) {
@@ -435,7 +435,7 @@ export async function createSpace(input: {
   try {
     await prisma.space.create({
       data: {
-        userId: currentUser.id,
+        userAccountId: currentUser.id,
         name,
       },
     });
@@ -457,7 +457,7 @@ export async function updateSpace(
   id: string,
   input: { name: string },
 ): Promise<SpaceActionResult> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
   const name = input.name.trim();
 
   if (!name) {
@@ -497,7 +497,7 @@ export async function archiveSpace(
   id: string,
   confirmationText: string,
 ): Promise<SpaceActionResult> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   if (confirmationText !== "delete") {
     return { success: false, error: "spaces_page.archive_requires_confirm" };
@@ -529,7 +529,7 @@ export async function archiveSpace(
 export async function unarchiveSpace(
   id: string,
 ): Promise<SpaceActionResult> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     const existingSpace = await findOwnedSpaceOrNull(currentUser.id, id);

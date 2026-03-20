@@ -33,7 +33,7 @@ export async function requestLoginCode(input: {
 
   try {
     if (isDevelopmentAuthBypassEnabled() && isDevAdminEmail(email)) {
-      await prisma.user.upsert({
+      await prisma.userAccount.upsert({
         where: { email },
         update: {},
         create: {
@@ -45,7 +45,7 @@ export async function requestLoginCode(input: {
       return { success: true };
     }
 
-    const user = await prisma.user.upsert({
+    const userAccount = await prisma.userAccount.upsert({
       where: { email },
       update: {},
       create: { email },
@@ -53,7 +53,7 @@ export async function requestLoginCode(input: {
 
     await prisma.loginCode.updateMany({
       where: {
-        userId: user.id,
+        userAccountId: userAccount.id,
         email,
         consumedAt: null,
       },
@@ -65,7 +65,7 @@ export async function requestLoginCode(input: {
     const code = generateLoginCode();
     const loginCode = await prisma.loginCode.create({
       data: {
-        userId: user.id,
+        userAccountId: userAccount.id,
         email,
         codeHash: hashLoginCode(email, code),
         expiresAt: new Date(Date.now() + 10 * 60 * 1000),
@@ -106,7 +106,7 @@ export async function verifyLoginCode(input: {
 
   try {
     if (isValidDevAdminCode(email, code)) {
-      const adminUser = await prisma.user.upsert({
+      const adminUser = await prisma.userAccount.upsert({
         where: { email },
         update: {},
         create: {
@@ -120,17 +120,17 @@ export async function verifyLoginCode(input: {
       return { success: true };
     }
 
-    const user = await prisma.user.findUnique({
+    const userAccount = await prisma.userAccount.findUnique({
       where: { email },
     });
 
-    if (!user) {
+    if (!userAccount) {
       return { success: false, error: "auth.invalid_code" };
     }
 
     const loginCode = await prisma.loginCode.findFirst({
       where: {
-        userId: user.id,
+        userAccountId: userAccount.id,
         email,
         consumedAt: null,
         expiresAt: {
@@ -152,7 +152,7 @@ export async function verifyLoginCode(input: {
 
     await prisma.loginCode.updateMany({
       where: {
-        userId: user.id,
+        userAccountId: userAccount.id,
         email,
         consumedAt: null,
       },
@@ -161,7 +161,7 @@ export async function verifyLoginCode(input: {
       },
     });
 
-    await createSession(user.id, generateSessionToken());
+    await createSession(userAccount.id, generateSessionToken());
 
     return { success: true };
   } catch (error) {

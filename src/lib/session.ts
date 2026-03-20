@@ -6,11 +6,11 @@ import { prisma } from "@/lib/prisma";
 
 const SESSION_COOKIE_NAME = "expense_tracker_session";
 
-type SessionWithUser = {
+type SessionWithUserAccount = {
   id: string;
-  userId: string;
+  userAccountId: string;
   expiresAt: Date;
-  user: {
+  userAccount: {
     id: string;
     email: string;
     name: string | null;
@@ -24,14 +24,14 @@ async function getCookieStore() {
 }
 
 export async function createSession(
-  userId: string,
+  userAccountId: string,
   token: string,
 ): Promise<void> {
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
 
   await prisma.session.create({
     data: {
-      userId,
+      userAccountId,
       sessionTokenHash: hashSessionToken(token),
       expiresAt,
     },
@@ -47,7 +47,7 @@ export async function createSession(
   });
 }
 
-export async function getCurrentSession(): Promise<SessionWithUser | null> {
+export async function getCurrentSession(): Promise<SessionWithUserAccount | null> {
   const cookieStore = await getCookieStore();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
@@ -60,7 +60,7 @@ export async function getCurrentSession(): Promise<SessionWithUser | null> {
       sessionTokenHash: hashSessionToken(sessionToken),
     },
     include: {
-      user: true,
+      userAccount: true,
     },
   });
 
@@ -80,26 +80,26 @@ export async function getCurrentSession(): Promise<SessionWithUser | null> {
   return session;
 }
 
-export async function getCurrentUser() {
+export async function getCurrentUserAccount() {
   const session = await getCurrentSession();
 
-  return session?.user ?? null;
+  return session?.userAccount ?? null;
 }
 
-export async function requireCurrentUser() {
-  const user = await getCurrentUser();
+export async function requireCurrentUserAccount() {
+  const userAccount = await getCurrentUserAccount();
 
-  if (!user) {
+  if (!userAccount) {
     redirect("/login");
   }
 
-  return user;
+  return userAccount;
 }
 
 export async function requireAnonymous() {
-  const user = await getCurrentUser();
+  const userAccount = await getCurrentUserAccount();
 
-  if (user) {
+  if (userAccount) {
     redirect("/");
   }
 }

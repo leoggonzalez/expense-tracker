@@ -4,11 +4,11 @@ import { AppLink } from "@/components/app_link/app_link";
 import { Avatar } from "@/components/avatar/avatar";
 import { Container } from "@/components/container/container";
 import { Icon } from "@/elements";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUserAccount } from "@/lib/session";
 import { i18n } from "@/model/i18n";
 
 export async function Navbar(): Promise<React.ReactElement | null> {
-  const currentUser = await getCurrentUser();
+  const currentUser = await getCurrentUserAccount();
 
   if (!currentUser) {
     return null;

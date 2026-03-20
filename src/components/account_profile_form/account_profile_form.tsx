@@ -6,21 +6,21 @@ import React, { useState } from "react";
 
 import { i18n } from "@/model/i18n";
 import { logout } from "@/actions/auth";
-import { updateCurrentUserProfile } from "@/actions/user";
+import { updateCurrentUserAccountProfile } from "@/actions/user_account";
 import { useRouter } from "next/navigation";
 
 type AccountProfileFormProps = {
-  user: {
+  userAccount: {
     email: string;
     name: string | null;
   };
 };
 
 export function AccountProfileForm({
-  user,
+  userAccount,
 }: AccountProfileFormProps): React.ReactElement {
   const router = useRouter();
-  const [name, setName] = useState(user.name || "");
+  const [name, setName] = useState(userAccount.name || "");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ export function AccountProfileForm({
     setError(null);
     setSuccess(null);
 
-    const result = await updateCurrentUserProfile({ name });
+    const result = await updateCurrentUserAccountProfile({ name });
 
     if (!result.success) {
       setError(result.error || "account.update_failed");
@@ -55,7 +55,7 @@ export function AccountProfileForm({
           <Text size="sm" weight="semibold">
             {i18n.t("account.email")}
           </Text>
-          <Text color="secondary">{user.email}</Text>
+          <Text color="secondary">{userAccount.email}</Text>
         </Stack>
 
         <Input

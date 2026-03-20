@@ -425,20 +425,20 @@ async function main() {
   await prisma.session.deleteMany();
   await prisma.transaction.deleteMany();
   await prisma.space.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.userAccount.deleteMany();
 
   const seedEmail = getSeedEmail();
 
-  const user = await prisma.user.create({
+  const userAccount = await prisma.userAccount.create({
     data: {
       email: seedEmail,
-      name: "Scenario Seed User",
+      name: "Scenario Seed UserAccount",
     },
   });
 
   await prisma.space.createMany({
     data: ACCOUNT_SPECS.map((spaceSpec) => ({
-      userId: user.id,
+      userAccountId: userAccount.id,
       name: spaceSpec.name,
       isArchived: false,
     })),
@@ -446,7 +446,7 @@ async function main() {
 
   const spaces = await prisma.space.findMany({
     where: {
-      userId: user.id,
+      userAccountId: userAccount.id,
     },
     orderBy: {
       name: "asc",
@@ -534,7 +534,7 @@ async function main() {
   await refreshCurrentMonthCounters();
 
   const [userCount, spaceCount, transactionCount, recurringTransactions] = await Promise.all([
-    prisma.user.count(),
+    prisma.userAccount.count(),
     prisma.space.count(),
     prisma.transaction.count(),
     prisma.transaction.findMany({
@@ -553,7 +553,7 @@ async function main() {
     return transaction.endDate > transaction.beginDate;
   }).length;
 
-  console.log(`Seed user: ${seedEmail}`);
+  console.log(`Seed userAccount: ${seedEmail}`);
   console.log(`Users: ${userCount}`);
   console.log(`Spaces: ${spaceCount}`);
   console.log(`Transactions: ${transactionCount}`);

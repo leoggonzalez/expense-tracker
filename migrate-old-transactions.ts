@@ -45,16 +45,16 @@ const oldTransactions = [
 async function main() {
   console.log("Starting migration of existing transactions to new schema...");
 
-  const user = await prisma.user.upsert({
+  const userAccount = await prisma.userAccount.upsert({
     where: {
       email: MIGRATION_USER_EMAIL,
     },
     update: {
-      name: "Bootstrap User",
+      name: "Bootstrap UserAccount",
     },
     create: {
       email: MIGRATION_USER_EMAIL,
-      name: "Bootstrap User",
+      name: "Bootstrap UserAccount",
     },
   });
 
@@ -71,8 +71,8 @@ async function main() {
   for (const spaceName of uniqueSpaces) {
     let space = await prisma.space.findUnique({
       where: {
-        userId_name: {
-          userId: user.id,
+        userAccountId_name: {
+          userAccountId: userAccount.id,
           name: spaceName,
         },
       },
@@ -81,7 +81,7 @@ async function main() {
     if (!space) {
       space = await prisma.space.create({
         data: {
-          userId: user.id,
+          userAccountId: userAccount.id,
           name: spaceName,
         },
       });

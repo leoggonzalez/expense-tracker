@@ -11,7 +11,7 @@ import {
 } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
-import { requireCurrentUser } from "@/lib/session";
+import { requireCurrentUserAccount } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export interface CreateTransactionInput {
@@ -33,7 +33,7 @@ export interface CreateTransferInput {
 
 type SpaceRecord = {
   id: string;
-  userId: string;
+  userAccountId: string;
   name: string;
   createdAt: Date;
   updatedAt: Date;
@@ -153,7 +153,7 @@ export type ProjectionPagePayload = {
 
 type TransactionFiltersWhere = {
   space: {
-    userId: string;
+    userAccountId: string;
   };
   spaceId?: string;
   type?: "income" | "expense";
@@ -357,7 +357,7 @@ export async function syncAllCurrentMonthTransactionCounters(): Promise<void> {
 }
 
 async function getMonthTotalsForUser(
-  userId: string,
+  userAccountId: string,
   monthStartInput: Date,
 ): Promise<DashboardTotals> {
   const monthStart = startOfMonth(monthStartInput);
@@ -395,7 +395,7 @@ async function getMonthTotalsForUser(
           ) AS expense
         FROM "Transaction" e
         INNER JOIN "Space" a ON a.id = e."spaceId"
-        WHERE a."userId" = ${userId}
+        WHERE a."userAccountId" = ${userAccountId}
           AND e."transferSpaceId" IS NULL
           AND e."beginDate" <= ${monthEnd}
           AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
@@ -422,14 +422,14 @@ async function getMonthTotalsForUser(
 export async function getMonthTotals(
   monthStart: Date,
 ): Promise<DashboardTotals> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
   return getMonthTotalsForUser(currentUser.id, monthStart);
 }
 
-async function findOrCreateSpace(userId: string, spaceName: string) {
+async function findOrCreateSpace(userAccountId: string, spaceName: string) {
   let space = await prisma.space.findFirst({
     where: {
-      userId,
+      userAccountId,
       name: spaceName,
       isArchived: false,
     },
@@ -438,7 +438,7 @@ async function findOrCreateSpace(userId: string, spaceName: string) {
   if (!space) {
     const archivedSpace = await prisma.space.findFirst({
       where: {
-        userId,
+        userAccountId,
         name: spaceName,
         isArchived: true,
       },
@@ -453,7 +453,7 @@ async function findOrCreateSpace(userId: string, spaceName: string) {
 
     space = await prisma.space.create({
       data: {
-        userId,
+        userAccountId,
         name: spaceName,
       },
     });
@@ -508,7 +508,7 @@ function revalidateTransactionPages() {
 export async function createTransaction(
   input: CreateTransactionInput,
 ): Promise<TransactionMutationResult> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     const space = await findOrCreateSpace(
@@ -548,7 +548,7 @@ export async function createTransaction(
 export async function createTransferTransaction(
   input: CreateTransferInput,
 ): Promise<TransferMutationResult> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   if (input.fromSpaceId === input.toSpaceId) {
     return { success: false, error: "transfer_same_space" };
@@ -565,14 +565,14 @@ export async function createTransferTransaction(
       prisma.space.findFirst({
         where: {
           id: input.fromSpaceId,
-          userId: currentUser.id,
+          userAccountId: currentUser.id,
           isArchived: false,
         },
       }),
       prisma.space.findFirst({
         where: {
           id: input.toSpaceId,
-          userId: currentUser.id,
+          userAccountId: currentUser.id,
           isArchived: false,
         },
       }),
@@ -650,13 +650,13 @@ export async function createMultipleTransactions(
 }
 
 export async function getTransactions(): Promise<TransactionWithSpaceRecord[]> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     return await prisma.transaction.findMany({
       where: {
         space: {
-          userId: currentUser.id,
+          userAccountId: currentUser.id,
         },
       },
       include: {
@@ -673,13 +673,13 @@ export async function getTransactions(): Promise<TransactionWithSpaceRecord[]> {
 export async function getRecentTransactions(
   limit: number = 10,
 ): Promise<TransactionWithSpaceRecord[]> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     return await prisma.transaction.findMany({
       where: {
         space: {
-          userId: currentUser.id,
+          userAccountId: currentUser.id,
         },
       },
       include: {
@@ -716,7 +716,7 @@ export async function getProjectionTransactions(): Promise<
 export async function getProjectionPagePayload(
   focusedMonthStart: Date,
 ): Promise<ProjectionPagePayload> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
   const normalizedFocusedMonthStart = startOfMonth(focusedMonthStart);
   const endMonthStart = addMonths(normalizedFocusedMonthStart, 5);
   const focusedMonthEnd = endOfMonth(normalizedFocusedMonthStart);
@@ -770,7 +770,7 @@ export async function getProjectionPagePayload(
        AND e."transferSpaceId" IS NULL
       LEFT JOIN "Space" a
         ON a.id = e."spaceId"
-       AND a."userId" = ${currentUser.id}
+       AND a."userAccountId" = ${currentUser.id}
       GROUP BY months.month_start
       ORDER BY months.month_start ASC
     `,
@@ -799,7 +799,7 @@ export async function getProjectionPagePayload(
         END AS "monthTransactionCount"
       FROM "Space" a
       INNER JOIN "Transaction" e ON e."spaceId" = a.id
-      WHERE a."userId" = ${currentUser.id}
+      WHERE a."userAccountId" = ${currentUser.id}
         AND e."beginDate" <= ${focusedMonthEnd}
         AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
       GROUP BY a.id, a.name, a."currentMonthTransactionCount"
@@ -841,7 +841,7 @@ export async function getProjectionPagePayload(
         INNER JOIN "Transaction" e ON e."spaceId" = a.id
         LEFT JOIN "Space" transfer_space
           ON transfer_space.id = e."transferSpaceId"
-        WHERE a."userId" = ${currentUser.id}
+        WHERE a."userAccountId" = ${currentUser.id}
           AND e."beginDate" <= ${focusedMonthEnd}
           AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
       ) ranked
@@ -915,7 +915,7 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
   const today = startOfDay(now);
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   const [totals, recentTransactions, upcomingPayments] = await Promise.all([
     getMonthTotalsForUser(currentUser.id, monthStart),
@@ -925,7 +925,7 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
         type: "expense",
         transferSpaceId: null,
         space: {
-          userId: currentUser.id,
+          userAccountId: currentUser.id,
         },
         beginDate: {
           gte: today,
@@ -968,7 +968,7 @@ export async function getTransactionsWithFilters(filters: {
   page?: number;
   limit?: number;
 }): Promise<TransactionListWithPagination> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     const page = filters.page || 1;
@@ -977,7 +977,7 @@ export async function getTransactionsWithFilters(filters: {
 
     const where: TransactionFiltersWhere = {
       space: {
-        userId: currentUser.id,
+        userAccountId: currentUser.id,
       },
     };
 
@@ -1098,12 +1098,12 @@ export async function getTransactionsWithFilters(filters: {
 }
 
 export async function getSpaces(): Promise<SpaceRecord[]> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     return await prisma.space.findMany({
       where: {
-        userId: currentUser.id,
+        userAccountId: currentUser.id,
         isArchived: false,
       },
       orderBy: {
@@ -1119,14 +1119,14 @@ export async function getSpaces(): Promise<SpaceRecord[]> {
 export async function getTransactionById(
   id: string,
 ): Promise<TransactionWithSpaceRecord | null> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     return await prisma.transaction.findFirst({
       where: {
         id,
         space: {
-          userId: currentUser.id,
+          userAccountId: currentUser.id,
         },
       },
       include: {
@@ -1149,14 +1149,14 @@ export async function updateTransaction(
   id: string,
   input: Partial<CreateTransactionInput>,
 ): Promise<TransactionMutationResult> {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     const existingTransaction = await prisma.transaction.findFirst({
       where: {
         id,
         space: {
-          userId: currentUser.id,
+          userAccountId: currentUser.id,
         },
       },
       include: {
@@ -1207,14 +1207,14 @@ export async function updateTransaction(
 }
 
 export async function deleteTransaction(id: string) {
-  const currentUser = await requireCurrentUser();
+  const currentUser = await requireCurrentUserAccount();
 
   try {
     const existingTransaction = await prisma.transaction.findFirst({
       where: {
         id,
         space: {
-          userId: currentUser.id,
+          userAccountId: currentUser.id,
         },
       },
       select: {
