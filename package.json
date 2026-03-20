@@ -13,6 +13,7 @@
     "lint:repo": "node scripts/lint/check_repo_rules.mjs",
     "lint:types": "tsc --noEmit",
     "review:page-primitives": "node scripts/review/page_primitive_review.mjs",
+    "review:prefer-primitives": "node scripts/review/prefer_primitives_review.mjs",
     "add-icon": "node scripts/add_icon.mjs",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
