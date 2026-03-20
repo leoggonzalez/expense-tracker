@@ -26,12 +26,7 @@ export function Avatar({ name }: AvatarProps): React.ReactElement {
 
   return (
     <span className="avatar" aria-label={name} title={name}>
-      <Stack
-        align="center"
-        justify="center"
-        fullWidth
-        fullHeight
-      >
+      <Stack align="center" justify="center" fullWidth fullHeight>
         <Text as="span" size="xs" weight="semibold" transform="uppercase">
           {initials}
         </Text>

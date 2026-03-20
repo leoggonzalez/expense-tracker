@@ -42,11 +42,11 @@ export function AccountCard({
                 size="sm"
                 startIcon={<Icon name="external-link" size={16} />}
                 ariaLabel={String(i18n.t("accounts_page.open_account"))}
-                >
-                  <span className="account-card__sr-only">
-                    {i18n.t("accounts_page.open_account")}
-                  </span>
-                </Button>
+              >
+                <span className="account-card__sr-only">
+                  {i18n.t("accounts_page.open_account")}
+                </span>
+              </Button>
             </Stack>
 
             <Text size="sm" color="secondary">

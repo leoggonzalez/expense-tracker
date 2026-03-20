@@ -13,6 +13,12 @@
       color-mix(in srgb, var(--color-border) 82%, white);
   }
 
+  &__row-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
   &__empty-state {
     border-radius: 20px;
     background-color: var(--color-surface-muted);

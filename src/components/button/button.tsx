@@ -45,13 +45,7 @@ export function Button({
     .join(" ");
 
   const content = (
-    <Stack
-      direction="row"
-      align="center"
-      justify="center"
-      gap={4}
-      inline
-    >
+    <Stack direction="row" align="center" justify="center" gap={4} inline>
       {startIcon && <span className="button__icon">{startIcon}</span>}
       {children}
     </Stack>

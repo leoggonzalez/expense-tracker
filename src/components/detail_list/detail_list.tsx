@@ -23,7 +23,12 @@ export function DetailRow({
   return (
     <div className="detail-list__row">
       <Box
-        padding={{ paddingTop: 16, paddingRight: 24, paddingBottom: 16, paddingLeft: 24 }}
+        padding={{
+          paddingTop: 16,
+          paddingRight: 24,
+          paddingBottom: 16,
+          paddingLeft: 24,
+        }}
       >
         <Stack direction="row" align="center" justify="space-between" gap={16}>
           <div>{label}</div>

@@ -1,7 +1,9 @@
 @use "@/styles/variables.scss" as *;
 
 .button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: var(--border-width) solid transparent;
   border-radius: 18px;
   font-weight: var(--font-weight-medium);
@@ -32,16 +34,19 @@
 
   /* Sizes */
   &--size-sm {
+    min-height: 40px;
     padding: var(--spacing-xs) var(--spacing-md);
     font-size: var(--font-size-sm);
   }
 
   &--size-md {
+    min-height: 48px;
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: var(--font-size-md);
   }
 
   &--size-lg {
+    min-height: 56px;
     padding: var(--spacing-md) var(--spacing-xl);
     font-size: var(--font-size-lg);
   }

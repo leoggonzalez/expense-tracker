@@ -52,41 +52,48 @@ export function UpcomingPaymentsPanel({
           <div className="upcoming-payments-panel__list">
             {upcomingPayments.map((entry) => (
               <div key={entry.id} className="upcoming-payments-panel__row">
-                <Box
-                  padding={{
-                    paddingTop: 16,
-                    paddingRight: 18,
-                    paddingBottom: 16,
-                    paddingLeft: 18,
-                  }}
+                <AppLink
+                  href={`/entries/${entry.id}`}
+                  ariaLabel={entry.description}
                 >
-                  <Stack
-                    direction="row"
-                    align="center"
-                    justify="space-between"
-                    gap={16}
-                    fullWidth
-                  >
-                    <Stack gap={4}>
-                      <Text as="span" size="sm" weight="semibold">
-                        {entry.description}
-                      </Text>
-                      <Text as="span" size="xs" color="secondary">
-                        {entry.accountName}
-                      </Text>
-                    </Stack>
-                    <Stack gap={4} align="flex-end">
-                      <Text as="span" size="sm" weight="semibold">
-                        {formatCurrency(Math.abs(entry.amount))}
-                      </Text>
-                      <Text as="span" size="xs" color="secondary">
-                        {i18n.t("dashboard.payment_due", {
-                          date: formatPaymentDate(entry.beginDate),
-                        })}
-                      </Text>
-                    </Stack>
-                  </Stack>
-                </Box>
+                  <div className="upcoming-payments-panel__row-link">
+                    <Box
+                      padding={{
+                        paddingTop: 16,
+                        paddingRight: 18,
+                        paddingBottom: 16,
+                        paddingLeft: 18,
+                      }}
+                    >
+                      <Stack
+                        direction="row"
+                        align="center"
+                        justify="space-between"
+                        gap={16}
+                        fullWidth
+                      >
+                        <Stack gap={4} align="flex-start">
+                          <Text as="span" size="sm" weight="semibold">
+                            {entry.description}
+                          </Text>
+                          <Text as="span" size="xs" color="secondary">
+                            {entry.accountName}
+                          </Text>
+                        </Stack>
+                        <Stack gap={4} align="flex-end">
+                          <Text as="span" size="sm" weight="semibold">
+                            {formatCurrency(Math.abs(entry.amount))}
+                          </Text>
+                          <Text as="span" size="xs" color="secondary">
+                            {i18n.t("dashboard.payment_due", {
+                              date: formatPaymentDate(entry.beginDate),
+                            })}
+                          </Text>
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  </div>
+                </AppLink>
               </div>
             ))}
           </div>
