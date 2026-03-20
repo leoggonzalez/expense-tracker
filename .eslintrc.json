@@ -2,5 +2,17 @@
   "extends": [
     "next/core-web-vitals",
     "next/typescript"
-  ]
+  ],
+  "rules": {
+    "internal-import-alias": "error",
+    "no-react-fc": "error",
+    "component-export-style": "error",
+    "component-return-type": "error",
+    "component-props-shape": "error",
+    "no-inline-style-prop": "error",
+    "no-disallowed-component-props": "error",
+    "no-page-component-name": "error",
+    "no-hardcoded-ui-strings": "warn",
+    "warn-use-effect": "warn"
+  }
 }
