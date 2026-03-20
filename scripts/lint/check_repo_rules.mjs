@@ -29,6 +29,10 @@ function isSnakeCaseName(name) {
   return /^[a-z0-9]+(?:_[a-z0-9]+)*$/.test(name);
 }
 
+function isKebabCaseName(name) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name);
+}
+
 function walk(targetPath) {
   const stat = fs.statSync(targetPath);
 
@@ -96,6 +100,13 @@ function checkSnakeCase(relativePath) {
           `${relativePath}: filenames must use snake_case unless they are a framework exception.`,
         );
       }
+      continue;
+    }
+
+    if (
+      relativePath.startsWith("src/app/") &&
+      isKebabCaseName(part)
+    ) {
       continue;
     }
 

@@ -10,42 +10,6 @@ function isPascalCase(name) {
   return /^[A-Z][A-Za-z0-9]*$/.test(name);
 }
 
-function isReactElementReference(node) {
-  return (
-    node &&
-    node.type === "TSTypeReference" &&
-    node.typeName &&
-    node.typeName.type === "TSQualifiedName" &&
-    node.typeName.left.type === "Identifier" &&
-    node.typeName.left.name === "React" &&
-    node.typeName.right.type === "Identifier" &&
-    node.typeName.right.name === "ReactElement"
-  );
-}
-
-function hasAllowedReturnType(node) {
-  if (!node.returnType) {
-    return false;
-  }
-
-  const annotation = node.returnType.typeAnnotation;
-
-  if (isReactElementReference(annotation)) {
-    return true;
-  }
-
-  return (
-    annotation &&
-    annotation.type === "TSTypeReference" &&
-    annotation.typeName.type === "Identifier" &&
-    annotation.typeName.name === "Promise" &&
-    annotation.typeParameters &&
-    annotation.typeParameters.params &&
-    annotation.typeParameters.params.length === 1 &&
-    isReactElementReference(annotation.typeParameters.params[0])
-  );
-}
-
 module.exports = {
   meta: {
     type: "problem",
@@ -56,9 +20,26 @@ module.exports = {
   },
   create(context) {
     const filename = path.normalize(context.getFilename());
+    const sourceCode = context.getSourceCode();
 
     if (!isComponentFile(filename)) {
       return {};
+    }
+
+    function hasAllowedReturnType(node) {
+      if (!node.returnType) {
+        return false;
+      }
+
+      const returnTypeText = sourceCode
+        .getText(node.returnType.typeAnnotation)
+        .replace(/\s+/g, "");
+
+      return (
+        returnTypeText === "React.ReactElement" ||
+        returnTypeText === "Promise<React.ReactElement>" ||
+        returnTypeText === "Promise<React.ReactElement|null>"
+      );
     }
 
     return {

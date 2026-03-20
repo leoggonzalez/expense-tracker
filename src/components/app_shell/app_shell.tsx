@@ -29,6 +29,7 @@ export function AppShell({
   const isSingleEntryDraftRoute =
     pathname === "/entries/new/income" || pathname === "/entries/new/expense";
 
+  // eslint-disable-next-line warn-use-effect -- This effect keeps draft persistence and last-path tracking synchronized with route changes.
   useEffect(() => {
     if (!isSingleEntryDraftRoute) {
       clearNewEntryDraft();
