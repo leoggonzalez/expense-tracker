@@ -22,6 +22,9 @@ type SpaceFieldProps = {
   placeholder?: string;
   required?: boolean;
   loadSpacesOnMount?: boolean;
+  size?: "md" | "lg";
+  surface?: "default" | "subtle";
+  labelTone?: "primary" | "secondary";
 };
 
 export function SpaceField({
@@ -32,6 +35,9 @@ export function SpaceField({
   placeholder,
   required = false,
   loadSpacesOnMount = false,
+  size = "md",
+  surface = "default",
+  labelTone = "primary",
 }: SpaceFieldProps): React.ReactElement {
   const endpoint = "/api/transactions/new/spaces";
   const { data, hasError, retry } = useProtectedPageSection(
@@ -71,6 +77,9 @@ export function SpaceField({
               placeholder={placeholder}
               required={required}
               hasTrailingControl
+              size={size}
+              surface={surface}
+              labelTone={labelTone}
             />
             <button
               type="button"
@@ -92,6 +101,9 @@ export function SpaceField({
             }))}
             placeholder={placeholder}
             required={required}
+            size={size}
+            surface={surface}
+            labelTone={labelTone}
             trailingContent={
               <button
                 type="button"

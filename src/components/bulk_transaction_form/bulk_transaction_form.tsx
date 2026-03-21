@@ -245,6 +245,9 @@ export function BulkTransactionForm({
               i18n.t("bulk_transaction_form.shared_space_placeholder") as string
             }
             required
+            size="lg"
+            surface="subtle"
+            labelTone="secondary"
           />
 
           <Stack gap={4}>

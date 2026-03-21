@@ -435,6 +435,9 @@ export function TransactionForm({
           loadSpacesOnMount={isCreateFlow && initialSpaces.length === 0}
           placeholder={i18n.t("transaction_form.space_placeholder") as string}
           required
+          size="lg"
+          surface="subtle"
+          labelTone="secondary"
         />
 
         <Input
