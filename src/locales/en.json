@@ -247,6 +247,8 @@
     "save": "Save changes",
     "saving": "Saving...",
     "save_success": "Your userAccount details have been updated.",
+    "profile_load_failed": "Unable to load your account details right now.",
+    "not_found": "Account details not found.",
     "update_failed": "Unable to update your userAccount details.",
     "logout": "Logout"
   },

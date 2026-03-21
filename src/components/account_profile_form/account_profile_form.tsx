@@ -7,7 +7,6 @@ import React, { useState } from "react";
 import { i18n } from "@/model/i18n";
 import { logout } from "@/actions/auth";
 import { updateCurrentUserAccountProfile } from "@/actions/user_account";
-import { useRouter } from "next/navigation";
 
 type AccountProfileFormProps = {
   userAccount: {
@@ -19,7 +18,6 @@ type AccountProfileFormProps = {
 export function AccountProfileForm({
   userAccount,
 }: AccountProfileFormProps): React.ReactElement {
-  const router = useRouter();
   const [name, setName] = useState(userAccount.name || "");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -41,7 +39,6 @@ export function AccountProfileForm({
 
     setSuccess("account.save_success");
     setLoading(false);
-    router.refresh();
   };
 
   const handleLogout = async (): Promise<void> => {

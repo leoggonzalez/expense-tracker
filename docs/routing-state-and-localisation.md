@@ -29,6 +29,10 @@ Protected pages may use a hybrid shell instead when all of the following are tru
 
 This pattern is preferred when the goal is faster-feeling client navigation across protected pages without risking cross-user leakage.
 
+Some protected pages can stay fully client-owned inside a static shell when they do not need authenticated server reads after navigation. Settings is the reference example for this lighter variant.
+
+When authenticated profile data is still needed, keep the shell static and fetch that data after mount through a private route handler. Account is the reference example for this profile-bootstrap variant.
+
 ## Localisation Rules
 
 - `src/locales/en.json` is the canonical source for English UI copy.

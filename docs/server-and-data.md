@@ -197,6 +197,11 @@ Spaces now use the same approach across overview, archived, detail, and edit flo
 - the detail route mounts a client detail section behind an authenticated endpoint
 - the edit route keeps a static shell and fetches its editable payload after mount
 
+Settings and account are the lightweight follow-on cases:
+
+- settings keeps a static shell and mounts client-only preferences UI without adding a server fetch
+- account keeps a static shell and fetches the current profile behind an authenticated endpoint
+
 This keeps navigation fast while preserving per-user correctness.
 
 ### Detail Page Queries

@@ -8,6 +8,29 @@ type UpdateUserAccountProfileResult = {
   error?: string;
 };
 
+export type CurrentUserAccountProfilePayload = {
+  email: string;
+  name: string | null;
+};
+
+// Read
+export async function getCurrentUserAccountProfilePayloadForUser(
+  userAccountId: string,
+): Promise<CurrentUserAccountProfilePayload | null> {
+  const userAccount = await UserAccount.findById(userAccountId);
+
+  if (!userAccount) {
+    return null;
+  }
+
+  const userAccountRecord = userAccount.toRecord();
+
+  return {
+    email: userAccountRecord.email,
+    name: userAccountRecord.name,
+  };
+}
+
 // Update
 export async function updateCurrentUserAccountProfile(input: {
   name: string;
@@ -19,7 +42,7 @@ export async function updateCurrentUserAccountProfile(input: {
     const userAccount = await UserAccount.findById(currentUserAccount.id);
 
     if (!userAccount) {
-      return { success: false, error: "settings_page.update_failed" };
+      return { success: false, error: "account.update_failed" };
     }
 
     await userAccount.updateName(name || null);
@@ -27,6 +50,6 @@ export async function updateCurrentUserAccountProfile(input: {
     return { success: true };
   } catch (error) {
     console.error("Failed to update current user account profile:", error);
-    return { success: false, error: "settings_page.update_failed" };
+    return { success: false, error: "account.update_failed" };
   }
 }
