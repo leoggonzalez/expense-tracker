@@ -1,13 +1,14 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { requireCurrentUserAccount } from "@/lib/session";
+import { UserAccount } from "@/lib/user_account";
 
 type UpdateUserAccountProfileResult = {
   success: boolean;
   error?: string;
 };
 
+// Update
 export async function updateCurrentUserAccountProfile(input: {
   name: string;
 }): Promise<UpdateUserAccountProfileResult> {
@@ -15,14 +16,13 @@ export async function updateCurrentUserAccountProfile(input: {
   const name = input.name.trim();
 
   try {
-    await prisma.userAccount.update({
-      where: {
-        id: currentUserAccount.id,
-      },
-      data: {
-        name: name || null,
-      },
-    });
+    const userAccount = await UserAccount.findById(currentUserAccount.id);
+
+    if (!userAccount) {
+      return { success: false, error: "settings_page.update_failed" };
+    }
+
+    await userAccount.updateName(name || null);
 
     return { success: true };
   } catch (error) {
