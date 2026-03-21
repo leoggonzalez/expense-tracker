@@ -10,9 +10,11 @@ import {
   startOfMonth,
 } from "date-fns";
 
+import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
+import { normalizeTransactionAmount } from "@/lib/amount";
 import { prisma } from "@/lib/prisma";
+import { Space, type SpaceRecord } from "@/lib/space";
 import { requireCurrentUserAccount } from "@/lib/session";
-import { revalidatePath } from "next/cache";
 
 export interface CreateTransactionInput {
   type: "income" | "expense";
@@ -30,14 +32,6 @@ export interface CreateTransferInput {
   amount: number;
   beginDate: Date;
 }
-
-type SpaceRecord = {
-  id: string;
-  userAccountId: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 type TransactionWithSpaceRecord = {
   id: string;
@@ -268,14 +262,6 @@ type ProjectionFocusedSpaceTransactionRow = {
   updatedAt: Date;
 };
 
-function normalizeTransactionAmount(type: string, amount: number): number {
-  if (type === "expense" && amount > 0) {
-    return -amount;
-  }
-
-  return amount;
-}
-
 function serializeProjectionMonthTransactionRow(
   transaction: ProjectionFocusedSpaceTransactionRow,
 ): ProjectionMonthTransaction {
@@ -294,66 +280,8 @@ function serializeProjectionMonthTransactionRow(
   };
 }
 
-function getCurrentMonthBounds(): { monthStart: Date; monthEnd: Date } {
-  const monthStart = startOfMonth(new Date());
-  const monthEnd = endOfMonth(monthStart);
-
-  return { monthStart, monthEnd };
-}
-
-async function syncCurrentMonthTransactionCounterForSpace(
-  spaceId: string,
-): Promise<void> {
-  const { monthStart, monthEnd } = getCurrentMonthBounds();
-
-  await prisma.$executeRaw`
-    UPDATE "Space" a
-    SET "currentMonthTransactionCount" = (
-      SELECT COUNT(e.id)::integer
-      FROM "Transaction" e
-      WHERE e."spaceId" = a.id
-        AND e."beginDate" <= ${monthEnd}
-        AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
-    )
-    WHERE a.id = ${spaceId}
-  `;
-}
-
-async function syncCurrentMonthTransactionCounterForSpaces(
-  spaceIds: string[],
-): Promise<void> {
-  const uniqueSpaceIds = Array.from(new Set(spaceIds.filter(Boolean)));
-
-  if (uniqueSpaceIds.length === 0) {
-    return;
-  }
-
-  await Promise.all(
-    uniqueSpaceIds.map((spaceId) =>
-      syncCurrentMonthTransactionCounterForSpace(spaceId),
-    ),
-  );
-}
-
 export async function syncAllCurrentMonthTransactionCounters(): Promise<void> {
-  const { monthStart, monthEnd } = getCurrentMonthBounds();
-
-  await prisma.$executeRaw`
-    UPDATE "Space" a
-    SET "currentMonthTransactionCount" = COALESCE(month_counts."transactionCount", 0)
-    FROM (
-      SELECT
-        a2.id AS "spaceId",
-        COUNT(e.id)::integer AS "transactionCount"
-      FROM "Space" a2
-      LEFT JOIN "Transaction" e
-        ON e."spaceId" = a2.id
-       AND e."beginDate" <= ${monthEnd}
-       AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
-      GROUP BY a2.id
-    ) month_counts
-    WHERE a.id = month_counts."spaceId"
-  `;
+  await Space.syncAllCurrentMonthTransactionCounts();
 }
 
 async function getMonthTotalsForUser(
@@ -426,42 +354,6 @@ export async function getMonthTotals(
   return getMonthTotalsForUser(currentUser.id, monthStart);
 }
 
-async function findOrCreateSpace(userAccountId: string, spaceName: string) {
-  let space = await prisma.space.findFirst({
-    where: {
-      userAccountId,
-      name: spaceName,
-      isArchived: false,
-    },
-  });
-
-  if (!space) {
-    const archivedSpace = await prisma.space.findFirst({
-      where: {
-        userAccountId,
-        name: spaceName,
-        isArchived: true,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (archivedSpace) {
-      throw new Error("space_is_archived");
-    }
-
-    space = await prisma.space.create({
-      data: {
-        userAccountId,
-        name: spaceName,
-      },
-    });
-  }
-
-  return space;
-}
-
 function serializeProjectionTransaction(
   transaction: TransactionWithSpaceRecord,
 ): SerializedProjectionTransaction {
@@ -496,30 +388,22 @@ function serializeDashboardRecentTransaction(transaction: TransactionWithSpaceRe
   };
 }
 
-function revalidateTransactionPages() {
-  revalidatePath("/");
-  revalidatePath("/projection");
-  revalidatePath("/transactions");
-  revalidatePath("/transactions/all");
-  revalidatePath("/space");
-  revalidatePath("/settings");
-}
-
 export async function createTransaction(
   input: CreateTransactionInput,
 ): Promise<TransactionMutationResult> {
   const currentUser = await requireCurrentUserAccount();
 
   try {
-    const space = await findOrCreateSpace(
+    const space = await Space.findOrCreateActive(
       currentUser.id,
       input.spaceName,
     );
+    const spaceId = space.persistedId;
 
     const transaction = await prisma.transaction.create({
       data: {
         type: input.type,
-        spaceId: space.id,
+        spaceId,
         transferSpaceId: null,
         description: input.description,
         amount: input.amount,
@@ -531,8 +415,8 @@ export async function createTransaction(
       },
     });
 
-    await syncCurrentMonthTransactionCounterForSpace(space.id);
-    revalidateTransactionPages();
+    await Space.syncCurrentMonthTransactionCount(spaceId);
+    revalidateTransactionMutationPages();
 
     return { success: true, transaction };
   } catch (error) {
@@ -615,11 +499,11 @@ export async function createTransferTransaction(
       }),
     ]);
 
-    await syncCurrentMonthTransactionCounterForSpaces([
+    await Space.syncCurrentMonthTransactionCounts([
       fromSpace.id,
       toSpace.id,
     ]);
-    revalidateTransactionPages();
+    revalidateTransactionMutationPages();
 
     return { success: true, transactions: [fromTransaction, toTransaction] };
   } catch (error) {
@@ -1101,15 +985,11 @@ export async function getSpaces(): Promise<SpaceRecord[]> {
   const currentUser = await requireCurrentUserAccount();
 
   try {
-    return await prisma.space.findMany({
-      where: {
-        userAccountId: currentUser.id,
-        isArchived: false,
-      },
-      orderBy: {
-        name: "asc",
-      },
-    });
+    const spaces = await Space.listActiveByUser(currentUser.id);
+
+    return spaces.map((space) => ({
+      ...space.toRecord(),
+    }));
   } catch (error) {
     console.error("Error fetching spaces:", error);
     return [];
@@ -1171,11 +1051,11 @@ export async function updateTransaction(
     let spaceId: string | undefined;
 
     if (input.spaceName) {
-      const space = await findOrCreateSpace(
+      const space = await Space.findOrCreateActive(
         currentUser.id,
         input.spaceName,
       );
-      spaceId = space.id;
+      spaceId = space.persistedId;
     }
 
     const transaction = await prisma.transaction.update({
@@ -1193,11 +1073,11 @@ export async function updateTransaction(
       },
     });
 
-    await syncCurrentMonthTransactionCounterForSpaces([
+    await Space.syncCurrentMonthTransactionCounts([
       existingTransaction.spaceId,
       transaction.spaceId,
     ]);
-    revalidateTransactionPages();
+    revalidateTransactionMutationPages();
 
     return { success: true, transaction };
   } catch (error) {
@@ -1231,8 +1111,10 @@ export async function deleteTransaction(id: string) {
       where: { id },
     });
 
-    await syncCurrentMonthTransactionCounterForSpace(existingTransaction.spaceId);
-    revalidateTransactionPages();
+    await Space.syncCurrentMonthTransactionCount(
+      existingTransaction.spaceId,
+    );
+    revalidateTransactionMutationPages();
 
     return { success: true };
   } catch (error) {

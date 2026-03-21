@@ -34,3 +34,14 @@ export function parseAmountInput(value: string): number | null {
 
   return parsed;
 }
+
+export function normalizeTransactionAmount(
+  type: string,
+  amount: number,
+): number {
+  if (type === "expense" && amount > 0) {
+    return -amount;
+  }
+
+  return amount;
+}

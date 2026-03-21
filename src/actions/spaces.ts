@@ -1,24 +1,16 @@
 "use server";
 
 import { endOfMonth, format, startOfMonth } from "date-fns";
-import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/prisma";
+import { revalidateSpaceMutationPages } from "@/lib/app_revalidation";
+import { normalizeTransactionAmount } from "@/lib/amount";
+import { isPrismaErrorWithCode } from "@/lib/prisma_errors";
+import { Space, type SpaceTransactionRecord } from "@/lib/space";
 import { requireCurrentUserAccount } from "@/lib/session";
 
 type SpaceActionResult = {
   success: boolean;
   error?: string;
-};
-
-type PrismaErrorWithCode = {
-  code: string;
-};
-
-type SpaceCurrentMonthSummaryRow = {
-  id: string;
-  name: string;
-  currentMonthTotal: number | null;
 };
 
 type SpaceCurrentMonthSummary = {
@@ -71,113 +63,57 @@ export type SpaceEditData = {
   isArchived: boolean;
 };
 
-function normalizeTransactionAmount(type: string, amount: number): number {
-  if (type === "expense" && amount > 0) {
-    return -amount;
+function serializeSpaceTransaction(
+  spaceName: string,
+  transaction: SpaceTransactionRecord,
+): SpaceDetailTransaction {
+  return {
+    id: transaction.id,
+    type: transaction.type,
+    spaceName,
+    transferSpaceId: transaction.transferSpaceId,
+    transferSpaceName: transaction.transferSpace?.name || null,
+    description: transaction.description,
+    amount: normalizeTransactionAmount(transaction.type, transaction.amount),
+    beginDate: transaction.beginDate.toISOString(),
+    endDate: transaction.endDate?.toISOString() || null,
+    createdAt: transaction.createdAt.toISOString(),
+    updatedAt: transaction.updatedAt.toISOString(),
+  };
+}
+
+// Create
+export async function createSpace(input: {
+  name: string;
+}): Promise<SpaceActionResult> {
+  const currentUser = await requireCurrentUserAccount();
+  const name = input.name.trim();
+
+  if (!name) {
+    return { success: false, error: "spaces_page.name_required" };
   }
 
-  return amount;
+  try {
+    await new Space({
+      userAccountId: currentUser.id,
+      name,
+    }).create();
+
+    revalidateSpaceMutationPages();
+
+    return { success: true };
+  } catch (error) {
+    if (isPrismaErrorWithCode(error) && error.code === "P2002") {
+      return { success: false, error: "spaces_page.duplicate_name" };
+    }
+
+    console.error("Error creating space:", error);
+    return { success: false, error: "spaces_page.create_failed" };
+  }
 }
 
-function isPrismaErrorWithCode(error: unknown): error is PrismaErrorWithCode {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    typeof (error as { code?: unknown }).code === "string"
-  );
-}
-
-function revalidateSpacePages(): void {
-  revalidatePath("/");
-  revalidatePath("/transactions");
-  revalidatePath("/transactions/all");
-  revalidatePath("/projection");
-  revalidatePath("/spaces");
-  revalidatePath("/spaces/new");
-  revalidatePath("/spaces/archived");
-  revalidatePath("/settings");
-}
-
-async function findOwnedSpaceOrNull(userAccountId: string, id: string) {
-  return prisma.space.findFirst({
-    where: {
-      id,
-      userAccountId,
-    },
-  });
-}
-
-async function getMonthTotalForSpace(
-  userAccountId: string,
-  spaceId: string,
-  monthStart: Date,
-  monthEnd: Date,
-): Promise<number> {
-  const rows = await prisma.$queryRaw<
-    Array<{ currentMonthTotal: number | null }>
-  >`
-    SELECT
-      COALESCE(
-        SUM(
-          CASE
-            WHEN e.type = 'expense' THEN
-              CASE
-                WHEN e.amount > 0 THEN -e.amount
-                ELSE e.amount
-              END
-            ELSE e.amount
-          END
-        ),
-        0
-      ) AS "currentMonthTotal"
-    FROM "Space" a
-    LEFT JOIN "Transaction" e
-      ON e."spaceId" = a.id
-     AND e."beginDate" <= ${monthEnd}
-     AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
-    WHERE a.id = ${spaceId}
-      AND a."userAccountId" = ${userAccountId}
-    GROUP BY a.id
-  `;
-
-  return Number(rows[0]?.currentMonthTotal || 0);
-}
-
-async function getHistoricalTotalForSpace(
-  userAccountId: string,
-  spaceId: string,
-): Promise<number> {
-  const rows = await prisma.$queryRaw<
-    Array<{ historicalTotal: number | null }>
-  >`
-    SELECT
-      COALESCE(
-        SUM(
-          CASE
-            WHEN e.type = 'expense' THEN
-              CASE
-                WHEN e.amount > 0 THEN -e.amount
-                ELSE e.amount
-              END
-            ELSE e.amount
-          END
-        ),
-        0
-      ) AS "historicalTotal"
-    FROM "Space" a
-    LEFT JOIN "Transaction" e
-      ON e."spaceId" = a.id
-    WHERE a.id = ${spaceId}
-      AND a."userAccountId" = ${userAccountId}
-    GROUP BY a.id
-  `;
-
-  return Number(rows[0]?.historicalTotal || 0);
-}
-
-async function getSpacesByArchiveState(
-  isArchived: boolean,
+// Read
+export async function getSpacesCurrentMonthSummary(
   selectedMonthStart?: Date,
 ): Promise<SpaceCurrentMonthSummary[]> {
   const currentUser = await requireCurrentUserAccount();
@@ -185,55 +121,36 @@ async function getSpacesByArchiveState(
   const monthEnd = endOfMonth(monthStart);
 
   try {
-    const rows = await prisma.$queryRaw<SpaceCurrentMonthSummaryRow[]>`
-      SELECT
-        a.id,
-        a.name,
-        COALESCE(
-          SUM(
-            CASE
-              WHEN e.type = 'expense' THEN
-                CASE
-                  WHEN e.amount > 0 THEN -e.amount
-                  ELSE e.amount
-                END
-              ELSE e.amount
-            END
-          ),
-          0
-        ) AS "currentMonthTotal"
-      FROM "Space" a
-      LEFT JOIN "Transaction" e
-        ON e."spaceId" = a.id
-       AND e."beginDate" <= ${monthEnd}
-       AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
-      WHERE a."userAccountId" = ${currentUser.id}
-        AND a."isArchived" = ${isArchived}
-      GROUP BY a.id, a.name
-      ORDER BY a.name ASC
-    `;
-
-    return rows.map((row) => ({
-      id: row.id,
-      name: row.name,
-      currentMonthTotal: Number(row.currentMonthTotal || 0),
-    }));
+    return await Space.listByArchiveStateWithMonthTotals(
+      currentUser.id,
+      false,
+      monthStart,
+      monthEnd,
+    );
   } catch (error) {
     console.error("Error fetching spaces summary:", error);
     return [];
   }
 }
 
-export async function getSpacesCurrentMonthSummary(
-  selectedMonthStart?: Date,
-): Promise<SpaceCurrentMonthSummary[]> {
-  return getSpacesByArchiveState(false, selectedMonthStart);
-}
-
 export async function getArchivedSpacesCurrentMonthSummary(
   selectedMonthStart?: Date,
 ): Promise<SpaceCurrentMonthSummary[]> {
-  return getSpacesByArchiveState(true, selectedMonthStart);
+  const currentUser = await requireCurrentUserAccount();
+  const monthStart = startOfMonth(selectedMonthStart || new Date());
+  const monthEnd = endOfMonth(monthStart);
+
+  try {
+    return await Space.listByArchiveStateWithMonthTotals(
+      currentUser.id,
+      true,
+      monthStart,
+      monthEnd,
+    );
+  } catch (error) {
+    console.error("Error fetching spaces summary:", error);
+    return [];
+  }
 }
 
 export async function getSpaceDetailPageData(input: {
@@ -243,7 +160,6 @@ export async function getSpaceDetailPageData(input: {
   selectedMonthStart?: Date;
 }): Promise<SpaceDetailPageData | null> {
   const currentUser = await requireCurrentUserAccount();
-
   const page = Math.max(1, input.page || 1);
   const limit = Math.max(1, input.limit || 10);
   const take = page * limit;
@@ -251,125 +167,17 @@ export async function getSpaceDetailPageData(input: {
   const monthEnd = endOfMonth(monthStart);
 
   try {
-    const space = await findOwnedSpaceOrNull(
+    const detailData = await Space.getDetailPageQueryResult(
       currentUser.id,
       input.spaceId,
+      monthStart,
+      monthEnd,
+      take,
     );
 
-    if (!space) {
+    if (!detailData) {
       return null;
     }
-
-    const [
-      total,
-      allTransactionsRaw,
-      selectedMonthTotal,
-      historicalTotal,
-      selectedMonthRelevantRaw,
-    ] = await Promise.all([
-      prisma.transaction.count({
-        where: {
-          spaceId: space.id,
-        },
-      }),
-      prisma.transaction.findMany({
-        where: {
-          spaceId: space.id,
-        },
-        select: {
-          id: true,
-          type: true,
-          transferSpaceId: true,
-          transferSpace: {
-            select: {
-              name: true,
-            },
-          },
-          description: true,
-          amount: true,
-          beginDate: true,
-          endDate: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-        orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
-        take,
-      }),
-      getMonthTotalForSpace(currentUser.id, space.id, monthStart, monthEnd),
-      getHistoricalTotalForSpace(currentUser.id, space.id),
-      prisma.transaction.findMany({
-        where: {
-          spaceId: space.id,
-          beginDate: {
-            lte: monthEnd,
-          },
-          OR: [
-            {
-              endDate: null,
-            },
-            {
-              endDate: {
-                gte: monthStart,
-              },
-            },
-          ],
-        },
-        select: {
-          id: true,
-          type: true,
-          transferSpaceId: true,
-          transferSpace: {
-            select: {
-              name: true,
-            },
-          },
-          description: true,
-          amount: true,
-          beginDate: true,
-          endDate: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-        orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
-      }),
-    ]);
-
-    const sortedSelectedMonthRelevantRaw = [...selectedMonthRelevantRaw].sort(
-      (left, right) => {
-        if (left.beginDate.getTime() !== right.beginDate.getTime()) {
-          return right.beginDate.getTime() - left.beginDate.getTime();
-        }
-
-        return right.createdAt.getTime() - left.createdAt.getTime();
-      },
-    );
-
-    const serializeTransaction = (transaction: {
-      id: string;
-      type: string;
-      transferSpaceId: string | null;
-      transferSpace: {
-        name: string;
-      } | null;
-      description: string;
-      amount: number;
-      beginDate: Date;
-      endDate: Date | null;
-      createdAt: Date;
-      updatedAt: Date;
-    }): SpaceDetailTransaction => ({
-      id: transaction.id,
-      type: transaction.type,
-      spaceName: space.name,
-      transferSpaceId: transaction.transferSpaceId,
-      transferSpaceName: transaction.transferSpace?.name || null,
-      description: transaction.description,
-      amount: normalizeTransactionAmount(transaction.type, transaction.amount),
-      beginDate: transaction.beginDate.toISOString(),
-      endDate: transaction.endDate?.toISOString() || null,
-      createdAt: transaction.createdAt.toISOString(),
-      updatedAt: transaction.updatedAt.toISOString(),
-    });
 
     return {
       selectedMonth: {
@@ -377,20 +185,25 @@ export async function getSpaceDetailPageData(input: {
         label: format(monthStart, "MMMM yyyy"),
       },
       space: {
-        id: space.id,
-        name: space.name,
-        isArchived: space.isArchived,
-        historicalTotal,
-        selectedMonthTotal,
+        id: detailData.metrics.id,
+        name: detailData.metrics.name,
+        isArchived: detailData.metrics.isArchived,
+        historicalTotal: detailData.metrics.historicalTotal,
+        selectedMonthTotal: detailData.metrics.selectedMonthTotal,
       },
       selectedMonthRelevantTransactions:
-        sortedSelectedMonthRelevantRaw.map(serializeTransaction),
-      allTransactions: allTransactionsRaw.map(serializeTransaction),
+        detailData.selectedMonthRelevantTransactions.map((transaction) =>
+          serializeSpaceTransaction(detailData.metrics.name, transaction),
+        ),
+      allTransactions: detailData.allTransactions.map((transaction) =>
+        serializeSpaceTransaction(detailData.metrics.name, transaction),
+      ),
       pagination: {
         page,
         limit,
-        total,
-        hasMore: total > allTransactionsRaw.length,
+        total: detailData.metrics.transactionCount,
+        hasMore: detailData.metrics.transactionCount >
+          detailData.allTransactions.length,
       },
     };
   } catch (error) {
@@ -405,16 +218,18 @@ export async function getSpaceForEdit(
   const currentUser = await requireCurrentUserAccount();
 
   try {
-    const space = await findOwnedSpaceOrNull(currentUser.id, id);
+    const space = await Space.findOwnedById(currentUser.id, id);
 
     if (!space) {
       return null;
     }
 
+    const spaceRecord = space.toRecord();
+
     return {
-      id: space.id,
-      name: space.name,
-      isArchived: space.isArchived,
+      id: spaceRecord.id,
+      name: spaceRecord.name,
+      isArchived: spaceRecord.isArchived,
     };
   } catch (error) {
     console.error("Error fetching space for edit:", error);
@@ -422,37 +237,7 @@ export async function getSpaceForEdit(
   }
 }
 
-export async function createSpace(input: {
-  name: string;
-}): Promise<SpaceActionResult> {
-  const currentUser = await requireCurrentUserAccount();
-  const name = input.name.trim();
-
-  if (!name) {
-    return { success: false, error: "spaces_page.name_required" };
-  }
-
-  try {
-    await prisma.space.create({
-      data: {
-        userAccountId: currentUser.id,
-        name,
-      },
-    });
-
-    revalidateSpacePages();
-
-    return { success: true };
-  } catch (error) {
-    if (isPrismaErrorWithCode(error) && error.code === "P2002") {
-      return { success: false, error: "spaces_page.duplicate_name" };
-    }
-
-    console.error("Error creating space:", error);
-    return { success: false, error: "spaces_page.create_failed" };
-  }
-}
-
+// Update
 export async function updateSpace(
   id: string,
   input: { name: string },
@@ -465,22 +250,14 @@ export async function updateSpace(
   }
 
   try {
-    const existingSpace = await findOwnedSpaceOrNull(currentUser.id, id);
+    const space = await Space.findOwnedById(currentUser.id, id);
 
-    if (!existingSpace) {
+    if (!space) {
       return { success: false, error: "space_detail_page.not_found" };
     }
 
-    await prisma.space.update({
-      where: {
-        id,
-      },
-      data: {
-        name,
-      },
-    });
-
-    revalidateSpacePages();
+    await space.updateName(name);
+    revalidateSpaceMutationPages();
 
     return { success: true };
   } catch (error) {
@@ -493,6 +270,7 @@ export async function updateSpace(
   }
 }
 
+// Delete/Archive
 export async function archiveSpace(
   id: string,
   confirmationText: string,
@@ -504,20 +282,14 @@ export async function archiveSpace(
   }
 
   try {
-    const existingSpace = await findOwnedSpaceOrNull(currentUser.id, id);
+    const space = await Space.findOwnedById(currentUser.id, id);
 
-    if (!existingSpace) {
+    if (!space) {
       return { success: false, error: "space_detail_page.not_found" };
     }
 
-    await prisma.space.update({
-      where: { id },
-      data: {
-        isArchived: true,
-      },
-    });
-
-    revalidateSpacePages();
+    await space.archive();
+    revalidateSpaceMutationPages();
 
     return { success: true };
   } catch (error) {
@@ -532,20 +304,14 @@ export async function unarchiveSpace(
   const currentUser = await requireCurrentUserAccount();
 
   try {
-    const existingSpace = await findOwnedSpaceOrNull(currentUser.id, id);
+    const space = await Space.findOwnedById(currentUser.id, id);
 
-    if (!existingSpace) {
+    if (!space) {
       return { success: false, error: "space_detail_page.not_found" };
     }
 
-    await prisma.space.update({
-      where: { id },
-      data: {
-        isArchived: false,
-      },
-    });
-
-    revalidateSpacePages();
+    await space.unarchive();
+    revalidateSpaceMutationPages();
 
     return { success: true };
   } catch (error) {
