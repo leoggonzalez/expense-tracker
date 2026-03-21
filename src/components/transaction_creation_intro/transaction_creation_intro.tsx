@@ -14,7 +14,7 @@ export function TransactionCreationIntro({
 }: TransactionCreationIntroProps): React.ReactElement {
   return (
     <div className="transaction-creation-intro">
-      <Text size="sm" as="p" color="inverse">
+      <Text size="sm" as="p" color="hero-muted">
         {subtitle}
       </Text>
     </div>

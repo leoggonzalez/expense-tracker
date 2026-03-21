@@ -7,10 +7,6 @@
 
   &__text-mode {
     position: relative;
-
-    .input__field {
-      padding-right: calc(var(--spacing-md) + 48px);
-    }
   }
 
   &__toggle {

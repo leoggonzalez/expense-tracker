@@ -142,10 +142,15 @@ export function TransferForm({
             i18n.t("transaction_form.transfer_space_placeholder") as string
           }
           required
+          size="lg"
+          surface="subtle"
+          labelTone="secondary"
         />
         {showInsufficientFundsWarning && selectedFromSpace ? (
           <InfoBox
             variant="warning"
+            accent="primary"
+            radius="xl"
             title={String(
               i18n.t("transaction_form.transfer_insufficient_funds_title"),
             )}
@@ -168,6 +173,9 @@ export function TransferForm({
             i18n.t("transaction_form.transfer_space_placeholder") as string
           }
           required
+          size="lg"
+          surface="subtle"
+          labelTone="secondary"
         />
 
         <Input
@@ -176,6 +184,9 @@ export function TransferForm({
           onChange={setDescription}
           placeholder={i18n.t("transaction_form.description_placeholder") as string}
           required
+          size="lg"
+          surface="subtle"
+          labelTone="secondary"
         />
 
         <Input
@@ -185,6 +196,9 @@ export function TransferForm({
           placeholder={i18n.t("transaction_form.amount_placeholder") as string}
           required
           inputMode="decimal"
+          size="lg"
+          surface="subtle"
+          labelTone="secondary"
         />
 
         <MonthSelector
@@ -200,6 +214,7 @@ export function TransferForm({
           monthLabel={i18n.t("transaction_form.month")}
           yearLabel={i18n.t("transaction_form.year")}
           required
+          surface="subtle"
         />
 
         <Text size="sm" color="secondary">

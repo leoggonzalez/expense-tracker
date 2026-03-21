@@ -192,9 +192,21 @@
     width: 100%;
   }
 
+  &--full-width-mobile-only {
+    width: 100%;
+  }
+
   &__icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .button {
+    &--full-width-mobile-only {
+      width: auto;
+    }
   }
 }

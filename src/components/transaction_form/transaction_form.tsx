@@ -421,6 +421,9 @@ export function TransactionForm({
               { value: "expense", label: i18n.t("common.expense") },
             ]}
             required
+            size="lg"
+            surface="subtle"
+            labelTone="secondary"
           />
         )}
 
@@ -439,6 +442,9 @@ export function TransactionForm({
           onChange={(value) => fields.description.onChange(value)}
           placeholder={i18n.t("transaction_form.description_placeholder") as string}
           required
+          size="lg"
+          surface="subtle"
+          labelTone="secondary"
         />
 
         <Input
@@ -451,6 +457,9 @@ export function TransactionForm({
           }
           placeholder={i18n.t("transaction_form.amount_placeholder") as string}
           required
+          size="lg"
+          surface="subtle"
+          labelTone="secondary"
         />
 
         <Stack gap={4}>
@@ -500,6 +509,7 @@ export function TransactionForm({
           monthLabel={i18n.t("transaction_form.month")}
           yearLabel={i18n.t("transaction_form.year")}
           required
+          surface="subtle"
         />
 
         {model.scheduleMode === "installments" && (
@@ -515,6 +525,9 @@ export function TransactionForm({
               max={120}
               step={1}
               required
+              size="lg"
+              surface="subtle"
+              labelTone="secondary"
             />
 
             {formattedEndDate && (

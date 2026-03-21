@@ -28,6 +28,7 @@ type MonthSelectorProps = {
   monthLabel: React.ReactNode;
   yearLabel: React.ReactNode;
   required?: boolean;
+  surface?: "default" | "subtle";
 };
 
 function getMonthOptions(): Array<{ value: string; label: string }> {
@@ -80,6 +81,7 @@ export function MonthSelector({
   monthLabel,
   yearLabel,
   required = false,
+  surface = "default",
 }: MonthSelectorProps): React.ReactElement {
   const fieldValue = field?.value ?? value ?? "";
   const handleFieldChange = field?.onChange ?? onChange;
@@ -94,7 +96,12 @@ export function MonthSelector({
 
   if (mode === "date") {
     return (
-      <div className="month-selector">
+      <div
+        className={[
+          "month-selector",
+          `month-selector--surface-${surface}`,
+        ].join(" ")}
+      >
         <Stack gap={8}>
           <Text as="div" size="sm" weight="medium" color="secondary">
             {label}
@@ -106,6 +113,10 @@ export function MonthSelector({
               value={toModeValue(fieldValue, "date")}
               onChange={handleFieldChange}
               required={required}
+              size="lg"
+              surface={surface}
+              hasTrailingControl
+              fullWidth
             />
             <button
               type="button"
@@ -148,7 +159,12 @@ export function MonthSelector({
     monthOptions.find((option) => option.value === month)?.label || month;
 
   return (
-    <div className="month-selector">
+    <div
+      className={[
+        "month-selector",
+        `month-selector--surface-${surface}`,
+      ].join(" ")}
+    >
       <Stack gap={8}>
         <Text as="div" size="sm" weight="medium" color="secondary">
           {label}

@@ -73,14 +73,14 @@ export default async function Page({
           ]}
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="inverse">
+            <Text as="p" size="sm" color="hero-muted">
               {i18n.t("spaces_page.hero_subtitle")}
             </Text>
 
             <HeroMetrics columns={2}>
               <HeroMetric tone="soft">
                 <Stack gap={16}>
-                  <Text size="sm" color="inverse">
+                  <Text size="sm" color="hero">
                     {i18n.t("spaces_page.month_total_overview")}
                   </Text>
                   <Stack
@@ -96,7 +96,7 @@ export default async function Page({
                     >
                       <Icon name="chevron-left" size={18} />
                     </Button>
-                    <Text size="lg" weight="semibold" color="inverse">
+                    <Text size="lg" weight="semibold" color="hero">
                       {selectedMonthLabel}
                     </Text>
                     <Button
@@ -110,10 +110,10 @@ export default async function Page({
                 </Stack>
               </HeroMetric>
               <HeroMetric>
-                <Text size="sm" color="inverse">
+                <Text size="sm" color="hero">
                   {i18n.t("spaces_page.active_spaces_label")}
                 </Text>
-                <Text size="h3" weight="bold" color="inverse">
+                <Text size="h3" weight="bold" color="hero">
                   {String(spaces.length)}
                 </Text>
               </HeroMetric>

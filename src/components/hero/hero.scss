@@ -65,18 +65,6 @@
     color: var(--color-hero-foreground);
   }
 
-  &__title .text {
-    color: var(--color-hero-foreground);
-  }
-
-  &__body .text--color-inverse {
-    color: var(--color-hero-foreground);
-  }
-
-  &__body .text--color-secondary {
-    color: var(--color-hero-foreground-muted);
-  }
-
   &__body {
     display: grid;
     gap: var(--spacing-lg);

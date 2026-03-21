@@ -54,7 +54,9 @@ export function Hero({
               <Icon name={icon} size={20} />
             </span>
             <div className="hero__title">
-              <Text size="h3">{title}</Text>
+              <Text size="h3" color="hero">
+                {title}
+              </Text>
             </div>
           </Stack>
         </div>

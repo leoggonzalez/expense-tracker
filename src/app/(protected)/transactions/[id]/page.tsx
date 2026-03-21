@@ -157,7 +157,7 @@ export default async function Page({
           ]}
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="inverse">
+            <Text as="p" size="sm" color="hero-muted">
               {formatTransactionDate(
                 normalizedTransaction.beginDate,
                 normalizedTransaction.endDate,
@@ -166,7 +166,7 @@ export default async function Page({
 
             <HeroMetrics columns={2}>
               <HeroMetric>
-                <Text size="sm" color="inverse">
+                <Text size="sm" color="hero">
                   {i18n.t("transaction_detail_page.amount")}
                 </Text>
                 <Currency
@@ -177,10 +177,10 @@ export default async function Page({
                 />
               </HeroMetric>
               <HeroMetric tone="soft">
-                <Text size="sm" color="inverse">
+                <Text size="sm" color="hero">
                   {i18n.t("transaction_detail_page.type")}
                 </Text>
-                <Text size="lg" weight="semibold" color="inverse">
+                <Text size="lg" weight="semibold" color="hero">
                   {getTransactionTypeLabel(normalizedTransaction.type)}
                 </Text>
               </HeroMetric>

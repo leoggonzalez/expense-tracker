@@ -19,7 +19,7 @@ export default function Page(): React.ReactElement {
           title={String(i18n.t("spaces_page.create_space"))}
           pattern="space_form"
         >
-          <Text as="p" size="sm" color="inverse">
+          <Text as="p" size="sm" color="hero-muted">
             {i18n.t("spaces_page.create_space_hint")}
           </Text>
         </Hero>

@@ -90,28 +90,28 @@ export default async function ProjectionPage({
         >
           <Stack gap={24}>
             <Stack gap={10}>
-              <Text as="h1" size="h1" color="inverse" weight="bold">
+              <Text as="h1" size="h1" color="hero" weight="bold">
                 {formatCurrency(payload.focusedMonthTotals.net)}
               </Text>
-              <Text as="p" size="sm" color="inverse">
+              <Text as="p" size="sm" color="hero-muted">
                 {i18n.t("projection_page.subtitle")}
               </Text>
             </Stack>
 
             <HeroMetrics columns={2}>
               <HeroMetric>
-                <Text as="span" size="xs" color="inverse" weight="medium">
+                <Text as="span" size="xs" color="hero" weight="medium">
                   {i18n.t("projection_page.income")}
                 </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
+                <Text as="span" size="lg" color="hero" weight="semibold">
                   {formatCurrency(payload.focusedMonthTotals.income)}
                 </Text>
               </HeroMetric>
               <HeroMetric tone="soft">
-                <Text as="span" size="xs" color="inverse" weight="medium">
+                <Text as="span" size="xs" color="hero" weight="medium">
                   {i18n.t("projection_page.expenses")}
                 </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
+                <Text as="span" size="lg" color="hero" weight="semibold">
                   {formatCurrency(Math.abs(payload.focusedMonthTotals.expense))}
                 </Text>
               </HeroMetric>

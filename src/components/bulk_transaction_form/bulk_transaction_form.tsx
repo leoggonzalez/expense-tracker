@@ -308,6 +308,7 @@ export function BulkTransactionForm({
             monthLabel={i18n.t("transaction_form.month")}
             yearLabel={i18n.t("transaction_form.year")}
             required
+            surface="subtle"
           />
 
           {shared.scheduleMode === "installments" && (
@@ -326,6 +327,9 @@ export function BulkTransactionForm({
                 max={120}
                 step={1}
                 required
+                size="lg"
+                surface="subtle"
+                labelTone="secondary"
               />
 
               {formattedEndDate && (
@@ -373,6 +377,8 @@ export function BulkTransactionForm({
                         label: i18n.t("common.expense"),
                       },
                     ]}
+                    size="lg"
+                    surface="subtle"
                   />
 
                   <Input
@@ -386,6 +392,8 @@ export function BulkTransactionForm({
                       ) as string
                     }
                     required
+                    size="lg"
+                    surface="subtle"
                   />
 
                   <Input
@@ -403,6 +411,8 @@ export function BulkTransactionForm({
                       i18n.t("bulk_transaction_form.amount_placeholder") as string
                     }
                     required
+                    size="lg"
+                    surface="subtle"
                   />
                 </Stack>
 

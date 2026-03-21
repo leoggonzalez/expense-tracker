@@ -87,7 +87,7 @@ export function ConfirmDialog({
               variant={confirmVariant}
               onClick={onConfirm}
               disabled={isLoading}
-              fullWidth
+              fullWidth="mobile-only"
             >
               {confirmLabel}
             </Button>
@@ -96,7 +96,7 @@ export function ConfirmDialog({
               variant="secondary"
               onClick={onClose}
               disabled={isLoading}
-              fullWidth
+              fullWidth="mobile-only"
             >
               {cancelLabel}
             </Button>

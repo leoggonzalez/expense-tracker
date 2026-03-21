@@ -4,19 +4,6 @@
   width: 100%;
   padding: var(--spacing-xs);
 
-  .input__field,
-  .select__field,
-  .month-selector__control {
-    min-height: 52px;
-    border-radius: 18px;
-    background-color: var(--color-background-secondary);
-  }
-
-  .input__label,
-  .select__label {
-    color: var(--color-text-secondary);
-  }
-
   &__shared {
     padding: var(--spacing-lg);
     background-color: var(--color-background-secondary);

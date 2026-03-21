@@ -103,7 +103,7 @@ export function NavigationClient({
 
   return (
     <nav className="navigation">
-      <Container maxWidth="wide">
+      <Container maxWidth="wide" layout="intrinsic">
         <div className="navigation__inner">
           <div className="navigation__brand">
             <AppLink href="/">
@@ -152,15 +152,17 @@ export function NavigationClient({
             </ul>
 
             <div className="navigation__section">
-              <Text
-                as="span"
-                size="xs"
-                color="secondary"
-                weight="medium"
-                transform="uppercase"
-              >
-                {i18n.t("navigation.primary_section")}
-              </Text>
+              <span className="navigation__section-label">
+                <Text
+                  as="span"
+                  size="xs"
+                  color="secondary"
+                  weight="medium"
+                  transform="uppercase"
+                >
+                  {i18n.t("navigation.primary_section")}
+                </Text>
+              </span>
               <ul className="navigation__links navigation__links--desktop">
                 {primaryLinks.map((link) => (
                   <li key={link.href} className="navigation__item">
@@ -193,15 +195,17 @@ export function NavigationClient({
 
             {secondaryLinks.length > 0 ? (
               <div className="navigation__section navigation__section--secondary">
-                <Text
-                  as="span"
-                  size="xs"
-                  color="secondary"
-                  weight="medium"
-                  transform="uppercase"
-                >
-                  {i18n.t("navigation.secondary_section")}
-                </Text>
+                <span className="navigation__section-label">
+                  <Text
+                    as="span"
+                    size="xs"
+                    color="secondary"
+                    weight="medium"
+                    transform="uppercase"
+                  >
+                    {i18n.t("navigation.secondary_section")}
+                  </Text>
+                </span>
                 <ul className="navigation__links navigation__links--desktop">
                   {secondaryLinks.map((link) => (
                     <li key={link.href} className="navigation__item">
@@ -245,12 +249,16 @@ export function NavigationClient({
                     <Avatar name={displayName} />
                   </span>
                   <span className="navigation__user-copy">
-                    <Text as="span" size="sm" weight="semibold">
-                      {displayName}
-                    </Text>
-                    <Text as="span" size="xs" color="secondary">
-                      {currentUser.email}
-                    </Text>
+                    <span className="navigation__user-name">
+                      <Text as="span" size="sm" weight="semibold">
+                        {displayName}
+                      </Text>
+                    </span>
+                    <span className="navigation__user-email">
+                      <Text as="span" size="xs" color="secondary">
+                        {currentUser.email}
+                      </Text>
+                    </span>
                   </span>
                 </span>
               </AppLink>

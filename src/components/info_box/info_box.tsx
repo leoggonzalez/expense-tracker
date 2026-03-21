@@ -10,6 +10,8 @@ export type InfoBoxProps = {
   variant: InfoBoxVariant;
   title?: string;
   message: string;
+  accent?: "default" | "primary";
+  radius?: "default" | "xl";
 };
 
 function getIconName(variant: InfoBoxVariant): "alert" | "check" {
@@ -24,10 +26,19 @@ export function InfoBox({
   variant,
   title,
   message,
+  accent = "default",
+  radius = "default",
 }: InfoBoxProps): React.ReactElement {
   return (
     <div
-      className={["info-box", `info-box--${variant}`].filter(Boolean).join(" ")}
+      className={[
+        "info-box",
+        `info-box--${variant}`,
+        `info-box--accent-${accent}`,
+        `info-box--radius-${radius}`,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       role={variant === "error" ? "alert" : "status"}
     >
       <Stack direction="row" align="flex-start" gap={10}>

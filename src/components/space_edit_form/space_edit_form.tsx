@@ -56,6 +56,9 @@ export function SpaceEditForm({
               i18n.t("spaces_page.space_name_placeholder") as string
             }
             required
+            size="lg"
+            surface="subtle"
+            labelTone="secondary"
           />
 
           {error ? <Text color="danger">{i18n.t(error)}</Text> : null}

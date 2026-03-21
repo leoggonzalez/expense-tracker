@@ -22,7 +22,7 @@ export default async function Page(): Promise<React.ReactElement> {
           pattern="settings"
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="inverse">
+            <Text as="p" size="sm" color="hero-muted">
               {i18n.t("account.subtitle")}
             </Text>
           </Stack>

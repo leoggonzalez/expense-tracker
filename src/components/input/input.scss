@@ -5,9 +5,17 @@
     display: block;
   }
 
+  &__label {
+    display: block;
+  }
+
   &__required {
     color: var(--color-danger);
     margin-left: var(--spacing-xs);
+  }
+
+  &--full-width {
+    width: 100%;
   }
 
   &__field {
@@ -52,5 +60,18 @@
     &::placeholder {
       color: var(--color-text-tertiary);
     }
+  }
+
+  &--size-lg &__field {
+    min-height: 52px;
+    border-radius: 18px;
+  }
+
+  &--surface-subtle &__field {
+    background-color: var(--color-background-secondary);
+  }
+
+  &--with-trailing-control &__field {
+    padding-right: calc(var(--spacing-md) + 48px);
   }
 }

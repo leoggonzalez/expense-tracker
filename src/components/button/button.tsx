@@ -17,7 +17,7 @@ export interface ButtonProps {
     | "outline";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
-  fullWidth?: boolean;
+  fullWidth?: boolean | "mobile-only";
   startIcon?: React.ReactNode;
   href?: string;
   ariaLabel?: string;
@@ -39,7 +39,8 @@ export function Button({
     "button",
     `button--variant-${variant}`,
     `button--size-${size}`,
-    fullWidth && "button--full-width",
+    fullWidth === true && "button--full-width",
+    fullWidth === "mobile-only" && "button--full-width-mobile-only",
   ]
     .filter(Boolean)
     .join(" ");

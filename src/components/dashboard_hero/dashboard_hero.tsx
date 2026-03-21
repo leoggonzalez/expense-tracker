@@ -39,10 +39,16 @@ export function DashboardHero({
     >
       <div className="dashboard-hero__body">
         <Stack gap={10}>
-          <Text as="h1" size="h1" color="inverse" weight="bold">
+          <Text
+            as="h1"
+            size="h1"
+            color="hero"
+            weight="bold"
+            tracking="tight"
+          >
             {formatCurrency(totals.net)}
           </Text>
-          <Text as="p" size="sm" color="secondary">
+          <Text as="p" size="sm" color="hero-muted">
             {i18n.t("dashboard.hero_caption")}
           </Text>
         </Stack>

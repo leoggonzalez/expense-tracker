@@ -91,7 +91,7 @@ export default async function Page({
           ]}
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="inverse">
+            <Text as="p" size="sm" color="hero-muted">
               {i18n.t("transactions_page.subtitle")}
             </Text>
           </Stack>

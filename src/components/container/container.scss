@@ -30,4 +30,16 @@
     grid-column: 1;
     max-width: 100%;
   }
+
+  &--layout-intrinsic {
+    display: block;
+    width: auto;
+    min-width: 0;
+  }
+
+  &--layout-intrinsic &__content {
+    grid-column: auto;
+    width: auto;
+    min-width: 0;
+  }
 }

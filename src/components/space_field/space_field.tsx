@@ -54,6 +54,7 @@ export function SpaceField({
               onChange={onChange}
               placeholder={placeholder}
               required={required}
+              hasTrailingControl
             />
             <button
               type="button"
