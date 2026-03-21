@@ -114,7 +114,7 @@ The next architectural step after 1.0 is the hybrid protected-page pattern:
 - keep titles, icons, descriptions, and actions visible immediately
 - use shimmer placeholders only for the data-bearing region
 
-The dashboard is the first reference migration for this approach, projection is the second, and the transactions flows extend it across list, detail, and creation surfaces.
+The dashboard is the first reference migration for this approach, projection is the second, the transactions flows extend it across list, detail, and creation surfaces, and the spaces routes carry it through overview, archived, detail, and edit pages.
 
 Migration steps for future pages:
 

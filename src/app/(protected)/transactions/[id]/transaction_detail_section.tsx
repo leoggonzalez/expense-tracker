@@ -28,7 +28,10 @@ type TransactionDetailSectionProps = {
   isDeleteDialogOpen: boolean;
 };
 
-function formatTransactionDate(beginDate: string, endDate: string | null): string {
+function formatTransactionDate(
+  beginDate: string,
+  endDate: string | null,
+): string {
   const locale = i18n.locale || "en";
   const begin = new Date(beginDate);
   const formatter = new Intl.DateTimeFormat(locale, {
@@ -206,13 +209,17 @@ export function TransactionDetailSection({
           actions={[
             {
               icon: "edit",
-              ariaLabel: String(i18n.t("transaction_detail_page.edit_transaction")),
+              ariaLabel: String(
+                i18n.t("transaction_detail_page.edit_transaction"),
+              ),
               href: `/transactions/${data.id}/edit`,
               variant: "outline",
             },
             {
               icon: "transfer",
-              ariaLabel: String(i18n.t("transaction_detail_page.settle_transaction")),
+              ariaLabel: String(
+                i18n.t("transaction_detail_page.settle_transaction"),
+              ),
               href: `/transactions/new/transfer?${settleSearchParams.toString()}`,
               variant: "outline",
             },
@@ -234,7 +241,12 @@ export function TransactionDetailSection({
                 <Text size="sm" color="hero">
                   {i18n.t("transaction_detail_page.amount")}
                 </Text>
-                <Currency value={data.amount} size="h3" weight="bold" color="inverse" />
+                <Currency
+                  value={data.amount}
+                  size="h3"
+                  weight="bold"
+                  color="hero"
+                />
               </HeroMetric>
               <HeroMetric tone="soft">
                 <Text size="sm" color="hero">

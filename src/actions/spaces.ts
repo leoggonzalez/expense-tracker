@@ -21,6 +21,14 @@ type SpaceCurrentMonthSummary = {
 
 export type { SpaceCurrentMonthSummary };
 
+export type SpacesPagePayload = {
+  spaces: SpaceCurrentMonthSummary[];
+};
+
+export type ArchivedSpacesPayload = {
+  spaces: SpaceCurrentMonthSummary[];
+};
+
 type SpaceDetailTransaction = {
   id: string;
   type: string;
@@ -62,6 +70,9 @@ export type SpaceEditData = {
   name: string;
   isArchived: boolean;
 };
+
+export type SpaceDetailPayload = SpaceDetailPageData;
+export type SpaceEditPayload = SpaceEditData;
 
 function serializeSpaceTransaction(
   spaceName: string,
@@ -113,20 +124,126 @@ export async function createSpace(input: {
 }
 
 // Read
+export async function getSpacesPagePayloadForUser(
+  userAccountId: string,
+  selectedMonthStart?: Date,
+): Promise<SpacesPagePayload> {
+  const monthStart = startOfMonth(selectedMonthStart || new Date());
+  const monthEnd = endOfMonth(monthStart);
+
+  return {
+    spaces: await Space.listByArchiveStateWithMonthTotals(
+      userAccountId,
+      false,
+      monthStart,
+      monthEnd,
+    ),
+  };
+}
+
+export async function getArchivedSpacesPayloadForUser(
+  userAccountId: string,
+  selectedMonthStart?: Date,
+): Promise<ArchivedSpacesPayload> {
+  const monthStart = startOfMonth(selectedMonthStart || new Date());
+  const monthEnd = endOfMonth(monthStart);
+
+  return {
+    spaces: await Space.listByArchiveStateWithMonthTotals(
+      userAccountId,
+      true,
+      monthStart,
+      monthEnd,
+    ),
+  };
+}
+
+export async function getSpaceDetailPayloadForUser(
+  userAccountId: string,
+  input: {
+    spaceId: string;
+    page?: number;
+    limit?: number;
+    selectedMonthStart?: Date;
+  },
+): Promise<SpaceDetailPayload | null> {
+  const page = Math.max(1, input.page || 1);
+  const limit = Math.max(1, input.limit || 10);
+  const take = page * limit;
+  const monthStart = startOfMonth(input.selectedMonthStart || new Date());
+  const monthEnd = endOfMonth(monthStart);
+  const detailData = await Space.getDetailPageQueryResult(
+    userAccountId,
+    input.spaceId,
+    monthStart,
+    monthEnd,
+    take,
+  );
+
+  if (!detailData) {
+    return null;
+  }
+
+  return {
+    selectedMonth: {
+      key: format(monthStart, "yyyy-MM"),
+      label: format(monthStart, "MMMM yyyy"),
+    },
+    space: {
+      id: detailData.metrics.id,
+      name: detailData.metrics.name,
+      isArchived: detailData.metrics.isArchived,
+      historicalTotal: detailData.metrics.historicalTotal,
+      selectedMonthTotal: detailData.metrics.selectedMonthTotal,
+    },
+    selectedMonthRelevantTransactions:
+      detailData.selectedMonthRelevantTransactions.map((transaction) =>
+        serializeSpaceTransaction(detailData.metrics.name, transaction),
+      ),
+    allTransactions: detailData.allTransactions.map((transaction) =>
+      serializeSpaceTransaction(detailData.metrics.name, transaction),
+    ),
+    pagination: {
+      page,
+      limit,
+      total: detailData.metrics.transactionCount,
+      hasMore:
+        detailData.metrics.transactionCount > detailData.allTransactions.length,
+    },
+  };
+}
+
+export async function getSpaceEditPayloadForUser(
+  userAccountId: string,
+  id: string,
+): Promise<SpaceEditPayload | null> {
+  const space = await Space.findOwnedById(userAccountId, id);
+
+  if (!space) {
+    return null;
+  }
+
+  const spaceRecord = space.toRecord();
+
+  return {
+    id: spaceRecord.id,
+    name: spaceRecord.name,
+    isArchived: spaceRecord.isArchived,
+  };
+}
+
 export async function getSpacesCurrentMonthSummary(
   selectedMonthStart?: Date,
 ): Promise<SpaceCurrentMonthSummary[]> {
   const currentUser = await requireCurrentUserAccount();
-  const monthStart = startOfMonth(selectedMonthStart || new Date());
-  const monthEnd = endOfMonth(monthStart);
 
   try {
-    return await Space.listByArchiveStateWithMonthTotals(
+    const payload = await getSpacesPagePayloadForUser(
       currentUser.id,
-      false,
-      monthStart,
-      monthEnd,
+      selectedMonthStart,
     );
+
+    return payload.spaces;
   } catch (error) {
     console.error("Error fetching spaces summary:", error);
     return [];
@@ -137,16 +254,14 @@ export async function getArchivedSpacesCurrentMonthSummary(
   selectedMonthStart?: Date,
 ): Promise<SpaceCurrentMonthSummary[]> {
   const currentUser = await requireCurrentUserAccount();
-  const monthStart = startOfMonth(selectedMonthStart || new Date());
-  const monthEnd = endOfMonth(monthStart);
 
   try {
-    return await Space.listByArchiveStateWithMonthTotals(
+    const payload = await getArchivedSpacesPayloadForUser(
       currentUser.id,
-      true,
-      monthStart,
-      monthEnd,
+      selectedMonthStart,
     );
+
+    return payload.spaces;
   } catch (error) {
     console.error("Error fetching spaces summary:", error);
     return [];
@@ -160,52 +275,9 @@ export async function getSpaceDetailPageData(input: {
   selectedMonthStart?: Date;
 }): Promise<SpaceDetailPageData | null> {
   const currentUser = await requireCurrentUserAccount();
-  const page = Math.max(1, input.page || 1);
-  const limit = Math.max(1, input.limit || 10);
-  const take = page * limit;
-  const monthStart = startOfMonth(input.selectedMonthStart || new Date());
-  const monthEnd = endOfMonth(monthStart);
 
   try {
-    const detailData = await Space.getDetailPageQueryResult(
-      currentUser.id,
-      input.spaceId,
-      monthStart,
-      monthEnd,
-      take,
-    );
-
-    if (!detailData) {
-      return null;
-    }
-
-    return {
-      selectedMonth: {
-        key: format(monthStart, "yyyy-MM"),
-        label: format(monthStart, "MMMM yyyy"),
-      },
-      space: {
-        id: detailData.metrics.id,
-        name: detailData.metrics.name,
-        isArchived: detailData.metrics.isArchived,
-        historicalTotal: detailData.metrics.historicalTotal,
-        selectedMonthTotal: detailData.metrics.selectedMonthTotal,
-      },
-      selectedMonthRelevantTransactions:
-        detailData.selectedMonthRelevantTransactions.map((transaction) =>
-          serializeSpaceTransaction(detailData.metrics.name, transaction),
-        ),
-      allTransactions: detailData.allTransactions.map((transaction) =>
-        serializeSpaceTransaction(detailData.metrics.name, transaction),
-      ),
-      pagination: {
-        page,
-        limit,
-        total: detailData.metrics.transactionCount,
-        hasMore: detailData.metrics.transactionCount >
-          detailData.allTransactions.length,
-      },
-    };
+    return await getSpaceDetailPayloadForUser(currentUser.id, input);
   } catch (error) {
     console.error("Error fetching space detail page data:", error);
     return null;
@@ -218,19 +290,7 @@ export async function getSpaceForEdit(
   const currentUser = await requireCurrentUserAccount();
 
   try {
-    const space = await Space.findOwnedById(currentUser.id, id);
-
-    if (!space) {
-      return null;
-    }
-
-    const spaceRecord = space.toRecord();
-
-    return {
-      id: spaceRecord.id,
-      name: spaceRecord.name,
-      isArchived: spaceRecord.isArchived,
-    };
+    return await getSpaceEditPayloadForUser(currentUser.id, id);
   } catch (error) {
     console.error("Error fetching space for edit:", error);
     return null;
@@ -298,9 +358,7 @@ export async function archiveSpace(
   }
 }
 
-export async function unarchiveSpace(
-  id: string,
-): Promise<SpaceActionResult> {
+export async function unarchiveSpace(id: string): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUserAccount();
 
   try {

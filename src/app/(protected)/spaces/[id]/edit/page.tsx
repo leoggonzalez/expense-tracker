@@ -1,17 +1,7 @@
-import { notFound } from "next/navigation";
-
-import { getSpaceForEdit } from "@/actions/spaces";
-import {
-  SpaceEditForm,
-  AppLink,
-  Container,
-  Hero,
-  PagePanel,
-} from "@/components";
+import { SpaceEditFormSection } from "@/app/(protected)/spaces/[id]/edit/space_edit_form_section";
+import { Container, Hero } from "@/components";
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
-
-export const dynamic = "force-dynamic";
 
 type SpaceEditPageProps = {
   params: Promise<{
@@ -23,11 +13,6 @@ export default async function Page({
   params,
 }: SpaceEditPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const space = await getSpaceForEdit(id);
-
-  if (!space) {
-    notFound();
-  }
 
   return (
     <Container>
@@ -42,13 +27,7 @@ export default async function Page({
           </Text>
         </Hero>
 
-        <PagePanel tone="form">
-          <SpaceEditForm spaceId={space.id} initialName={space.name} />
-        </PagePanel>
-
-        <AppLink href={`/spaces/${space.id}`}>
-          {i18n.t("spaces_page.back_to_space")}
-        </AppLink>
+        <SpaceEditFormSection id={id} />
       </Stack>
     </Container>
   );

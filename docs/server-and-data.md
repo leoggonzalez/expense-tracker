@@ -190,6 +190,13 @@ Transactions now use the same approach across listing, detail, and creation flow
 - the detail route mounts a client detail section behind an authenticated endpoint
 - new-transaction forms fetch their own space and recent-activity data after mount
 
+Spaces now use the same approach across overview, archived, detail, and edit flows:
+
+- the month shell renders from the URL alone
+- the overview and archived lists fetch behind authenticated endpoints
+- the detail route mounts a client detail section behind an authenticated endpoint
+- the edit route keeps a static shell and fetches its editable payload after mount
+
 This keeps navigation fast while preserving per-user correctness.
 
 ### Detail Page Queries
