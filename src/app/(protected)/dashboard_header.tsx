@@ -9,15 +9,15 @@ import {
   HeroMetrics,
   LoadingSkeleton,
 } from "@/components";
-import { useDashboardSection } from "@/app/(protected)/use_dashboard_section";
+import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import { Stack, Text } from "@/elements";
 import { formatCurrency } from "@/lib/utils";
 import { i18n } from "@/model/i18n";
 
 import React from "react";
 
-const dashboardHeaderCache: { data: DashboardHeaderPayload | null } = {
-  data: null,
+const dashboardHeaderCache = {
+  entries: new Map<string, DashboardHeaderPayload>(),
 };
 
 function getCurrentMonthQuery(
@@ -40,7 +40,8 @@ function getCurrentMonthQuery(
 }
 
 export function DashboardHeader(): React.ReactElement {
-  const { data, isLoading, hasError, retry } = useDashboardSection(
+  const { data, isLoading, hasError, retry } = useProtectedPageSection(
+    "/api/dashboard/header",
     "/api/dashboard/header",
     dashboardHeaderCache,
   );

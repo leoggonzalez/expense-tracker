@@ -177,6 +177,13 @@ The dashboard is the reference implementation for this pattern:
 - upcoming payments fetch separately
 - recent activity fetches separately
 
+Projection now follows the same pattern:
+
+- the month shell renders from the URL alone
+- header totals fetch separately
+- chart data fetches separately
+- spaces-with-transactions fetch separately
+
 This keeps navigation fast while preserving per-user correctness.
 
 ### Detail Page Queries

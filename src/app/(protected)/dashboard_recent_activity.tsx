@@ -4,7 +4,7 @@ import type {
   DashboardRecentActivityPayload,
   DashboardTransactionItem,
 } from "@/actions/transactions";
-import { useDashboardSection } from "@/app/(protected)/use_dashboard_section";
+import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
   AppLink,
   Button,
@@ -17,9 +17,9 @@ import { i18n } from "@/model/i18n";
 import React from "react";
 
 const dashboardRecentActivityCache: {
-  data: DashboardRecentActivityPayload | null;
+  entries: Map<string, DashboardRecentActivityPayload>;
 } = {
-  data: null,
+  entries: new Map<string, DashboardRecentActivityPayload>(),
 };
 
 function getRecentTransactionsHref(
@@ -60,7 +60,8 @@ function RecentActivityRowSkeleton(): React.ReactElement {
 }
 
 export function DashboardRecentActivity(): React.ReactElement {
-  const { data, isLoading, hasError, retry } = useDashboardSection(
+  const { data, isLoading, hasError, retry } = useProtectedPageSection(
+    "/api/dashboard/recent-activity",
     "/api/dashboard/recent-activity",
     dashboardRecentActivityCache,
   );

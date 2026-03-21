@@ -4,6 +4,7 @@ import { addMonths, format } from "date-fns";
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
 import { normalizeTransactionAmount } from "@/lib/amount";
+import { formatProjectionMonthKey } from "@/lib/projection_month";
 import { Space, type SpaceRecord } from "@/lib/space";
 import {
   Transaction,
@@ -89,7 +90,6 @@ export type ProjectionMonthTransaction = {
 
 export type ProjectionChartMonth = {
   monthKey: string;
-  monthLabel: string;
   income: number;
   expense: number;
   net: number;
@@ -103,15 +103,20 @@ export type ProjectionFocusedSpace = {
   transactions: ProjectionMonthTransaction[];
 };
 
-export type ProjectionPagePayload = {
-  focusedMonth: {
-    key: string;
-    label: string;
-  };
+export type ProjectionHeaderPayload = {
+  focusedMonthKey: string;
   previousMonthKey: string;
   nextMonthKey: string;
-  chartMonths: ProjectionChartMonth[];
   focusedMonthTotals: DashboardTotals;
+};
+
+export type ProjectionChartPayload = {
+  focusedMonthKey: string;
+  chartMonths: ProjectionChartMonth[];
+};
+
+export type ProjectionSpacesPayload = {
+  focusedMonthKey: string;
   focusedMonthSpaces: ProjectionFocusedSpace[];
 };
 
@@ -431,28 +436,45 @@ export async function getProjectionTransactions(): Promise<
   }
 }
 
-export async function getProjectionPagePayload(
+export async function getProjectionHeaderPayloadForUser(
+  userAccountId: string,
   focusedMonthStart: Date,
-): Promise<ProjectionPagePayload> {
-  const currentUser = await requireCurrentUserAccount();
+): Promise<ProjectionHeaderPayload> {
+  const projectionData = await Transaction.getProjectionHeaderQueryData(
+    userAccountId,
+    focusedMonthStart,
+  );
 
-  const projectionData = await Transaction.getProjectionQueryData(
-    currentUser.id,
+  return {
+    focusedMonthKey: formatProjectionMonthKey(
+      projectionData.normalizedFocusedMonthStart,
+    ),
+    previousMonthKey: formatProjectionMonthKey(
+      addMonths(projectionData.normalizedFocusedMonthStart, -1),
+    ),
+    nextMonthKey: formatProjectionMonthKey(
+      addMonths(projectionData.normalizedFocusedMonthStart, 1),
+    ),
+    focusedMonthTotals: projectionData.focusedMonthTotals,
+  };
+}
+
+export async function getProjectionChartPayloadForUser(
+  userAccountId: string,
+  focusedMonthStart: Date,
+): Promise<ProjectionChartPayload> {
+  const projectionData = await Transaction.getProjectionChartQueryData(
+    userAccountId,
     focusedMonthStart,
   );
 
   const chartMonths: ProjectionChartMonth[] = projectionData.chartRows.map(
-    (row, index) => {
-      const monthStart = addMonths(
-        projectionData.normalizedFocusedMonthStart,
-        index,
-      );
+    (row) => {
       const income = Number(row.income || 0);
       const expense = Number(row.expense || 0);
 
       return {
         monthKey: row.monthKey,
-        monthLabel: format(monthStart, "MMMM yyyy"),
         income,
         expense,
         net: income + expense,
@@ -461,20 +483,26 @@ export async function getProjectionPagePayload(
   );
 
   return {
-    focusedMonth: {
-      key: format(projectionData.normalizedFocusedMonthStart, "yyyy-MM"),
-      label: format(projectionData.normalizedFocusedMonthStart, "MMMM yyyy"),
-    },
-    previousMonthKey: format(
-      addMonths(projectionData.normalizedFocusedMonthStart, -1),
-      "yyyy-MM",
-    ),
-    nextMonthKey: format(
-      addMonths(projectionData.normalizedFocusedMonthStart, 1),
-      "yyyy-MM",
+    focusedMonthKey: formatProjectionMonthKey(
+      projectionData.normalizedFocusedMonthStart,
     ),
     chartMonths,
-    focusedMonthTotals: projectionData.focusedMonthTotals,
+  };
+}
+
+export async function getProjectionSpacesPayloadForUser(
+  userAccountId: string,
+  focusedMonthStart: Date,
+): Promise<ProjectionSpacesPayload> {
+  const projectionData = await Transaction.getProjectionSpacesQueryData(
+    userAccountId,
+    focusedMonthStart,
+  );
+
+  return {
+    focusedMonthKey: formatProjectionMonthKey(
+      projectionData.normalizedFocusedMonthStart,
+    ),
     focusedMonthSpaces: mapProjectionSpaces(
       projectionData.spaceSummaryRows,
       projectionData.spaceTransactionsRows,

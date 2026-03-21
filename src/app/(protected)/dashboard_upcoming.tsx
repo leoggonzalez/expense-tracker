@@ -1,7 +1,7 @@
 "use client";
 
 import type { DashboardUpcomingPayload } from "@/actions/transactions";
-import { useDashboardSection } from "@/app/(protected)/use_dashboard_section";
+import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import { AppLink, Button, LoadingSkeleton } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { formatCurrency } from "@/lib/utils";
@@ -10,8 +10,8 @@ import { i18n } from "@/model/i18n";
 
 import React from "react";
 
-const dashboardUpcomingCache: { data: DashboardUpcomingPayload | null } = {
-  data: null,
+const dashboardUpcomingCache = {
+  entries: new Map<string, DashboardUpcomingPayload>(),
 };
 
 function getUpcomingTransactionsHref(
@@ -57,7 +57,8 @@ function UpcomingPaymentRowSkeleton(): React.ReactElement {
 }
 
 export function DashboardUpcoming(): React.ReactElement {
-  const { data, isLoading, hasError, retry } = useDashboardSection(
+  const { data, isLoading, hasError, retry } = useProtectedPageSection(
+    "/api/dashboard/upcoming",
     "/api/dashboard/upcoming",
     dashboardUpcomingCache,
   );

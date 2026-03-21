@@ -171,10 +171,18 @@ export type ProjectionFocusedSpaceTransactionRow = {
   updatedAt: Date;
 };
 
-export type ProjectionQueryData = {
+export type ProjectionHeaderQueryData = {
+  normalizedFocusedMonthStart: Date;
+  focusedMonthTotals: DashboardTotals;
+};
+
+export type ProjectionChartQueryData = {
   normalizedFocusedMonthStart: Date;
   chartRows: ProjectionChartMonthRow[];
-  focusedMonthTotals: DashboardTotals;
+};
+
+export type ProjectionSpacesQueryData = {
+  normalizedFocusedMonthStart: Date;
   spaceSummaryRows: ProjectionFocusedSpaceSummaryRow[];
   spaceTransactionsRows: ProjectionFocusedSpaceTransactionRow[];
 };
@@ -516,25 +524,51 @@ export class Transaction {
     };
   }
 
-  public static async getProjectionQueryData(
+  private static getProjectionMonthContext(focusedMonthStart: Date): {
+    normalizedFocusedMonthStart: Date;
+    endMonthStart: Date;
+    focusedMonthEnd: Date;
+    focusedMonthIsCurrent: boolean;
+  } {
+    const normalizedFocusedMonthStart = startOfMonth(focusedMonthStart);
+
+    return {
+      normalizedFocusedMonthStart,
+      endMonthStart: addMonths(normalizedFocusedMonthStart, 5),
+      focusedMonthEnd: endOfMonth(normalizedFocusedMonthStart),
+      focusedMonthIsCurrent: isSameMonth(
+        normalizedFocusedMonthStart,
+        startOfMonth(new Date()),
+      ),
+    };
+  }
+
+  public static async getProjectionHeaderQueryData(
     userAccountId: string,
     focusedMonthStart: Date,
-  ): Promise<ProjectionQueryData> {
-    const normalizedFocusedMonthStart = startOfMonth(focusedMonthStart);
-    const endMonthStart = addMonths(normalizedFocusedMonthStart, 5);
-    const focusedMonthEnd = endOfMonth(normalizedFocusedMonthStart);
-    const focusedMonthIsCurrent = isSameMonth(
-      normalizedFocusedMonthStart,
-      startOfMonth(new Date()),
-    );
+  ): Promise<ProjectionHeaderQueryData> {
+    const { normalizedFocusedMonthStart } =
+      Transaction.getProjectionMonthContext(focusedMonthStart);
 
-    const [
-      chartRows,
-      focusedMonthTotals,
-      spaceSummaryRows,
-      spaceTransactionsRows,
-    ] = await Promise.all([
-      prisma.$queryRaw<ProjectionChartMonthRow[]>`
+    return {
+      normalizedFocusedMonthStart,
+      focusedMonthTotals: await Transaction.getMonthTotalsForUser(
+        userAccountId,
+        normalizedFocusedMonthStart,
+      ),
+    };
+  }
+
+  public static async getProjectionChartQueryData(
+    userAccountId: string,
+    focusedMonthStart: Date,
+  ): Promise<ProjectionChartQueryData> {
+    const { normalizedFocusedMonthStart, endMonthStart } =
+      Transaction.getProjectionMonthContext(focusedMonthStart);
+
+    return {
+      normalizedFocusedMonthStart,
+      chartRows: await prisma.$queryRaw<ProjectionChartMonthRow[]>`
         WITH months AS (
           SELECT generate_series(
             ${normalizedFocusedMonthStart}::timestamp,
@@ -577,10 +611,20 @@ export class Transaction {
         GROUP BY months.month_start
         ORDER BY months.month_start ASC
       `,
-      Transaction.getMonthTotalsForUser(
-        userAccountId,
-        normalizedFocusedMonthStart,
-      ),
+    };
+  }
+
+  public static async getProjectionSpacesQueryData(
+    userAccountId: string,
+    focusedMonthStart: Date,
+  ): Promise<ProjectionSpacesQueryData> {
+    const {
+      normalizedFocusedMonthStart,
+      focusedMonthEnd,
+      focusedMonthIsCurrent,
+    } = Transaction.getProjectionMonthContext(focusedMonthStart);
+
+    const [spaceSummaryRows, spaceTransactionsRows] = await Promise.all([
       prisma.$queryRaw<ProjectionFocusedSpaceSummaryRow[]>`
         SELECT
           a.id AS "spaceId",
@@ -657,8 +701,6 @@ export class Transaction {
 
     return {
       normalizedFocusedMonthStart,
-      chartRows,
-      focusedMonthTotals,
       spaceSummaryRows,
       spaceTransactionsRows,
     };
