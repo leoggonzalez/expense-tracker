@@ -55,7 +55,7 @@
   &--variant-primary {
     background-color: var(--color-success);
     color: var(--color-text-inverse);
-    box-shadow: 0 14px 24px rgba(0, 212, 126, 0.22);
+    box-shadow: var(--shadow-success-button);
 
     &:hover:not(:disabled) {
       background-color: var(--color-success-dark);
@@ -122,15 +122,19 @@
   }
 
   &--variant-outline-danger {
-    background-color: transparent;
-    border-color: color-mix(in srgb, var(--color-danger) 28%, white 20%);
+    background-color: var(--color-static-transparent);
+    border-color: color-mix(
+      in srgb,
+      var(--color-danger) 28%,
+      var(--color-static-white) 20%
+    );
     color: var(--color-danger-light);
 
     &:hover:not(:disabled) {
       background-color: color-mix(
         in srgb,
         var(--color-danger) 14%,
-        transparent
+        var(--color-static-transparent)
       );
       transform: translateY(-1px);
     }
@@ -139,7 +143,7 @@
       background-color: color-mix(
         in srgb,
         var(--color-danger) 20%,
-        transparent
+        var(--color-static-transparent)
       );
     }
   }
@@ -159,31 +163,31 @@
   }
 
   &--variant-transfer {
-    background-color: #7c3aed;
+    background-color: var(--color-transfer);
     color: var(--color-text-inverse);
 
     &:hover:not(:disabled) {
-      background-color: #6d28d9;
+      background-color: var(--color-transfer-dark);
       transform: translateY(-1px);
     }
 
     &:active:not(:disabled) {
-      background-color: #5b21b6;
+      background-color: var(--color-transfer-darker);
     }
   }
 
   &--variant-outline {
-    background-color: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.18);
+    background-color: var(--color-hero-surface-12);
+    border-color: var(--color-hero-surface-18);
     color: var(--color-hero-foreground);
 
     &:hover:not(:disabled) {
-      background-color: rgba(255, 255, 255, 0.18);
+      background-color: var(--color-hero-surface-18);
       transform: translateY(-1px);
     }
 
     &:active:not(:disabled) {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: var(--color-hero-surface-20);
     }
   }
 

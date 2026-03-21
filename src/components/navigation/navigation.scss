@@ -10,7 +10,7 @@
   max-width: calc(100vw - 16px);
   padding: 3px 4px;
   border: var(--border-width) solid
-    color-mix(in srgb, var(--color-border) 88%, white 12%);
+    color-mix(in srgb, var(--color-border) 88%, var(--color-static-white) 12%);
   border-radius: 999px;
   background-color: color-mix(
     in srgb,
@@ -85,8 +85,8 @@
       min-height: 48px;
       padding: 0;
       color: var(--color-text-inverse);
-      background-color: #00bf72;
-      box-shadow: 0 10px 18px rgba(0, 191, 114, 0.22);
+      background-color: var(--color-nav-primary-action);
+      box-shadow: var(--shadow-nav-primary-action);
     }
 
     &--mobile-primary .navigation__icon {
@@ -99,7 +99,7 @@
     &--mobile-primary.navigation__link--active .navigation__link-content,
     &--mobile-primary:active .navigation__link-content {
       color: var(--color-text-inverse);
-      background-color: #00a965;
+      background-color: var(--color-nav-primary-action-dark);
     }
   }
 
