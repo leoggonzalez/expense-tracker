@@ -3,11 +3,14 @@
 .info-box {
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--border-radius-md);
-  padding: var(--spacing-md);
   background-color: var(--color-background-secondary);
 
   &__icon {
     line-height: 0;
+  }
+
+  &--radius-xl {
+    border-radius: 24px;
   }
 
   &--warning {
@@ -48,5 +51,15 @@
       var(--color-background)
     );
     color: var(--color-success-dark);
+  }
+
+  &--warning.info-box--accent-primary {
+    border-color: color-mix(in srgb, var(--color-primary) 24%, white);
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 8%,
+      var(--color-background-secondary)
+    );
+    color: var(--color-primary-dark);
   }
 }

@@ -19,6 +19,11 @@ export interface InputProps {
   pattern?: string;
   name?: string;
   id?: string;
+  size?: "md" | "lg";
+  surface?: "default" | "subtle";
+  labelTone?: "primary" | "secondary";
+  hasTrailingControl?: boolean;
+  fullWidth?: boolean;
 }
 
 export function Input({
@@ -38,13 +43,33 @@ export function Input({
   pattern,
   name,
   id,
+  size = "md",
+  surface = "default",
+  labelTone = "primary",
+  hasTrailingControl = false,
+  fullWidth = false,
 }: InputProps): React.ReactElement {
+  const classes = [
+    "input",
+    `input--size-${size}`,
+    `input--surface-${surface}`,
+    hasTrailingControl && "input--with-trailing-control",
+    fullWidth && "input--full-width",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="input">
+    <div className={classes}>
       <Stack gap={4}>
         {label && (
-          <label htmlFor={id}>
-            <Text as="span" size="sm" weight="medium">
+          <label htmlFor={id} className="input__label">
+            <Text
+              as="span"
+              size="sm"
+              weight="medium"
+              color={labelTone === "secondary" ? "secondary" : "primary"}
+            >
               {label}
             </Text>
             {required && <span className="input__required">*</span>}

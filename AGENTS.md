@@ -4,6 +4,8 @@ This file is the canonical source of truth for coding conventions in this reposi
 
 New code must follow these rules immediately. Existing code that does not comply should be updated when touched for feature work or refactors unless the required migration would make the change disproportionately large. In those cases, follow the migration policy in this document and isolate the cleanup into a dedicated follow-up change.
 
+Supplementary guidance for server actions, shared model classes, and database-access structure lives in `SERVER_GUIDELINES.md`. Use that file when designing or refactoring table-backed server/data flows. If there is a conflict, this file still takes precedence.
+
 ## Naming Conventions
 
 - All new filenames must use `snake_case`.

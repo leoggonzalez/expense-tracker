@@ -2,7 +2,7 @@ import {
   Button,
   Container,
   Currency,
-  EntryList,
+  TransactionList,
   Hero,
   HeroMetric,
   HeroMetrics,
@@ -11,7 +11,7 @@ import {
 import { Card, Icon, Stack, Text } from "@/elements";
 
 import { formatCurrency } from "@/lib/utils";
-import { getProjectionPagePayload } from "@/actions/entries";
+import { getProjectionPagePayload } from "@/actions/transactions";
 import { i18n } from "@/model/i18n";
 import { startOfMonth } from "date-fns";
 
@@ -90,28 +90,28 @@ export default async function ProjectionPage({
         >
           <Stack gap={24}>
             <Stack gap={10}>
-              <Text as="h1" size="h1" color="inverse" weight="bold">
+              <Text as="h1" size="h1" color="hero" weight="bold">
                 {formatCurrency(payload.focusedMonthTotals.net)}
               </Text>
-              <Text as="p" size="sm" color="inverse">
+              <Text as="p" size="sm" color="hero-muted">
                 {i18n.t("projection_page.subtitle")}
               </Text>
             </Stack>
 
             <HeroMetrics columns={2}>
               <HeroMetric>
-                <Text as="span" size="xs" color="inverse" weight="medium">
+                <Text as="span" size="xs" color="hero" weight="medium">
                   {i18n.t("projection_page.income")}
                 </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
+                <Text as="span" size="lg" color="hero" weight="semibold">
                   {formatCurrency(payload.focusedMonthTotals.income)}
                 </Text>
               </HeroMetric>
               <HeroMetric tone="soft">
-                <Text as="span" size="xs" color="inverse" weight="medium">
+                <Text as="span" size="xs" color="hero" weight="medium">
                   {i18n.t("projection_page.expenses")}
                 </Text>
-                <Text as="span" size="lg" color="inverse" weight="semibold">
+                <Text as="span" size="lg" color="hero" weight="semibold">
                   {formatCurrency(Math.abs(payload.focusedMonthTotals.expense))}
                 </Text>
               </HeroMetric>
@@ -131,72 +131,72 @@ export default async function ProjectionPage({
 
           <Stack gap={16}>
             <Text size="h4" as="h3" weight="semibold">
-              {i18n.t("projection_page.accounts_with_entries")}
+              {i18n.t("projection_page.spaces_with_transactions")}
             </Text>
 
-            {payload.focusedMonthAccounts.length === 0 ? (
+            {payload.focusedMonthSpaces.length === 0 ? (
               <Card padding={24} variant="dashed">
                 <Text color="secondary">
-                  {i18n.t("projection_page.empty_month_entries")}
+                  {i18n.t("projection_page.empty_month_transactions")}
                 </Text>
               </Card>
             ) : (
               <Stack gap={24}>
-                {payload.focusedMonthAccounts.map((account) => {
-                  const hiddenEntriesCount = Math.max(
+                {payload.focusedMonthSpaces.map((space) => {
+                  const hiddenTransactionsCount = Math.max(
                     0,
-                    account.monthEntryCount - account.entries.length,
+                    space.monthTransactionCount - space.transactions.length,
                   );
-                  const accountMonthHref = `/accounts/${account.accountId}?currentMonth=${payload.focusedMonth.key}`;
+                  const spaceMonthHref = `/spaces/${space.spaceId}?currentMonth=${payload.focusedMonth.key}`;
 
                   return (
                     <Card
-                      key={account.accountId}
+                      key={space.spaceId}
                       as="section"
                       padding={24}
-                      title={account.accountName}
-                      icon="accounts"
+                      title={space.spaceName}
+                      icon="spaces"
                       actions={
                         <Button
-                          href={accountMonthHref}
+                          href={spaceMonthHref}
                           variant="secondary"
                           size="sm"
                           startIcon={<Icon name="external-link" size={16} />}
                           ariaLabel={String(
-                            i18n.t("projection_page.open_account"),
+                            i18n.t("projection_page.open_space"),
                           )}
                         >
                           {null}
                         </Button>
                       }
                     >
-                      <EntryList
-                        entries={account.entries}
+                      <TransactionList
+                        transactions={space.transactions}
                         showDelete={false}
-                        entryHrefBase="/entries"
+                        transactionHrefBase="/transactions"
                         summaryRows={[
-                          ...(hiddenEntriesCount > 0
+                          ...(hiddenTransactionsCount > 0
                             ? [
                                 {
-                                  id: `more-${account.accountId}`,
+                                  id: `more-${space.spaceId}`,
                                   label: i18n.t(
-                                    "projection_page.more_entries_this_month",
+                                    "projection_page.more_transactions_this_month",
                                     {
-                                      count: hiddenEntriesCount,
+                                      count: hiddenTransactionsCount,
                                     },
                                   ) as string,
-                                  href: accountMonthHref,
+                                  href: spaceMonthHref,
                                 },
                               ]
                             : []),
                           {
-                            id: `total-${account.accountId}`,
+                            id: `total-${space.spaceId}`,
                             label: i18n.t(
-                              "projection_page.account_month_total",
+                              "projection_page.space_month_total",
                             ) as string,
                             value: (
                               <Currency
-                                value={account.monthTotal}
+                                value={space.monthTotal}
                                 size="sm"
                                 weight="bold"
                               />

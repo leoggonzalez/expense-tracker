@@ -10,7 +10,7 @@
   max-width: calc(100vw - 16px);
   padding: 3px 4px;
   border: var(--border-width) solid
-    color-mix(in srgb, var(--color-border) 88%, white 12%);
+    color-mix(in srgb, var(--color-border) 88%, var(--color-static-white) 12%);
   border-radius: 999px;
   background-color: color-mix(
     in srgb,
@@ -19,18 +19,6 @@
   );
   backdrop-filter: blur(18px);
   box-shadow: var(--shadow-xl);
-
-  .container {
-    display: block;
-    width: auto;
-    min-width: 0;
-  }
-
-  .container__content {
-    grid-column: auto;
-    width: auto;
-    min-width: 0;
-  }
 
   &__inner {
     display: grid;
@@ -44,6 +32,10 @@
     display: none;
   }
 
+  &__cta {
+    display: none;
+  }
+
   &__sections {
     min-width: 0;
     width: max-content;
@@ -53,7 +45,7 @@
     min-width: 0;
   }
 
-  &__section > .text {
+  &__section-label {
     display: none;
   }
 
@@ -97,8 +89,8 @@
       min-height: 48px;
       padding: 0;
       color: var(--color-text-inverse);
-      background-color: #00bf72;
-      box-shadow: 0 10px 18px rgba(0, 191, 114, 0.22);
+      background-color: var(--color-nav-primary-action);
+      box-shadow: var(--shadow-nav-primary-action);
     }
 
     &--mobile-primary .navigation__icon {
@@ -111,7 +103,7 @@
     &--mobile-primary.navigation__link--active .navigation__link-content,
     &--mobile-primary:active .navigation__link-content {
       color: var(--color-text-inverse);
-      background-color: #00a965;
+      background-color: var(--color-nav-primary-action-dark);
     }
   }
 
@@ -200,18 +192,6 @@
     box-shadow: none;
     backdrop-filter: none;
 
-    .container {
-      display: block;
-      grid-template-columns: none;
-      min-width: 0;
-      height: 100%;
-    }
-
-    .container__content {
-      grid-column: auto;
-      height: 100%;
-    }
-
     &__inner {
       width: 100%;
       height: 100%;
@@ -237,6 +217,10 @@
       border-bottom: var(--border-width) solid var(--color-border);
     }
 
+    &__cta {
+      display: block;
+    }
+
     &__brand-link {
       display: inline-flex;
       align-items: center;
@@ -249,7 +233,7 @@
       font-weight: var(--font-weight-medium);
     }
 
-    &__section > .text {
+    &__section-label {
       display: block;
       margin-bottom: var(--spacing-md);
       letter-spacing: 0.12em;
@@ -357,7 +341,8 @@
       gap: 2px;
     }
 
-    &__user-copy .text {
+    &__user-name,
+    &__user-email {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

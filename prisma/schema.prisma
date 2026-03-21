@@ -8,40 +8,40 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model User {
+model UserAccount {
   id         String      @id @default(cuid())
   email      String      @unique
   name       String?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
-  accounts   Account[]
+  spaces   Space[]
   loginCodes LoginCode[]
   sessions   Session[]
 }
 
-model Account {
+model Space {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAccountId    String
+  userAccount      UserAccount     @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
   name      String
   isArchived Boolean @default(false)
-  currentMonthEntryCount Int @default(0)
+  currentMonthTransactionCount Int @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  entries   Entry[]
-  transferEntries Entry[] @relation("EntryTransferAccount")
+  transactions   Transaction[]
+  transferTransactions Transaction[] @relation("TransactionTransferSpace")
 
-  @@unique([userId, name])
-  @@index([userId])
+  @@unique([userAccountId, name])
+  @@index([userAccountId])
 }
 
-model Entry {
+model Transaction {
   id          String    @id @default(cuid())
   type        String    // "income" or "expense"
-  accountId   String
-  account     Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  transferAccountId String?
-  transferAccount Account? @relation("EntryTransferAccount", fields: [transferAccountId], references: [id], onDelete: SetNull)
+  spaceId   String
+  space     Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  transferSpaceId String?
+  transferSpace Space? @relation("TransactionTransferSpace", fields: [transferSpaceId], references: [id], onDelete: SetNull)
   description String
   amount      Float
   beginDate   DateTime
@@ -49,34 +49,34 @@ model Entry {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  @@index([accountId])
-  @@index([transferAccountId])
+  @@index([spaceId])
+  @@index([transferSpaceId])
   @@index([beginDate])
 }
 
 model LoginCode {
   id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAccountId     String
+  userAccount       UserAccount     @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
   email      String
   codeHash   String
   expiresAt  DateTime
   consumedAt DateTime?
   createdAt  DateTime @default(now())
 
-  @@index([userId])
+  @@index([userAccountId])
   @@index([email])
   @@index([expiresAt])
 }
 
 model Session {
   id               String   @id @default(cuid())
-  userId           String
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAccountId           String
+  userAccount             UserAccount     @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
   sessionTokenHash String   @unique
   expiresAt        DateTime
   createdAt        DateTime @default(now())
 
-  @@index([userId])
+  @@index([userAccountId])
   @@index([expiresAt])
 }

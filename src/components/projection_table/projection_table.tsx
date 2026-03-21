@@ -3,17 +3,17 @@
 import "./projection_table.scss";
 
 import { Currency, Input, useNavigationProgress } from "@/components";
-import { Entry, EntryCollection } from "@/model";
+import { Transaction, TransactionCollection } from "@/model";
 import { i18n } from "@/model/i18n";
 import React, { useState } from "react";
 import { Card, Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
 
 export interface ProjectionTableProps {
-  entries: Array<{
+  transactions: Array<{
     id: string;
     type: string;
-    account: string;
+    space: string;
     description: string;
     amount: number;
     beginDate: string;
@@ -24,26 +24,26 @@ export interface ProjectionTableProps {
 }
 
 export function ProjectionTable({
-  entries: plainEntries,
+  transactions: plainTransactions,
 }: ProjectionTableProps): React.ReactElement {
   const { push } = useNavigationProgress();
 
-  // Convert plain objects to Entry instances
-  const entries = plainEntries.map((entry) =>
-    Entry.fromJSON({
-      ...entry,
-      beginDate: new Date(entry.beginDate),
-      endDate: entry.endDate ? new Date(entry.endDate) : null,
-      createdAt: new Date(entry.createdAt),
-      updatedAt: new Date(entry.updatedAt),
+  // Convert plain objects to Transaction instances
+  const transactions = plainTransactions.map((transaction) =>
+    Transaction.fromJSON({
+      ...transaction,
+      beginDate: new Date(transaction.beginDate),
+      endDate: transaction.endDate ? new Date(transaction.endDate) : null,
+      createdAt: new Date(transaction.createdAt),
+      updatedAt: new Date(transaction.updatedAt),
     }),
   );
 
   const currentDate = new Date();
   const fallbackStartMonth = startOfMonth(currentDate);
-  const earliestBeginDate = entries.reduce<Date | null>((earliest, entry) => {
-    if (!earliest || entry.beginDate < earliest) {
-      return entry.beginDate;
+  const earliestBeginDate = transactions.reduce<Date | null>((earliest, transaction) => {
+    if (!earliest || transaction.beginDate < earliest) {
+      return transaction.beginDate;
     }
 
     return earliest;
@@ -59,7 +59,7 @@ export function ProjectionTable({
     ),
   );
 
-  const collection = new EntryCollection(entries);
+  const collection = new TransactionCollection(transactions);
 
   // Calculate number of months from start month to end month
   const [endYear, endMonth] = endDate.split("-").map(Number);
@@ -72,7 +72,7 @@ export function ProjectionTable({
 
   const monthCount = Math.max(1, monthsDiff);
 
-  const { accounts, monthlyTotals, months } = collection.getProjectionData(
+  const { spaces, monthlyTotals, months } = collection.getProjectionData(
     startMonth,
     monthCount,
   );
@@ -109,7 +109,7 @@ export function ProjectionTable({
               <thead className="projection-table__thead">
                 <tr className="projection-table__row">
                   <th className="projection-table__cell projection-table__cell--header projection-table__cell--sticky projection-table__cell--header-sticky">
-                    {i18n.t("projection_table.account_description")}
+                    {i18n.t("projection_table.space_description")}
                   </th>
                   {months.map((month) => (
                     <th
@@ -122,13 +122,13 @@ export function ProjectionTable({
                 </tr>
               </thead>
               <tbody className="projection-table__tbody">
-                {accounts.map((account) => {
+                {spaces.map((space) => {
                   return (
-                    <React.Fragment key={account.account}>
+                    <React.Fragment key={space.space}>
                       <tr className="projection-table__row projection-table__row--group-header">
                         <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--group-header">
                           <Text size="md" weight="bold">
-                            {account.account}
+                            {space.space}
                           </Text>
                         </td>
                         {months.map((month) => (
@@ -138,23 +138,23 @@ export function ProjectionTable({
                           />
                         ))}
                       </tr>
-                      {account.entries.map((entry) => (
+                      {space.transactions.map((transaction) => (
                         <tr
-                          key={entry.id}
+                          key={transaction.id}
                           className="projection-table__row projection-table__row--interactive"
-                          onClick={() => push(`/entries/${entry.id}`)}
+                          onClick={() => push(`/transactions/${transaction.id}`)}
                         >
                           <td className="projection-table__cell projection-table__cell--sticky">
-                            <div className="projection-table__entry">
+                            <div className="projection-table__transaction">
                               <Stack gap={4}>
                                 <Text size="xs" color="secondary">
-                                  {entry.description}
+                                  {transaction.description}
                                 </Text>
                               </Stack>
                             </div>
                           </td>
                           {months.map((month) => {
-                            const amount = entry.getAmountForMonth(month);
+                            const amount = transaction.getAmountForMonth(month);
                             return (
                               <td
                                 key={month.toISOString()}
@@ -172,15 +172,15 @@ export function ProjectionTable({
                       <tr className="projection-table__row projection-table__row--group-total">
                         <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--total">
                           <Text size="sm" weight="bold">
-                            {i18n.t("projection_table.account_total", {
-                              account: account.account,
+                            {i18n.t("projection_table.space_total", {
+                              space: space.space,
                             })}
                           </Text>
                         </td>
                         {months.map((month) => {
                           const monthKey = format(month, "yyyy-MM");
                           const total =
-                            account.monthlyTotals.get(monthKey) || 0;
+                            space.monthlyTotals.get(monthKey) || 0;
                           return (
                             <td
                               key={month.toISOString()}

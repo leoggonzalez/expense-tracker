@@ -1,0 +1,30 @@
+@use "@/styles/variables.scss" as *;
+
+.transaction-date-field {
+  &__input {
+    flex: 1;
+  }
+
+  &__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-background);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition:
+      border-color var(--transition-base),
+      color var(--transition-base);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      outline: none;
+    }
+  }
+}

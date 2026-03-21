@@ -1,0 +1,49 @@
+@use "@/styles/variables.scss" as *;
+
+.space-field {
+  &__input {
+    min-width: 0;
+  }
+
+  &__text-mode {
+    position: relative;
+  }
+
+  &__toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 0;
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 10%,
+      var(--color-background)
+    );
+    color: var(--color-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    pointer-events: auto;
+    transition:
+      background-color var(--transition-fast),
+      color var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+      background-color: color-mix(
+        in srgb,
+        var(--color-primary) 16%,
+        var(--color-background)
+      );
+      color: var(--color-primary-dark);
+      outline: none;
+    }
+  }
+
+  &__text-mode &__toggle {
+    position: absolute;
+    right: var(--spacing-sm);
+    bottom: calc(var(--spacing-sm) + 1px);
+  }
+}

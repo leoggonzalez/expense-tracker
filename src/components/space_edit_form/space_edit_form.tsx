@@ -1,0 +1,76 @@
+"use client";
+
+import "./space_edit_form.scss";
+
+import React, { useState } from "react";
+
+import { updateSpace } from "@/actions/spaces";
+import { Button, Input, useNavigationProgress } from "@/components";
+import { Stack, Text } from "@/elements";
+import { i18n } from "@/model/i18n";
+
+type SpaceEditFormProps = {
+  spaceId: string;
+  initialName: string;
+};
+
+export function SpaceEditForm({
+  spaceId,
+  initialName,
+}: SpaceEditFormProps): React.ReactElement {
+  const [name, setName] = useState(initialName);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const { push } = useNavigationProgress();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    const result = await updateSpace(spaceId, { name });
+
+    if (!result.success) {
+      setError(result.error || "space_detail_page.update_failed");
+      setIsLoading(false);
+      return;
+    }
+
+    setSuccess("space_detail_page.update_success");
+    setIsLoading(false);
+    push(`/spaces/${spaceId}`);
+  };
+
+  return (
+    <div className="space-edit-form">
+      <form onSubmit={handleSubmit}>
+        <Stack gap={16}>
+          <Input
+            label={i18n.t("spaces_page.space_name")}
+            value={name}
+            onChange={setName}
+            placeholder={
+              i18n.t("spaces_page.space_name_placeholder") as string
+            }
+            required
+            size="lg"
+            surface="subtle"
+            labelTone="secondary"
+          />
+
+          {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+          {success ? <Text color="success">{i18n.t(success)}</Text> : null}
+
+          <Button type="submit" disabled={isLoading}>
+            {isLoading
+              ? i18n.t("space_detail_page.saving")
+              : i18n.t("space_detail_page.save")}
+          </Button>
+        </Stack>
+      </form>
+    </div>
+  );
+}

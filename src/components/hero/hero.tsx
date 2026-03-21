@@ -10,13 +10,13 @@ import React from "react";
 export type HeroPattern =
   | "dashboard"
   | "projection"
-  | "entries"
-  | "accounts"
-  | "account_detail"
-  | "account_form"
-  | "entry_detail"
-  | "new_entry"
-  | "account"
+  | "transactions"
+  | "spaces"
+  | "space_detail"
+  | "space_form"
+  | "transaction_detail"
+  | "new_transaction"
+  | "space"
   | "settings";
 
 export type HeroProps = {
@@ -54,7 +54,9 @@ export function Hero({
               <Icon name={icon} size={20} />
             </span>
             <div className="hero__title">
-              <Text size="h3">{title}</Text>
+              <Text size="h3" color="hero">
+                {title}
+              </Text>
             </div>
           </Stack>
         </div>

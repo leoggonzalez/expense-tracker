@@ -5,6 +5,10 @@
     display: block;
   }
 
+  &__label {
+    display: block;
+  }
+
   &__required {
     color: var(--color-danger);
     margin-left: var(--spacing-xs);
@@ -68,5 +72,14 @@
     justify-content: center;
     color: var(--color-text-secondary);
     flex-shrink: 0;
+  }
+
+  &--size-lg &__field {
+    min-height: 52px;
+    border-radius: 18px;
+  }
+
+  &--surface-subtle &__field {
+    background-color: var(--color-background-secondary);
   }
 }

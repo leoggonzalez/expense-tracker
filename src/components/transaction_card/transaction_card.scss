@@ -1,0 +1,38 @@
+@use "@/styles/variables.scss" as *;
+
+.transaction-card {
+  min-height: 68px;
+
+  &__layout {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  &__space {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__details {
+    min-width: 0;
+  }
+
+  &__detail-line {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__amount {
+    text-align: right;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .transaction-card {
+    min-height: 72px;
+  }
+}

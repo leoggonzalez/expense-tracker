@@ -3,7 +3,7 @@ import "./dashboard_hero.scss";
 import { AppLink, Hero } from "@/components";
 import { Box, Grid, Stack, Text } from "@/elements";
 
-import { DashboardTotals } from "@/actions/entries";
+import { DashboardTotals } from "@/actions/transactions";
 import React from "react";
 import { formatCurrency } from "@/lib/utils";
 import { i18n } from "@/model/i18n";
@@ -32,22 +32,28 @@ export function DashboardHero({
           icon: "plus",
           title: String(i18n.t("dashboard.hero_add_action")),
           ariaLabel: String(i18n.t("dashboard.hero_add_action")),
-          href: "/entries/new/expense",
+          href: "/transactions/new/expense",
           variant: "primary",
         },
       ]}
     >
       <div className="dashboard-hero__body">
         <Stack gap={10}>
-          <Text as="h1" size="h1" color="inverse" weight="bold">
+          <Text
+            as="h1"
+            size="h1"
+            color="hero"
+            weight="bold"
+            tracking="tight"
+          >
             {formatCurrency(totals.net)}
           </Text>
-          <Text as="p" size="sm" color="secondary">
+          <Text as="p" size="sm" color="hero-muted">
             {i18n.t("dashboard.hero_caption")}
           </Text>
         </Stack>
         <Grid minColumnWidth={220} gap={12}>
-          <AppLink href={`/entries?${currentMonthQuery}&type=income`}>
+          <AppLink href={`/transactions?${currentMonthQuery}&type=income`}>
             <span className="dashboard-hero__stat-card">
               <Box
                 padding={{
@@ -68,7 +74,7 @@ export function DashboardHero({
               </Box>
             </span>
           </AppLink>
-          <AppLink href={`/entries?${currentMonthQuery}&type=expense`}>
+          <AppLink href={`/transactions?${currentMonthQuery}&type=expense`}>
             <span className="dashboard-hero__stat-card dashboard-hero__stat-card--soft">
               <Box
                 padding={{

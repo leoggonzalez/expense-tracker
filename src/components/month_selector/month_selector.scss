@@ -20,21 +20,13 @@
       background-color var(--transition-fast);
   }
 
+  &--surface-subtle &__control {
+    background-color: var(--color-background-secondary);
+  }
+
   &__date-mode {
     position: relative;
     width: 100%;
-
-    .input {
-      width: 100%;
-    }
-
-    .input__field {
-      width: 100%;
-      min-height: 52px;
-      padding-right: calc(var(--spacing-md) + 48px);
-      border-radius: 18px;
-      background-color: var(--color-background-secondary);
-    }
   }
 
   &__control:focus-within {

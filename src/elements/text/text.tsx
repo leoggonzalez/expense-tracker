@@ -15,10 +15,13 @@ export interface TextProps {
     | "danger-light"
     | "warning"
     | "info"
-    | "inverse";
+    | "inverse"
+    | "hero"
+    | "hero-muted";
   weight?: "normal" | "medium" | "semibold" | "bold";
   as?: "p" | "span" | "div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "label";
   transform?: "none" | "uppercase" | "lowercase" | "capitalize";
+  tracking?: "default" | "tight";
 }
 
 export function Text({
@@ -28,6 +31,7 @@ export function Text({
   weight = "normal",
   as: Component = "p",
   transform = "none",
+  tracking = "default",
 }: TextProps): React.ReactElement {
   const classes = [
     "text",
@@ -35,6 +39,7 @@ export function Text({
     `text--color-${color}`,
     `text--weight-${weight}`,
     `text--transform-${transform}`,
+    `text--tracking-${tracking}`,
   ]
     .filter(Boolean)
     .join(" ");

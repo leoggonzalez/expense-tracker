@@ -1,14 +1,6 @@
 @use "@/styles/variables.scss" as *;
 
 .otp-input {
-  &__label {
-    display: block;
-    margin-bottom: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
-  }
-
   &__required {
     color: var(--color-danger);
     margin-left: 2px;

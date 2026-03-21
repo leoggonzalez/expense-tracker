@@ -17,6 +17,9 @@ export interface SelectProps {
   placeholder?: string;
   required?: boolean;
   trailingContent?: React.ReactNode;
+  size?: "md" | "lg";
+  surface?: "default" | "subtle";
+  labelTone?: "primary" | "secondary";
 }
 
 export function Select({
@@ -27,13 +30,29 @@ export function Select({
   placeholder,
   required = false,
   trailingContent,
+  size = "md",
+  surface = "default",
+  labelTone = "primary",
 }: SelectProps): React.ReactElement {
+  const classes = [
+    "select",
+    `select--size-${size}`,
+    `select--surface-${surface}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="select">
+    <div className={classes}>
       <Stack gap={4}>
         {label && (
-          <label>
-            <Text as="span" size="sm" weight="medium">
+          <label className="select__label">
+            <Text
+              as="span"
+              size="sm"
+              weight="medium"
+              color={labelTone === "secondary" ? "secondary" : "primary"}
+            >
               {label}
             </Text>
             {required && <span className="select__required">*</span>}

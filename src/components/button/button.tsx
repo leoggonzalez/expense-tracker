@@ -14,13 +14,15 @@ export interface ButtonProps {
     | "outline-danger"
     | "success"
     | "transfer"
-    | "outline";
+    | "outline"
+    | "cta";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
-  fullWidth?: boolean;
+  fullWidth?: boolean | "mobile-only";
   startIcon?: React.ReactNode;
   href?: string;
   ariaLabel?: string;
+  contentAlign?: "center" | "start";
 }
 
 export function Button({
@@ -34,21 +36,36 @@ export function Button({
   startIcon,
   href,
   ariaLabel,
+  contentAlign = "center",
 }: ButtonProps): React.ReactElement {
   const classes = [
     "button",
     `button--variant-${variant}`,
     `button--size-${size}`,
-    fullWidth && "button--full-width",
+    fullWidth === true && "button--full-width",
+    fullWidth === "mobile-only" && "button--full-width-mobile-only",
   ]
     .filter(Boolean)
     .join(" ");
 
   const content = (
-    <Stack direction="row" align="center" justify="center" gap={4} inline>
-      {startIcon && <span className="button__icon">{startIcon}</span>}
-      {children}
-    </Stack>
+    <span
+      className={[
+        "button__content",
+        `button__content--align-${contentAlign}`,
+      ].join(" ")}
+    >
+      <Stack
+        direction="row"
+        align="center"
+        justify={contentAlign === "start" ? "flex-start" : "center"}
+        gap={4}
+        inline
+      >
+        {startIcon && <span className="button__icon">{startIcon}</span>}
+        {children}
+      </Stack>
+    </span>
   );
 
   if (href && !disabled) {

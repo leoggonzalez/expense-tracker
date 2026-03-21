@@ -15,6 +15,8 @@ export interface CardProps {
   title?: string;
   icon?: IconName;
   actions?: React.ReactNode;
+  radius?: "default" | "xl" | "2xl";
+  fullHeight?: boolean;
 }
 
 export function Card({
@@ -25,8 +27,17 @@ export function Card({
   title,
   icon,
   actions,
+  radius = "default",
+  fullHeight = false,
 }: CardProps): React.ReactElement {
-  const classes = ["card", `card--${variant}`].join(" ");
+  const classes = [
+    "card",
+    `card--${variant}`,
+    `card--radius-${radius}`,
+    fullHeight && "card--full-height",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <Component className={classes}>

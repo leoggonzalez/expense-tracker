@@ -7,10 +7,10 @@ import React, { useEffect } from "react";
 import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
 
 import {
-  clearNewEntryDraft,
+  clearNewTransactionDraft,
   setLastPathname,
-  setNewEntryFlowActive,
-} from "@/lib/new_entry_draft";
+  setNewTransactionFlowActive,
+} from "@/lib/new_transaction_draft";
 
 type AppShellProps = {
   navigation: React.ReactNode;
@@ -26,18 +26,18 @@ export function AppShell({
   const pathname = usePathname();
   const { isNavigating } = useNavigationProgress();
   const isAuthRoute = pathname === "/login" || pathname === "/login/verify";
-  const isSingleEntryDraftRoute =
-    pathname === "/entries/new/income" || pathname === "/entries/new/expense";
+  const isSingleTransactionDraftRoute =
+    pathname === "/transactions/new/income" || pathname === "/transactions/new/expense";
 
   // eslint-disable-next-line warn-use-effect -- This effect keeps draft persistence and last-path tracking synchronized with route changes.
   useEffect(() => {
-    if (!isSingleEntryDraftRoute) {
-      clearNewEntryDraft();
-      setNewEntryFlowActive(false);
+    if (!isSingleTransactionDraftRoute) {
+      clearNewTransactionDraft();
+      setNewTransactionFlowActive(false);
     }
 
     setLastPathname(pathname);
-  }, [isSingleEntryDraftRoute, pathname]);
+  }, [isSingleTransactionDraftRoute, pathname]);
 
   return (
     <div

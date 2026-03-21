@@ -90,6 +90,14 @@
     color: var(--color-text-inverse);
   }
 
+  &--color-hero {
+    color: var(--color-hero-foreground);
+  }
+
+  &--color-hero-muted {
+    color: var(--color-hero-foreground-muted);
+  }
+
   /* Weights */
   &--weight-normal {
     font-weight: var(--font-weight-normal);
@@ -122,5 +130,13 @@
 
   &--transform-capitalize {
     text-transform: capitalize;
+  }
+
+  &--tracking-default {
+    letter-spacing: normal;
+  }
+
+  &--tracking-tight {
+    letter-spacing: -0.04em;
   }
 }
