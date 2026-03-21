@@ -432,6 +432,7 @@ export function TransactionForm({
           value={fields.spaceName.value || ""}
           onChange={(value) => fields.spaceName.onChange(value)}
           spaces={initialSpaces}
+          loadSpacesOnMount={isCreateFlow && initialSpaces.length === 0}
           placeholder={i18n.t("transaction_form.space_placeholder") as string}
           required
         />

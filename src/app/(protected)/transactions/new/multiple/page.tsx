@@ -1,9 +1,10 @@
 import {
+  BulkTransactionForm,
   Container,
   TransactionCreationIntro,
   Hero,
+  PagePanel,
 } from "@/components";
-import { NewTransactionFormSection } from "@/app/(protected)/transactions/new/new_transaction_form_section";
 import { Stack } from "@/elements";
 import { i18n } from "@/model/i18n";
 
@@ -22,7 +23,9 @@ export default async function Page(): Promise<React.ReactElement> {
           />
         </Hero>
 
-        <NewTransactionFormSection pageType="multiple" />
+        <PagePanel tone="form">
+          <BulkTransactionForm spaces={[]} />
+        </PagePanel>
       </Stack>
     </Container>
   );

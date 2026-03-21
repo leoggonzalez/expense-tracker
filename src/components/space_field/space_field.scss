@@ -46,4 +46,18 @@
     right: var(--spacing-sm);
     bottom: calc(var(--spacing-sm) + 1px);
   }
+
+  &__status {
+    margin-top: var(--spacing-xs);
+  }
+
+  &__retry {
+    border: 0;
+    background: transparent;
+    color: var(--color-info);
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-decoration: underline;
+  }
 }

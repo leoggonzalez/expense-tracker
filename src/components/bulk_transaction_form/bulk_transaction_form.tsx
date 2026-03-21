@@ -240,6 +240,7 @@ export function BulkTransactionForm({
               setShared((current) => ({ ...current, spaceName: value }))
             }
             spaces={initialSpaces}
+            loadSpacesOnMount={initialSpaces.length === 0}
             placeholder={
               i18n.t("bulk_transaction_form.shared_space_placeholder") as string
             }
