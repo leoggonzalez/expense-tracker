@@ -11,6 +11,7 @@ type ProtectedPageSectionResult<T> = {
   data: T | null;
   isLoading: boolean;
   hasError: boolean;
+  isNotFound: boolean;
   retry: () => void;
 };
 
@@ -26,6 +27,7 @@ export function useProtectedPageSection<T>(
   const [data, setData] = useState<T | null>(cache.entries.get(cacheKey) ?? null);
   const [isLoading, setIsLoading] = useState(!cache.entries.has(cacheKey));
   const [hasError, setHasError] = useState(false);
+  const [isNotFound, setIsNotFound] = useState(false);
 
   const load = useCallback(
     async (
@@ -38,6 +40,7 @@ export function useProtectedPageSection<T>(
       if (showLoading && isMountedRef.current) {
         setIsLoading(true);
         setHasError(false);
+        setIsNotFound(false);
       }
 
       try {
@@ -49,6 +52,20 @@ export function useProtectedPageSection<T>(
 
         if (response.status === 401) {
           router.push("/login");
+          return;
+        }
+
+        if (response.status === 404) {
+          if (
+            !isMountedRef.current ||
+            activeRequestKeyRef.current !== requestKey
+          ) {
+            return;
+          }
+
+          setData(null);
+          setHasError(false);
+          setIsNotFound(true);
           return;
         }
 
@@ -68,6 +85,7 @@ export function useProtectedPageSection<T>(
 
         setData(payload);
         setHasError(false);
+        setIsNotFound(false);
       } catch {
         if (
           !isMountedRef.current ||
@@ -81,9 +99,11 @@ export function useProtectedPageSection<T>(
         if (cachedData === null) {
           setData(null);
           setHasError(true);
+          setIsNotFound(false);
         } else {
           setData(cachedData);
           setHasError(false);
+          setIsNotFound(false);
         }
       } finally {
         if (
@@ -108,6 +128,7 @@ export function useProtectedPageSection<T>(
     setData(cachedData);
     setIsLoading(cachedData === null);
     setHasError(false);
+    setIsNotFound(false);
 
     void load(cachedData === null, cacheKey, endpoint);
 
@@ -124,6 +145,7 @@ export function useProtectedPageSection<T>(
     data,
     isLoading,
     hasError,
+    isNotFound,
     retry,
   };
 }

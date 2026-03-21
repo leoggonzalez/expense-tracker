@@ -1,18 +1,13 @@
-import { getSpacesCurrentMonthSummary } from "@/actions/spaces";
 import {
   Container,
   TransactionCreationIntro,
   TransactionTypeTabs,
   Hero,
-  PagePanel,
-  TransferForm,
 } from "@/components";
+import { NewTransferFormSection } from "@/app/(protected)/transactions/new/new_transfer_form_section";
 import { sanitizeAmountInput } from "@/lib/amount";
-import { format } from "date-fns";
 import { Stack } from "@/elements";
 import { i18n } from "@/model/i18n";
-
-export const dynamic = "force-dynamic";
 
 type TransferPageSearchParams = Promise<{
   to_space?: string;
@@ -24,34 +19,14 @@ type TransferPageProps = {
   searchParams: TransferPageSearchParams;
 };
 
-function getDefaultDescription(spaceName: string): string {
-  const monthLabel = format(new Date(), "MMMM yyyy");
-  return String(
-    i18n.t("spaces_page.settle_description", {
-      space: spaceName,
-      month: monthLabel,
-    }),
-  );
-}
-
 export default async function Page({
   searchParams,
 }: TransferPageProps): Promise<React.ReactElement> {
-  const [spaces, params] = await Promise.all([
-    getSpacesCurrentMonthSummary(),
-    searchParams,
-  ]);
-
-  const toSpace = spaces.find(
-    (space) => space.id === params.to_space,
-  );
-  const normalizedAmount = sanitizeAmountInput(params.amount || "");
+  const params = await searchParams;
   const initialValues = {
-    toSpaceId: toSpace?.id || "",
-    description:
-      params.description ||
-      (toSpace ? getDefaultDescription(toSpace.name) : ""),
-    amount: normalizedAmount,
+    toSpaceId: params.to_space || "",
+    description: params.description || "",
+    amount: sanitizeAmountInput(params.amount || ""),
   };
 
   return (
@@ -89,16 +64,7 @@ export default async function Page({
           ]}
         />
 
-        <PagePanel tone="form">
-          <TransferForm
-            spaces={spaces.map((space) => ({
-              id: space.id,
-              name: space.name,
-              currentMonthTotal: space.currentMonthTotal,
-            }))}
-            initialValues={initialValues}
-          />
-        </PagePanel>
+        <NewTransferFormSection initialValues={initialValues} />
       </Stack>
     </Container>
   );

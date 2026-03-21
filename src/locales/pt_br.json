@@ -127,6 +127,7 @@
     "clear_filters": "Limpar filtros",
     "showing_results": "Mostrando %{count} de %{total} lançamentos",
     "results_title": "Lançamentos filtrados",
+    "results_load_failed": "Não foi possível carregar os lançamentos agora.",
     "summary_shown": "Exibidos agora",
     "summary_total": "Correspondências totais",
     "summary_filters": "Filtros ativos",
@@ -327,7 +328,10 @@
     "multiple_tab": "Vários",
     "recent_transactions": "Lançamentos recentes",
     "recent_transactions_subtitle": "Use a atividade recente como referência rápida enquanto cria novos registros.",
-    "open_all_transactions": "Ver todos os lançamentos"
+    "open_all_transactions": "Ver todos os lançamentos",
+    "recent_load_failed": "Não foi possível carregar os lançamentos recentes agora.",
+    "form_load_failed": "Não foi possível carregar os espaços para este formulário.",
+    "transfer_form_load_failed": "Não foi possível carregar os espaços para esta transferência."
   },
   "transaction_detail_page": {
     "title": "Detalhes do lançamento",
@@ -343,7 +347,9 @@
     "back_to_transactions": "Voltar para lançamentos",
     "delete": "Excluir lançamento",
     "deleting": "Excluindo...",
-    "delete_confirm": "Tem certeza de que deseja excluir este lançamento?"
+    "delete_confirm": "Tem certeza de que deseja excluir este lançamento?",
+    "load_failed": "Não foi possível carregar este lançamento agora.",
+    "not_found": "Lançamento não encontrado."
   },
   "space_field": {
     "edit_space_name": "Inserir um nome de espaço personalizado",

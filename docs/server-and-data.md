@@ -184,6 +184,12 @@ Projection now follows the same pattern:
 - chart data fetches separately
 - spaces-with-transactions fetch separately
 
+Transactions now use the same approach across listing, detail, and creation flows:
+
+- the filterable list shell renders from the URL and fetches the results card separately
+- the detail route mounts a client detail section behind an authenticated endpoint
+- new-transaction forms fetch their own space and recent-activity data after mount
+
 This keeps navigation fast while preserving per-user correctness.
 
 ### Detail Page Queries

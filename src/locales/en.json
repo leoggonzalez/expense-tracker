@@ -129,6 +129,7 @@
     "clear_filters": "Clear Filters",
     "showing_results": "Showing %{count} of %{total} transactions",
     "results_title": "Filtered Transactions",
+    "results_load_failed": "Unable to load transactions right now.",
     "search_pill": "Search: %{term}",
     "type_pill": "Type: %{type}",
     "space_pill": "Space: %{space}",
@@ -340,7 +341,10 @@
     "multiple_tab": "Multiple",
     "recent_transactions": "Recent transactions",
     "recent_transactions_subtitle": "Use recent activity as a quick reference while creating new records.",
-    "open_all_transactions": "See all transactions"
+    "open_all_transactions": "See all transactions",
+    "recent_load_failed": "Unable to load recent transactions right now.",
+    "form_load_failed": "Unable to load spaces for this form.",
+    "transfer_form_load_failed": "Unable to load spaces for this transfer."
   },
   "transaction_detail_page": {
     "title": "Transaction details",
@@ -359,7 +363,9 @@
     "delete_confirm": "Are you sure you want to delete this transaction?",
     "delete_dialog_title": "Delete transaction?",
     "delete_dialog_description": "This action cannot be undone.",
-    "cancel_delete": "Cancel"
+    "cancel_delete": "Cancel",
+    "load_failed": "Unable to load this transaction right now.",
+    "not_found": "Transaction not found."
   },
   "space_field": {
     "edit_space_name": "Enter a custom space name",

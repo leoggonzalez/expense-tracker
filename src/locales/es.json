@@ -127,6 +127,7 @@
     "clear_filters": "Limpiar filtros",
     "showing_results": "Mostrando %{count} de %{total} movimientos",
     "results_title": "Movimientos filtrados",
+    "results_load_failed": "No se pueden cargar los movimientos en este momento.",
     "summary_shown": "Mostrados ahora",
     "summary_total": "Coincidencias totales",
     "summary_filters": "Filtros activos",
@@ -327,7 +328,10 @@
     "multiple_tab": "Varios",
     "recent_transactions": "Movimientos recientes",
     "recent_transactions_subtitle": "Usa la actividad reciente como referencia rápida mientras creas nuevos registros.",
-    "open_all_transactions": "Ver todos los movimientos"
+    "open_all_transactions": "Ver todos los movimientos",
+    "recent_load_failed": "No se pueden cargar los movimientos recientes en este momento.",
+    "form_load_failed": "No se pueden cargar los espacios para este formulario.",
+    "transfer_form_load_failed": "No se pueden cargar los espacios para esta transferencia."
   },
   "transaction_detail_page": {
     "title": "Detalles del movimiento",
@@ -343,7 +347,9 @@
     "back_to_transactions": "Volver a movimientos",
     "delete": "Eliminar movimiento",
     "deleting": "Eliminando...",
-    "delete_confirm": "¿Seguro que quieres eliminar este movimiento?"
+    "delete_confirm": "¿Seguro que quieres eliminar este movimiento?",
+    "load_failed": "No se puede cargar este movimiento en este momento.",
+    "not_found": "Movimiento no encontrado."
   },
   "space_field": {
     "edit_space_name": "Introducir un nombre de espacio personalizado",

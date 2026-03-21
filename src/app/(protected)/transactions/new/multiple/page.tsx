@@ -1,19 +1,13 @@
 import {
-  BulkTransactionForm,
   Container,
   TransactionCreationIntro,
   Hero,
-  PagePanel,
 } from "@/components";
-import { getSpaces } from "@/actions/transactions";
+import { NewTransactionFormSection } from "@/app/(protected)/transactions/new/new_transaction_form_section";
 import { Stack } from "@/elements";
 import { i18n } from "@/model/i18n";
 
-export const dynamic = "force-dynamic";
-
 export default async function Page(): Promise<React.ReactElement> {
-  const spaces = await getSpaces();
-
   return (
     <Container>
       <Stack gap={24}>
@@ -28,9 +22,7 @@ export default async function Page(): Promise<React.ReactElement> {
           />
         </Hero>
 
-        <PagePanel tone="form">
-          <BulkTransactionForm spaces={spaces.map((space) => space.name)} />
-        </PagePanel>
+        <NewTransactionFormSection pageType="multiple" />
       </Stack>
     </Container>
   );

@@ -1,6 +1,6 @@
 "use server";
 
-import { addMonths, format } from "date-fns";
+import { addMonths, endOfMonth, format, startOfMonth } from "date-fns";
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
 import { normalizeTransactionAmount } from "@/lib/amount";
@@ -120,6 +120,49 @@ export type ProjectionSpacesPayload = {
   focusedMonthSpaces: ProjectionFocusedSpace[];
 };
 
+export type TransactionsPagePayload = {
+  spaces: Array<{
+    id: string;
+    name: string;
+  }>;
+  transactions: FilteredTransactionListItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+export type TransactionDetailPayload = {
+  id: string;
+  type: string;
+  spaceId: string;
+  spaceName: string;
+  transferSpaceId: string | null;
+  transferSpaceName: string | null;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+};
+
+export type NewTransactionRecentPayload = {
+  recentTransactions: DashboardTransactionItem[];
+};
+
+export type NewTransactionSpacesPayload = {
+  spaces: string[];
+};
+
+export type NewTransferSpacesPayload = {
+  spaces: Array<{
+    id: string;
+    name: string;
+    currentMonthTotal: number;
+  }>;
+};
+
 type TransactionListWithPagination = {
   transactions: FilteredTransactionListItem[];
   pagination: {
@@ -231,6 +274,23 @@ function serializeDashboardTransaction(
     transferSpaceName: transaction.transferSpace?.name || null,
     createdAt: transaction.createdAt.toISOString(),
     updatedAt: transaction.updatedAt.toISOString(),
+  };
+}
+
+function serializeTransactionDetail(
+  transaction: TransactionWithSpaceRecord,
+): TransactionDetailPayload {
+  return {
+    id: transaction.id,
+    type: transaction.type,
+    spaceId: transaction.spaceId,
+    spaceName: transaction.space.name,
+    transferSpaceId: transaction.transferSpaceId,
+    transferSpaceName: transaction.transferSpace?.name || null,
+    description: transaction.description,
+    amount: transaction.amount,
+    beginDate: transaction.beginDate.toISOString(),
+    endDate: transaction.endDate?.toISOString() || null,
   };
 }
 
@@ -575,6 +635,88 @@ export async function getDashboardRecentActivityPayloadForUser(
     recentTransactions: dashboardData.recentTransactions.map(
       serializeDashboardTransaction,
     ),
+  };
+}
+
+export async function getTransactionsPagePayloadForUser(
+  userAccountId: string,
+  filters: TransactionFiltersInput,
+): Promise<TransactionsPagePayload> {
+  const [result, spaces] = await Promise.all([
+    Transaction.getFilteredTransactionsForUser(userAccountId, filters),
+    Space.listActiveByUser(userAccountId),
+  ]);
+
+  return {
+    spaces: spaces.map((space) => {
+      const spaceRecord = space.toRecord();
+
+      return {
+        id: spaceRecord.id,
+        name: spaceRecord.name,
+      };
+    }),
+    transactions: result.transactions.map(serializeFilteredTransaction),
+    pagination: {
+      page: result.page,
+      limit: result.limit,
+      total: result.total,
+      totalPages: Math.ceil(result.total / result.limit),
+    },
+  };
+}
+
+export async function getTransactionDetailPayloadForUser(
+  userAccountId: string,
+  id: string,
+): Promise<TransactionDetailPayload | null> {
+  const transaction = await Transaction.findWithSpaceByIdForUser(userAccountId, id);
+
+  if (!transaction) {
+    return null;
+  }
+
+  return serializeTransactionDetail(transaction);
+}
+
+export async function getNewTransactionRecentPayloadForUser(
+  userAccountId: string,
+): Promise<NewTransactionRecentPayload> {
+  const transactions = await Transaction.listRecentByUser(userAccountId, 5);
+
+  return {
+    recentTransactions: transactions.map(serializeDashboardTransaction),
+  };
+}
+
+export async function getNewTransactionSpacesPayloadForUser(
+  userAccountId: string,
+): Promise<NewTransactionSpacesPayload> {
+  const spaces = await Space.listActiveByUser(userAccountId);
+
+  return {
+    spaces: spaces.map((space) => space.toRecord().name),
+  };
+}
+
+export async function getNewTransferSpacesPayloadForUser(
+  userAccountId: string,
+): Promise<NewTransferSpacesPayload> {
+  const monthStart = startOfMonth(new Date());
+  const monthEnd = endOfMonth(monthStart);
+  const spaces = await Space.listByArchiveStateWithMonthTotals(
+    userAccountId,
+    false,
+    monthStart,
+    monthEnd,
+  );
+
+  return {
+    spaces: spaces.map((space) => ({
+      id: space.id,
+      name: space.name,
+      currentMonthTotal: space.currentMonthTotal,
+    })),
   };
 }
 
