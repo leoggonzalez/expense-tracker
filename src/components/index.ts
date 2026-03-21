@@ -14,9 +14,6 @@ export type { CheckboxProps } from "./checkbox/checkbox";
 export { Autocomplete } from "./autocomplete/autocomplete";
 export type { AutocompleteProps } from "./autocomplete/autocomplete";
 
-export { DashboardHero } from "./dashboard_hero/dashboard_hero";
-export { DashboardPanels } from "./dashboard_panels/dashboard_panels";
-
 export { ProjectionTable } from "./projection_table/projection_table";
 export type { ProjectionTableProps } from "./projection_table/projection_table";
 export { ProjectionChart } from "./projection_chart/projection_chart";
@@ -76,9 +73,6 @@ export { PagePanel } from "./page_panel/page_panel";
 export { TransactionTypeTabs } from "./transaction_type_tabs/transaction_type_tabs";
 export { TransactionCreationIntro } from "./transaction_creation_intro/transaction_creation_intro";
 export { DetailList, DetailRow } from "./detail_list/detail_list";
-export { UpcomingPaymentsPanel } from "./upcoming_payments_panel/upcoming_payments_panel";
-export { RecentActivityPanel } from "./recent_activity_panel/recent_activity_panel";
-
 export { Container } from "./container/container";
 export type { ContainerProps } from "./container/container";
 export { Avatar } from "./avatar/avatar";

@@ -4,6 +4,7 @@ const path = require("path");
 
 const ALLOWED_FILES = [
   path.normalize("src/elements/box/box.tsx"),
+  path.normalize("src/elements/card/card.tsx"),
   path.normalize("src/elements/grid/grid.tsx"),
   path.normalize("src/elements/icon/icon.tsx"),
   path.normalize("src/elements/stack/stack.tsx"),

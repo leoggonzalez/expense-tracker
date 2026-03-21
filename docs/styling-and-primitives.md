@@ -22,7 +22,7 @@ This chapter defines Currento's styling system, component ownership rules, and l
 ## Inline Style Rules
 
 - Do not use inline styling in JSX or TSX.
-- The only approved inline-style exception is internal CSS custom property plumbing inside shared layout primitives such as `Stack`, `Box`, and `Grid`.
+- The only approved inline-style exception is internal CSS custom property plumbing inside shared primitives such as `Stack`, `Box`, `Grid`, and `Card`.
 - That exception is internal implementation detail only, never a public `style` prop escape hatch.
 
 Not preferred:

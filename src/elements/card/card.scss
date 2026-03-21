@@ -2,7 +2,7 @@
 
 .card {
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--card-radius, var(--border-radius-lg));
   box-shadow: var(--shadow-sm);
 
   &--default {
@@ -16,14 +16,6 @@
   &--dashed {
     border-style: dashed;
     background-color: var(--color-surface-muted);
-  }
-
-  &--radius-xl {
-    border-radius: 24px;
-  }
-
-  &--radius-2xl {
-    border-radius: 28px;
   }
 
   &--full-height {

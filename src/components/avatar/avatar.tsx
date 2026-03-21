@@ -1,7 +1,7 @@
 import "./avatar.scss";
 
 import React from "react";
-import { Stack, Text } from "@/elements";
+import { Stack } from "@/elements";
 
 type AvatarProps = {
   name: string;
@@ -27,9 +27,7 @@ export function Avatar({ name }: AvatarProps): React.ReactElement {
   return (
     <span className="avatar" aria-label={name} title={name}>
       <Stack align="center" justify="center" fullWidth fullHeight>
-        <Text as="span" size="xs" weight="semibold" transform="uppercase">
-          {initials}
-        </Text>
+        <span className="avatar__initials">{initials}</span>
       </Stack>
     </span>
   );

@@ -15,7 +15,7 @@ export function PagePanel({
 }: PagePanelProps): React.ReactElement {
   return (
     <div className={`page-panel page-panel--${tone}`}>
-      <Card padding={24} radius="2xl">
+      <Card padding={24} radius={28}>
         {children}
       </Card>
     </div>
