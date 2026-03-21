@@ -158,6 +158,27 @@ Preferred patterns:
 - Reuse shared date-bound helpers when they represent the same business rule.
 - Avoid loading the same record multiple times within one request path.
 
+### Hybrid Protected Shell Pattern
+
+When a protected page should feel instant on navigation, prefer a static shell plus client-mounted personalized sections over a single server-rendered page payload.
+
+Rules:
+
+- keep the route shell free of personalized values
+- split personalized reads by section rather than keeping one large page payload
+- prefer authenticated route handlers for client-mounted read fetching
+- return `401` JSON from those handlers when auth is missing or expired
+- mark personalized route responses as private and `no-store`
+- keep server actions thin by shaping section payloads from shared model methods or adjacent read helpers
+
+The dashboard is the reference implementation for this pattern:
+
+- header summary fetches separately
+- upcoming payments fetch separately
+- recent activity fetches separately
+
+This keeps navigation fast while preserving per-user correctness.
+
 ### Detail Page Queries
 
 Prefer a dedicated detail-query method when a page needs:

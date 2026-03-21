@@ -104,6 +104,26 @@ This final major pass renamed the domain to the cleaner Currento vocabulary:
 
 It also modernized backend classes, updated routes and UI, aligned color variables, and increased primitive usage. This is the clearest milestone for the current 1.0 shape of the app.
 
+## Phase 9: Hybrid Protected Navigation
+
+The next architectural step after 1.0 is the hybrid protected-page pattern:
+
+- keep the protected route shell static when it contains no personalized values
+- move personalized data into independently fetched client sections
+- prefer authenticated route handlers for those section reads
+- keep titles, icons, descriptions, and actions visible immediately
+- use shimmer placeholders only for the data-bearing region
+
+The dashboard is the first reference migration for this approach.
+
+Migration steps for future pages:
+
+1. Remove page-level personalized data fetching from the route shell.
+2. Keep only static chrome in the shell.
+3. Split personalized reads into section-level server helpers and authenticated route handlers.
+4. Mount client section components that fetch, cache the last successful payload, and revalidate on mount.
+5. Keep `401` handling explicit and isolate non-auth failures to the affected section.
+
 ## Why This History Matters
 
 The important lesson is not just that features were added. The repo steadily moved toward:

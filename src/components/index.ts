@@ -48,6 +48,7 @@ export { TransactionsPagination } from "./transactions_pagination/transactions_p
 export { Hero } from "./hero/hero";
 export type { HeroAction, HeroPattern, HeroProps } from "./hero/hero";
 export { HeroMetric, HeroMetrics } from "./hero_metrics/hero_metrics";
+export { LoadingSkeleton } from "./loading_skeleton/loading_skeleton";
 export { ToastProvider, useToast } from "./toast_provider/toast_provider";
 
 export { AuthFormShell } from "./auth_form_shell/auth_form_shell";

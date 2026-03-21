@@ -35,9 +35,12 @@
     "hero_caption": "Ingresos menos gastos en todos los espacios activos.",
     "hero_add_action": "Añadir",
     "hero_more_action": "Más",
+    "header_load_failed": "No se puede cargar el resumen del panel en este momento.",
     "upcoming_payments": "Próximos pagos",
     "upcoming_payments_empty": "No quedan gastos programados para este mes.",
+    "upcoming_load_failed": "No se pueden cargar los próximos pagos en este momento.",
     "upcoming_payments_link": "Ver todos los gastos",
+    "recent_activity_load_failed": "No se puede cargar la actividad reciente en este momento.",
     "recent_activity_link": "Explorar movimientos",
     "payment_due": "Vence %{date}",
     "activity_subtitle": "Últimos cambios en tus movimientos."
@@ -348,7 +351,8 @@
     "income": "Ingreso",
     "expense": "Gasto",
     "transfer": "Transferencia",
-    "add_transaction": "Añadir movimiento"
+    "add_transaction": "Añadir movimiento",
+    "retry": "Reintentar"
   },
   "toast": {
     "transaction_created": "Movimiento creado.",

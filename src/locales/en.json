@@ -35,9 +35,12 @@
     "hero_caption": "Income minus expenses across all active spaces.",
     "hero_add_action": "Add",
     "hero_more_action": "More",
+    "header_load_failed": "Unable to load the dashboard summary right now.",
     "upcoming_payments": "Upcoming Payments",
     "upcoming_payments_empty": "No scheduled expenses remain for this month.",
+    "upcoming_load_failed": "Unable to load upcoming payments right now.",
     "upcoming_payments_link": "View all expenses",
+    "recent_activity_load_failed": "Unable to load recent activity right now.",
     "recent_activity_link": "Browse transactions",
     "payment_due": "Due %{date}",
     "activity_subtitle": "Latest changes across your transactions."
@@ -363,7 +366,8 @@
     "income": "Income",
     "expense": "Expense",
     "transfer": "Transfer",
-    "add_transaction": "Add transaction"
+    "add_transaction": "Add transaction",
+    "retry": "Retry"
   },
   "toast": {
     "transaction_created": "Transaction created.",

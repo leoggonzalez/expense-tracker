@@ -32,7 +32,7 @@ Enforced rules:
 - `component-export-style`: prefers exported function declarations over arrow-function components
 - `component-return-type`: requires explicit `React.ReactElement` return types on exported components
 - `component-props-shape`: requires explicit named props types or interfaces
-- `no-inline-style-prop`: disallows inline `style` props outside approved primitive exceptions such as `Box`, `Grid`, `Stack`, and `Card`
+- `no-inline-style-prop`: disallows inline `style` props outside approved primitive exceptions such as `Box`, `Grid`, `Stack`, `Card`, and shared loading primitives like `LoadingSkeleton`
 - `no-disallowed-component-props`: blocks `style` and `className` props on shared components and elements
 - `no-page-component-name`: blocks route-like wrapper components such as `*_page`
 - `no-hardcoded-ui-strings`: warns on user-facing copy that should move into locales

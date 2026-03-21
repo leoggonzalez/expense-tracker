@@ -20,6 +20,25 @@ import { requireCurrentUserAccount } from "@/lib/session";
 
 export type { CreateTransactionInput, CreateTransferInput, DashboardTotals };
 
+export type DashboardDateRange = {
+  startDate: string;
+  endDate: string;
+};
+
+export type DashboardTransactionItem = {
+  id: string;
+  type: string;
+  spaceName: string;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+  transferSpaceId: string | null;
+  transferSpaceName: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type SerializedProjectionTransaction = {
   id: string;
   type: string;
@@ -34,36 +53,24 @@ export type SerializedProjectionTransaction = {
 
 export type DashboardPayload = {
   totals: DashboardTotals;
-  recentTransactions: Array<{
-    id: string;
-    type: string;
-    spaceName: string;
-    description: string;
-    amount: number;
-    beginDate: string;
-    endDate: string | null;
-    transferSpaceId: string | null;
-    transferSpaceName: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  upcomingPayments: Array<{
-    id: string;
-    type: string;
-    spaceName: string;
-    description: string;
-    amount: number;
-    beginDate: string;
-    endDate: string | null;
-    transferSpaceId: string | null;
-    transferSpaceName: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  currentMonthRange: {
-    startDate: string;
-    endDate: string;
-  };
+  recentTransactions: DashboardTransactionItem[];
+  upcomingPayments: DashboardTransactionItem[];
+  currentMonthRange: DashboardDateRange;
+};
+
+export type DashboardHeaderPayload = {
+  totals: DashboardTotals;
+  currentMonthRange: DashboardDateRange;
+};
+
+export type DashboardUpcomingPayload = {
+  currentMonthRange: DashboardDateRange;
+  upcomingPayments: DashboardTransactionItem[];
+};
+
+export type DashboardRecentActivityPayload = {
+  currentMonthRange: DashboardDateRange;
+  recentTransactions: DashboardTransactionItem[];
 };
 
 export type ProjectionMonthTransaction = {
@@ -204,7 +211,9 @@ function serializeProjectionTransaction(
   };
 }
 
-function serializeDashboardTransaction(transaction: TransactionWithSpaceRecord) {
+function serializeDashboardTransaction(
+  transaction: TransactionWithSpaceRecord,
+): DashboardTransactionItem {
   return {
     id: transaction.id,
     type: transaction.type,
@@ -217,6 +226,16 @@ function serializeDashboardTransaction(transaction: TransactionWithSpaceRecord) 
     transferSpaceName: transaction.transferSpace?.name || null,
     createdAt: transaction.createdAt.toISOString(),
     updatedAt: transaction.updatedAt.toISOString(),
+  };
+}
+
+function serializeDashboardDateRange(
+  monthStart: Date,
+  monthEnd: Date,
+): DashboardDateRange {
+  return {
+    startDate: format(monthStart, "yyyy-MM-dd"),
+    endDate: format(monthEnd, "yyyy-MM-dd"),
   };
 }
 
@@ -262,7 +281,9 @@ function mapProjectionSpaces(
       return;
     }
 
-    existing.transactions.push(serializeProjectionMonthTransactionRow(transaction));
+    existing.transactions.push(
+      serializeProjectionMonthTransactionRow(transaction),
+    );
   });
 
   return Array.from(spaceMap.values())
@@ -422,7 +443,10 @@ export async function getProjectionPagePayload(
 
   const chartMonths: ProjectionChartMonth[] = projectionData.chartRows.map(
     (row, index) => {
-      const monthStart = addMonths(projectionData.normalizedFocusedMonthStart, index);
+      const monthStart = addMonths(
+        projectionData.normalizedFocusedMonthStart,
+        index,
+      );
       const income = Number(row.income || 0);
       const expense = Number(row.expense || 0);
 
@@ -470,10 +494,59 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
     upcomingPayments: dashboardData.upcomingPayments.map(
       serializeDashboardTransaction,
     ),
-    currentMonthRange: {
-      startDate: format(dashboardData.monthStart, "yyyy-MM-dd"),
-      endDate: format(dashboardData.monthEnd, "yyyy-MM-dd"),
-    },
+    currentMonthRange: serializeDashboardDateRange(
+      dashboardData.monthStart,
+      dashboardData.monthEnd,
+    ),
+  };
+}
+
+export async function getDashboardHeaderPayloadForUser(
+  userAccountId: string,
+): Promise<DashboardHeaderPayload> {
+  const dashboardData =
+    await Transaction.getDashboardHeaderQueryData(userAccountId);
+
+  return {
+    totals: dashboardData.totals,
+    currentMonthRange: serializeDashboardDateRange(
+      dashboardData.monthStart,
+      dashboardData.monthEnd,
+    ),
+  };
+}
+
+export async function getDashboardUpcomingPayloadForUser(
+  userAccountId: string,
+): Promise<DashboardUpcomingPayload> {
+  const dashboardData =
+    await Transaction.getDashboardUpcomingQueryData(userAccountId);
+
+  return {
+    currentMonthRange: serializeDashboardDateRange(
+      dashboardData.monthStart,
+      dashboardData.monthEnd,
+    ),
+    upcomingPayments: dashboardData.upcomingPayments.map(
+      serializeDashboardTransaction,
+    ),
+  };
+}
+
+export async function getDashboardRecentActivityPayloadForUser(
+  userAccountId: string,
+): Promise<DashboardRecentActivityPayload> {
+  const dashboardData =
+    await Transaction.getDashboardRecentActivityQueryData(userAccountId);
+
+  return {
+    currentMonthRange: serializeDashboardDateRange(
+      dashboardData.monthStart,
+      dashboardData.monthEnd,
+    ),
+    recentTransactions: dashboardData.recentTransactions.map(
+      serializeDashboardTransaction,
+    ),
   };
 }
 
@@ -550,10 +623,9 @@ export async function updateTransaction(
   } catch (error) {
     if (
       error instanceof Error &&
-      [
-        "failed_to_update_transaction",
-        "space_is_archived",
-      ].includes(error.message)
+      ["failed_to_update_transaction", "space_is_archived"].includes(
+        error.message,
+      )
     ) {
       return { success: false, error: error.message };
     }

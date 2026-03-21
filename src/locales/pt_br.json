@@ -35,9 +35,12 @@
     "hero_caption": "Receitas menos despesas em todos os espaços ativos.",
     "hero_add_action": "Adicionar",
     "hero_more_action": "Mais",
+    "header_load_failed": "Não foi possível carregar o resumo do painel agora.",
     "upcoming_payments": "Próximos pagamentos",
     "upcoming_payments_empty": "Não restam despesas programadas para este mês.",
+    "upcoming_load_failed": "Não foi possível carregar os próximos pagamentos agora.",
     "upcoming_payments_link": "Ver todas as despesas",
+    "recent_activity_load_failed": "Não foi possível carregar a atividade recente agora.",
     "recent_activity_link": "Explorar lançamentos",
     "payment_due": "Vence em %{date}",
     "activity_subtitle": "Últimas alterações nos seus lançamentos."
@@ -348,7 +351,8 @@
     "income": "Receita",
     "expense": "Despesa",
     "transfer": "Transferência",
-    "add_transaction": "Adicionar lançamento"
+    "add_transaction": "Adicionar lançamento",
+    "retry": "Tentar novamente"
   },
   "toast": {
     "transaction_created": "Lançamento criado.",

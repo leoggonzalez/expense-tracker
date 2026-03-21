@@ -72,6 +72,8 @@ $breakpoint-desktop: 1280px;
   --color-avatar-background-end: #d9f7ea;
   --color-avatar-border: rgba(2, 88, 100, 0.18);
   --color-avatar-foreground: #01434d;
+  --color-skeleton-base: rgba(255, 255, 255, 0.12);
+  --color-skeleton-highlight: rgba(255, 255, 255, 0.24);
   --shadow-success-button: 0 14px 24px 0 rgba(0, 212, 126, 0.22);
   --shadow-nav-primary-action: 0 10px 18px 0 rgba(0, 191, 114, 0.22);
 
@@ -211,6 +213,8 @@ $breakpoint-desktop: 1280px;
   --color-avatar-background-end: #c8eef2;
   --color-avatar-border: rgba(200, 238, 242, 0.38);
   --color-avatar-foreground: #0b3a42;
+  --color-skeleton-base: rgba(255, 255, 255, 0.08);
+  --color-skeleton-highlight: rgba(255, 255, 255, 0.18);
   --shadow-success-button: 0 14px 24px 0 rgba(0, 212, 126, 0.22);
   --shadow-nav-primary-action: 0 10px 18px 0 rgba(0, 191, 114, 0.22);
 

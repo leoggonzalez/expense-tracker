@@ -103,10 +103,7 @@ function checkSnakeCase(relativePath) {
       continue;
     }
 
-    if (
-      relativePath.startsWith("src/app/") &&
-      isKebabCaseName(part)
-    ) {
+    if (relativePath.startsWith("src/app/") && isKebabCaseName(part)) {
       continue;
     }
 
@@ -145,7 +142,9 @@ function checkPairedBasenames(allFiles) {
 
   for (const [directory, basenames] of byDirectory.entries()) {
     const tsxFiles = basenames.filter((basename) => basename.endsWith(".tsx"));
-    const scssFiles = basenames.filter((basename) => basename.endsWith(".scss"));
+    const scssFiles = basenames.filter((basename) =>
+      basename.endsWith(".scss"),
+    );
 
     if (tsxFiles.length === 1 && scssFiles.length === 1) {
       const tsxBase = tsxFiles[0].replace(/\.tsx$/, "");
@@ -200,8 +199,13 @@ function checkDynamicProtectedPages(allFiles) {
     }
 
     const content = fs.readFileSync(absolutePath, "utf8");
+    const usesServerDataDirectly =
+      content.includes('from "@/actions/') || content.includes("await ");
 
-    if (!content.includes('export const dynamic = "force-dynamic"')) {
+    if (
+      usesServerDataDirectly &&
+      !content.includes('export const dynamic = "force-dynamic"')
+    ) {
       warnings.push(
         `${relativePath}: authenticated protected pages should usually declare export const dynamic = "force-dynamic".`,
       );
@@ -213,7 +217,10 @@ function checkRouteWrapperHeuristics(allFiles) {
   for (const absolutePath of allFiles) {
     const relativePath = toPosixPath(path.relative(projectRoot, absolutePath));
 
-    if (!relativePath.startsWith("src/components/") || !relativePath.endsWith(".tsx")) {
+    if (
+      !relativePath.startsWith("src/components/") ||
+      !relativePath.endsWith(".tsx")
+    ) {
       continue;
     }
 

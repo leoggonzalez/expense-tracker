@@ -8,6 +8,7 @@ const ALLOWED_FILES = [
   path.normalize("src/elements/grid/grid.tsx"),
   path.normalize("src/elements/icon/icon.tsx"),
   path.normalize("src/elements/stack/stack.tsx"),
+  path.normalize("src/components/loading_skeleton/loading_skeleton.tsx"),
   path.normalize("src/app/icon.tsx"),
   path.normalize("src/app/apple-icon.tsx"),
 ];
