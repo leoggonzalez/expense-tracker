@@ -1,247 +1,45 @@
 # Repo Coding Guidelines
 
-This file is the canonical source of truth for coding conventions in this repository.
+This file remains the repo-level entrypoint for coding standards, but the detailed handbook now lives under `docs/`.
 
-New code must follow these rules immediately. Existing code that does not comply should be updated when touched for feature work or refactors unless the required migration would make the change disproportionately large. In those cases, follow the migration policy in this document and isolate the cleanup into a dedicated follow-up change.
+## Start Here
 
-Supplementary guidance for server actions, shared model classes, and database-access structure lives in `SERVER_GUIDELINES.md`. Use that file when designing or refactoring table-backed server/data flows. If there is a conflict, this file still takes precedence.
+- [docs/index.md](./docs/index.md)
+- [docs/filesystem-and-imports.md](./docs/filesystem-and-imports.md)
+- [docs/components.md](./docs/components.md)
+- [docs/styling-and-primitives.md](./docs/styling-and-primitives.md)
+- [docs/routing-state-and-localisation.md](./docs/routing-state-and-localisation.md)
+- [docs/server-and-data.md](./docs/server-and-data.md)
+- [docs/validation-linting-and-skills.md](./docs/validation-linting-and-skills.md)
+- [docs/tech-stack.md](./docs/tech-stack.md)
+- [docs/project-history.md](./docs/project-history.md)
+- [docs/new-project-quickstart.md](./docs/new-project-quickstart.md)
 
-## Naming Conventions
+## Core Rules
 
-- All new filenames must use `snake_case`.
-- React component directories and component files must both use `snake_case`.
-- SCSS files paired to components must use the same basename as the component file.
-- Type, interface, and type-alias names stay PascalCase in code.
-- React component identifiers stay PascalCase in code even when the file is `snake_case`.
+- New files must follow the current conventions immediately.
+- Existing files should be updated toward compliance when touched for feature work or refactors.
+- Large mechanical migrations should be isolated into dedicated cleanup changesets.
+- If a detailed topic exists in `docs/`, prefer that page over this summary.
 
-Examples:
+## High-Level Standards
 
-- `src/components/navigation/navigation.tsx`
-- `src/components/navigation/navigation.scss`
-- `src/app/entries/all/page.tsx` remains valid because Next.js route filenames are framework-defined and should remain framework-compliant.
+- Use `snake_case` for new non-framework filenames.
+- Use `@/` for internal imports under `src/`.
+- Prefer function-declaration components with explicit `React.ReactElement` return types.
+- Do not use `React.FC`.
+- Keep styling component-owned, mobile-first, and free from public `style` or `className` escape hatches.
+- Do not add route-owned SCSS under `src/app`.
+- Keep filter, search, sort, and pagination state in the URL when it changes page content.
+- Treat authenticated user pages as dynamic and per-request.
+- Put all user-facing copy in `src/locales/en.json` before use.
 
-## Import Conventions
+## Related Guidance
 
-- Internal imports must use the `@/` alias whenever the target resolves under `src/`.
-- Relative imports are allowed only when `@/` cannot express the import cleanly because the target is outside `src/` or a framework convention requires a local relative path.
-- Barrel files may remain temporarily, but imports from them must also use `@/`.
+Backend and database-access structure lives in [`SERVER_GUIDELINES.md`](./SERVER_GUIDELINES.md) and in the detailed backend chapter at [docs/server-and-data.md](./docs/server-and-data.md).
 
-Examples:
+## Exceptions
 
-Preferred:
-
-```ts
-import { Container } from "@/components";
-```
-
-Not preferred:
-
-```ts
-import { Container } from "../Container/Container";
-```
-
-## React Component Conventions
-
-- Prefer function declarations over arrow-function components.
-- Exported React components must declare the return type as `React.ReactElement`.
-- Do not use `React.FC` for component typing.
-- Props must be declared with an explicit `type` or `interface`.
-- Local helper callbacks inside components may use arrow functions when that is the clearest option. The function-declaration preference applies primarily to exported components and shared helpers.
-
-Canonical example:
-
-```tsx
-type NavigationProps = {
-  // props here
-};
-
-export function Navigation(props: NavigationProps): React.ReactElement {
-  return <nav />;
-}
-```
-
-## React Compiler And Effects
-
-- React Compiler is enabled repo-wide and should be assumed active for all React code.
-- Do not add `useMemo`, `useCallback`, or `React.memo` by default.
-- Only keep or add manual memoization when there is a demonstrated reason the compiler does not cover, and document that reason inline.
-- `useEffect` is an escape hatch and should be used sparingly.
-- Before adding an effect, first try:
-  - deriving values during render
-  - moving logic into event handlers
-  - lifting data loading to route/server composition
-  - using framework state such as URL search params when appropriate
-- Avoid effects for:
-  - derived state
-  - mirroring props or state into more state
-  - post-processing render data
-  - user-event logic that can run directly in handlers
-- Legitimate effects are limited to synchronization with external systems such as DOM subscriptions, timers, browser storage, `matchMedia`, and async work that cannot be expressed through framework data loading.
-
-## Styling And Composition Conventions
-
-- All component styling must be mobile-first. Base styles target phones first, then layer larger-screen adjustments with media queries.
-- The only standard responsive breakpoints are:
-  - tablet: `min-width: 768px`
-  - desktop: `min-width: 1280px`
-- Prefer flat-design UI treatments across the app. Avoid heavy shadows, glassmorphism, decorative gradients, and lift-on-hover effects unless a change documents a clear exception.
-- Do not use inline styling in JSX or TSX. Avoid patterns such as `style={{ ... }}` and other inline style props.
-- The only allowed inline-style exception is declaring CSS custom properties inside shared layout primitives. This exception is for primitives such as `Stack`, `Box`, and `Grid`, not for page or feature components.
-- Components under `src/components/*` and shared primitives under `src/elements/*` must not expose `style` or `className` props.
-- UI component styling must be owned internally by the component via paired SCSS files and semantic props, not consumer-supplied class hooks.
-- The only allowed inline-style exception is internal CSS custom property plumbing required by shared layout primitives (`Stack`, `Box`, `Grid`) and similar internal primitive implementation details, never as a public prop.
-- If layout, spacing, or presentation is needed, express it through component markup and SCSS classes, not inline style objects or page-local wrapper styling.
-- Use the shared layout primitives for general layout work:
-  - `Stack` for flex layout and wrapping
-  - `Box` for box layout with padding and max-width controls
-  - `Grid` for CSS grid layout
-- Prefer component-owned SCSS files paired with the component that owns the markup.
-- `src/app` is for route entrypoints, data loading, and page-level composition. Route files such as `page.tsx` may own the structure of the route they render.
-- Route files may compose shared components and layout primitives directly when building a page.
-- Do not create components whose purpose is to represent or style an entire route screen. Components ending in `_page` are prohibited.
-- Reusable styling abstractions must represent a repeated section or pattern, not a whole page.
-- Reusable or rendered UI sections with their own markup and styling must live under `src/components`, even when they are currently used by only one route.
-- Do not add new `.scss` files under `src/app`. Non-global styling belongs in `src/components/<component>/<component>.scss`.
-- Do not add page-specific SCSS or other route-owned styling files under `src/components/*_page`; whole-page components are not part of the architecture.
-- Global application styles imported from `src/styles` remain valid. The prohibition applies to page-local SCSS under `src/app`, not shared global styles.
-
-## Validation Conventions
-
-- Do not run a full production build after every change by default. Frequent `yarn build` runs interrupt the live development process and should be reserved for meaningful checkpoints.
-- Prefer validating with the smallest relevant check while iterating, then run broader validation once a coherent batch of work is ready.
-- Use `yarn build` for final verification before handoff, when changing routing/build-sensitive behavior, or when investigating a production-only issue.
-
-## Routing And State Conventions
-
-- Page-level filter, search, sort, and pagination state that materially changes page content must live in the URL query string.
-- Pages with filterable content must read their initial state from the URL and update the URL when filters change.
-- Reload, bookmark, and browser back/forward navigation must preserve the same filtered result set.
-- “Clear filters” actions must reset both the visible controls and the related query parameters.
-- Pages that render authenticated, user-specific data must not rely on static rendering defaults. Treat account, entry, dashboard, projection, and settings pages as per-request/dynamic pages to avoid cross-user data leakage.
-
-Examples:
-
-Preferred:
-
-```tsx
-// src/app/(protected)/entries/page.tsx
-import { EntriesFilters, EntriesTable, Hero } from "@/components";
-import { Card, Stack } from "@/elements";
-
-export default async function Page(): Promise<React.ReactElement> {
-  return (
-    <Stack gap={24}>
-      <Hero icon="entries" title="..." pattern="entries">
-        ...
-      </Hero>
-      <Card padding={24}>
-        <EntriesFilters
-          accounts={[]}
-          filters={{ account: "", type: "", startDate: "", endDate: "" }}
-        />
-      </Card>
-      <Card padding={24}>
-        <EntriesTable entries={[]} />
-      </Card>
-    </Stack>
-  );
-}
-```
-
-```text
-src/components/entry_list/entry_list.tsx
-src/components/entry_list/entry_list.scss
-src/components/hero_metrics/hero_metrics.tsx
-src/components/hero_metrics/hero_metrics.scss
-```
-
-Not preferred:
-
-```tsx
-<div style={{ display: "grid", gap: "32px" }} />
-```
-
-```text
-src/components/route_dashboard/route_dashboard.tsx
-src/components/route_dashboard/route_dashboard.scss
-src/components/settings_route/settings_route.tsx
-src/components/settings_route/settings_route.scss
-```
-
-## Localization Conventions
-
-- `src/locales/en.json` is the canonical source for English UI copy.
-- All user-facing text must come from locale messages instead of hardcoded JSX strings, page metadata strings, or other inline literals.
-- New features must add their strings to `src/locales/en.json` before using them.
-- The repository will adopt a formal i18n runtime later, but new hardcoded UI strings are already prohibited.
-
-Message key rules:
-
-- Use feature-based namespaces such as `navigation.dashboard`, `navigation.projection`, and `dashboard.current_month_overview`.
-- Use `lower_snake_case` for leaf keys.
-- Prefer semantic names over literal text fragments.
-
-Future localization contract:
-
-- Source message file: `src/locales/en.json`
-- Message key style: feature-based `lower_snake_case`
-- Future runtime integration must read from that file or a compatible structure
-
-## Migration Policy
-
-- New files must be compliant immediately.
-- Existing files should be made compliant when they are edited for feature work or refactors.
-- Avoid broad mechanical renames mixed into unrelated product changes.
-- Large migrations must be split into dedicated follow-up changesets grouped by concern.
-
-Recommended migration groupings:
-
-- filename normalization
-- import normalization
-- component signature normalization
-- localization rollout
-- styling normalization
-- app-to-components extraction
-
-Known gaps in the current codebase:
-
-- Component and model filenames are currently mostly PascalCase.
-- Several files still use relative internal imports.
-- Many components use `React.FC` and arrow-function exports.
-- UI copy and metadata strings are currently hardcoded.
-- No i18n runtime is present today.
-- Some route files still use inline JSX `style` props.
-- Some presentational UI and SCSS still live under `src/app`.
-- `src/app/entries/page.tsx` currently uses inline styles and should move that presentation into component classes.
-- `src/elements/stack/stack.tsx` and `src/elements/box/box.tsx` rely on inline styles internally to wire CSS custom properties and should remain internal-only (no public style prop exposure).
-- Several UI components still accept `className` props and should be normalized when touched or via dedicated cleanup changesets.
-
-## Exceptions and Framework Constraints
-
-- Next.js special files such as `page.tsx` and `layout.tsx` keep their framework-required names.
+- Next.js special files such as `page.tsx`, `layout.tsx`, `route.ts`, `icon.tsx`, and `apple-icon.tsx` keep framework-required names.
 - Prisma files follow Prisma conventions.
-- Temporary exceptions must be documented in the relevant change description and must not be introduced silently.
-
-## Review Scenarios
-
-Use these scenarios when reviewing future changes against this document:
-
-- A new component author should be able to determine the correct filename, import style, and component signature without making additional decisions.
-- A contributor touching an old PascalCase component should be able to determine whether to rename it in the same change or defer it into a dedicated migration.
-- A contributor adding new UI text should be able to determine that hardcoded strings are disallowed and that the English source belongs in `src/locales/en.json`.
-- A contributor working in `src/app/layout.tsx` should be able to distinguish between a framework exception such as `layout.tsx` and a non-exception such as hardcoded metadata strings.
-- A contributor adding spacing or layout to a page should be able to determine that inline `style` props are disallowed and that page structure may be composed directly in the route from shared components and primitives.
-- A contributor creating a rendered UI block under `src/app` should be able to determine that it belongs in `src/components`.
-- A reviewer should be able to reject a page-local `.scss` file under `src/app` unless it is a documented framework exception.
-- A reviewer should be able to reject a new component whose purpose is to render or style an entire route page.
-- A reviewer should be able to reject any new `style` or `className` prop added to a component under `src/components/*` or `src/elements/*`.
-- A contributor needing flex, box, or grid layout should be able to choose `Stack`, `Box`, or `Grid` instead of adding ad hoc inline styles.
-- A contributor creating a responsive component should be able to determine that phone styles come first, tablet changes begin at `768px`, and desktop changes begin at `1280px`.
-
-## Assumptions and Defaults
-
-- This file is the canonical repo-level standard instead of `CODE_GUIDELINES.md` or `docs/code_guidelines.md`.
-- This phase defines both the rules and the migration policy.
-- `src/locales/en.json` is standardized now, but the i18n runtime choice is intentionally deferred.
-- The function-over-arrow preference applies to exported components and shared helpers, not every inline callback.
-- Full compliance is phased through touched-file migration and dedicated cleanup changes.
+- Temporary exceptions must be documented in the relevant change description and should not be introduced silently.
