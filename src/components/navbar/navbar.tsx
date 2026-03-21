@@ -3,7 +3,7 @@ import "./navbar.scss";
 import { AppLink } from "@/components/app_link/app_link";
 import { Avatar } from "@/components/avatar/avatar";
 import { Container } from "@/components/container/container";
-import { Icon } from "@/elements";
+import { Icon, Stack } from "@/elements";
 import { getCurrentUserAccount } from "@/lib/session";
 import { i18n } from "@/model/i18n";
 
@@ -21,6 +21,13 @@ export async function Navbar(): Promise<React.ReactElement | null> {
     <header className="navbar">
       <Container maxWidth="wide">
         <div className="navbar__content">
+          <Stack
+            direction="row"
+            align="center"
+            justify="flex-end"
+            gap={16}
+            fullWidth
+          >
           <AppLink href="/account" ariaLabel={displayName}>
             <span className="navbar__avatar-link">
               <Avatar name={displayName} />
@@ -35,6 +42,7 @@ export async function Navbar(): Promise<React.ReactElement | null> {
               <Icon name="settings" size={20} />
             </span>
           </AppLink>
+          </Stack>
         </div>
       </Container>
     </header>

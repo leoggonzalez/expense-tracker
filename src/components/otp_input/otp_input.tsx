@@ -3,6 +3,7 @@
 import "./otp_input.scss";
 
 import React, { useRef } from "react";
+import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 type OtpInputProps = {
@@ -102,10 +103,11 @@ export function OtpInput({
 
   return (
     <div className="otp-input">
-      <label className="otp-input__label">
-        {label}
-        {required && <span className="otp-input__required">*</span>}
-      </label>
+      <Stack gap={8}>
+        <Text as="span" size="sm" weight="medium">
+          {label}
+          {required && <span className="otp-input__required">*</span>}
+        </Text>
       <div className="otp-input__boxes" onPaste={handlePaste}>
         {digits.map((digit, index) => (
           <input
@@ -133,6 +135,7 @@ export function OtpInput({
           />
         ))}
       </div>
+      </Stack>
     </div>
   );
 }

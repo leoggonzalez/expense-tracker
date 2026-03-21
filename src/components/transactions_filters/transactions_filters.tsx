@@ -3,7 +3,7 @@
 import "./transactions_filters.scss";
 
 import { ContextMenu, useNavigationProgress } from "@/components";
-import { Icon, Text } from "@/elements";
+import { Icon, Stack, Text } from "@/elements";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import React from "react";
@@ -259,35 +259,39 @@ export function TransactionsFilters({
                 {i18n.t("transactions_page.type")}
               </Text>
               <div className="transactions-filters__type-options">
-                {[
-                  { value: "", label: i18n.t("transactions_page.type_all") },
-                  { value: "income", label: i18n.t("common.income") },
-                  { value: "expense", label: i18n.t("common.expense") },
-                  { value: "transfer", label: i18n.t("common.transfer") },
-                ].map((option) => (
-                  <button
-                    key={option.value || "all"}
-                    type="button"
-                    className={[
-                      "transactions-filters__type-option",
-                      option.value === "income" &&
-                        "transactions-filters__type-option--income",
-                      option.value === "expense" &&
-                        "transactions-filters__type-option--expense",
-                      option.value === "transfer" &&
-                        "transactions-filters__type-option--transfer",
-                      filters.type === option.value &&
-                        "transactions-filters__type-option--active",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                    onClick={() =>
-                      updateQuery({ type: option.value as TransactionTypeFilter })
-                    }
-                  >
-                    {option.label}
-                  </button>
-                ))}
+                <Stack direction="row" wrap gap={8}>
+                  {[
+                    { value: "", label: i18n.t("transactions_page.type_all") },
+                    { value: "income", label: i18n.t("common.income") },
+                    { value: "expense", label: i18n.t("common.expense") },
+                    { value: "transfer", label: i18n.t("common.transfer") },
+                  ].map((option) => (
+                    <button
+                      key={option.value || "all"}
+                      type="button"
+                      className={[
+                        "transactions-filters__type-option",
+                        option.value === "income" &&
+                          "transactions-filters__type-option--income",
+                        option.value === "expense" &&
+                          "transactions-filters__type-option--expense",
+                        option.value === "transfer" &&
+                          "transactions-filters__type-option--transfer",
+                        filters.type === option.value &&
+                          "transactions-filters__type-option--active",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onClick={() =>
+                        updateQuery({ type: option.value as TransactionTypeFilter })
+                      }
+                    >
+                      <Text as="span" size="sm" weight="medium">
+                        {option.label}
+                      </Text>
+                    </button>
+                  ))}
+                </Stack>
               </div>
             </div>
 
@@ -353,24 +357,32 @@ export function TransactionsFilters({
 
       {anyFilters ? (
         <div className="transactions-filters__pills">
-          {pills.map((pill) => (
+          <Stack direction="row" wrap gap={8}>
+            {pills.map((pill) => (
+              <button
+                key={pill.id}
+                type="button"
+                className="transactions-filters__pill"
+                onClick={pill.onRemove}
+              >
+                <Stack direction="row" inline align="center" gap={4}>
+                  <Text as="span" size="sm" weight="medium">
+                    {pill.label}
+                  </Text>
+                  <Icon name="close" size={14} />
+                </Stack>
+              </button>
+            ))}
             <button
-              key={pill.id}
               type="button"
-              className="transactions-filters__pill"
-              onClick={pill.onRemove}
+              className="transactions-filters__pill transactions-filters__pill--clear"
+              onClick={clearFilters}
             >
-              <span>{pill.label}</span>
-              <Icon name="close" size={14} />
+              <Text as="span" size="sm" weight="medium">
+                {i18n.t("transactions_page.clear_filters")}
+              </Text>
             </button>
-          ))}
-          <button
-            type="button"
-            className="transactions-filters__pill transactions-filters__pill--clear"
-            onClick={clearFilters}
-          >
-            {i18n.t("transactions_page.clear_filters")}
-          </button>
+          </Stack>
         </div>
       ) : null}
     </div>

@@ -42,4 +42,18 @@
     width: auto;
     min-width: 0;
   }
+
+  &--layout-intrinsic-full-height {
+    display: block;
+    width: auto;
+    min-width: 0;
+    height: 100%;
+  }
+
+  &--layout-intrinsic-full-height &__content {
+    grid-column: auto;
+    width: auto;
+    min-width: 0;
+    height: 100%;
+  }
 }

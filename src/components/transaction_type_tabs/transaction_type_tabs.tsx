@@ -3,7 +3,7 @@ import "./transaction_type_tabs.scss";
 import React from "react";
 
 import { AppLink } from "@/components/app_link/app_link";
-import { Icon } from "@/elements";
+import { Icon, Stack, Text } from "@/elements";
 
 type TransactionPageType = "income" | "expense" | "transfer";
 
@@ -32,16 +32,20 @@ export function TransactionTypeTabs({
           ]
             .filter(Boolean)
             .join(" ")}
-        >
-          <AppLink href={tab.href}>
-            <span className="transaction-type-tabs__content">
-              <span className="transaction-type-tabs__icon">
-                <Icon name={tab.key} size={16} />
+          >
+            <AppLink href={tab.href}>
+              <span className="transaction-type-tabs__content">
+                <Stack direction="row" inline align="center" justify="center" gap={8}>
+                  <span className="transaction-type-tabs__icon">
+                    <Icon name={tab.key} size={16} />
+                  </span>
+                  <Text as="span" size="sm" weight="medium">
+                    {tab.label}
+                  </Text>
+                </Stack>
               </span>
-              {tab.label}
-            </span>
-          </AppLink>
-        </div>
+            </AppLink>
+          </div>
       ))}
     </div>
   );

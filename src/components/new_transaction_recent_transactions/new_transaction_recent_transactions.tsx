@@ -29,7 +29,9 @@ export function NewTransactionRecentTransactions({
               </Text>
               <div className="new-transaction-recent-transactions__all-link">
                 <AppLink href="/transactions">
-                  {i18n.t("new_transaction_page.open_all_transactions")}
+                  <Text as="span" size="sm" weight="medium" color="info">
+                    {i18n.t("new_transaction_page.open_all_transactions")}
+                  </Text>
                 </AppLink>
               </div>
             </Stack>

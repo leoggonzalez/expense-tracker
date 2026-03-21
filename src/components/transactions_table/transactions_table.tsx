@@ -6,7 +6,7 @@ import { Avatar, Currency, useNavigationProgress } from "@/components";
 import { format } from "date-fns";
 import React from "react";
 
-import { Card, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export type TransactionsTableItem = {
@@ -61,15 +61,19 @@ export function TransactionsTable({
             tabIndex={0}
           >
             <div className="transactions-table__space">
-              <Avatar name={transaction.spaceName} />
+              <Stack inline align="center" justify="center">
+                <Avatar name={transaction.spaceName} />
+              </Stack>
             </div>
             <div className="transactions-table__details">
-              <Text size="sm" weight="semibold">
-                {transaction.description}
-              </Text>
-              <Text size="xs" color="secondary">
-                {formatTransactionDate(transaction.beginDate)}
-              </Text>
+              <Stack gap={4}>
+                <Text size="sm" weight="semibold">
+                  {transaction.description}
+                </Text>
+                <Text size="xs" color="secondary">
+                  {formatTransactionDate(transaction.beginDate)}
+                </Text>
+              </Stack>
             </div>
             <div className="transactions-table__amount">
               <Currency value={transaction.amount} size="sm" weight="bold" />

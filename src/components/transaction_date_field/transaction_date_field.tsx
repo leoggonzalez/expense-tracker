@@ -3,7 +3,7 @@ import "./transaction_date_field.scss";
 import React from "react";
 
 import { Input } from "@/components/input/input";
-import { Icon } from "@/elements";
+import { Icon, Stack } from "@/elements";
 
 export type TransactionDateFieldMode = "month" | "date";
 
@@ -28,25 +28,28 @@ export function TransactionDateField({
 }: TransactionDateFieldProps): React.ReactElement {
   return (
     <div className="transaction-date-field">
-      <div className="transaction-date-field__input">
-        <Input
-          label={label}
-          type={mode}
-          value={value}
-          onChange={onChange}
-          required={required}
-        />
-      </div>
-      {mode === "month" && (
-        <button
-          type="button"
-          className="transaction-date-field__toggle"
-          onClick={onEnableFullDate}
-          aria-label={editLabel}
-        >
-          <Icon name="edit" size={16} />
-        </button>
-      )}
+      <Stack direction="row" align="flex-end" gap={8} fullWidth>
+        <div className="transaction-date-field__input">
+          <Input
+            label={label}
+            type={mode}
+            value={value}
+            onChange={onChange}
+            required={required}
+            fullWidth
+          />
+        </div>
+        {mode === "month" && (
+          <button
+            type="button"
+            className="transaction-date-field__toggle"
+            onClick={onEnableFullDate}
+            aria-label={editLabel}
+          >
+            <Icon name="edit" size={16} />
+          </button>
+        )}
+      </Stack>
     </div>
   );
 }

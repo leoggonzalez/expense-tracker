@@ -4,7 +4,7 @@ import "./container.scss";
 export interface ContainerProps {
   children: React.ReactNode;
   maxWidth?: "content" | "wide" | "full";
-  layout?: "default" | "intrinsic";
+  layout?: "default" | "intrinsic" | "intrinsic-full-height";
 }
 
 export function Container({

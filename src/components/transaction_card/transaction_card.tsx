@@ -3,7 +3,7 @@ import "./transaction_card.scss";
 import React from "react";
 
 import { Avatar, Currency } from "@/components";
-import { Text } from "@/elements";
+import { Box, Stack, Text } from "@/elements";
 import { format } from "date-fns";
 import { i18n } from "@/model/i18n";
 
@@ -65,31 +65,44 @@ export function TransactionCard({ transaction }: TransactionCardProps): React.Re
 
   return (
     <div className="transaction-card">
-      <div className="transaction-card__space">
-        <Avatar name={transaction.spaceName} />
-      </div>
-      <div className="transaction-card__details">
-        <div className="transaction-card__detail-line">
-          <Text size="sm" weight="semibold">
-            {transaction.description}
-          </Text>
-        </div>
-        {transferDirectionLabel ? (
-          <div className="transaction-card__detail-line">
-            <Text size="xs" color="secondary">
-              {transferDirectionLabel}
-            </Text>
+      <Box
+        padding={{
+          paddingTop: 16,
+          paddingRight: 16,
+          paddingBottom: 16,
+          paddingLeft: 16,
+        }}
+      >
+        <div className="transaction-card__layout">
+          <div className="transaction-card__space">
+            <Avatar name={transaction.spaceName} />
           </div>
-        ) : null}
-        <div className="transaction-card__detail-line">
-          <Text size="xs" color="secondary">
-            {formatDateLine(transaction.beginDate, transaction.endDate)}
-          </Text>
+          <div className="transaction-card__details">
+            <Stack gap={4}>
+              <div className="transaction-card__detail-line">
+                <Text size="sm" weight="semibold">
+                  {transaction.description}
+                </Text>
+              </div>
+              {transferDirectionLabel ? (
+                <div className="transaction-card__detail-line">
+                  <Text size="xs" color="secondary">
+                    {transferDirectionLabel}
+                  </Text>
+                </div>
+              ) : null}
+              <div className="transaction-card__detail-line">
+                <Text size="xs" color="secondary">
+                  {formatDateLine(transaction.beginDate, transaction.endDate)}
+                </Text>
+              </div>
+            </Stack>
+          </div>
+          <div className="transaction-card__amount">
+            <Currency value={transaction.amount} size="sm" weight="bold" />
+          </div>
         </div>
-      </div>
-      <div className="transaction-card__amount">
-        <Currency value={transaction.amount} size="sm" weight="bold" />
-      </div>
+      </Box>
     </div>
   );
 }

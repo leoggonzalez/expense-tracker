@@ -3,7 +3,7 @@
 import "./transaction_list.scss";
 
 import { AppLink, Button, TransactionCard } from "@/components";
-import { Card, Text } from "@/elements";
+import { Card, Stack, Text } from "@/elements";
 import { deleteTransaction } from "@/actions/transactions";
 import { i18n } from "@/model/i18n";
 import React from "react";
@@ -78,24 +78,26 @@ export function TransactionList({
                 .filter(Boolean)
                 .join(" ")}
             >
-              {row.href ? (
-                <div className="transaction-list__summary-link">
-                  <AppLink href={row.href}>{row.label}</AppLink>
-                </div>
-              ) : (
-                <Text size="sm" color="secondary" as="span">
-                  {row.label}
-                </Text>
-              )}
-              {row.value ? (
-                typeof row.value === "string" ? (
-                  <Text size="sm" weight="bold" as="span">
-                    {row.value}
-                  </Text>
+              <Stack direction="row" align="center" justify="space-between" gap={8}>
+                {row.href ? (
+                  <div className="transaction-list__summary-link">
+                    <AppLink href={row.href}>{row.label}</AppLink>
+                  </div>
                 ) : (
-                  <span className="transaction-list__summary-value">{row.value}</span>
-                )
-              ) : null}
+                  <Text size="sm" color="secondary" as="span">
+                    {row.label}
+                  </Text>
+                )}
+                {row.value ? (
+                  typeof row.value === "string" ? (
+                    <Text size="sm" weight="bold" as="span">
+                      {row.value}
+                    </Text>
+                  ) : (
+                    <span className="transaction-list__summary-value">{row.value}</span>
+                  )
+                ) : null}
+              </Stack>
             </div>
           ))}
 
@@ -127,13 +129,15 @@ export function TransactionList({
                 {content}
                 {showDelete && (
                   <div className="transaction-list__actions">
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onClick={() => handleDelete(transaction.id)}
-                    >
-                      {i18n.t("transaction_list.delete")}
-                    </Button>
+                    <Stack direction="row" justify="flex-end" gap={8}>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => handleDelete(transaction.id)}
+                      >
+                        {i18n.t("transaction_list.delete")}
+                      </Button>
+                    </Stack>
                   </div>
                 )}
               </div>
@@ -150,24 +154,26 @@ export function TransactionList({
                 .filter(Boolean)
                 .join(" ")}
             >
-              {row.href ? (
-                <div className="transaction-list__summary-link">
-                  <AppLink href={row.href}>{row.label}</AppLink>
-                </div>
-              ) : (
-                <Text size="sm" color="secondary" as="span">
-                  {row.label}
-                </Text>
-              )}
-              {row.value ? (
-                typeof row.value === "string" ? (
-                  <Text size="sm" weight="bold" as="span">
-                    {row.value}
-                  </Text>
+              <Stack direction="row" align="center" justify="space-between" gap={8}>
+                {row.href ? (
+                  <div className="transaction-list__summary-link">
+                    <AppLink href={row.href}>{row.label}</AppLink>
+                  </div>
                 ) : (
-                  <span className="transaction-list__summary-value">{row.value}</span>
-                )
-              ) : null}
+                  <Text size="sm" color="secondary" as="span">
+                    {row.label}
+                  </Text>
+                )}
+                {row.value ? (
+                  typeof row.value === "string" ? (
+                    <Text size="sm" weight="bold" as="span">
+                      {row.value}
+                    </Text>
+                  ) : (
+                    <span className="transaction-list__summary-value">{row.value}</span>
+                  )
+                ) : null}
+              </Stack>
             </div>
           ))}
         </Card>

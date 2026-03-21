@@ -5,6 +5,7 @@ import "./navigation.scss";
 import {
   AppLink,
   Avatar,
+  Button,
   Container,
   useNavigationProgress,
 } from "@/components";
@@ -103,7 +104,7 @@ export function NavigationClient({
 
   return (
     <nav className="navigation">
-      <Container maxWidth="wide" layout="intrinsic">
+      <Container maxWidth="wide" layout="intrinsic-full-height">
         <div className="navigation__inner">
           <div className="navigation__brand">
             <AppLink href="/">
@@ -117,6 +118,22 @@ export function NavigationClient({
               </span>
             </AppLink>
           </div>
+
+          {isAuthenticated ? (
+            <div className="navigation__cta">
+              <Button
+                href="/transactions/new/expense"
+                ariaLabel={String(i18n.t("common.add_transaction"))}
+                variant="cta"
+                size="lg"
+                fullWidth
+                startIcon={<Icon name="plus" size={18} />}
+                contentAlign="start"
+              >
+                {i18n.t("common.add_transaction")}
+              </Button>
+            </div>
+          ) : null}
 
           <div className="navigation__sections">
             <ul className="navigation__links navigation__links--mobile">

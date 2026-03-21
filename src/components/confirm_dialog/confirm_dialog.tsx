@@ -3,7 +3,7 @@
 import "./confirm_dialog.scss";
 
 import { Button } from "@/components/button/button";
-import { Stack, Text } from "@/elements";
+import { Box, Stack, Text } from "@/elements";
 import React, { useEffect, useRef } from "react";
 
 type ConfirmDialogProps = {
@@ -66,42 +66,51 @@ export function ConfirmDialog({
       }}
     >
       <div className="confirm-dialog__content">
-        <Stack gap={20}>
-          <Stack gap={10}>
-            <Text as="h3" size="h4" weight="semibold">
-              {title}
-            </Text>
-            <Text size="sm" color="secondary">
-              {description}
-            </Text>
-            {error ? (
-              <Text size="sm" color="danger">
-                {error}
+        <Box padding={24}>
+          <Stack gap={20}>
+            <Stack gap={10}>
+              <Text as="h3" size="h4" weight="semibold">
+                {title}
               </Text>
-            ) : null}
-          </Stack>
+              <Text size="sm" color="secondary">
+                {description}
+              </Text>
+              {error ? (
+                <Text size="sm" color="danger">
+                  {error}
+                </Text>
+              ) : null}
+            </Stack>
 
-          <div className="confirm-dialog__actions">
-            <Button
-              type="button"
-              variant={confirmVariant}
-              onClick={onConfirm}
-              disabled={isLoading}
-              fullWidth="mobile-only"
-            >
-              {confirmLabel}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onClose}
-              disabled={isLoading}
-              fullWidth="mobile-only"
-            >
-              {cancelLabel}
-            </Button>
-          </div>
-        </Stack>
+            <div className="confirm-dialog__actions">
+              <Stack
+                gap={8}
+                fullWidth
+                desktopDirection="row"
+                justify="flex-end"
+              >
+                <Button
+                  type="button"
+                  variant={confirmVariant}
+                  onClick={onConfirm}
+                  disabled={isLoading}
+                  fullWidth="mobile-only"
+                >
+                  {confirmLabel}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onClose}
+                  disabled={isLoading}
+                  fullWidth="mobile-only"
+                >
+                  {cancelLabel}
+                </Button>
+              </Stack>
+            </div>
+          </Stack>
+        </Box>
       </div>
     </dialog>
   );

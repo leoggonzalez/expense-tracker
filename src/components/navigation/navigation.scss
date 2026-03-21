@@ -32,6 +32,10 @@
     display: none;
   }
 
+  &__cta {
+    display: none;
+  }
+
   &__sections {
     min-width: 0;
     width: max-content;
@@ -211,6 +215,10 @@
       display: block;
       padding-bottom: var(--spacing-lg);
       border-bottom: var(--border-width) solid var(--color-border);
+    }
+
+    &__cta {
+      display: block;
     }
 
     &__brand-link {

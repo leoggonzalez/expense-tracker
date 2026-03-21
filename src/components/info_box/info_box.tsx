@@ -2,7 +2,7 @@ import "./info_box.scss";
 
 import React from "react";
 
-import { Icon, Stack, Text } from "@/elements";
+import { Box, Icon, Stack, Text } from "@/elements";
 
 type InfoBoxVariant = "warning" | "error" | "info" | "success";
 
@@ -41,19 +41,21 @@ export function InfoBox({
         .join(" ")}
       role={variant === "error" ? "alert" : "status"}
     >
-      <Stack direction="row" align="flex-start" gap={10}>
-        <div className="info-box__icon">
-          <Icon name={getIconName(variant)} size={18} />
-        </div>
-        <Stack gap={4}>
-          {title ? (
-            <Text size="sm" weight="semibold">
-              {title}
-            </Text>
-          ) : null}
-          <Text size="sm">{message}</Text>
+      <Box padding={16}>
+        <Stack direction="row" align="flex-start" gap={10}>
+          <div className="info-box__icon">
+            <Icon name={getIconName(variant)} size={18} />
+          </div>
+          <Stack gap={4}>
+            {title ? (
+              <Text size="sm" weight="semibold">
+                {title}
+              </Text>
+            ) : null}
+            <Text size="sm">{message}</Text>
+          </Stack>
         </Stack>
-      </Stack>
+      </Box>
     </div>
   );
 }

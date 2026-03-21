@@ -176,6 +176,22 @@
     }
   }
 
+  &--variant-cta {
+    background-color: var(--color-nav-primary-action);
+    color: var(--color-text-inverse);
+    box-shadow: var(--shadow-nav-primary-action);
+    border-radius: 20px;
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-nav-primary-action-dark);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      background-color: var(--color-nav-primary-action-dark);
+    }
+  }
+
   &--variant-outline {
     background-color: var(--color-hero-surface-12);
     border-color: var(--color-hero-surface-18);
@@ -204,6 +220,19 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+
+  &__content {
+    display: inline-flex;
+    width: 100%;
+  }
+
+  &__content--align-center {
+    justify-content: center;
+  }
+
+  &__content--align-start {
+    justify-content: flex-start;
   }
 }
 
