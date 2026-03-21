@@ -19,10 +19,10 @@ export default function Icon(): ImageResponse {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(145deg, #f1f6f8 0%, #e7f2f3 100%)",
+        background: "transparent",
       }}
     >
-      <CurrentoLogo size={360} />
+      <CurrentoLogo size={420} />
     </div>,
     size,
   );

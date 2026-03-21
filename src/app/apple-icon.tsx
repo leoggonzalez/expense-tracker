@@ -19,10 +19,10 @@ export default function AppleIcon(): ImageResponse {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#f1f6f8",
+        background: "transparent",
       }}
     >
-      <CurrentoLogo size={136} />
+      <CurrentoLogo size={148} />
     </div>,
     size,
   );

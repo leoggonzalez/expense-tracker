@@ -7,6 +7,8 @@ import { Icon } from "@/elements/icon/icon";
 import type { IconName } from "@/elements/icon/icon_assets";
 import { Text } from "@/elements/text/text";
 
+type CardStyle = React.CSSProperties & Record<`--${string}`, string>;
+
 export interface CardProps {
   children: React.ReactNode;
   padding?: number | BoxPadding;
@@ -15,7 +17,7 @@ export interface CardProps {
   title?: string;
   icon?: IconName;
   actions?: React.ReactNode;
-  radius?: "default" | "xl" | "2xl";
+  radius?: number;
   fullHeight?: boolean;
 }
 
@@ -27,20 +29,25 @@ export function Card({
   title,
   icon,
   actions,
-  radius = "default",
+  radius,
   fullHeight = false,
 }: CardProps): React.ReactElement {
+  const style: CardStyle = {};
+
+  if (radius !== undefined) {
+    style["--card-radius"] = `${radius}px`;
+  }
+
   const classes = [
     "card",
     `card--${variant}`,
-    `card--radius-${radius}`,
     fullHeight && "card--full-height",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <Component className={classes}>
+    <Component className={classes} style={style}>
       <Box padding={padding}>
         {title || icon || actions ? (
           <div className="card__header">

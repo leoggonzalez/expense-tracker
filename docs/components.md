@@ -83,6 +83,19 @@ When the need is structural rather than bespoke:
 - use `Grid` for general grid layout
 - use `Text` for typography semantics when the style is not component-specific
 
+## Loading-State Pattern
+
+For hybrid protected pages, render static section chrome immediately and reserve shimmer placeholders for the data-bearing area only.
+
+Preferred behavior:
+
+- keep hero titles, icons, captions, and actions visible while data loads
+- keep card titles, icons, subtitles, and static links visible while data loads
+- use shared loading visuals instead of route-owned one-off placeholders
+- isolate loading and error states inside the section component that owns the fetch
+
+This keeps the shell useful on navigation while making delayed data obvious without collapsing the layout.
+
 ## Review Checklist
 
 - Is the exported component a function declaration with `React.ReactElement`?

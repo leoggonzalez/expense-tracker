@@ -16,20 +16,22 @@ That means:
 
 This is especially important on dashboard-adjacent listing pages such as transactions, projections, and other filterable screens.
 
-## Dynamic Authenticated Pages
+## Protected Page Rendering
 
-Pages that render authenticated, user-specific data must not rely on static rendering defaults.
+Protected pages that embed authenticated, user-specific data directly in the server-rendered shell must remain per-request and dynamic.
 
-Treat these kinds of pages as per-request and dynamic:
+Protected pages may use a hybrid shell instead when all of the following are true:
 
-- account pages
-- dashboard pages
-- projection pages
-- settings pages
-- space pages
-- transaction pages
+- the route shell itself contains no user-specific values
+- personalized data is fetched after mount through authenticated per-user boundaries such as route handlers
+- server responses for that personalized data are private and non-cacheable
+- the shell remains useful immediately with static titles, descriptions, icons, and actions
 
-The goal is to avoid any cross-user leakage of personalized data.
+This pattern is preferred when the goal is faster-feeling client navigation across protected pages without risking cross-user leakage.
+
+Some protected pages can stay fully client-owned inside a static shell when they do not need authenticated server reads after navigation. Settings is the reference example for this lighter variant.
+
+When authenticated profile data is still needed, keep the shell static and fetch that data after mount through a private route handler. Account is the reference example for this profile-bootstrap variant.
 
 ## Localisation Rules
 
@@ -57,6 +59,6 @@ Currento already maintains locale files under `src/locales/` with English as the
 
 - Does filter/search/sort state live in the URL?
 - Does the page preserve state through reloads and browser navigation?
-- Is the page rendering authenticated data in a dynamic-safe way?
+- Is the page either dynamic-safe or using the approved hybrid protected-shell pattern?
 - Does all user-facing copy come from locale messages?
 - Are new locale keys semantic and `lower_snake_case`?

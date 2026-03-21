@@ -25,6 +25,7 @@ export type HeroProps = {
   children: React.ReactNode;
   actions?: HeroAction[];
   pattern: HeroPattern;
+  isBodyLoading?: boolean;
 };
 
 export type HeroAction = {
@@ -42,8 +43,15 @@ export function Hero({
   children,
   actions,
   pattern,
+  isBodyLoading = false,
 }: HeroProps): React.ReactElement {
-  const classes = ["hero", `hero--pattern-${pattern}`].join(" ");
+  const classes = [
+    "hero",
+    `hero--pattern-${pattern}`,
+    isBodyLoading && "hero--body-loading",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <section className={classes}>

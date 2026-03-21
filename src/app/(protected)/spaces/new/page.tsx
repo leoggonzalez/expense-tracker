@@ -8,8 +8,6 @@ import {
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
-export const dynamic = "force-dynamic";
-
 export default function Page(): React.ReactElement {
   return (
     <Container>
@@ -28,9 +26,7 @@ export default function Page(): React.ReactElement {
           <SpaceCreateForm />
         </PagePanel>
 
-        <AppLink href="/spaces">
-          {i18n.t("spaces_page.back_to_spaces")}
-        </AppLink>
+        <AppLink href="/spaces">{i18n.t("spaces_page.back_to_spaces")}</AppLink>
       </Stack>
     </Container>
   );

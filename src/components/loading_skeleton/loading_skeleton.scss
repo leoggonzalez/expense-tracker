@@ -1,0 +1,26 @@
+@use "@/styles/variables.scss" as *;
+
+.loading-skeleton {
+  display: block;
+  width: var(--loading-skeleton-width, 100%);
+  height: var(--loading-skeleton-height, 16px);
+  border-radius: var(--loading-skeleton-radius, 10px);
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-base) 0%,
+    var(--color-skeleton-highlight) 50%,
+    var(--color-skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  animation: loading-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

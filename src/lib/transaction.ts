@@ -171,10 +171,18 @@ export type ProjectionFocusedSpaceTransactionRow = {
   updatedAt: Date;
 };
 
-export type ProjectionQueryData = {
+export type ProjectionHeaderQueryData = {
+  normalizedFocusedMonthStart: Date;
+  focusedMonthTotals: DashboardTotals;
+};
+
+export type ProjectionChartQueryData = {
   normalizedFocusedMonthStart: Date;
   chartRows: ProjectionChartMonthRow[];
-  focusedMonthTotals: DashboardTotals;
+};
+
+export type ProjectionSpacesQueryData = {
+  normalizedFocusedMonthStart: Date;
   spaceSummaryRows: ProjectionFocusedSpaceSummaryRow[];
   spaceTransactionsRows: ProjectionFocusedSpaceTransactionRow[];
 };
@@ -183,6 +191,24 @@ export type DashboardQueryData = {
   totals: DashboardTotals;
   recentTransactions: TransactionWithSpaceRecord[];
   upcomingPayments: TransactionWithSpaceRecord[];
+  monthStart: Date;
+  monthEnd: Date;
+};
+
+export type DashboardHeaderQueryData = {
+  totals: DashboardTotals;
+  monthStart: Date;
+  monthEnd: Date;
+};
+
+export type DashboardUpcomingQueryData = {
+  upcomingPayments: TransactionWithSpaceRecord[];
+  monthStart: Date;
+  monthEnd: Date;
+};
+
+export type DashboardRecentActivityQueryData = {
+  recentTransactions: TransactionWithSpaceRecord[];
   monthStart: Date;
   monthEnd: Date;
 };
@@ -281,7 +307,10 @@ export class Transaction {
     userAccountId: string,
     input: CreateTransactionInput,
   ): Promise<TransactionWithSpaceRecord> {
-    const space = await Space.findOrCreateActive(userAccountId, input.spaceName);
+    const space = await Space.findOrCreateActive(
+      userAccountId,
+      input.spaceName,
+    );
     const transaction = await prisma.transaction.create({
       data: {
         type: input.type,
@@ -495,25 +524,51 @@ export class Transaction {
     };
   }
 
-  public static async getProjectionQueryData(
+  private static getProjectionMonthContext(focusedMonthStart: Date): {
+    normalizedFocusedMonthStart: Date;
+    endMonthStart: Date;
+    focusedMonthEnd: Date;
+    focusedMonthIsCurrent: boolean;
+  } {
+    const normalizedFocusedMonthStart = startOfMonth(focusedMonthStart);
+
+    return {
+      normalizedFocusedMonthStart,
+      endMonthStart: addMonths(normalizedFocusedMonthStart, 5),
+      focusedMonthEnd: endOfMonth(normalizedFocusedMonthStart),
+      focusedMonthIsCurrent: isSameMonth(
+        normalizedFocusedMonthStart,
+        startOfMonth(new Date()),
+      ),
+    };
+  }
+
+  public static async getProjectionHeaderQueryData(
     userAccountId: string,
     focusedMonthStart: Date,
-  ): Promise<ProjectionQueryData> {
-    const normalizedFocusedMonthStart = startOfMonth(focusedMonthStart);
-    const endMonthStart = addMonths(normalizedFocusedMonthStart, 5);
-    const focusedMonthEnd = endOfMonth(normalizedFocusedMonthStart);
-    const focusedMonthIsCurrent = isSameMonth(
-      normalizedFocusedMonthStart,
-      startOfMonth(new Date()),
-    );
+  ): Promise<ProjectionHeaderQueryData> {
+    const { normalizedFocusedMonthStart } =
+      Transaction.getProjectionMonthContext(focusedMonthStart);
 
-    const [
-      chartRows,
-      focusedMonthTotals,
-      spaceSummaryRows,
-      spaceTransactionsRows,
-    ] = await Promise.all([
-      prisma.$queryRaw<ProjectionChartMonthRow[]>`
+    return {
+      normalizedFocusedMonthStart,
+      focusedMonthTotals: await Transaction.getMonthTotalsForUser(
+        userAccountId,
+        normalizedFocusedMonthStart,
+      ),
+    };
+  }
+
+  public static async getProjectionChartQueryData(
+    userAccountId: string,
+    focusedMonthStart: Date,
+  ): Promise<ProjectionChartQueryData> {
+    const { normalizedFocusedMonthStart, endMonthStart } =
+      Transaction.getProjectionMonthContext(focusedMonthStart);
+
+    return {
+      normalizedFocusedMonthStart,
+      chartRows: await prisma.$queryRaw<ProjectionChartMonthRow[]>`
         WITH months AS (
           SELECT generate_series(
             ${normalizedFocusedMonthStart}::timestamp,
@@ -556,7 +611,20 @@ export class Transaction {
         GROUP BY months.month_start
         ORDER BY months.month_start ASC
       `,
-      Transaction.getMonthTotalsForUser(userAccountId, normalizedFocusedMonthStart),
+    };
+  }
+
+  public static async getProjectionSpacesQueryData(
+    userAccountId: string,
+    focusedMonthStart: Date,
+  ): Promise<ProjectionSpacesQueryData> {
+    const {
+      normalizedFocusedMonthStart,
+      focusedMonthEnd,
+      focusedMonthIsCurrent,
+    } = Transaction.getProjectionMonthContext(focusedMonthStart);
+
+    const [spaceSummaryRows, spaceTransactionsRows] = await Promise.all([
       prisma.$queryRaw<ProjectionFocusedSpaceSummaryRow[]>`
         SELECT
           a.id AS "spaceId",
@@ -633,8 +701,6 @@ export class Transaction {
 
     return {
       normalizedFocusedMonthStart,
-      chartRows,
-      focusedMonthTotals,
       spaceSummaryRows,
       spaceTransactionsRows,
     };
@@ -643,36 +709,83 @@ export class Transaction {
   public static async getDashboardQueryData(
     userAccountId: string,
   ): Promise<DashboardQueryData> {
+    const [headerData, recentActivityData, upcomingData] = await Promise.all([
+      Transaction.getDashboardHeaderQueryData(userAccountId),
+      Transaction.getDashboardRecentActivityQueryData(userAccountId),
+      Transaction.getDashboardUpcomingQueryData(userAccountId),
+    ]);
+
+    return {
+      totals: headerData.totals,
+      recentTransactions: recentActivityData.recentTransactions,
+      upcomingPayments: upcomingData.upcomingPayments,
+      monthStart: headerData.monthStart,
+      monthEnd: headerData.monthEnd,
+    };
+  }
+
+  public static async getDashboardHeaderQueryData(
+    userAccountId: string,
+  ): Promise<DashboardHeaderQueryData> {
+    const now = new Date();
+    const monthStart = startOfMonth(now);
+    const monthEnd = endOfMonth(now);
+    const totals = await Transaction.getMonthTotalsForUser(
+      userAccountId,
+      monthStart,
+    );
+
+    return {
+      totals,
+      monthStart,
+      monthEnd,
+    };
+  }
+
+  public static async getDashboardUpcomingQueryData(
+    userAccountId: string,
+  ): Promise<DashboardUpcomingQueryData> {
     const now = new Date();
     const monthStart = startOfMonth(now);
     const monthEnd = endOfMonth(now);
     const today = startOfDay(now);
-
-    const [totals, recentTransactions, upcomingPayments] = await Promise.all([
-      Transaction.getMonthTotalsForUser(userAccountId, monthStart),
-      Transaction.listRecentByUser(userAccountId, 10),
-      prisma.transaction.findMany({
-        where: {
-          type: "expense",
-          transferSpaceId: null,
-          space: {
-            userAccountId,
-          },
-          beginDate: {
-            gte: today,
-            lte: monthEnd,
-          },
+    const upcomingPayments = await prisma.transaction.findMany({
+      where: {
+        type: "expense",
+        transferSpaceId: null,
+        space: {
+          userAccountId,
         },
-        include: transactionWithSpaceInclude,
-        orderBy: [{ beginDate: "asc" }, { createdAt: "desc" }],
-        take: 6,
-      }),
-    ]);
+        beginDate: {
+          gte: today,
+          lte: monthEnd,
+        },
+      },
+      include: transactionWithSpaceInclude,
+      orderBy: [{ beginDate: "asc" }, { createdAt: "desc" }],
+      take: 6,
+    });
 
     return {
-      totals,
-      recentTransactions,
       upcomingPayments,
+      monthStart,
+      monthEnd,
+    };
+  }
+
+  public static async getDashboardRecentActivityQueryData(
+    userAccountId: string,
+  ): Promise<DashboardRecentActivityQueryData> {
+    const now = new Date();
+    const monthStart = startOfMonth(now);
+    const monthEnd = endOfMonth(now);
+    const recentTransactions = await Transaction.listRecentByUser(
+      userAccountId,
+      10,
+    );
+
+    return {
+      recentTransactions,
       monthStart,
       monthEnd,
     };
@@ -772,7 +885,10 @@ export class Transaction {
     id: string,
     input: Partial<CreateTransactionInput>,
   ): Promise<TransactionWithSpaceRecord> {
-    const existingTransaction = await Transaction.findOwnedById(userAccountId, id);
+    const existingTransaction = await Transaction.findOwnedById(
+      userAccountId,
+      id,
+    );
 
     if (!existingTransaction) {
       throw new Error("failed_to_update_transaction");
@@ -781,7 +897,10 @@ export class Transaction {
     let spaceId: string | undefined;
 
     if (input.spaceName) {
-      const space = await Space.findOrCreateActive(userAccountId, input.spaceName);
+      const space = await Space.findOrCreateActive(
+        userAccountId,
+        input.spaceName,
+      );
       spaceId = space.persistedId;
     }
 
@@ -810,14 +929,19 @@ export class Transaction {
     userAccountId: string,
     id: string,
   ): Promise<void> {
-    const existingTransaction = await Transaction.findOwnedById(userAccountId, id);
+    const existingTransaction = await Transaction.findOwnedById(
+      userAccountId,
+      id,
+    );
 
     if (!existingTransaction) {
       throw new Error("failed_to_delete_transaction");
     }
 
     await existingTransaction.delete();
-    await Space.syncCurrentMonthTransactionCount(existingTransaction.data.spaceId);
+    await Space.syncCurrentMonthTransactionCount(
+      existingTransaction.data.spaceId,
+    );
   }
 
   private static fromRecord(record: TransactionPersistedData): Transaction {

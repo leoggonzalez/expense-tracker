@@ -1,35 +1,19 @@
-import {
-  Container,
-  DashboardHero,
-  DashboardPanels,
-  RecentActivityPanel,
-  UpcomingPaymentsPanel,
-} from "@/components";
-import { Stack } from "@/elements";
-import { getDashboardPayload } from "@/actions/transactions";
-
-export const dynamic = "force-dynamic";
+import { Container } from "@/components";
+import { DashboardHeader } from "@/app/(protected)/dashboard_header";
+import { DashboardRecentActivity } from "@/app/(protected)/dashboard_recent_activity";
+import { DashboardUpcoming } from "@/app/(protected)/dashboard_upcoming";
+import { Grid, Stack } from "@/elements";
 
 export default async function HomePage(): Promise<React.ReactElement> {
-  const dashboardPayload = await getDashboardPayload();
-
   return (
     <Container>
       <Stack gap={24}>
-        <DashboardHero
-          totals={dashboardPayload.totals}
-          currentMonthRange={dashboardPayload.currentMonthRange}
-        />
-        <DashboardPanels>
-          <UpcomingPaymentsPanel
-            currentMonthRange={dashboardPayload.currentMonthRange}
-            upcomingPayments={dashboardPayload.upcomingPayments}
-          />
-          <RecentActivityPanel
-            currentMonthRange={dashboardPayload.currentMonthRange}
-            recentTransactions={dashboardPayload.recentTransactions}
-          />
-        </DashboardPanels>
+        <DashboardHeader />
+
+        <Grid minColumnWidth={360} gap={24}>
+          <DashboardUpcoming />
+          <DashboardRecentActivity />
+        </Grid>
       </Stack>
     </Container>
   );

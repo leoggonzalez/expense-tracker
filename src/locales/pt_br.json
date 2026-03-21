@@ -35,9 +35,12 @@
     "hero_caption": "Receitas menos despesas em todos os espaços ativos.",
     "hero_add_action": "Adicionar",
     "hero_more_action": "Mais",
+    "header_load_failed": "Não foi possível carregar o resumo do painel agora.",
     "upcoming_payments": "Próximos pagamentos",
     "upcoming_payments_empty": "Não restam despesas programadas para este mês.",
+    "upcoming_load_failed": "Não foi possível carregar os próximos pagamentos agora.",
     "upcoming_payments_link": "Ver todas as despesas",
+    "recent_activity_load_failed": "Não foi possível carregar a atividade recente agora.",
     "recent_activity_link": "Explorar lançamentos",
     "payment_due": "Vence em %{date}",
     "activity_subtitle": "Últimas alterações nos seus lançamentos."
@@ -124,6 +127,7 @@
     "clear_filters": "Limpar filtros",
     "showing_results": "Mostrando %{count} de %{total} lançamentos",
     "results_title": "Lançamentos filtrados",
+    "results_load_failed": "Não foi possível carregar os lançamentos agora.",
     "summary_shown": "Exibidos agora",
     "summary_total": "Correspondências totais",
     "summary_filters": "Filtros ativos",
@@ -175,6 +179,9 @@
     "total": "Total",
     "spaces_with_transactions": "Espaços com lançamentos neste mês",
     "empty_month_transactions": "Não há lançamentos para este mês.",
+    "header_load_failed": "Não foi possível carregar os totais deste mês.",
+    "chart_load_failed": "Não foi possível carregar o gráfico de projeção.",
+    "spaces_load_failed": "Não foi possível carregar os espaços deste mês.",
     "more_transactions_this_month": "%{count} lançamentos a mais neste mês",
     "space_month_total": "Total do mês",
     "open_space": "Abrir espaço",
@@ -321,7 +328,10 @@
     "multiple_tab": "Vários",
     "recent_transactions": "Lançamentos recentes",
     "recent_transactions_subtitle": "Use a atividade recente como referência rápida enquanto cria novos registros.",
-    "open_all_transactions": "Ver todos os lançamentos"
+    "open_all_transactions": "Ver todos os lançamentos",
+    "recent_load_failed": "Não foi possível carregar os lançamentos recentes agora.",
+    "form_load_failed": "Não foi possível carregar os espaços para este formulário.",
+    "transfer_form_load_failed": "Não foi possível carregar os espaços para esta transferência."
   },
   "transaction_detail_page": {
     "title": "Detalhes do lançamento",
@@ -337,7 +347,9 @@
     "back_to_transactions": "Voltar para lançamentos",
     "delete": "Excluir lançamento",
     "deleting": "Excluindo...",
-    "delete_confirm": "Tem certeza de que deseja excluir este lançamento?"
+    "delete_confirm": "Tem certeza de que deseja excluir este lançamento?",
+    "load_failed": "Não foi possível carregar este lançamento agora.",
+    "not_found": "Lançamento não encontrado."
   },
   "space_field": {
     "edit_space_name": "Inserir um nome de espaço personalizado",
@@ -348,7 +360,8 @@
     "income": "Receita",
     "expense": "Despesa",
     "transfer": "Transferência",
-    "add_transaction": "Adicionar lançamento"
+    "add_transaction": "Adicionar lançamento",
+    "retry": "Tentar novamente"
   },
   "toast": {
     "transaction_created": "Lançamento criado.",

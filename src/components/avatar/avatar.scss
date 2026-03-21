@@ -5,11 +5,19 @@
   border-radius: 999px;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--color-primary) 18%, white),
-    color-mix(in srgb, var(--color-success) 18%, white)
+    var(--color-avatar-background-start),
+    var(--color-avatar-background-end)
   );
-  border: var(--border-width) solid
-    color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
-  color: var(--color-primary-dark);
+  border: var(--border-width) solid var(--color-avatar-border);
+  color: var(--color-avatar-foreground);
   flex-shrink: 0;
+
+  &__initials {
+    color: var(--color-avatar-foreground);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
 }

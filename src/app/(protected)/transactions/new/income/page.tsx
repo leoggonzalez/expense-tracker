@@ -1,20 +1,15 @@
 import {
   Container,
+  PagePanel,
   TransactionCreationIntro,
   TransactionForm,
   TransactionTypeTabs,
   Hero,
-  PagePanel,
 } from "@/components";
-import { getSpaces } from "@/actions/transactions";
 import { Stack } from "@/elements";
 import { i18n } from "@/model/i18n";
 
-export const dynamic = "force-dynamic";
-
 export default async function Page(): Promise<React.ReactElement> {
-  const spaces = await getSpaces();
-
   return (
     <Container>
       <Stack gap={24}>
@@ -51,11 +46,7 @@ export default async function Page(): Promise<React.ReactElement> {
         />
 
         <PagePanel tone="form">
-          <TransactionForm
-            spaces={spaces.map((space) => space.name)}
-            transactionType="income"
-            hideTypeField
-          />
+          <TransactionForm spaces={[]} transactionType="income" hideTypeField />
         </PagePanel>
       </Stack>
     </Container>

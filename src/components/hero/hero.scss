@@ -9,7 +9,7 @@
   border-radius: 32px;
   background: linear-gradient(
     135deg,
-    var(--color-primary) 0%,
+    var(--color-hero-background-start) 0%,
     var(--color-hero-background-end) 100%
   );
   box-shadow: var(--shadow-lg);
@@ -72,6 +72,18 @@
   &__body {
     display: grid;
     gap: var(--spacing-lg);
+  }
+
+  &--body-loading {
+    .loading-skeleton {
+      background: linear-gradient(
+        90deg,
+        var(--color-hero-surface-12) 0%,
+        var(--color-hero-surface-20) 50%,
+        var(--color-hero-surface-12) 100%
+      );
+      background-size: 200% 100%;
+    }
   }
 
   &--pattern-dashboard::before {

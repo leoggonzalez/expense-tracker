@@ -35,9 +35,12 @@
     "hero_caption": "Income minus expenses across all active spaces.",
     "hero_add_action": "Add",
     "hero_more_action": "More",
+    "header_load_failed": "Unable to load the dashboard summary right now.",
     "upcoming_payments": "Upcoming Payments",
     "upcoming_payments_empty": "No scheduled expenses remain for this month.",
+    "upcoming_load_failed": "Unable to load upcoming payments right now.",
     "upcoming_payments_link": "View all expenses",
+    "recent_activity_load_failed": "Unable to load recent activity right now.",
     "recent_activity_link": "Browse transactions",
     "payment_due": "Due %{date}",
     "activity_subtitle": "Latest changes across your transactions."
@@ -126,6 +129,7 @@
     "clear_filters": "Clear Filters",
     "showing_results": "Showing %{count} of %{total} transactions",
     "results_title": "Filtered Transactions",
+    "results_load_failed": "Unable to load transactions right now.",
     "search_pill": "Search: %{term}",
     "type_pill": "Type: %{type}",
     "space_pill": "Space: %{space}",
@@ -183,6 +187,9 @@
     "total": "Total",
     "spaces_with_transactions": "Spaces with transactions this month",
     "empty_month_transactions": "No transactions for this month.",
+    "header_load_failed": "Unable to load this month's totals.",
+    "chart_load_failed": "Unable to load the projection chart.",
+    "spaces_load_failed": "Unable to load this month's spaces.",
     "more_transactions_this_month": "%{count} more transactions for this month",
     "space_month_total": "Month total",
     "open_space": "Open space",
@@ -240,6 +247,8 @@
     "save": "Save changes",
     "saving": "Saving...",
     "save_success": "Your userAccount details have been updated.",
+    "profile_load_failed": "Unable to load your account details right now.",
+    "not_found": "Account details not found.",
     "update_failed": "Unable to update your userAccount details.",
     "logout": "Logout"
   },
@@ -289,6 +298,10 @@
     "load_more_transactions": "Load more transactions",
     "archived_spaces": "Archived spaces",
     "empty_archived_state": "No archived spaces.",
+    "summary_load_failed": "Unable to load spaces right now.",
+    "archived_load_failed": "Unable to load archived spaces right now.",
+    "detail_load_failed": "Unable to load this space right now.",
+    "edit_form_load_failed": "Unable to load this space for editing right now.",
     "archived_badge": "Archived",
     "archived_space_hint": "This space is archived and can be restored whenever you need it again.",
     "cancel": "Cancel",
@@ -334,7 +347,10 @@
     "multiple_tab": "Multiple",
     "recent_transactions": "Recent transactions",
     "recent_transactions_subtitle": "Use recent activity as a quick reference while creating new records.",
-    "open_all_transactions": "See all transactions"
+    "open_all_transactions": "See all transactions",
+    "recent_load_failed": "Unable to load recent transactions right now.",
+    "form_load_failed": "Unable to load spaces for this form.",
+    "transfer_form_load_failed": "Unable to load spaces for this transfer."
   },
   "transaction_detail_page": {
     "title": "Transaction details",
@@ -353,7 +369,9 @@
     "delete_confirm": "Are you sure you want to delete this transaction?",
     "delete_dialog_title": "Delete transaction?",
     "delete_dialog_description": "This action cannot be undone.",
-    "cancel_delete": "Cancel"
+    "cancel_delete": "Cancel",
+    "load_failed": "Unable to load this transaction right now.",
+    "not_found": "Transaction not found."
   },
   "space_field": {
     "edit_space_name": "Enter a custom space name",
@@ -363,7 +381,8 @@
     "income": "Income",
     "expense": "Expense",
     "transfer": "Transfer",
-    "add_transaction": "Add transaction"
+    "add_transaction": "Add transaction",
+    "retry": "Retry"
   },
   "toast": {
     "transaction_created": "Transaction created.",

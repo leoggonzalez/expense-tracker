@@ -1,9 +1,10 @@
 "use server";
 
-import { addMonths, format } from "date-fns";
+import { addMonths, endOfMonth, format, startOfMonth } from "date-fns";
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
 import { normalizeTransactionAmount } from "@/lib/amount";
+import { formatProjectionMonthKey } from "@/lib/projection_month";
 import { Space, type SpaceRecord } from "@/lib/space";
 import {
   Transaction,
@@ -20,6 +21,25 @@ import { requireCurrentUserAccount } from "@/lib/session";
 
 export type { CreateTransactionInput, CreateTransferInput, DashboardTotals };
 
+export type DashboardDateRange = {
+  startDate: string;
+  endDate: string;
+};
+
+export type DashboardTransactionItem = {
+  id: string;
+  type: string;
+  spaceName: string;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+  transferSpaceId: string | null;
+  transferSpaceName: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type SerializedProjectionTransaction = {
   id: string;
   type: string;
@@ -34,36 +54,24 @@ export type SerializedProjectionTransaction = {
 
 export type DashboardPayload = {
   totals: DashboardTotals;
-  recentTransactions: Array<{
-    id: string;
-    type: string;
-    spaceName: string;
-    description: string;
-    amount: number;
-    beginDate: string;
-    endDate: string | null;
-    transferSpaceId: string | null;
-    transferSpaceName: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  upcomingPayments: Array<{
-    id: string;
-    type: string;
-    spaceName: string;
-    description: string;
-    amount: number;
-    beginDate: string;
-    endDate: string | null;
-    transferSpaceId: string | null;
-    transferSpaceName: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  currentMonthRange: {
-    startDate: string;
-    endDate: string;
-  };
+  recentTransactions: DashboardTransactionItem[];
+  upcomingPayments: DashboardTransactionItem[];
+  currentMonthRange: DashboardDateRange;
+};
+
+export type DashboardHeaderPayload = {
+  totals: DashboardTotals;
+  currentMonthRange: DashboardDateRange;
+};
+
+export type DashboardUpcomingPayload = {
+  currentMonthRange: DashboardDateRange;
+  upcomingPayments: DashboardTransactionItem[];
+};
+
+export type DashboardRecentActivityPayload = {
+  currentMonthRange: DashboardDateRange;
+  recentTransactions: DashboardTransactionItem[];
 };
 
 export type ProjectionMonthTransaction = {
@@ -82,7 +90,6 @@ export type ProjectionMonthTransaction = {
 
 export type ProjectionChartMonth = {
   monthKey: string;
-  monthLabel: string;
   income: number;
   expense: number;
   net: number;
@@ -96,16 +103,64 @@ export type ProjectionFocusedSpace = {
   transactions: ProjectionMonthTransaction[];
 };
 
-export type ProjectionPagePayload = {
-  focusedMonth: {
-    key: string;
-    label: string;
-  };
+export type ProjectionHeaderPayload = {
+  focusedMonthKey: string;
   previousMonthKey: string;
   nextMonthKey: string;
-  chartMonths: ProjectionChartMonth[];
   focusedMonthTotals: DashboardTotals;
+};
+
+export type ProjectionChartPayload = {
+  focusedMonthKey: string;
+  chartMonths: ProjectionChartMonth[];
+};
+
+export type ProjectionSpacesPayload = {
+  focusedMonthKey: string;
   focusedMonthSpaces: ProjectionFocusedSpace[];
+};
+
+export type TransactionsPagePayload = {
+  spaces: Array<{
+    id: string;
+    name: string;
+  }>;
+  transactions: FilteredTransactionListItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+export type TransactionDetailPayload = {
+  id: string;
+  type: string;
+  spaceId: string;
+  spaceName: string;
+  transferSpaceId: string | null;
+  transferSpaceName: string | null;
+  description: string;
+  amount: number;
+  beginDate: string;
+  endDate: string | null;
+};
+
+export type NewTransactionRecentPayload = {
+  recentTransactions: DashboardTransactionItem[];
+};
+
+export type NewTransactionSpacesPayload = {
+  spaces: string[];
+};
+
+export type NewTransferSpacesPayload = {
+  spaces: Array<{
+    id: string;
+    name: string;
+    currentMonthTotal: number;
+  }>;
 };
 
 type TransactionListWithPagination = {
@@ -204,7 +259,9 @@ function serializeProjectionTransaction(
   };
 }
 
-function serializeDashboardTransaction(transaction: TransactionWithSpaceRecord) {
+function serializeDashboardTransaction(
+  transaction: TransactionWithSpaceRecord,
+): DashboardTransactionItem {
   return {
     id: transaction.id,
     type: transaction.type,
@@ -217,6 +274,33 @@ function serializeDashboardTransaction(transaction: TransactionWithSpaceRecord) 
     transferSpaceName: transaction.transferSpace?.name || null,
     createdAt: transaction.createdAt.toISOString(),
     updatedAt: transaction.updatedAt.toISOString(),
+  };
+}
+
+function serializeTransactionDetail(
+  transaction: TransactionWithSpaceRecord,
+): TransactionDetailPayload {
+  return {
+    id: transaction.id,
+    type: transaction.type,
+    spaceId: transaction.spaceId,
+    spaceName: transaction.space.name,
+    transferSpaceId: transaction.transferSpaceId,
+    transferSpaceName: transaction.transferSpace?.name || null,
+    description: transaction.description,
+    amount: transaction.amount,
+    beginDate: transaction.beginDate.toISOString(),
+    endDate: transaction.endDate?.toISOString() || null,
+  };
+}
+
+function serializeDashboardDateRange(
+  monthStart: Date,
+  monthEnd: Date,
+): DashboardDateRange {
+  return {
+    startDate: format(monthStart, "yyyy-MM-dd"),
+    endDate: format(monthEnd, "yyyy-MM-dd"),
   };
 }
 
@@ -262,7 +346,9 @@ function mapProjectionSpaces(
       return;
     }
 
-    existing.transactions.push(serializeProjectionMonthTransactionRow(transaction));
+    existing.transactions.push(
+      serializeProjectionMonthTransactionRow(transaction),
+    );
   });
 
   return Array.from(spaceMap.values())
@@ -410,25 +496,45 @@ export async function getProjectionTransactions(): Promise<
   }
 }
 
-export async function getProjectionPagePayload(
+export async function getProjectionHeaderPayloadForUser(
+  userAccountId: string,
   focusedMonthStart: Date,
-): Promise<ProjectionPagePayload> {
-  const currentUser = await requireCurrentUserAccount();
+): Promise<ProjectionHeaderPayload> {
+  const projectionData = await Transaction.getProjectionHeaderQueryData(
+    userAccountId,
+    focusedMonthStart,
+  );
 
-  const projectionData = await Transaction.getProjectionQueryData(
-    currentUser.id,
+  return {
+    focusedMonthKey: formatProjectionMonthKey(
+      projectionData.normalizedFocusedMonthStart,
+    ),
+    previousMonthKey: formatProjectionMonthKey(
+      addMonths(projectionData.normalizedFocusedMonthStart, -1),
+    ),
+    nextMonthKey: formatProjectionMonthKey(
+      addMonths(projectionData.normalizedFocusedMonthStart, 1),
+    ),
+    focusedMonthTotals: projectionData.focusedMonthTotals,
+  };
+}
+
+export async function getProjectionChartPayloadForUser(
+  userAccountId: string,
+  focusedMonthStart: Date,
+): Promise<ProjectionChartPayload> {
+  const projectionData = await Transaction.getProjectionChartQueryData(
+    userAccountId,
     focusedMonthStart,
   );
 
   const chartMonths: ProjectionChartMonth[] = projectionData.chartRows.map(
-    (row, index) => {
-      const monthStart = addMonths(projectionData.normalizedFocusedMonthStart, index);
+    (row) => {
       const income = Number(row.income || 0);
       const expense = Number(row.expense || 0);
 
       return {
         monthKey: row.monthKey,
-        monthLabel: format(monthStart, "MMMM yyyy"),
         income,
         expense,
         net: income + expense,
@@ -437,20 +543,26 @@ export async function getProjectionPagePayload(
   );
 
   return {
-    focusedMonth: {
-      key: format(projectionData.normalizedFocusedMonthStart, "yyyy-MM"),
-      label: format(projectionData.normalizedFocusedMonthStart, "MMMM yyyy"),
-    },
-    previousMonthKey: format(
-      addMonths(projectionData.normalizedFocusedMonthStart, -1),
-      "yyyy-MM",
-    ),
-    nextMonthKey: format(
-      addMonths(projectionData.normalizedFocusedMonthStart, 1),
-      "yyyy-MM",
+    focusedMonthKey: formatProjectionMonthKey(
+      projectionData.normalizedFocusedMonthStart,
     ),
     chartMonths,
-    focusedMonthTotals: projectionData.focusedMonthTotals,
+  };
+}
+
+export async function getProjectionSpacesPayloadForUser(
+  userAccountId: string,
+  focusedMonthStart: Date,
+): Promise<ProjectionSpacesPayload> {
+  const projectionData = await Transaction.getProjectionSpacesQueryData(
+    userAccountId,
+    focusedMonthStart,
+  );
+
+  return {
+    focusedMonthKey: formatProjectionMonthKey(
+      projectionData.normalizedFocusedMonthStart,
+    ),
     focusedMonthSpaces: mapProjectionSpaces(
       projectionData.spaceSummaryRows,
       projectionData.spaceTransactionsRows,
@@ -470,10 +582,141 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
     upcomingPayments: dashboardData.upcomingPayments.map(
       serializeDashboardTransaction,
     ),
-    currentMonthRange: {
-      startDate: format(dashboardData.monthStart, "yyyy-MM-dd"),
-      endDate: format(dashboardData.monthEnd, "yyyy-MM-dd"),
+    currentMonthRange: serializeDashboardDateRange(
+      dashboardData.monthStart,
+      dashboardData.monthEnd,
+    ),
+  };
+}
+
+export async function getDashboardHeaderPayloadForUser(
+  userAccountId: string,
+): Promise<DashboardHeaderPayload> {
+  const dashboardData =
+    await Transaction.getDashboardHeaderQueryData(userAccountId);
+
+  return {
+    totals: dashboardData.totals,
+    currentMonthRange: serializeDashboardDateRange(
+      dashboardData.monthStart,
+      dashboardData.monthEnd,
+    ),
+  };
+}
+
+export async function getDashboardUpcomingPayloadForUser(
+  userAccountId: string,
+): Promise<DashboardUpcomingPayload> {
+  const dashboardData =
+    await Transaction.getDashboardUpcomingQueryData(userAccountId);
+
+  return {
+    currentMonthRange: serializeDashboardDateRange(
+      dashboardData.monthStart,
+      dashboardData.monthEnd,
+    ),
+    upcomingPayments: dashboardData.upcomingPayments.map(
+      serializeDashboardTransaction,
+    ),
+  };
+}
+
+export async function getDashboardRecentActivityPayloadForUser(
+  userAccountId: string,
+): Promise<DashboardRecentActivityPayload> {
+  const dashboardData =
+    await Transaction.getDashboardRecentActivityQueryData(userAccountId);
+
+  return {
+    currentMonthRange: serializeDashboardDateRange(
+      dashboardData.monthStart,
+      dashboardData.monthEnd,
+    ),
+    recentTransactions: dashboardData.recentTransactions.map(
+      serializeDashboardTransaction,
+    ),
+  };
+}
+
+export async function getTransactionsPagePayloadForUser(
+  userAccountId: string,
+  filters: TransactionFiltersInput,
+): Promise<TransactionsPagePayload> {
+  const [result, spaces] = await Promise.all([
+    Transaction.getFilteredTransactionsForUser(userAccountId, filters),
+    Space.listActiveByUser(userAccountId),
+  ]);
+
+  return {
+    spaces: spaces.map((space) => {
+      const spaceRecord = space.toRecord();
+
+      return {
+        id: spaceRecord.id,
+        name: spaceRecord.name,
+      };
+    }),
+    transactions: result.transactions.map(serializeFilteredTransaction),
+    pagination: {
+      page: result.page,
+      limit: result.limit,
+      total: result.total,
+      totalPages: Math.ceil(result.total / result.limit),
     },
+  };
+}
+
+export async function getTransactionDetailPayloadForUser(
+  userAccountId: string,
+  id: string,
+): Promise<TransactionDetailPayload | null> {
+  const transaction = await Transaction.findWithSpaceByIdForUser(userAccountId, id);
+
+  if (!transaction) {
+    return null;
+  }
+
+  return serializeTransactionDetail(transaction);
+}
+
+export async function getNewTransactionRecentPayloadForUser(
+  userAccountId: string,
+): Promise<NewTransactionRecentPayload> {
+  const transactions = await Transaction.listRecentByUser(userAccountId, 5);
+
+  return {
+    recentTransactions: transactions.map(serializeDashboardTransaction),
+  };
+}
+
+export async function getNewTransactionSpacesPayloadForUser(
+  userAccountId: string,
+): Promise<NewTransactionSpacesPayload> {
+  const spaces = await Space.listActiveByUser(userAccountId);
+
+  return {
+    spaces: spaces.map((space) => space.toRecord().name),
+  };
+}
+
+export async function getNewTransferSpacesPayloadForUser(
+  userAccountId: string,
+): Promise<NewTransferSpacesPayload> {
+  const monthStart = startOfMonth(new Date());
+  const monthEnd = endOfMonth(monthStart);
+  const spaces = await Space.listByArchiveStateWithMonthTotals(
+    userAccountId,
+    false,
+    monthStart,
+    monthEnd,
+  );
+
+  return {
+    spaces: spaces.map((space) => ({
+      id: space.id,
+      name: space.name,
+      currentMonthTotal: space.currentMonthTotal,
+    })),
   };
 }
 
@@ -550,10 +793,9 @@ export async function updateTransaction(
   } catch (error) {
     if (
       error instanceof Error &&
-      [
-        "failed_to_update_transaction",
-        "space_is_archived",
-      ].includes(error.message)
+      ["failed_to_update_transaction", "space_is_archived"].includes(
+        error.message,
+      )
     ) {
       return { success: false, error: error.message };
     }

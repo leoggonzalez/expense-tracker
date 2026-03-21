@@ -4,9 +4,15 @@ import "./space_field.scss";
 
 import React, { useState } from "react";
 
+import type { NewTransactionSpacesPayload } from "@/actions/transactions";
+import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import { Input, Select } from "@/components";
-import { Icon } from "@/elements";
+import { Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
+
+const createFlowSpacesCache = {
+  entries: new Map<string, NewTransactionSpacesPayload>(),
+};
 
 type SpaceFieldProps = {
   label: React.ReactNode;
@@ -15,6 +21,10 @@ type SpaceFieldProps = {
   onChange: (value: string) => void;
   placeholder?: string;
   required?: boolean;
+  loadSpacesOnMount?: boolean;
+  size?: "md" | "lg";
+  surface?: "default" | "subtle";
+  labelTone?: "primary" | "secondary";
 };
 
 export function SpaceField({
@@ -24,8 +34,20 @@ export function SpaceField({
   onChange,
   placeholder,
   required = false,
+  loadSpacesOnMount = false,
+  size = "md",
+  surface = "default",
+  labelTone = "primary",
 }: SpaceFieldProps): React.ReactElement {
-  const hasMatchingSpace = spaces.includes(value);
+  const endpoint = "/api/transactions/new/spaces";
+  const { data, hasError, retry } = useProtectedPageSection(
+    endpoint,
+    endpoint,
+    createFlowSpacesCache,
+  );
+  const resolvedSpaces =
+    loadSpacesOnMount && spaces.length === 0 ? (data?.spaces || []) : spaces;
+  const hasMatchingSpace = resolvedSpaces.includes(value);
   const [prefersCustomMode, setPrefersCustomMode] = useState(
     !hasMatchingSpace && !!value,
   );
@@ -55,6 +77,9 @@ export function SpaceField({
               placeholder={placeholder}
               required={required}
               hasTrailingControl
+              size={size}
+              surface={surface}
+              labelTone={labelTone}
             />
             <button
               type="button"
@@ -70,12 +95,15 @@ export function SpaceField({
             label={label}
             value={value}
             onChange={onChange}
-            options={spaces.map((space) => ({
+            options={resolvedSpaces.map((space) => ({
               value: space,
               label: space,
             }))}
             placeholder={placeholder}
             required={required}
+            size={size}
+            surface={surface}
+            labelTone={labelTone}
             trailingContent={
               <button
                 type="button"
@@ -89,6 +117,23 @@ export function SpaceField({
           />
         )}
       </div>
+
+      {loadSpacesOnMount && hasError && spaces.length === 0 ? (
+        <div className="space-field__status">
+          <Stack direction="row" gap={8} align="center">
+            <Text size="xs" color="secondary">
+              {i18n.t("new_transaction_page.form_load_failed")}
+            </Text>
+            <button
+              type="button"
+              className="space-field__retry"
+              onClick={retry}
+            >
+              {i18n.t("common.retry")}
+            </button>
+          </Stack>
+        </div>
+      ) : null}
     </div>
   );
 }

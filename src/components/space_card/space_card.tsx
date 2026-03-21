@@ -22,7 +22,7 @@ export function SpaceCard({
   return (
     <div className="space-card">
       <div className="space-card__panel">
-        <Card padding={24} radius="2xl" fullHeight>
+        <Card padding={24} radius={28} fullHeight>
           <Stack gap={20}>
             <Stack
               direction="row"
