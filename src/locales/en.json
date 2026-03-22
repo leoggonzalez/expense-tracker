@@ -221,6 +221,7 @@
     "request_failed": "Unable to send the login code.",
     "verify_failed": "Unable to verify the login code.",
     "email_send_failed": "Unable to send the login email.",
+    "account_not_found": "Account does not exist. Please contact admins.",
     "logout": "Logout"
   },
   "settings_page": {
@@ -255,6 +256,7 @@
   "spaces_page": {
     "title": "Spaces",
     "create_space": "Create space",
+    "new_space": "New space",
     "create_space_hint": "Create a dedicated space to organize your transactions.",
     "edit_space_hint": "Update the space name while keeping its history and transactions intact.",
     "hero_subtitle": "Review balances by month and move into each space from one overview.",

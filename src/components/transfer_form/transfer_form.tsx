@@ -2,7 +2,7 @@
 
 import "./transfer_form.scss";
 
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 import { createTransferTransaction } from "@/actions/transactions";
 import { MonthSelector } from "@/components/month_selector/month_selector";
@@ -51,14 +51,10 @@ export function TransferForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const beginDateMode = inferTransactionDateMode(beginDate);
 
-  const transferOptions = useMemo(
-    () =>
-      spaces.map((space) => ({
-        value: space.id,
-        label: space.name,
-      })),
-    [spaces],
-  );
+  const transferOptions = spaces.map((space) => ({
+    value: space.id,
+    label: space.name,
+  }));
   const parsedAmount = parseAmountInput(amountInput);
   const selectedFromSpace = spaces.find(
     (space) => space.id === fromSpaceId,
@@ -223,7 +219,7 @@ export function TransferForm({
 
         <Button
           type="submit"
-          variant="transfer"
+          variant="outline-transfer"
           disabled={isSubmitting}
           startIcon={<Icon name="transfer" />}
         >

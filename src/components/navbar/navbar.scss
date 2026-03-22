@@ -2,13 +2,26 @@
 
 .navbar {
   padding-top: env(safe-area-inset-top);
-  background-color: var(--color-background-secondary);
-  border-bottom: var(--border-width) solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  background-color: var(--color-background);
 
   &__content {
     min-height: var(--navbar-height-mobile);
     padding: var(--spacing-sm) 0;
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  &__brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  &__logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__avatar-link,

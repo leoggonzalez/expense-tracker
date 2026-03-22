@@ -106,13 +106,13 @@ function getSubmitButtonConfig(
   type: "income" | "expense",
   isSubmitting: boolean,
 ): {
-  variant: "primary" | "danger" | "success";
+  variant: "primary" | "danger" | "outline-success";
   label: string;
   iconName: "income" | "expense";
 } {
   if (type === "income") {
     return {
-      variant: "success",
+      variant: "outline-success",
       label: String(
         i18n.t(
           isSubmitting

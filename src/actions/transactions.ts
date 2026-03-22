@@ -288,7 +288,7 @@ function serializeTransactionDetail(
     transferSpaceId: transaction.transferSpaceId,
     transferSpaceName: transaction.transferSpace?.name || null,
     description: transaction.description,
-    amount: transaction.amount,
+    amount: normalizeTransactionAmount(transaction.type, transaction.amount),
     beginDate: transaction.beginDate.toISOString(),
     endDate: transaction.endDate?.toISOString() || null,
   };

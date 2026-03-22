@@ -10,6 +10,42 @@
   .recharts-legend-item-text {
     color: var(--color-text-secondary) !important;
   }
+
+  &__tooltip {
+    min-width: 180px;
+    padding: var(--spacing-sm);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 18px;
+    background-color: color-mix(
+      in srgb,
+      var(--color-background-secondary) 96%,
+      var(--color-background)
+    );
+    color: var(--color-text-primary);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &__tooltip-label {
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  &__tooltip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  &__tooltip-row--total {
+    margin-top: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    border-top: var(--border-width) solid var(--color-border);
+    color: var(--color-text-primary);
+  }
 }
 
 @media (min-width: $breakpoint-tablet) {

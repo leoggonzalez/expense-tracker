@@ -37,6 +37,7 @@ export function ProjectionChartSection({
       }),
       income: month.income,
       expenses: Math.abs(month.expense),
+      total: month.net,
     })) || [];
 
   return (

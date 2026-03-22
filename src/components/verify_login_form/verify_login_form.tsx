@@ -1,5 +1,7 @@
 "use client";
 
+import "./verify_login_form.scss";
+
 import React, { useState } from "react";
 
 import { verifyLoginCode } from "@/actions/auth";
@@ -40,7 +42,7 @@ export function VerifyLoginForm({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="verify-login-form">
       <Stack gap={16}>
         <Text size="h2" as="h1" weight="bold">
           {i18n.t("auth.verify_title")}
@@ -58,6 +60,7 @@ export function VerifyLoginForm({
           disabled
           readOnly
           required
+          fullWidth
         />
 
         <OtpInput

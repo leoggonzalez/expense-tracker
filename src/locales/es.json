@@ -213,6 +213,7 @@
     "request_failed": "No se pudo enviar el código de acceso.",
     "verify_failed": "No se pudo verificar el código de acceso.",
     "email_send_failed": "No se pudo enviar el correo de acceso.",
+    "account_not_found": "La cuenta no existe. Ponte en contacto con los administradores.",
     "logout": "Cerrar sesión"
   },
   "settings_page": {
@@ -245,6 +246,7 @@
   "spaces_page": {
     "title": "Espacios",
     "create_space": "Crear espacio",
+    "new_space": "Nuevo espacio",
     "create_space_hint": "Crea un espacio dedicado para organizar tus movimientos.",
     "edit_space_hint": "Actualiza el nombre del espacio manteniendo intactos su historial y sus movimientos.",
     "hero_subtitle": "Revisa saldos por mes y entra en cada espacio desde una sola vista.",

@@ -16,8 +16,7 @@
   }
 
   &__search-input,
-  &__select,
-  &__date-input {
+  &__select {
     width: 100%;
     min-height: 48px;
     padding: 0 var(--spacing-md);
@@ -59,10 +58,6 @@
     cursor: pointer;
   }
 
-  &__date-input {
-    padding-right: var(--spacing-sm);
-  }
-
   &__menu {
     display: grid;
     gap: var(--spacing-lg);
@@ -76,12 +71,6 @@
   &__field {
     display: grid;
     gap: var(--spacing-xs);
-  }
-
-  &__field-label {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
   }
 
   &__date-grid {

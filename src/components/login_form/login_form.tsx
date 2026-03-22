@@ -1,5 +1,7 @@
 "use client";
 
+import "./login_form.scss";
+
 import React, { useState } from "react";
 
 import { requestLoginCode } from "@/actions/auth";
@@ -32,7 +34,7 @@ export function LoginForm(): React.ReactElement {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="login-form">
       <Stack gap={16}>
         <Text size="h2" as="h1" weight="bold">
           {i18n.t("auth.title")}
@@ -47,6 +49,7 @@ export function LoginForm(): React.ReactElement {
           placeholder={i18n.t("auth.email_placeholder") as string}
           autoComplete="email"
           required
+          fullWidth
         />
 
         {error ? <Text color="danger">{i18n.t(error)}</Text> : null}

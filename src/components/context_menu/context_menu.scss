@@ -53,6 +53,10 @@
     color: var(--color-text-primary);
   }
 
+  &--fallback-open &__popover {
+    display: grid;
+  }
+
   &__popover:popover-open {
     display: grid;
   }

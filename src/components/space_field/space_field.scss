@@ -44,7 +44,8 @@
   &__text-mode &__toggle {
     position: absolute;
     right: var(--spacing-sm);
-    bottom: calc(var(--spacing-sm) + 1px);
+    top: calc(50% + 12px);
+    transform: translateY(-50%);
   }
 
   &__status {

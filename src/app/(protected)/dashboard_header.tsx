@@ -52,20 +52,11 @@ export function DashboardHeader(): React.ReactElement {
       title={String(i18n.t("dashboard.hero_label"))}
       pattern="dashboard"
       isBodyLoading={isLoading}
-      actions={[
-        {
-          icon: "plus",
-          title: String(i18n.t("dashboard.hero_add_action")),
-          ariaLabel: String(i18n.t("dashboard.hero_add_action")),
-          href: "/transactions/new/expense",
-          variant: "primary",
-        },
-      ]}
     >
       <Stack gap={24}>
         <Stack gap={10}>
           {data ? (
-            <Text as="h1" size="h1" color="hero" weight="bold" tracking="tight">
+            <Text as="h1" size="h1" color="hero" weight="bold">
               {formatCurrency(data.totals.net)}
             </Text>
           ) : (

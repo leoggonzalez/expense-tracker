@@ -39,7 +39,11 @@ export async function requestLoginCode(input: {
       return { success: true };
     }
 
-    const userAccount = await UserAccount.upsertByEmail(email);
+    const userAccount = await UserAccount.findByEmail(email);
+
+    if (!userAccount) {
+      return { success: false, error: "auth.account_not_found" };
+    }
 
     await LoginCode.consumeActiveCodesForEmail(userAccount.persistedId, email);
 

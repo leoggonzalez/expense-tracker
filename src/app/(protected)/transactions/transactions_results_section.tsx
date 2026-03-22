@@ -12,6 +12,7 @@ import { Card, Stack, Text } from "@/elements";
 import type { NormalizedTransactionsFilters } from "@/lib/transactions_search";
 import { buildTransactionsFiltersQuery } from "@/lib/transactions_search";
 import { i18n } from "@/model/i18n";
+import React from "react";
 
 const transactionsResultsCache = {
   entries: new Map<string, TransactionsPagePayload>(),
@@ -45,6 +46,59 @@ export function TransactionsResultsSection({
     endpoint,
     transactionsResultsCache,
   );
+  const [visibleData, setVisibleData] = React.useState<TransactionsPagePayload | null>(
+    null,
+  );
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+
+  React.useEffect(() => {
+    setVisibleData(data);
+  }, [data]);
+
+  const handleLoadMore = async (): Promise<void> => {
+    if (!visibleData || isLoadingMore) {
+      return;
+    }
+
+    setIsLoadingMore(true);
+
+    try {
+      const nextFilters = {
+        ...filters,
+        page: visibleData.pagination.page + 1,
+      };
+      const nextQueryString = buildTransactionsFiltersQuery(nextFilters);
+      const response = await fetch(`/api/transactions/list?${nextQueryString}`, {
+        method: "GET",
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+
+      if (!response.ok) {
+        throw new Error("transactions_load_more_failed");
+      }
+
+      const nextPayload = (await response.json()) as TransactionsPagePayload;
+      setVisibleData((current) => {
+        if (!current) {
+          return nextPayload;
+        }
+
+        const seenIds = new Set(current.transactions.map((transaction) => transaction.id));
+        const appendedTransactions = nextPayload.transactions.filter(
+          (transaction) => !seenIds.has(transaction.id),
+        );
+
+        return {
+          ...nextPayload,
+          transactions: [...current.transactions, ...appendedTransactions],
+        };
+      });
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+  const currentData = visibleData || data;
 
   return (
     <Card
@@ -67,54 +121,26 @@ export function TransactionsResultsSection({
       ) : (
         <Stack gap={20}>
           <TransactionsFilters
-            spaces={data?.spaces || []}
+            spaces={currentData?.spaces || []}
             filters={filters}
           />
 
           <Text size="sm" color="secondary">
             {i18n.t("transactions_page.showing_results", {
-              count: data?.transactions.length || 0,
-              total: data?.pagination.total || 0,
+              count: currentData?.transactions.length || 0,
+              total: currentData?.pagination.total || 0,
             })}
           </Text>
 
-          <TransactionsTable transactions={data?.transactions || []} />
+          <TransactionsTable transactions={currentData?.transactions || []} />
 
-          {data && data.pagination.page < data.pagination.totalPages ? (
-            <form method="get">
-              {filters.space ? (
-                <input type="hidden" name="space" value={filters.space} />
-              ) : null}
-              {filters.type ? (
-                <input type="hidden" name="type" value={filters.type} />
-              ) : null}
-              {filters.startDate ? (
-                <input
-                  type="hidden"
-                  name="start_date"
-                  value={filters.startDate}
-                />
-              ) : null}
-              {filters.endDate ? (
-                <input type="hidden" name="end_date" value={filters.endDate} />
-              ) : null}
-              {filters.searchTerms.map((searchTerm) => (
-                <input
-                  key={searchTerm}
-                  type="hidden"
-                  name="search"
-                  value={searchTerm}
-                />
-              ))}
-              <input
-                type="hidden"
-                name="page"
-                value={String(data.pagination.page + 1)}
-              />
-              <Button type="submit">
-                {i18n.t("transactions_page.load_more_transactions")}
-              </Button>
-            </form>
+          {currentData &&
+          currentData.pagination.page < currentData.pagination.totalPages ? (
+            <Button onClick={() => void handleLoadMore()} disabled={isLoadingMore}>
+              {isLoadingMore
+                ? i18n.t("common.loading")
+                : i18n.t("transactions_page.load_more_transactions")}
+            </Button>
           ) : null}
         </Stack>
       )}
