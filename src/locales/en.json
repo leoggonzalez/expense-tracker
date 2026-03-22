@@ -384,6 +384,7 @@
     "expense": "Expense",
     "transfer": "Transfer",
     "add_transaction": "Add transaction",
+    "loading": "Loading...",
     "retry": "Retry"
   },
   "toast": {

@@ -363,6 +363,7 @@
     "expense": "Gasto",
     "transfer": "Transferencia",
     "add_transaction": "Añadir movimiento",
+    "loading": "Cargando...",
     "retry": "Reintentar"
   },
   "toast": {

@@ -20,6 +20,11 @@
       background-color var(--transition-fast);
   }
 
+  &__control .stack {
+    --stack-direction: column;
+    align-items: stretch;
+  }
+
   &--surface-subtle &__control {
     background-color: var(--color-background-secondary);
   }
@@ -38,6 +43,7 @@
 
   &__tag {
     position: relative;
+    width: 100%;
     min-width: 0;
     padding: 8px 14px;
     border-radius: 999px;
@@ -53,7 +59,8 @@
   &__toggle {
     width: 32px;
     height: 32px;
-    margin-left: auto;
+    margin-left: 0;
+    align-self: flex-end;
     border: 0;
     border-radius: 999px;
     background-color: color-mix(
@@ -95,5 +102,23 @@
     opacity: 0;
     cursor: pointer;
     appearance: none;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .month-selector {
+    &__control .stack {
+      --stack-direction: row;
+      align-items: center;
+    }
+
+    &__tag {
+      width: auto;
+    }
+
+    &__toggle {
+      margin-left: auto;
+      align-self: auto;
+    }
   }
 }

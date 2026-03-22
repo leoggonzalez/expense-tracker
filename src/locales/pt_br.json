@@ -363,6 +363,7 @@
     "expense": "Despesa",
     "transfer": "Transferência",
     "add_transaction": "Adicionar lançamento",
+    "loading": "Carregando...",
     "retry": "Tentar novamente"
   },
   "toast": {

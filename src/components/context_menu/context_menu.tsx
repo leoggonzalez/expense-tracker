@@ -20,16 +20,51 @@ export function ContextMenu({
   const popoverId = React.useId().replaceAll(":", "");
   const popoverRef = React.useRef<HTMLDivElement | null>(null);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
   const supportsPopover =
     typeof HTMLElement !== "undefined" &&
     "showPopover" in HTMLElement.prototype &&
     "hidePopover" in HTMLElement.prototype;
+  const supportsAnchorPositioning =
+    typeof CSS !== "undefined" &&
+    CSS.supports("top: anchor(bottom)") &&
+    CSS.supports("position-anchor: --context-menu-anchor");
+  const useNativePopover = supportsPopover && supportsAnchorPositioning;
 
-  React.useEffect(() => {
-    if (supportsPopover || !isOpen) {
+  const updateManualPosition = React.useCallback((): void => {
+    const trigger = triggerRef.current;
+    const popover = popoverRef.current;
+
+    if (!trigger || !popover) {
       return;
     }
+
+    const viewportPadding = 12;
+    const triggerRect = trigger.getBoundingClientRect();
+    const popoverRect = popover.getBoundingClientRect();
+    const measuredWidth = popoverRect.width || 420;
+    const measuredHeight = popoverRect.height || 0;
+    const maxLeft = window.innerWidth - viewportPadding - measuredWidth;
+    const anchoredLeft = triggerRect.right - measuredWidth;
+    const left = Math.max(viewportPadding, Math.min(anchoredLeft, maxLeft));
+    const belowTop = triggerRect.bottom + 8;
+    const fitsBelow =
+      belowTop + measuredHeight <= window.innerHeight - viewportPadding;
+    const top = fitsBelow
+      ? belowTop
+      : Math.max(viewportPadding, triggerRect.top - measuredHeight - 8);
+
+    popover.style.setProperty("--context-menu-top", `${top}px`);
+    popover.style.setProperty("--context-menu-left", `${left}px`);
+  }, []);
+
+  React.useEffect(() => {
+    if (useNativePopover || !isOpen) {
+      return;
+    }
+
+    updateManualPosition();
 
     const handlePointerDown = (event: MouseEvent): void => {
       if (!rootRef.current?.contains(event.target as Node)) {
@@ -43,17 +78,25 @@ export function ContextMenu({
       }
     };
 
+    const handleReposition = (): void => {
+      updateManualPosition();
+    };
+
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("resize", handleReposition);
+    window.addEventListener("scroll", handleReposition, true);
 
     return () => {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("resize", handleReposition);
+      window.removeEventListener("scroll", handleReposition, true);
     };
-  }, [isOpen, supportsPopover]);
+  }, [isOpen, updateManualPosition, useNativePopover]);
 
   const handleToggle = (): void => {
-    if (!supportsPopover) {
+    if (!useNativePopover) {
       setIsOpen((current) => !current);
       return;
     }
@@ -83,12 +126,13 @@ export function ContextMenu({
       ref={rootRef}
       className={[
         "context-menu",
-        !supportsPopover && isOpen && "context-menu--fallback-open",
+        !useNativePopover && isOpen && "context-menu--fallback-open",
       ]
         .filter(Boolean)
         .join(" ")}
     >
       <button
+        ref={triggerRef}
         type="button"
         className="context-menu__trigger"
         aria-label={ariaLabel}
@@ -101,9 +145,14 @@ export function ContextMenu({
       <div
         ref={popoverRef}
         id={popoverId}
-        {...(supportsPopover ? { popover: "auto" as const } : {})}
-        className="context-menu__popover"
-        hidden={!supportsPopover && !isOpen}
+        {...(useNativePopover ? { popover: "auto" as const } : {})}
+        className={[
+          "context-menu__popover",
+          !useNativePopover && "context-menu__popover--manual-position",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        hidden={!useNativePopover && !isOpen}
       >
         {children}
       </div>
