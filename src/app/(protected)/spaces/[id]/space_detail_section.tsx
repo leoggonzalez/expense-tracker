@@ -17,6 +17,7 @@ import {
 import { SpaceArchiveDialog } from "@/components/space_archive_dialog/space_archive_dialog";
 import { Card, Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
+import React from "react";
 
 const spaceDetailCache = {
   entries: new Map<string, SpaceDetailPayload>(),
@@ -117,6 +118,13 @@ export function SpaceDetailSection({
   const endpoint = `/api/spaces/${id}?currentMonth=${currentMonthKey}&page=${String(page)}`;
   const { data, isLoading, hasError, isNotFound, retry } =
     useProtectedPageSection(endpoint, endpoint, spaceDetailCache);
+  const [visibleData, setVisibleData] =
+    React.useState<SpaceDetailPayload | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+
+  React.useEffect(() => {
+    setVisibleData(data);
+  }, [data]);
 
   if (hasError && !data) {
     return (
@@ -166,6 +174,7 @@ export function SpaceDetailSection({
   if (!data) {
     return <></>;
   }
+  const currentData = visibleData || data;
 
   const detailSearchParams = new URLSearchParams();
 
@@ -173,33 +182,33 @@ export function SpaceDetailSection({
     detailSearchParams.set("currentMonth", currentMonthKey);
   }
 
-  if (page > 1) {
-    detailSearchParams.set("page", String(page));
+  if (currentData.pagination.page > 1) {
+    detailSearchParams.set("page", String(currentData.pagination.page));
   }
 
   const detailHref =
     detailSearchParams.size > 0
-      ? `/spaces/${data.space.id}?${detailSearchParams.toString()}`
-      : `/spaces/${data.space.id}`;
+      ? `/spaces/${currentData.space.id}?${detailSearchParams.toString()}`
+      : `/spaces/${currentData.space.id}`;
   const confirmArchiveHref =
     detailSearchParams.size > 0
       ? `${detailHref}&confirmArchive=1`
-      : `/spaces/${data.space.id}?confirmArchive=1`;
+      : `/spaces/${currentData.space.id}?confirmArchive=1`;
   const confirmUnarchiveHref =
     detailSearchParams.size > 0
       ? `${detailHref}&confirmUnarchive=1`
-      : `/spaces/${data.space.id}?confirmUnarchive=1`;
+      : `/spaces/${currentData.space.id}?confirmUnarchive=1`;
   const settleHref = `/transactions/new/transfer?${new URLSearchParams({
-    to_space: data.space.id,
-    amount: Math.abs(data.space.selectedMonthTotal).toFixed(2),
+    to_space: currentData.space.id,
+    amount: Math.abs(currentData.space.selectedMonthTotal).toFixed(2),
     description: String(
       i18n.t("spaces_page.settle_description", {
-        space: data.space.name,
+        space: currentData.space.name,
         month: currentMonthLabel,
       }),
     ),
   }).toString()}`;
-  const heroActions: HeroAction[] = data.space.isArchived
+  const heroActions: HeroAction[] = currentData.space.isArchived
     ? [
         {
           icon: "check",
@@ -212,15 +221,15 @@ export function SpaceDetailSection({
         {
           icon: "edit",
           ariaLabel: String(i18n.t("spaces_page.edit_space")),
-          href: `/spaces/${data.space.id}/edit`,
+          href: `/spaces/${currentData.space.id}/edit`,
           variant: "outline",
         },
         {
           icon: "transfer",
           ariaLabel: String(i18n.t("spaces_page.settle")),
           href: settleHref,
-          variant: "outline",
-          disabled: data.space.selectedMonthTotal >= 0,
+          variant: "outline-transfer",
+          disabled: currentData.space.selectedMonthTotal >= 0,
         },
         {
           icon: "alert",
@@ -230,12 +239,42 @@ export function SpaceDetailSection({
         },
       ];
 
+  const handleLoadMore = async (): Promise<void> => {
+    if (!currentData.pagination.hasMore || isLoadingMore) {
+      return;
+    }
+
+    setIsLoadingMore(true);
+
+    try {
+      const response = await fetch(
+        `/api/spaces/${id}?currentMonth=${currentMonthKey}&page=${String(
+          currentData.pagination.page + 1,
+        )}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          credentials: "same-origin",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("space_detail_load_more_failed");
+      }
+
+      const nextPayload = (await response.json()) as SpaceDetailPayload;
+      setVisibleData(nextPayload);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
   return (
     <Container>
       <Stack gap={24}>
         <Hero
           icon="spaces"
-          title={data.space.name}
+          title={currentData.space.name}
           pattern="space_detail"
           actions={heroActions}
         >
@@ -255,7 +294,7 @@ export function SpaceDetailSection({
                     })}
                   </Text>
                   <Currency
-                    value={data.space.selectedMonthTotal}
+                    value={currentData.space.selectedMonthTotal}
                     size="h3"
                     weight="bold"
                     color="hero"
@@ -267,7 +306,7 @@ export function SpaceDetailSection({
                     gap={12}
                   >
                     <Button
-                      href={`/spaces/${data.space.id}?currentMonth=${previousMonthKey}`}
+                      href={`/spaces/${currentData.space.id}?currentMonth=${previousMonthKey}`}
                       variant="outline"
                       ariaLabel={String(i18n.t("pagination.previous"))}
                     >
@@ -277,7 +316,7 @@ export function SpaceDetailSection({
                       {currentMonthLabel}
                     </Text>
                     <Button
-                      href={`/spaces/${data.space.id}?currentMonth=${nextMonthKey}`}
+                      href={`/spaces/${currentData.space.id}?currentMonth=${nextMonthKey}`}
                       variant="outline"
                       ariaLabel={String(i18n.t("pagination.next"))}
                     >
@@ -291,7 +330,7 @@ export function SpaceDetailSection({
                   {i18n.t("spaces_page.historical_total")}
                 </Text>
                 <Currency
-                  value={data.space.historicalTotal}
+                  value={currentData.space.historicalTotal}
                   size="h3"
                   weight="bold"
                   color="hero"
@@ -302,14 +341,14 @@ export function SpaceDetailSection({
         </Hero>
 
         <SpaceArchiveDialog
-          spaceId={data.space.id}
-          spaceName={data.space.name}
+          spaceId={currentData.space.id}
+          spaceName={currentData.space.name}
           isOpen={isArchiveDialogOpen || isUnarchiveDialogOpen}
           mode={isUnarchiveDialogOpen ? "unarchive" : "archive"}
           closeHref={detailHref}
         />
 
-        {data.space.isArchived ? (
+        {currentData.space.isArchived ? (
           <Card padding={24}>
             <Stack gap={18}>
               <Stack
@@ -342,7 +381,7 @@ export function SpaceDetailSection({
           icon="transactions"
         >
           <TransactionList
-            transactions={data.selectedMonthRelevantTransactions}
+            transactions={currentData.selectedMonthRelevantTransactions}
             showDelete={false}
             transactionHrefBase="/transactions"
             summaryRows={[
@@ -353,7 +392,7 @@ export function SpaceDetailSection({
                 }) as string,
                 value: (
                   <Currency
-                    value={data.space.selectedMonthTotal}
+                    value={currentData.space.selectedMonthTotal}
                     size="sm"
                     weight="bold"
                   />
@@ -371,27 +410,20 @@ export function SpaceDetailSection({
         >
           <Stack gap={20}>
             <TransactionList
-              transactions={data.allTransactions}
+              transactions={currentData.allTransactions}
               showDelete={false}
               transactionHrefBase="/transactions"
             />
 
-            {data.pagination.hasMore ? (
-              <form method="get">
-                <input
-                  type="hidden"
-                  name="currentMonth"
-                  value={data.selectedMonth.key}
-                />
-                <input
-                  type="hidden"
-                  name="page"
-                  value={String(data.pagination.page + 1)}
-                />
-                <Button type="submit">
-                  {i18n.t("spaces_page.load_more_transactions")}
-                </Button>
-              </form>
+            {currentData.pagination.hasMore ? (
+              <Button
+                onClick={() => void handleLoadMore()}
+                disabled={isLoadingMore}
+              >
+                {isLoadingMore
+                  ? i18n.t("common.loading")
+                  : i18n.t("spaces_page.load_more_transactions")}
+              </Button>
             ) : null}
           </Stack>
         </Card>

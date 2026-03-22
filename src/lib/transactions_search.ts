@@ -1,4 +1,6 @@
+import { endOfMonth } from "date-fns";
 import type { TransactionFiltersInput } from "@/lib/transaction";
+import { inferTransactionDateMode, toDate } from "@/lib/transaction_schedule";
 
 export type NormalizedTransactionsFilters = {
   page: number;
@@ -63,7 +65,7 @@ export function normalizeTransactionsFiltersFromUrlSearchParams(
     type: ["income", "expense", "transfer"].includes(
       searchParams.get("type") || "",
     )
-      ? ((searchParams.get("type") as "income" | "expense" | "transfer"))
+      ? (searchParams.get("type") as "income" | "expense" | "transfer")
       : "",
     startDate: searchParams.get("start_date") || "",
     endDate: searchParams.get("end_date") || "",
@@ -106,12 +108,22 @@ export function buildTransactionsFiltersQuery(
 export function toTransactionFiltersInput(
   filters: NormalizedTransactionsFilters,
 ): TransactionFiltersInput {
+  const parsedStartDate = filters.startDate
+    ? toDate(filters.startDate, inferTransactionDateMode(filters.startDate))
+    : undefined;
+  const parsedEndDate = filters.endDate
+    ? toDate(filters.endDate, inferTransactionDateMode(filters.endDate))
+    : undefined;
+
   return {
     spaceId: filters.space || undefined,
     type: filters.type || undefined,
     searchTerms: filters.searchTerms,
-    startDate: filters.startDate ? new Date(filters.startDate) : undefined,
-    endDate: filters.endDate ? new Date(filters.endDate) : undefined,
+    startDate: parsedStartDate || undefined,
+    endDate:
+      parsedEndDate && filters.endDate.length <= 7
+        ? endOfMonth(parsedEndDate)
+        : parsedEndDate || undefined,
     page: filters.page,
     limit: 20,
   };

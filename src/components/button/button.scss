@@ -15,7 +15,7 @@
     background-color var(--transition-fast),
     opacity var(--transition-fast);
   cursor: pointer;
-  userAccount-select: none;
+  useraccount-select: none;
 
   &:disabled {
     opacity: 0.5;
@@ -148,6 +148,33 @@
     }
   }
 
+  &--variant-outline-success {
+    background-color: color-mix(
+      in srgb,
+      var(--color-success) 12%,
+      var(--color-background-secondary)
+    );
+    border-color: color-mix(in srgb, var(--color-success) 32%, transparent);
+    color: var(--color-success);
+
+    &:hover:not(:disabled) {
+      background-color: color-mix(
+        in srgb,
+        var(--color-success) 18%,
+        var(--color-background-secondary)
+      );
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      background-color: color-mix(
+        in srgb,
+        var(--color-success) 24%,
+        var(--color-background-secondary)
+      );
+    }
+  }
+
   &--variant-success {
     background-color: var(--color-primary);
     color: var(--color-text-inverse);
@@ -159,6 +186,33 @@
 
     &:active:not(:disabled) {
       background-color: var(--color-primary-dark);
+    }
+  }
+
+  &--variant-outline-transfer {
+    background-color: color-mix(
+      in srgb,
+      var(--color-transfer) 12%,
+      var(--color-background-secondary)
+    );
+    border-color: color-mix(in srgb, var(--color-transfer) 32%, transparent);
+    color: var(--color-transfer);
+
+    &:hover:not(:disabled) {
+      background-color: color-mix(
+        in srgb,
+        var(--color-transfer) 18%,
+        var(--color-background-secondary)
+      );
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      background-color: color-mix(
+        in srgb,
+        var(--color-transfer) 24%,
+        var(--color-background-secondary)
+      );
     }
   }
 

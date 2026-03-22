@@ -16,7 +16,7 @@ export function AuthFormShell({
       <Stack align="center" justify="center" fullWidth fullHeight>
         <div className="auth-form-shell__card">
           <Box padding={24} maxWidth={480}>
-            {children}
+            <div className="auth-form-shell__content">{children}</div>
           </Box>
         </div>
       </Stack>

@@ -37,6 +37,7 @@ export function ProjectionChartSection({
       }),
       income: month.income,
       expenses: Math.abs(month.expense),
+      total: month.net,
     })) || [];
 
   return (
@@ -48,7 +49,9 @@ export function ProjectionChartSection({
     >
       {hasError && !data ? (
         <Stack gap={12} align="flex-start">
-          <Text color="secondary">{i18n.t("projection_page.chart_load_failed")}</Text>
+          <Text color="secondary">
+            {i18n.t("projection_page.chart_load_failed")}
+          </Text>
           <Button variant="secondary" size="sm" onClick={retry}>
             {i18n.t("common.retry")}
           </Button>

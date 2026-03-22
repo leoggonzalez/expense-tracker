@@ -107,6 +107,7 @@ export function SpacesPageSection({
           actions={[
             {
               icon: "plus",
+              title: String(i18n.t("spaces_page.new_space")),
               ariaLabel: String(i18n.t("spaces_page.create_space")),
               href: "/spaces/new",
               variant: "primary",

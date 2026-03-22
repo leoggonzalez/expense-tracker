@@ -2,14 +2,11 @@
 
 import "./bulk_transaction_form.scss";
 
+import { SpaceField, Button, Input, MonthSelector, Select } from "@/components";
 import {
-  SpaceField,
-  Button,
-  Input,
-  MonthSelector,
-  Select,
-} from "@/components";
-import { CreateTransactionInput, createMultipleTransactions } from "@/actions/transactions";
+  CreateTransactionInput,
+  createMultipleTransactions,
+} from "@/actions/transactions";
 import {
   TransactionScheduleMode,
   inferTransactionDateMode,
@@ -82,7 +79,9 @@ export function BulkTransactionForm({
   const [shared, setShared] = useState<SharedScheduleState>(
     getInitialSharedState(),
   );
-  const [transactions, setTransactions] = useState<BulkTransactionItem[]>(getInitialTransactions());
+  const [transactions, setTransactions] = useState<BulkTransactionItem[]>(
+    getInitialTransactions(),
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nextIdRef = useRef(2);
 
@@ -125,7 +124,9 @@ export function BulkTransactionForm({
   ): void => {
     setTransactions((currentTransactions) =>
       currentTransactions.map((transaction) =>
-        transaction.id === id ? { ...transaction, [field]: value } : transaction,
+        transaction.id === id
+          ? { ...transaction, [field]: value }
+          : transaction,
       ),
     );
   };
@@ -308,7 +309,9 @@ export function BulkTransactionForm({
               setShared((current) => ({ ...current, beginDate: value }))
             }
             editLabel={String(i18n.t("transaction_form.edit_full_begin_date"))}
-            closeLabel={String(i18n.t("transaction_form.use_month_year_begin_date"))}
+            closeLabel={String(
+              i18n.t("transaction_form.use_month_year_begin_date"),
+            )}
             monthLabel={i18n.t("transaction_form.month")}
             yearLabel={i18n.t("transaction_form.year")}
             required
@@ -388,7 +391,11 @@ export function BulkTransactionForm({
                   <Input
                     value={transaction.description}
                     onChange={(value) =>
-                      updateTransactionField(transaction.id, "description", value)
+                      updateTransactionField(
+                        transaction.id,
+                        "description",
+                        value,
+                      )
                     }
                     placeholder={
                       i18n.t(
@@ -412,7 +419,9 @@ export function BulkTransactionForm({
                       )
                     }
                     placeholder={
-                      i18n.t("bulk_transaction_form.amount_placeholder") as string
+                      i18n.t(
+                        "bulk_transaction_form.amount_placeholder",
+                      ) as string
                     }
                     required
                     size="lg"

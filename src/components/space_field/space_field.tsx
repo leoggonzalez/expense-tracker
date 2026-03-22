@@ -46,7 +46,7 @@ export function SpaceField({
     createFlowSpacesCache,
   );
   const resolvedSpaces =
-    loadSpacesOnMount && spaces.length === 0 ? (data?.spaces || []) : spaces;
+    loadSpacesOnMount && spaces.length === 0 ? data?.spaces || [] : spaces;
   const hasMatchingSpace = resolvedSpaces.includes(value);
   const [prefersCustomMode, setPrefersCustomMode] = useState(
     !hasMatchingSpace && !!value,

@@ -46,7 +46,11 @@ export default async function Page(): Promise<React.ReactElement> {
         />
 
         <PagePanel tone="form">
-          <TransactionForm spaces={[]} transactionType="expense" hideTypeField />
+          <TransactionForm
+            spaces={[]}
+            transactionType="expense"
+            hideTypeField
+          />
         </PagePanel>
       </Stack>
     </Container>

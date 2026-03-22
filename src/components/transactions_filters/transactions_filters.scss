@@ -16,8 +16,7 @@
   }
 
   &__search-input,
-  &__select,
-  &__date-input {
+  &__select {
     width: 100%;
     min-height: 48px;
     padding: 0 var(--spacing-md);
@@ -59,34 +58,33 @@
     cursor: pointer;
   }
 
-  &__date-input {
-    padding-right: var(--spacing-sm);
-  }
-
   &__menu {
     display: grid;
     gap: var(--spacing-lg);
+    align-content: start;
+    grid-auto-rows: max-content;
   }
 
   &__menu-section {
     display: grid;
     gap: var(--spacing-sm);
+    align-content: start;
+    grid-auto-rows: max-content;
   }
 
   &__field {
     display: grid;
     gap: var(--spacing-xs);
-  }
-
-  &__field-label {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
+    align-content: start;
+    grid-auto-rows: max-content;
   }
 
   &__date-grid {
     display: grid;
     gap: var(--spacing-sm);
+    align-content: start;
+    grid-auto-rows: max-content;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   &__type-option,
@@ -184,13 +182,5 @@
     );
     border-color: var(--color-primary);
     color: var(--color-primary);
-  }
-}
-
-@media (min-width: $breakpoint-tablet) {
-  .transactions-filters {
-    &__date-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 }

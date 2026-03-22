@@ -108,33 +108,33 @@ export function OtpInput({
           {label}
           {required && <span className="otp-input__required">*</span>}
         </Text>
-      <div className="otp-input__boxes" onPaste={handlePaste}>
-        {digits.map((digit, index) => (
-          <input
-            key={index}
-            ref={(node) => {
-              refs.current = refs.current.slice(0, length);
-              refs.current[index] = node;
-            }}
-            className="otp-input__box"
-            type="text"
-            inputMode="numeric"
-            autoComplete={index === 0 ? "one-time-code" : "off"}
-            pattern="[0-9]*"
-            maxLength={6}
-            value={digit}
-            onChange={(event) => handleChange(index, event.target.value)}
-            onKeyDown={(event) => handleKeyDown(index, event)}
-            aria-label={
-              i18n.t("auth.code_digit_aria_label", {
-                index: index + 1,
-              }) as string
-            }
-            disabled={disabled}
-            required={required && index === 0}
-          />
-        ))}
-      </div>
+        <div className="otp-input__boxes" onPaste={handlePaste}>
+          {digits.map((digit, index) => (
+            <input
+              key={index}
+              ref={(node) => {
+                refs.current = refs.current.slice(0, length);
+                refs.current[index] = node;
+              }}
+              className="otp-input__box"
+              type="text"
+              inputMode="numeric"
+              autoComplete={index === 0 ? "one-time-code" : "off"}
+              pattern="[0-9]*"
+              maxLength={6}
+              value={digit}
+              onChange={(event) => handleChange(index, event.target.value)}
+              onKeyDown={(event) => handleKeyDown(index, event)}
+              aria-label={
+                i18n.t("auth.code_digit_aria_label", {
+                  index: index + 1,
+                }) as string
+              }
+              disabled={disabled}
+              required={required && index === 0}
+            />
+          ))}
+        </div>
       </Stack>
     </div>
   );

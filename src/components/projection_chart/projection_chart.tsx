@@ -21,15 +21,58 @@ type ProjectionChartDataItem = {
   monthLabel: string;
   income: number;
   expenses: number;
+  total: number;
 };
 
 type ProjectionChartProps = {
   data: ProjectionChartDataItem[];
 };
 
+type ProjectionTooltipProps = {
+  active?: boolean;
+  payload?: Array<{
+    payload?: ProjectionChartDataItem;
+  }>;
+  label?: string;
+};
+
 function formatTooltipValue(value: unknown): string {
   const numericValue = typeof value === "number" ? value : Number(value ?? 0);
   return formatCurrency(Number.isFinite(numericValue) ? numericValue : 0);
+}
+
+function ProjectionTooltip({
+  active,
+  payload,
+  label,
+}: ProjectionTooltipProps): React.ReactElement | null {
+  if (!active || !payload?.length) {
+    return null;
+  }
+
+  const chartData = payload[0]?.payload as ProjectionChartDataItem | undefined;
+
+  if (!chartData) {
+    return null;
+  }
+
+  return (
+    <div className="projection-chart__tooltip">
+      <div className="projection-chart__tooltip-label">{label}</div>
+      <div className="projection-chart__tooltip-row">
+        <span>{i18n.t("projection_page.income")}</span>
+        <strong>{formatTooltipValue(chartData.income)}</strong>
+      </div>
+      <div className="projection-chart__tooltip-row">
+        <span>{i18n.t("projection_page.expenses")}</span>
+        <strong>{formatTooltipValue(chartData.expenses)}</strong>
+      </div>
+      <div className="projection-chart__tooltip-row projection-chart__tooltip-row--total">
+        <span>{i18n.t("projection_page.total")}</span>
+        <strong>{formatTooltipValue(chartData.total)}</strong>
+      </div>
+    </div>
+  );
 }
 
 export function ProjectionChart({
@@ -55,7 +98,7 @@ export function ProjectionChart({
             axisLine={false}
             tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }}
           />
-          <Tooltip formatter={(value) => formatTooltipValue(value)} />
+          <Tooltip content={<ProjectionTooltip />} />
           <Legend />
           <Bar
             dataKey="income"

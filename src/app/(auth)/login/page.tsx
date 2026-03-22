@@ -1,11 +1,9 @@
-import { AuthFormShell, Container, LoginForm } from "@/components";
+import { AuthFormShell, LoginForm } from "@/components";
 
 export default async function Page(): Promise<React.ReactElement> {
   return (
-    <Container>
-      <AuthFormShell>
-        <LoginForm />
-      </AuthFormShell>
-    </Container>
+    <AuthFormShell>
+      <LoginForm />
+    </AuthFormShell>
   );
 }

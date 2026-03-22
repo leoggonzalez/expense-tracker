@@ -160,10 +160,9 @@ export function MonthSelector({
 
   return (
     <div
-      className={[
-        "month-selector",
-        `month-selector--surface-${surface}`,
-      ].join(" ")}
+      className={["month-selector", `month-selector--surface-${surface}`].join(
+        " ",
+      )}
     >
       <Stack gap={8}>
         <Text as="div" size="sm" weight="medium" color="secondary">

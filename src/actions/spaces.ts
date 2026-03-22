@@ -1,5 +1,6 @@
 "use server";
 
+import { CreditCardPaymentTiming, SpaceType } from "@prisma/client";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 
 import { revalidateSpaceMutationPages } from "@/lib/app_revalidation";
@@ -12,6 +13,9 @@ type SpaceActionResult = {
   success: boolean;
   error?: string;
 };
+
+export type SpaceTypeInput = SpaceType | null;
+export type CreditCardPaymentTimingInput = CreditCardPaymentTiming | null;
 
 type SpaceCurrentMonthSummary = {
   id: string;
@@ -68,6 +72,9 @@ export type SpaceDetailPageData = {
 export type SpaceEditData = {
   id: string;
   name: string;
+  type: SpaceTypeInput;
+  paymentDueDay: number | null;
+  paymentTiming: CreditCardPaymentTimingInput;
   isArchived: boolean;
 };
 
@@ -93,21 +100,124 @@ function serializeSpaceTransaction(
   };
 }
 
+function normalizeSpaceType(type: string | null | undefined): SpaceTypeInput {
+  return type === SpaceType.credit_card ? SpaceType.credit_card : null;
+}
+
+function normalizePaymentTiming(
+  timing: string | null | undefined,
+): CreditCardPaymentTimingInput {
+  return timing === CreditCardPaymentTiming.same_month ||
+    timing === CreditCardPaymentTiming.previous_month
+    ? timing
+    : null;
+}
+
+function normalizePaymentDueDay(
+  value: number | string | null | undefined,
+): number | null {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const normalized = Number(value);
+
+  if (!Number.isInteger(normalized)) {
+    return Number.NaN;
+  }
+
+  return normalized;
+}
+
+function validateSpaceInput(input: {
+  name: string;
+  type: SpaceTypeInput;
+  paymentDueDay: number | null;
+  paymentTiming: CreditCardPaymentTimingInput;
+}): SpaceActionResult | null {
+  if (!input.name) {
+    return { success: false, error: "spaces_page.name_required" };
+  }
+
+  if (input.type === SpaceType.credit_card) {
+    if (input.paymentDueDay === null) {
+      return {
+        success: false,
+        error: "spaces_page.credit_card_payment_due_day_required",
+      };
+    }
+
+    if (Number.isNaN(input.paymentDueDay)) {
+      return {
+        success: false,
+        error: "spaces_page.credit_card_payment_due_day_invalid",
+      };
+    }
+
+    if (input.paymentDueDay < 1 || input.paymentDueDay > 31) {
+      return {
+        success: false,
+        error: "spaces_page.credit_card_payment_due_day_invalid",
+      };
+    }
+
+    if (input.paymentTiming === null) {
+      return {
+        success: false,
+        error: "spaces_page.credit_card_payment_timing_required",
+      };
+    }
+
+    return null;
+  }
+
+  if (input.paymentDueDay !== null && !Number.isNaN(input.paymentDueDay)) {
+    return {
+      success: false,
+      error: "spaces_page.payment_due_day_requires_credit_card",
+    };
+  }
+
+  if (input.paymentTiming !== null) {
+    return {
+      success: false,
+      error: "spaces_page.payment_timing_requires_credit_card",
+    };
+  }
+
+  return null;
+}
+
 // Create
 export async function createSpace(input: {
   name: string;
+  type?: SpaceTypeInput;
+  paymentDueDay?: number | null;
+  paymentTiming?: CreditCardPaymentTimingInput;
 }): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUserAccount();
   const name = input.name.trim();
+  const type = normalizeSpaceType(input.type);
+  const paymentDueDay = normalizePaymentDueDay(input.paymentDueDay);
+  const paymentTiming = normalizePaymentTiming(input.paymentTiming);
+  const validationError = validateSpaceInput({
+    name,
+    type,
+    paymentDueDay,
+    paymentTiming,
+  });
 
-  if (!name) {
-    return { success: false, error: "spaces_page.name_required" };
+  if (validationError) {
+    return validationError;
   }
 
   try {
     await new Space({
       userAccountId: currentUser.id,
       name,
+      type,
+      paymentDueDay: type === SpaceType.credit_card ? paymentDueDay : null,
+      paymentTiming: type === SpaceType.credit_card ? paymentTiming : null,
     }).create();
 
     revalidateSpaceMutationPages();
@@ -228,6 +338,9 @@ export async function getSpaceEditPayloadForUser(
   return {
     id: spaceRecord.id,
     name: spaceRecord.name,
+    type: spaceRecord.type,
+    paymentDueDay: spaceRecord.paymentDueDay,
+    paymentTiming: spaceRecord.paymentTiming,
     isArchived: spaceRecord.isArchived,
   };
 }
@@ -300,13 +413,33 @@ export async function getSpaceForEdit(
 // Update
 export async function updateSpace(
   id: string,
-  input: { name: string },
+  input: {
+    name: string;
+    type?: SpaceTypeInput;
+    paymentDueDay?: number | null;
+    paymentTiming?: CreditCardPaymentTimingInput;
+  },
 ): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUserAccount();
   const name = input.name.trim();
+  const type = normalizeSpaceType(input.type);
+  const paymentDueDay = normalizePaymentDueDay(input.paymentDueDay);
+  const paymentTiming = normalizePaymentTiming(input.paymentTiming);
+  const validationError = validateSpaceInput({
+    name,
+    type,
+    paymentDueDay,
+    paymentTiming,
+  });
 
-  if (!name) {
-    return { success: false, error: "space_detail_page.name_required" };
+  if (validationError) {
+    return {
+      success: false,
+      error:
+        validationError.error === "spaces_page.name_required"
+          ? "space_detail_page.name_required"
+          : validationError.error,
+    };
   }
 
   try {
@@ -316,7 +449,12 @@ export async function updateSpace(
       return { success: false, error: "space_detail_page.not_found" };
     }
 
-    await space.updateName(name);
+    await space.updateDetails({
+      name,
+      type,
+      paymentDueDay: type === SpaceType.credit_card ? paymentDueDay : null,
+      paymentTiming: type === SpaceType.credit_card ? paymentTiming : null,
+    });
     revalidateSpaceMutationPages();
 
     return { success: true };

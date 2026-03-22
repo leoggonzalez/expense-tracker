@@ -221,7 +221,7 @@ export function TransactionDetailSection({
                 i18n.t("transaction_detail_page.settle_transaction"),
               ),
               href: `/transactions/new/transfer?${settleSearchParams.toString()}`,
-              variant: "outline",
+              variant: "outline-transfer",
             },
             {
               icon: "trash",

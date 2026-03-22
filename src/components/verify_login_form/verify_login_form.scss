@@ -1,0 +1,16 @@
+@use "@/styles/variables.scss" as *;
+
+.verify-login-form {
+  width: 100%;
+  text-align: left;
+
+  > .stack {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .input__label {
+    width: 100%;
+    text-align: left;
+  }
+}

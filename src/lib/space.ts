@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { CreditCardPaymentTiming, Prisma, SpaceType } from "@prisma/client";
 import { endOfMonth, startOfMonth } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
@@ -6,6 +6,9 @@ import { prisma } from "@/lib/prisma";
 export type SpaceBaseData = {
   userAccountId: string;
   name: string;
+  type: SpaceType | null;
+  paymentDueDay: number | null;
+  paymentTiming: CreditCardPaymentTiming | null;
   isArchived: boolean;
   currentMonthTransactionCount: number;
   createdAt: Date;
@@ -27,9 +30,19 @@ export type SpaceMonthSummaryRecord = {
   currentMonthTotal: number;
 };
 
+export type CreditCardSpaceRecord = {
+  id: string;
+  name: string;
+  paymentDueDay: number;
+  paymentTiming: CreditCardPaymentTiming;
+};
+
 type SpaceDetailMetrics = {
   id: string;
   name: string;
+  type: SpaceType | null;
+  paymentDueDay: number | null;
+  paymentTiming: CreditCardPaymentTiming | null;
   isArchived: boolean;
   transactionCount: number;
   historicalTotal: number;
@@ -45,6 +58,9 @@ type SpaceMonthSummaryRow = {
 type SpaceDetailMetricsRow = {
   id: string;
   name: string;
+  type: SpaceType | null;
+  paymentDueDay: number | null;
+  paymentTiming: CreditCardPaymentTiming | null;
   isArchived: boolean;
   transactionCount: number | null;
   historicalTotal: number | null;
@@ -83,6 +99,9 @@ export class Space {
 
   public constructor(data: SpaceCreateData | SpacePersistedData) {
     this.data = {
+      type: null,
+      paymentDueDay: null,
+      paymentTiming: null,
       isArchived: false,
       currentMonthTransactionCount: 0,
       ...data,
@@ -94,19 +113,30 @@ export class Space {
       data: {
         userAccountId: this.data.userAccountId,
         name: this.data.name,
+        type: this.data.type,
+        paymentDueDay: this.data.paymentDueDay,
+        paymentTiming: this.data.paymentTiming,
       },
     });
 
     return Space.fromRecord(record);
   }
 
-  public async updateName(name: string): Promise<Space> {
+  public async updateDetails(input: {
+    name: string;
+    type: SpaceType | null;
+    paymentDueDay: number | null;
+    paymentTiming: CreditCardPaymentTiming | null;
+  }): Promise<Space> {
     const record = await prisma.space.update({
       where: {
         id: this.persistedId,
       },
       data: {
-        name,
+        name: input.name,
+        type: input.type,
+        paymentDueDay: input.paymentDueDay,
+        paymentTiming: input.paymentTiming,
       },
     });
 
@@ -152,6 +182,9 @@ export class Space {
       id: this.data.id,
       userAccountId: this.data.userAccountId,
       name: this.data.name,
+      type: this.data.type,
+      paymentDueDay: this.data.paymentDueDay,
+      paymentTiming: this.data.paymentTiming,
       isArchived: this.data.isArchived,
       currentMonthTransactionCount: this.data.currentMonthTransactionCount,
       createdAt: this.requirePersistedDate(this.data.createdAt),
@@ -241,6 +274,46 @@ export class Space {
     return records.map((record) => Space.fromRecord(record));
   }
 
+  public static async listActiveCreditCardSpaces(
+    userAccountId: string,
+  ): Promise<CreditCardSpaceRecord[]> {
+    const records = await prisma.space.findMany({
+      where: {
+        userAccountId,
+        isArchived: false,
+        type: SpaceType.credit_card,
+        paymentDueDay: {
+          not: null,
+        },
+        paymentTiming: {
+          not: null,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        paymentDueDay: true,
+        paymentTiming: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+
+    return records.flatMap((record) =>
+      record.paymentDueDay === null || record.paymentTiming === null
+        ? []
+        : [
+            {
+              id: record.id,
+              name: record.name,
+              paymentDueDay: record.paymentDueDay,
+              paymentTiming: record.paymentTiming,
+            },
+          ],
+    );
+  }
+
   public static async listByArchiveStateWithMonthTotals(
     userAccountId: string,
     isArchived: boolean,
@@ -307,7 +380,9 @@ export class Space {
     };
   }
 
-  public static async countTransactionsForSpace(spaceId: string): Promise<number> {
+  public static async countTransactionsForSpace(
+    spaceId: string,
+  ): Promise<number> {
     return prisma.transaction.count({
       where: {
         spaceId,
@@ -421,6 +496,9 @@ export class Space {
       SELECT
         s.id,
         s.name,
+        s.type,
+        s."paymentDueDay",
+        s."paymentTiming",
         s."isArchived",
         (
           SELECT COUNT(*)::integer
@@ -480,6 +558,9 @@ export class Space {
     return {
       id: row.id,
       name: row.name,
+      type: row.type,
+      paymentDueDay: row.paymentDueDay,
+      paymentTiming: row.paymentTiming,
       isArchived: row.isArchived,
       transactionCount: Number(row.transactionCount || 0),
       historicalTotal: Number(row.historicalTotal || 0),

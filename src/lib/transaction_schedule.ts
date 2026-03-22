@@ -12,7 +12,10 @@ export function inferTransactionDateMode(value: string): TransactionDateMode {
   return value.length > 7 ? "date" : "month";
 }
 
-export function normalizeDateValue(value: string, mode: TransactionDateMode): string {
+export function normalizeDateValue(
+  value: string,
+  mode: TransactionDateMode,
+): string {
   if (!value) {
     return "";
   }

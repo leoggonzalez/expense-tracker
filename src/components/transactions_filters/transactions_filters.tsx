@@ -2,13 +2,19 @@
 
 import "./transactions_filters.scss";
 
-import { ContextMenu, useNavigationProgress } from "@/components";
+import {
+  ContextMenu,
+  MonthSelector,
+  Select,
+  useNavigationProgress,
+} from "@/components";
 import { Icon, Stack, Text } from "@/elements";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import React from "react";
 import { format } from "date-fns";
 import { i18n } from "@/model/i18n";
+import { inferTransactionDateMode } from "@/lib/transaction_schedule";
 
 type TransactionsFiltersProps = {
   spaces: Array<{
@@ -33,6 +39,10 @@ type FilterPill = {
 };
 
 function formatFilterDate(date: string): string {
+  if (inferTransactionDateMode(date) === "month") {
+    return format(new Date(`${date}-01T00:00:00`), "MMM yyyy");
+  }
+
   return format(new Date(`${date}T00:00:00`), "MMM d, yyyy");
 }
 
@@ -166,8 +176,8 @@ export function TransactionsFilters({
   };
 
   const spaceLabel =
-    spaces.find((spaceOption) => spaceOption.id === filters.space)
-      ?.name || filters.space;
+    spaces.find((spaceOption) => spaceOption.id === filters.space)?.name ||
+    filters.space;
   const typeLabel =
     filters.type === "income"
       ? String(i18n.t("common.income"))
@@ -283,7 +293,9 @@ export function TransactionsFilters({
                         .filter(Boolean)
                         .join(" ")}
                       onClick={() =>
-                        updateQuery({ type: option.value as TransactionTypeFilter })
+                        updateQuery({
+                          type: option.value as TransactionTypeFilter,
+                        })
                       }
                     >
                       <Text as="span" size="sm" weight="medium">
@@ -296,26 +308,25 @@ export function TransactionsFilters({
             </div>
 
             <div className="transactions-filters__menu-section">
-              <label className="transactions-filters__field-label" htmlFor="space">
-                {i18n.t("transactions_page.space")}
-              </label>
-              <select
-                id="space"
-                className="transactions-filters__select"
+              <Select
+                label={i18n.t("transactions_page.space")}
                 value={filters.space}
-                onChange={(event) =>
-                  updateQuery({ space: event.target.value })
-                }
-              >
-                <option value="">
-                  {String(i18n.t("transactions_page.space_placeholder"))}
-                </option>
-                {spaces.map((space) => (
-                  <option key={space.id} value={space.id}>
-                    {space.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => updateQuery({ space: value })}
+                options={[
+                  {
+                    value: "",
+                    label: String(
+                      i18n.t("transactions_page.space_placeholder"),
+                    ),
+                  },
+                  ...spaces.map((space) => ({
+                    value: space.id,
+                    label: space.name,
+                  })),
+                ]}
+                size="lg"
+                surface="subtle"
+              />
             </div>
 
             <div className="transactions-filters__menu-section">
@@ -323,32 +334,34 @@ export function TransactionsFilters({
                 {i18n.t("transactions_page.date_range")}
               </Text>
               <div className="transactions-filters__date-grid">
-                <label className="transactions-filters__field">
-                  <span className="transactions-filters__field-label">
-                    {i18n.t("transactions_page.start_date")}
-                  </span>
-                  <input
-                    type="date"
-                    className="transactions-filters__date-input"
-                    value={filters.startDate}
-                    onChange={(event) =>
-                      updateQuery({ startDate: event.target.value })
-                    }
-                  />
-                </label>
-                <label className="transactions-filters__field">
-                  <span className="transactions-filters__field-label">
-                    {i18n.t("transactions_page.end_date")}
-                  </span>
-                  <input
-                    type="date"
-                    className="transactions-filters__date-input"
-                    value={filters.endDate}
-                    onChange={(event) =>
-                      updateQuery({ endDate: event.target.value })
-                    }
-                  />
-                </label>
+                <MonthSelector
+                  label={i18n.t("transactions_page.start_date")}
+                  value={filters.startDate}
+                  onChange={(value) => updateQuery({ startDate: value })}
+                  editLabel={String(
+                    i18n.t("transaction_form.edit_full_begin_date"),
+                  )}
+                  closeLabel={String(
+                    i18n.t("transaction_form.use_month_year_begin_date"),
+                  )}
+                  monthLabel={i18n.t("transaction_form.month")}
+                  yearLabel={i18n.t("transaction_form.year")}
+                  surface="subtle"
+                />
+                <MonthSelector
+                  label={i18n.t("transactions_page.end_date")}
+                  value={filters.endDate}
+                  onChange={(value) => updateQuery({ endDate: value })}
+                  editLabel={String(
+                    i18n.t("transaction_form.edit_full_end_date"),
+                  )}
+                  closeLabel={String(
+                    i18n.t("transaction_form.use_month_year_begin_date"),
+                  )}
+                  monthLabel={i18n.t("transaction_form.month")}
+                  yearLabel={i18n.t("transaction_form.year")}
+                  surface="subtle"
+                />
               </div>
             </div>
           </div>

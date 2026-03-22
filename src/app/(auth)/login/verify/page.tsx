@@ -1,4 +1,4 @@
-import { AuthFormShell, Container, VerifyLoginForm } from "@/components";
+import { AuthFormShell, VerifyLoginForm } from "@/components";
 
 type VerifyLoginRouteProps = {
   searchParams: Promise<{
@@ -12,10 +12,8 @@ export default async function Page({
   const params = await searchParams;
 
   return (
-    <Container>
-      <AuthFormShell>
-        <VerifyLoginForm initialEmail={params.email || ""} />
-      </AuthFormShell>
-    </Container>
+    <AuthFormShell>
+      <VerifyLoginForm initialEmail={params.email || ""} />
+    </AuthFormShell>
   );
 }

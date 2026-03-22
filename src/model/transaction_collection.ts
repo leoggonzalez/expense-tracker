@@ -47,7 +47,9 @@ export class TransactionCollection {
    * Get transactions active in a specific month
    */
   getActiveInMonth(targetDate: Date): Transaction[] {
-    return this.transactions.filter((transaction) => transaction.isActiveInMonth(targetDate));
+    return this.transactions.filter((transaction) =>
+      transaction.isActiveInMonth(targetDate),
+    );
   }
 
   /**
@@ -172,8 +174,8 @@ export class TransactionCollection {
   getCurrentMonthBreakdownBySpace(targetDate: Date): SpaceMonthBreakdown[] {
     return this.getTransactionsBySpace()
       .map((spaceGroup) => {
-        const activeTransactions = spaceGroup.transactions.filter((transaction) =>
-          transaction.isActiveInMonth(targetDate),
+        const activeTransactions = spaceGroup.transactions.filter(
+          (transaction) => transaction.isActiveInMonth(targetDate),
         );
 
         const income = activeTransactions
@@ -210,7 +212,9 @@ export class TransactionCollection {
    * Remove an transaction from the collection
    */
   remove(transactionId: string): void {
-    this.transactions = this.transactions.filter((transaction) => transaction.id !== transactionId);
+    this.transactions = this.transactions.filter(
+      (transaction) => transaction.id !== transactionId,
+    );
   }
 
   /**

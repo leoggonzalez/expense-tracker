@@ -64,7 +64,9 @@ export class SessionRecord {
     });
   }
 
-  public static async deleteByTokenHash(sessionTokenHash: string): Promise<void> {
+  public static async deleteByTokenHash(
+    sessionTokenHash: string,
+  ): Promise<void> {
     await prisma.session.deleteMany({
       where: {
         sessionTokenHash,

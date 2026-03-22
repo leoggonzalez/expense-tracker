@@ -43,6 +43,7 @@
     "recent_activity_load_failed": "No se puede cargar la actividad reciente en este momento.",
     "recent_activity_link": "Explorar movimientos",
     "payment_due": "Vence %{date}",
+    "debit_for_space": "Débito de %{space}",
     "activity_subtitle": "Últimos cambios en tus movimientos."
   },
   "transaction_form": {
@@ -213,6 +214,7 @@
     "request_failed": "No se pudo enviar el código de acceso.",
     "verify_failed": "No se pudo verificar el código de acceso.",
     "email_send_failed": "No se pudo enviar el correo de acceso.",
+    "account_not_found": "La cuenta no existe. Ponte en contacto con los administradores.",
     "logout": "Cerrar sesión"
   },
   "settings_page": {
@@ -245,6 +247,7 @@
   "spaces_page": {
     "title": "Espacios",
     "create_space": "Crear espacio",
+    "new_space": "Nuevo espacio",
     "create_space_hint": "Crea un espacio dedicado para organizar tus movimientos.",
     "edit_space_hint": "Actualiza el nombre del espacio manteniendo intactos su historial y sus movimientos.",
     "hero_subtitle": "Revisa saldos por mes y entra en cada espacio desde una sola vista.",
@@ -253,6 +256,14 @@
     "month_total_overview": "Resumen mensual",
     "space_name": "Nombre del espacio",
     "space_name_placeholder": "p. ej., espacio principal, inversión",
+    "space_type": "Tipo de espacio",
+    "space_type_regular": "Normal",
+    "space_type_credit_card": "Tarjeta de crédito",
+    "payment_due_day": "Día de vencimiento del pago",
+    "payment_timing": "Momento de liquidación",
+    "payment_timing_previous_month": "Mes anterior",
+    "payment_timing_same_month": "Mismo mes",
+    "payment_due_day_hint": "Elige el día de vencimiento y si esta tarjeta liquida el mismo mes o el mes anterior. Los meses más cortos usan el último día del mes.",
     "current_month_total": "Total del mes actual",
     "month_total_label": "Total de %{month}",
     "current_month_relevant_transactions": "Movimientos relevantes del mes actual",
@@ -291,6 +302,11 @@
     "empty_state": "Todavía no hay espacios. Crea el primero.",
     "duplicate_name": "Ya tienes un espacio con ese nombre.",
     "name_required": "El nombre del espacio es obligatorio.",
+    "credit_card_payment_due_day_required": "El día de vencimiento del pago es obligatorio para los espacios de tarjeta de crédito.",
+    "credit_card_payment_due_day_invalid": "El día de vencimiento del pago debe ser un número entero entre 1 y 31.",
+    "credit_card_payment_timing_required": "El momento de liquidación es obligatorio para los espacios de tarjeta de crédito.",
+    "payment_due_day_requires_credit_card": "El día de vencimiento del pago solo puede usarse en espacios de tarjeta de crédito.",
+    "payment_timing_requires_credit_card": "El momento de liquidación solo puede usarse en espacios de tarjeta de crédito.",
     "create_failed": "No se pudo crear el espacio.",
     "settle_hint": "Crea una transferencia de ajuste cuando este espacio cierre el mes por debajo de cero."
   },
@@ -311,6 +327,11 @@
     "update_failed": "No se pudo actualizar este espacio.",
     "duplicate_name": "Ya tienes un espacio con ese nombre.",
     "name_required": "El nombre del espacio es obligatorio.",
+    "credit_card_payment_due_day_required": "El día de vencimiento del pago es obligatorio para los espacios de tarjeta de crédito.",
+    "credit_card_payment_due_day_invalid": "El día de vencimiento del pago debe ser un número entero entre 1 y 31.",
+    "credit_card_payment_timing_required": "El momento de liquidación es obligatorio para los espacios de tarjeta de crédito.",
+    "payment_due_day_requires_credit_card": "El día de vencimiento del pago solo puede usarse en espacios de tarjeta de crédito.",
+    "payment_timing_requires_credit_card": "El momento de liquidación solo puede usarse en espacios de tarjeta de crédito.",
     "not_found": "Espacio no encontrado."
   },
   "new_transaction_page": {
@@ -361,6 +382,7 @@
     "expense": "Gasto",
     "transfer": "Transferencia",
     "add_transaction": "Añadir movimiento",
+    "loading": "Cargando...",
     "retry": "Reintentar"
   },
   "toast": {

@@ -34,8 +34,12 @@ export default async function Page({
             },
             {
               icon: "transactions",
-              title: String(i18n.t("transactions_page.add_multiple_transactions")),
-              ariaLabel: String(i18n.t("transactions_page.add_multiple_transactions")),
+              title: String(
+                i18n.t("transactions_page.add_multiple_transactions"),
+              ),
+              ariaLabel: String(
+                i18n.t("transactions_page.add_multiple_transactions"),
+              ),
               href: "/transactions/new/multiple",
               variant: "outline",
             },

@@ -10,6 +10,8 @@ import {
   Transaction,
   type CreateTransactionInput,
   type CreateTransferInput,
+  type DashboardCreditCardSettlementRecord,
+  type DashboardUpcomingPaymentRecord,
   type DashboardTotals,
   type FilteredTransactionRecord,
   type ProjectionFocusedSpaceSummaryRow,
@@ -28,7 +30,9 @@ export type DashboardDateRange = {
 
 export type DashboardTransactionItem = {
   id: string;
+  kind: "transaction";
   type: string;
+  spaceId: string;
   spaceName: string;
   description: string;
   amount: number;
@@ -38,6 +42,17 @@ export type DashboardTransactionItem = {
   transferSpaceName: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type DashboardCreditCardSettlementItem = {
+  id: string;
+  kind: "credit_card_settlement";
+  spaceId: string;
+  spaceName: string;
+  description: string;
+  amount: number;
+  dueDate: string;
+  projectedMonthRange: DashboardDateRange;
 };
 
 export type SerializedProjectionTransaction = {
@@ -55,7 +70,7 @@ export type SerializedProjectionTransaction = {
 export type DashboardPayload = {
   totals: DashboardTotals;
   recentTransactions: DashboardTransactionItem[];
-  upcomingPayments: DashboardTransactionItem[];
+  upcomingPayments: DashboardCreditCardSettlementItem[];
   currentMonthRange: DashboardDateRange;
 };
 
@@ -66,7 +81,7 @@ export type DashboardHeaderPayload = {
 
 export type DashboardUpcomingPayload = {
   currentMonthRange: DashboardDateRange;
-  upcomingPayments: DashboardTransactionItem[];
+  upcomingPayments: DashboardCreditCardSettlementItem[];
 };
 
 export type DashboardRecentActivityPayload = {
@@ -264,7 +279,9 @@ function serializeDashboardTransaction(
 ): DashboardTransactionItem {
   return {
     id: transaction.id,
+    kind: "transaction",
     type: transaction.type,
+    spaceId: transaction.spaceId,
     spaceName: transaction.space.name,
     description: transaction.description,
     amount: normalizeTransactionAmount(transaction.type, transaction.amount),
@@ -275,6 +292,30 @@ function serializeDashboardTransaction(
     createdAt: transaction.createdAt.toISOString(),
     updatedAt: transaction.updatedAt.toISOString(),
   };
+}
+
+function serializeDashboardCreditCardSettlement(
+  settlement: DashboardCreditCardSettlementRecord,
+): DashboardCreditCardSettlementItem {
+  return {
+    id: settlement.id,
+    kind: "credit_card_settlement",
+    spaceId: settlement.spaceId,
+    spaceName: settlement.spaceName,
+    description: settlement.description,
+    amount: settlement.amount,
+    dueDate: settlement.dueDate.toISOString(),
+    projectedMonthRange: serializeDashboardDateRange(
+      settlement.projectedMonthStart,
+      settlement.projectedMonthEnd,
+    ),
+  };
+}
+
+function serializeDashboardUpcomingPayment(
+  payment: DashboardUpcomingPaymentRecord,
+): DashboardCreditCardSettlementItem {
+  return serializeDashboardCreditCardSettlement(payment);
 }
 
 function serializeTransactionDetail(
@@ -288,7 +329,7 @@ function serializeTransactionDetail(
     transferSpaceId: transaction.transferSpaceId,
     transferSpaceName: transaction.transferSpace?.name || null,
     description: transaction.description,
-    amount: transaction.amount,
+    amount: normalizeTransactionAmount(transaction.type, transaction.amount),
     beginDate: transaction.beginDate.toISOString(),
     endDate: transaction.endDate?.toISOString() || null,
   };
@@ -580,7 +621,7 @@ export async function getDashboardPayload(): Promise<DashboardPayload> {
       serializeDashboardTransaction,
     ),
     upcomingPayments: dashboardData.upcomingPayments.map(
-      serializeDashboardTransaction,
+      serializeDashboardUpcomingPayment,
     ),
     currentMonthRange: serializeDashboardDateRange(
       dashboardData.monthStart,
@@ -616,7 +657,7 @@ export async function getDashboardUpcomingPayloadForUser(
       dashboardData.monthEnd,
     ),
     upcomingPayments: dashboardData.upcomingPayments.map(
-      serializeDashboardTransaction,
+      serializeDashboardUpcomingPayment,
     ),
   };
 }
@@ -670,7 +711,10 @@ export async function getTransactionDetailPayloadForUser(
   userAccountId: string,
   id: string,
 ): Promise<TransactionDetailPayload | null> {
-  const transaction = await Transaction.findWithSpaceByIdForUser(userAccountId, id);
+  const transaction = await Transaction.findWithSpaceByIdForUser(
+    userAccountId,
+    id,
+  );
 
   if (!transaction) {
     return null;

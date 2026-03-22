@@ -2,14 +2,12 @@
 
 import "./transaction_form.scss";
 
+import { SpaceField, Button, Input, MonthSelector, Select } from "@/components";
 import {
-  SpaceField,
-  Button,
-  Input,
-  MonthSelector,
-  Select,
-} from "@/components";
-import { CreateTransactionInput, createTransaction, updateTransaction } from "@/actions/transactions";
+  CreateTransactionInput,
+  createTransaction,
+  updateTransaction,
+} from "@/actions/transactions";
 import {
   TransactionScheduleMode,
   deriveScheduleFromDates,
@@ -83,7 +81,8 @@ function getInitialModel(props: TransactionFormProps): TransactionFormModel {
     ? new Date(props.initialData.endDate)
     : null;
   const schedule = deriveScheduleFromDates({ beginDate, endDate });
-  const isCreateSingleTransaction = !props.isEdit && Boolean(props.transactionType);
+  const isCreateSingleTransaction =
+    !props.isEdit && Boolean(props.transactionType);
   const defaultScheduleMode = isCreateSingleTransaction
     ? "one_time"
     : schedule.scheduleMode || "one_time";
@@ -106,13 +105,13 @@ function getSubmitButtonConfig(
   type: "income" | "expense",
   isSubmitting: boolean,
 ): {
-  variant: "primary" | "danger" | "success";
+  variant: "primary" | "danger" | "outline-success";
   label: string;
   iconName: "income" | "expense";
 } {
   if (type === "income") {
     return {
-      variant: "success",
+      variant: "outline-success",
       label: String(
         i18n.t(
           isSubmitting
@@ -444,7 +443,9 @@ export function TransactionForm({
           label={i18n.t("transaction_form.description")}
           value={fields.description.value || ""}
           onChange={(value) => fields.description.onChange(value)}
-          placeholder={i18n.t("transaction_form.description_placeholder") as string}
+          placeholder={
+            i18n.t("transaction_form.description_placeholder") as string
+          }
           required
           size="lg"
           surface="subtle"
@@ -488,7 +489,10 @@ export function TransactionForm({
                 },
               ] as const
             ).map((option) => (
-              <label key={option.value} className="transaction-form__schedule-option">
+              <label
+                key={option.value}
+                className="transaction-form__schedule-option"
+              >
                 <input
                   type="radio"
                   name="transaction-schedule"
@@ -509,7 +513,9 @@ export function TransactionForm({
           )}
           field={fields.beginDate}
           editLabel={String(i18n.t("transaction_form.edit_full_begin_date"))}
-          closeLabel={String(i18n.t("transaction_form.use_month_year_begin_date"))}
+          closeLabel={String(
+            i18n.t("transaction_form.use_month_year_begin_date"),
+          )}
           monthLabel={i18n.t("transaction_form.month")}
           yearLabel={i18n.t("transaction_form.year")}
           required

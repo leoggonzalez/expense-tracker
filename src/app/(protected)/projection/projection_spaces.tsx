@@ -119,7 +119,9 @@ export function ProjectionSpaces({
                       : []),
                     {
                       id: `total-${space.spaceId}`,
-                      label: i18n.t("projection_page.space_month_total") as string,
+                      label: i18n.t(
+                        "projection_page.space_month_total",
+                      ) as string,
                       value: (
                         <Currency
                           value={space.monthTotal}
