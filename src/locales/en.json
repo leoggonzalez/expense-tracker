@@ -43,6 +43,7 @@
     "recent_activity_load_failed": "Unable to load recent activity right now.",
     "recent_activity_link": "Browse transactions",
     "payment_due": "Due %{date}",
+    "debit_for_space": "Debit for %{space}",
     "activity_subtitle": "Latest changes across your transactions."
   },
   "transaction_form": {
@@ -265,6 +266,14 @@
     "month_total_overview": "Monthly overview",
     "space_name": "Space name",
     "space_name_placeholder": "e.g., Main space, Investment",
+    "space_type": "Space type",
+    "space_type_regular": "Regular",
+    "space_type_credit_card": "Credit card",
+    "payment_due_day": "Payment due day",
+    "payment_timing": "Settlement timing",
+    "payment_timing_previous_month": "Month before",
+    "payment_timing_same_month": "Same month",
+    "payment_due_day_hint": "Choose the due day and whether this card settles the same month or the month before. Shorter months use the last day of the month.",
     "current_month_total": "Current month total",
     "month_total_label": "%{month} total",
     "current_month_relevant_transactions": "Current month relevant transactions",
@@ -312,6 +321,11 @@
     "empty_state": "No spaces yet. Create your first space.",
     "duplicate_name": "You already have a space with this name.",
     "name_required": "Space name is required.",
+    "credit_card_payment_due_day_required": "Payment due day is required for credit-card spaces.",
+    "credit_card_payment_due_day_invalid": "Payment due day must be a whole number between 1 and 31.",
+    "credit_card_payment_timing_required": "Settlement timing is required for credit-card spaces.",
+    "payment_due_day_requires_credit_card": "Payment due day can only be used for credit-card spaces.",
+    "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
     "create_failed": "Unable to create the space.",
     "settle_hint": "Create a balancing transfer when this space finishes the month below zero."
   },
@@ -332,6 +346,11 @@
     "update_failed": "Unable to update this space.",
     "duplicate_name": "You already have a space with this name.",
     "name_required": "Space name is required.",
+    "credit_card_payment_due_day_required": "Payment due day is required for credit-card spaces.",
+    "credit_card_payment_due_day_invalid": "Payment due day must be a whole number between 1 and 31.",
+    "credit_card_payment_timing_required": "Settlement timing is required for credit-card spaces.",
+    "payment_due_day_requires_credit_card": "Payment due day can only be used for credit-card spaces.",
+    "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
     "not_found": "Space not found."
   },
   "new_transaction_page": {

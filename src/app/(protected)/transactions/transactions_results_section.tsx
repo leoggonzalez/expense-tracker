@@ -46,9 +46,8 @@ export function TransactionsResultsSection({
     endpoint,
     transactionsResultsCache,
   );
-  const [visibleData, setVisibleData] = React.useState<TransactionsPagePayload | null>(
-    null,
-  );
+  const [visibleData, setVisibleData] =
+    React.useState<TransactionsPagePayload | null>(null);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
   React.useEffect(() => {
@@ -68,11 +67,14 @@ export function TransactionsResultsSection({
         page: visibleData.pagination.page + 1,
       };
       const nextQueryString = buildTransactionsFiltersQuery(nextFilters);
-      const response = await fetch(`/api/transactions/list?${nextQueryString}`, {
-        method: "GET",
-        cache: "no-store",
-        credentials: "same-origin",
-      });
+      const response = await fetch(
+        `/api/transactions/list?${nextQueryString}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          credentials: "same-origin",
+        },
+      );
 
       if (!response.ok) {
         throw new Error("transactions_load_more_failed");
@@ -84,7 +86,9 @@ export function TransactionsResultsSection({
           return nextPayload;
         }
 
-        const seenIds = new Set(current.transactions.map((transaction) => transaction.id));
+        const seenIds = new Set(
+          current.transactions.map((transaction) => transaction.id),
+        );
         const appendedTransactions = nextPayload.transactions.filter(
           (transaction) => !seenIds.has(transaction.id),
         );
@@ -136,7 +140,10 @@ export function TransactionsResultsSection({
 
           {currentData &&
           currentData.pagination.page < currentData.pagination.totalPages ? (
-            <Button onClick={() => void handleLoadMore()} disabled={isLoadingMore}>
+            <Button
+              onClick={() => void handleLoadMore()}
+              disabled={isLoadingMore}
+            >
               {isLoadingMore
                 ? i18n.t("common.loading")
                 : i18n.t("transactions_page.load_more_transactions")}

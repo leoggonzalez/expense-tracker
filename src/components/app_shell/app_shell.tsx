@@ -27,7 +27,8 @@ export function AppShell({
   const { isNavigating } = useNavigationProgress();
   const isAuthRoute = pathname === "/login" || pathname === "/login/verify";
   const isSingleTransactionDraftRoute =
-    pathname === "/transactions/new/income" || pathname === "/transactions/new/expense";
+    pathname === "/transactions/new/income" ||
+    pathname === "/transactions/new/expense";
 
   // eslint-disable-next-line warn-use-effect -- This effect keeps draft persistence and last-path tracking synchronized with route changes.
   useEffect(() => {

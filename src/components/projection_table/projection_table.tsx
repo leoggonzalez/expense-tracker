@@ -41,13 +41,16 @@ export function ProjectionTable({
 
   const currentDate = new Date();
   const fallbackStartMonth = startOfMonth(currentDate);
-  const earliestBeginDate = transactions.reduce<Date | null>((earliest, transaction) => {
-    if (!earliest || transaction.beginDate < earliest) {
-      return transaction.beginDate;
-    }
+  const earliestBeginDate = transactions.reduce<Date | null>(
+    (earliest, transaction) => {
+      if (!earliest || transaction.beginDate < earliest) {
+        return transaction.beginDate;
+      }
 
-    return earliest;
-  }, null);
+      return earliest;
+    },
+    null,
+  );
   const startMonth = earliestBeginDate
     ? startOfMonth(earliestBeginDate)
     : fallbackStartMonth;
@@ -142,7 +145,9 @@ export function ProjectionTable({
                         <tr
                           key={transaction.id}
                           className="projection-table__row projection-table__row--interactive"
-                          onClick={() => push(`/transactions/${transaction.id}`)}
+                          onClick={() =>
+                            push(`/transactions/${transaction.id}`)
+                          }
                         >
                           <td className="projection-table__cell projection-table__cell--sticky">
                             <div className="projection-table__transaction">
@@ -179,8 +184,7 @@ export function ProjectionTable({
                         </td>
                         {months.map((month) => {
                           const monthKey = format(month, "yyyy-MM");
-                          const total =
-                            space.monthlyTotals.get(monthKey) || 0;
+                          const total = space.monthlyTotals.get(monthKey) || 0;
                           return (
                             <td
                               key={month.toISOString()}

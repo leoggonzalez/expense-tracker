@@ -24,7 +24,9 @@ export function useProtectedPageSection<T>(
   const isMountedRef = useRef(true);
   const activeRequestKeyRef = useRef(cacheKey);
   const cacheRef = useRef(cache);
-  const [data, setData] = useState<T | null>(cache.entries.get(cacheKey) ?? null);
+  const [data, setData] = useState<T | null>(
+    cache.entries.get(cacheKey) ?? null,
+  );
   const [isLoading, setIsLoading] = useState(!cache.entries.has(cacheKey));
   const [hasError, setHasError] = useState(false);
   const [isNotFound, setIsNotFound] = useState(false);

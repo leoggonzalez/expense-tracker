@@ -23,7 +23,9 @@ type TransactionCardProps = {
   transaction: TransactionCardItem;
 };
 
-function getTransferDirectionLabel(transaction: TransactionCardItem): string | null {
+function getTransferDirectionLabel(
+  transaction: TransactionCardItem,
+): string | null {
   if (!transaction.transferSpaceId || !transaction.transferSpaceName) {
     return null;
   }
@@ -60,7 +62,9 @@ function formatDateLine(beginDate: string, endDate: string | null): string {
   return `${formattedBegin} - ${format(new Date(endDate), "MMM dd, yyyy")}`;
 }
 
-export function TransactionCard({ transaction }: TransactionCardProps): React.ReactElement {
+export function TransactionCard({
+  transaction,
+}: TransactionCardProps): React.ReactElement {
   const transferDirectionLabel = getTransferDirectionLabel(transaction);
 
   return (

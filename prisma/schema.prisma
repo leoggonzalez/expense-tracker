@@ -19,11 +19,23 @@ model UserAccount {
   sessions   Session[]
 }
 
+enum SpaceType {
+  credit_card
+}
+
+enum CreditCardPaymentTiming {
+  same_month
+  previous_month
+}
+
 model Space {
   id        String   @id @default(cuid())
   userAccountId    String
   userAccount      UserAccount     @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
   name      String
+  type      SpaceType?
+  paymentDueDay Int?
+  paymentTiming CreditCardPaymentTiming?
   isArchived Boolean @default(false)
   currentMonthTransactionCount Int @default(0)
   createdAt DateTime @default(now())

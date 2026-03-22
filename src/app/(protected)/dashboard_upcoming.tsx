@@ -1,6 +1,9 @@
 "use client";
 
-import type { DashboardUpcomingPayload } from "@/actions/transactions";
+import type {
+  DashboardCreditCardSettlementItem,
+  DashboardUpcomingPayload,
+} from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import { AppLink, Button, LoadingSkeleton } from "@/components";
 import { Card, Stack, Text } from "@/elements";
@@ -31,6 +34,19 @@ function getUpcomingTransactionsHref(
 
 function formatPaymentDate(beginDate: string): string {
   return format(new Date(beginDate), "MMM d");
+}
+
+function getUpcomingPaymentHref(
+  payment: DashboardCreditCardSettlementItem,
+): string {
+  const searchParams = new URLSearchParams({
+    space: payment.spaceId,
+    type: "expense",
+    start_date: payment.projectedMonthRange.startDate,
+    end_date: payment.projectedMonthRange.endDate,
+  });
+
+  return `/transactions?${searchParams.toString()}`;
 }
 
 function UpcomingPaymentRowSkeleton(): React.ReactElement {
@@ -101,11 +117,15 @@ export function DashboardUpcoming(): React.ReactElement {
           </Card>
         ) : (
           <Stack gap={14}>
-            {data?.upcomingPayments.map((transaction) => (
+            {data?.upcomingPayments.map((payment) => (
               <AppLink
-                key={transaction.id}
-                href={`/transactions/${transaction.id}`}
-                ariaLabel={transaction.description}
+                key={payment.id}
+                href={getUpcomingPaymentHref(payment)}
+                ariaLabel={String(
+                  i18n.t("dashboard.debit_for_space", {
+                    space: payment.spaceName,
+                  }),
+                )}
               >
                 <Card
                   variant="secondary"
@@ -126,19 +146,21 @@ export function DashboardUpcoming(): React.ReactElement {
                   >
                     <Stack gap={4} align="flex-start">
                       <Text as="span" size="sm" weight="semibold">
-                        {transaction.description}
+                        {i18n.t("dashboard.debit_for_space", {
+                          space: payment.spaceName,
+                        })}
                       </Text>
                       <Text as="span" size="xs" color="secondary">
-                        {transaction.spaceName}
+                        {payment.spaceName}
                       </Text>
                     </Stack>
                     <Stack gap={4} align="flex-end">
                       <Text as="span" size="sm" weight="semibold">
-                        {formatCurrency(Math.abs(transaction.amount))}
+                        {formatCurrency(Math.abs(payment.amount))}
                       </Text>
                       <Text as="span" size="xs" color="secondary">
                         {i18n.t("dashboard.payment_due", {
-                          date: formatPaymentDate(transaction.beginDate),
+                          date: formatPaymentDate(payment.dueDate),
                         })}
                       </Text>
                     </Stack>

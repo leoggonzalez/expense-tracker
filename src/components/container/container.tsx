@@ -12,7 +12,11 @@ export function Container({
   maxWidth = "content",
   layout = "default",
 }: ContainerProps): React.ReactElement {
-  const classes = ["container", `container--${maxWidth}`, `container--layout-${layout}`].join(" ");
+  const classes = [
+    "container",
+    `container--${maxWidth}`,
+    `container--layout-${layout}`,
+  ].join(" ");
 
   return (
     <div className={classes}>

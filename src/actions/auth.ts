@@ -88,7 +88,9 @@ export async function verifyLoginCode(input: {
 
   try {
     if (isValidDevAdminCode(email, code)) {
-      const adminUser = await UserAccount.upsertByEmail(email, { name: "Admin" });
+      const adminUser = await UserAccount.upsertByEmail(email, {
+        name: "Admin",
+      });
       await createSession(adminUser.persistedId, generateSessionToken());
       return { success: true };
     }
@@ -108,13 +110,7 @@ export async function verifyLoginCode(input: {
       return { success: false, error: "auth.invalid_code" };
     }
 
-    if (
-      !verifyStoredLoginCode(
-        email,
-        code,
-        loginCode.data.codeHash,
-      )
-    ) {
+    if (!verifyStoredLoginCode(email, code, loginCode.data.codeHash)) {
       return { success: false, error: "auth.invalid_code" };
     }
 

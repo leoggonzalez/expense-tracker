@@ -60,7 +60,9 @@ export function NewTransferFormSection({
     return <NewTransferFormSkeleton />;
   }
 
-  const toSpace = data?.spaces.find((space) => space.id === initialValues.toSpaceId);
+  const toSpace = data?.spaces.find(
+    (space) => space.id === initialValues.toSpaceId,
+  );
   const resolvedInitialValues = {
     ...initialValues,
     description:

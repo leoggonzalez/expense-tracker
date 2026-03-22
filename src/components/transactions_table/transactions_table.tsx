@@ -32,7 +32,9 @@ export function TransactionsTable({
     return (
       <div className="transactions-table__empty">
         <Card padding={32} variant="dashed">
-          <Text color="secondary">{i18n.t("transactions_page.empty_state")}</Text>
+          <Text color="secondary">
+            {i18n.t("transactions_page.empty_state")}
+          </Text>
         </Card>
       </div>
     );

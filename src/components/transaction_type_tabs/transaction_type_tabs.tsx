@@ -32,20 +32,26 @@ export function TransactionTypeTabs({
           ]
             .filter(Boolean)
             .join(" ")}
-          >
-            <AppLink href={tab.href}>
-              <span className="transaction-type-tabs__content">
-                <Stack direction="row" inline align="center" justify="center" gap={8}>
-                  <span className="transaction-type-tabs__icon">
-                    <Icon name={tab.key} size={16} />
-                  </span>
-                  <Text as="span" size="sm" weight="medium">
-                    {tab.label}
-                  </Text>
-                </Stack>
-              </span>
-            </AppLink>
-          </div>
+        >
+          <AppLink href={tab.href}>
+            <span className="transaction-type-tabs__content">
+              <Stack
+                direction="row"
+                inline
+                align="center"
+                justify="center"
+                gap={8}
+              >
+                <span className="transaction-type-tabs__icon">
+                  <Icon name={tab.key} size={16} />
+                </span>
+                <Text as="span" size="sm" weight="medium">
+                  {tab.label}
+                </Text>
+              </Stack>
+            </span>
+          </AppLink>
+        </div>
       ))}
     </div>
   );

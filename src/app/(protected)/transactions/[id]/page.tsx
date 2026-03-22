@@ -16,5 +16,10 @@ export default async function Page({
   const { id } = await params;
   const query = await searchParams;
 
-  return <TransactionDetailSection id={id} isDeleteDialogOpen={query.confirmDelete === "1"} />;
+  return (
+    <TransactionDetailSection
+      id={id}
+      isDeleteDialogOpen={query.confirmDelete === "1"}
+    />
+  );
 }

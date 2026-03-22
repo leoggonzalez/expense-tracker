@@ -1,6 +1,11 @@
 import "./new_transaction_recent_transactions.scss";
 
-import { AppLink, Container, TransactionList, TransactionListItem } from "@/components";
+import {
+  AppLink,
+  Container,
+  TransactionList,
+  TransactionListItem,
+} from "@/components";
 import { Card, Stack, Text } from "@/elements";
 
 import React from "react";

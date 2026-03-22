@@ -78,7 +78,13 @@ export function SpaceEditFormSection({
   return (
     <Stack gap={24}>
       <PagePanel tone="form">
-        <SpaceEditForm spaceId={data.id} initialName={data.name} />
+        <SpaceEditForm
+          spaceId={data.id}
+          initialName={data.name}
+          initialType={data.type}
+          initialPaymentDueDay={data.paymentDueDay}
+          initialPaymentTiming={data.paymentTiming}
+        />
       </PagePanel>
 
       <AppLink href={`/spaces/${data.id}`}>

@@ -65,7 +65,7 @@ export function normalizeTransactionsFiltersFromUrlSearchParams(
     type: ["income", "expense", "transfer"].includes(
       searchParams.get("type") || "",
     )
-      ? ((searchParams.get("type") as "income" | "expense" | "transfer"))
+      ? (searchParams.get("type") as "income" | "expense" | "transfer")
       : "",
     startDate: searchParams.get("start_date") || "",
     endDate: searchParams.get("end_date") || "",

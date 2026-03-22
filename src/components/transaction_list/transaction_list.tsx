@@ -58,7 +58,9 @@ export function TransactionList({
     return (
       <div className="transaction-list transaction-list--empty">
         <Card padding={32} variant="dashed">
-          <Text color="secondary">{i18n.t("transaction_list.empty_state")}</Text>
+          <Text color="secondary">
+            {i18n.t("transaction_list.empty_state")}
+          </Text>
         </Card>
       </div>
     );
@@ -73,12 +75,18 @@ export function TransactionList({
               key={row.id}
               className={[
                 "transaction-list__summary-row",
-                row.tone === "emphasis" && "transaction-list__summary-row--emphasis",
+                row.tone === "emphasis" &&
+                  "transaction-list__summary-row--emphasis",
               ]
                 .filter(Boolean)
                 .join(" ")}
             >
-              <Stack direction="row" align="center" justify="space-between" gap={8}>
+              <Stack
+                direction="row"
+                align="center"
+                justify="space-between"
+                gap={8}
+              >
                 {row.href ? (
                   <div className="transaction-list__summary-link">
                     <AppLink href={row.href}>{row.label}</AppLink>
@@ -94,7 +102,9 @@ export function TransactionList({
                       {row.value}
                     </Text>
                   ) : (
-                    <span className="transaction-list__summary-value">{row.value}</span>
+                    <span className="transaction-list__summary-value">
+                      {row.value}
+                    </span>
                   )
                 ) : null}
               </Stack>
@@ -104,7 +114,9 @@ export function TransactionList({
           {plainTransactions.map((transaction) => {
             const href =
               transactionHref?.(transaction) ??
-              (transactionHrefBase ? `${transactionHrefBase}/${transaction.id}` : null);
+              (transactionHrefBase
+                ? `${transactionHrefBase}/${transaction.id}`
+                : null);
 
             const rowMain = <TransactionCard transaction={transaction} />;
 
@@ -149,12 +161,18 @@ export function TransactionList({
               key={row.id}
               className={[
                 "transaction-list__summary-row",
-                row.tone === "emphasis" && "transaction-list__summary-row--emphasis",
+                row.tone === "emphasis" &&
+                  "transaction-list__summary-row--emphasis",
               ]
                 .filter(Boolean)
                 .join(" ")}
             >
-              <Stack direction="row" align="center" justify="space-between" gap={8}>
+              <Stack
+                direction="row"
+                align="center"
+                justify="space-between"
+                gap={8}
+              >
                 {row.href ? (
                   <div className="transaction-list__summary-link">
                     <AppLink href={row.href}>{row.label}</AppLink>
@@ -170,7 +188,9 @@ export function TransactionList({
                       {row.value}
                     </Text>
                   ) : (
-                    <span className="transaction-list__summary-value">{row.value}</span>
+                    <span className="transaction-list__summary-value">
+                      {row.value}
+                    </span>
                   )
                 ) : null}
               </Stack>

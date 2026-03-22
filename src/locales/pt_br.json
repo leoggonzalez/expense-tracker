@@ -43,6 +43,7 @@
     "recent_activity_load_failed": "Não foi possível carregar a atividade recente agora.",
     "recent_activity_link": "Explorar lançamentos",
     "payment_due": "Vence em %{date}",
+    "debit_for_space": "Débito de %{space}",
     "activity_subtitle": "Últimas alterações nos seus lançamentos."
   },
   "transaction_form": {
@@ -255,6 +256,14 @@
     "month_total_overview": "Visão mensal",
     "space_name": "Nome do espaço",
     "space_name_placeholder": "ex.: espaço principal, investimento",
+    "space_type": "Tipo de espaço",
+    "space_type_regular": "Regular",
+    "space_type_credit_card": "Cartão de crédito",
+    "payment_due_day": "Dia de vencimento do pagamento",
+    "payment_timing": "Momento da liquidação",
+    "payment_timing_previous_month": "Mês anterior",
+    "payment_timing_same_month": "Mesmo mês",
+    "payment_due_day_hint": "Escolha o dia de vencimento e se este cartão liquida no mesmo mês ou no mês anterior. Meses mais curtos usam o último dia do mês.",
     "current_month_total": "Total do mês atual",
     "month_total_label": "Total de %{month}",
     "current_month_relevant_transactions": "Lançamentos relevantes do mês atual",
@@ -293,6 +302,11 @@
     "empty_state": "Ainda não há espaços. Crie o primeiro.",
     "duplicate_name": "Você já possui um espaço com esse nome.",
     "name_required": "O nome do espaço é obrigatório.",
+    "credit_card_payment_due_day_required": "O dia de vencimento do pagamento é obrigatório para espaços de cartão de crédito.",
+    "credit_card_payment_due_day_invalid": "O dia de vencimento do pagamento deve ser um número inteiro entre 1 e 31.",
+    "credit_card_payment_timing_required": "O momento da liquidação é obrigatório para espaços de cartão de crédito.",
+    "payment_due_day_requires_credit_card": "O dia de vencimento do pagamento só pode ser usado em espaços de cartão de crédito.",
+    "payment_timing_requires_credit_card": "O momento da liquidação só pode ser usado em espaços de cartão de crédito.",
     "create_failed": "Não foi possível criar o espaço.",
     "settle_hint": "Crie uma transferência de ajuste quando este espaço encerrar o mês abaixo de zero."
   },
@@ -313,6 +327,11 @@
     "update_failed": "Não foi possível atualizar este espaço.",
     "duplicate_name": "Você já possui um espaço com esse nome.",
     "name_required": "O nome do espaço é obrigatório.",
+    "credit_card_payment_due_day_required": "O dia de vencimento do pagamento é obrigatório para espaços de cartão de crédito.",
+    "credit_card_payment_due_day_invalid": "O dia de vencimento do pagamento deve ser um número inteiro entre 1 e 31.",
+    "credit_card_payment_timing_required": "O momento da liquidação é obrigatório para espaços de cartão de crédito.",
+    "payment_due_day_requires_credit_card": "O dia de vencimento do pagamento só pode ser usado em espaços de cartão de crédito.",
+    "payment_timing_requires_credit_card": "O momento da liquidação só pode ser usado em espaços de cartão de crédito.",
     "not_found": "Espaço não encontrado."
   },
   "new_transaction_page": {

@@ -176,8 +176,8 @@ export function TransactionsFilters({
   };
 
   const spaceLabel =
-    spaces.find((spaceOption) => spaceOption.id === filters.space)
-      ?.name || filters.space;
+    spaces.find((spaceOption) => spaceOption.id === filters.space)?.name ||
+    filters.space;
   const typeLabel =
     filters.type === "income"
       ? String(i18n.t("common.income"))
@@ -293,7 +293,9 @@ export function TransactionsFilters({
                         .filter(Boolean)
                         .join(" ")}
                       onClick={() =>
-                        updateQuery({ type: option.value as TransactionTypeFilter })
+                        updateQuery({
+                          type: option.value as TransactionTypeFilter,
+                        })
                       }
                     >
                       <Text as="span" size="sm" weight="medium">
@@ -313,7 +315,9 @@ export function TransactionsFilters({
                 options={[
                   {
                     value: "",
-                    label: String(i18n.t("transactions_page.space_placeholder")),
+                    label: String(
+                      i18n.t("transactions_page.space_placeholder"),
+                    ),
                   },
                   ...spaces.map((space) => ({
                     value: space.id,
@@ -334,7 +338,9 @@ export function TransactionsFilters({
                   label={i18n.t("transactions_page.start_date")}
                   value={filters.startDate}
                   onChange={(value) => updateQuery({ startDate: value })}
-                  editLabel={String(i18n.t("transaction_form.edit_full_begin_date"))}
+                  editLabel={String(
+                    i18n.t("transaction_form.edit_full_begin_date"),
+                  )}
                   closeLabel={String(
                     i18n.t("transaction_form.use_month_year_begin_date"),
                   )}
@@ -346,7 +352,9 @@ export function TransactionsFilters({
                   label={i18n.t("transactions_page.end_date")}
                   value={filters.endDate}
                   onChange={(value) => updateQuery({ endDate: value })}
-                  editLabel={String(i18n.t("transaction_form.edit_full_end_date"))}
+                  editLabel={String(
+                    i18n.t("transaction_form.edit_full_end_date"),
+                  )}
                   closeLabel={String(
                     i18n.t("transaction_form.use_month_year_begin_date"),
                   )}

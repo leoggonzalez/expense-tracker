@@ -118,9 +118,8 @@ export function SpaceDetailSection({
   const endpoint = `/api/spaces/${id}?currentMonth=${currentMonthKey}&page=${String(page)}`;
   const { data, isLoading, hasError, isNotFound, retry } =
     useProtectedPageSection(endpoint, endpoint, spaceDetailCache);
-  const [visibleData, setVisibleData] = React.useState<SpaceDetailPayload | null>(
-    null,
-  );
+  const [visibleData, setVisibleData] =
+    React.useState<SpaceDetailPayload | null>(null);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
   React.useEffect(() => {
@@ -417,7 +416,10 @@ export function SpaceDetailSection({
             />
 
             {currentData.pagination.hasMore ? (
-              <Button onClick={() => void handleLoadMore()} disabled={isLoadingMore}>
+              <Button
+                onClick={() => void handleLoadMore()}
+                disabled={isLoadingMore}
+              >
                 {isLoadingMore
                   ? i18n.t("common.loading")
                   : i18n.t("spaces_page.load_more_transactions")}

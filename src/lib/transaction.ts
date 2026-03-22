@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { CreditCardPaymentTiming, Prisma } from "@prisma/client";
 import {
   addMonths,
   endOfDay,
@@ -9,7 +9,7 @@ import {
 } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
-import { Space } from "@/lib/space";
+import { Space, type CreditCardSpaceRecord } from "@/lib/space";
 
 export type CreateTransactionInput = {
   type: "income" | "expense";
@@ -104,6 +104,21 @@ export type DashboardTotals = {
   net: number;
 };
 
+export type DashboardCreditCardSettlementRecord = {
+  kind: "credit_card_settlement";
+  id: string;
+  spaceId: string;
+  spaceName: string;
+  description: string;
+  amount: number;
+  dueDate: Date;
+  projectedMonthStart: Date;
+  projectedMonthEnd: Date;
+};
+
+export type DashboardUpcomingPaymentRecord =
+  DashboardCreditCardSettlementRecord;
+
 export type TransactionFiltersInput = {
   spaceId?: string;
   type?: "income" | "expense" | "transfer";
@@ -190,7 +205,7 @@ export type ProjectionSpacesQueryData = {
 export type DashboardQueryData = {
   totals: DashboardTotals;
   recentTransactions: TransactionWithSpaceRecord[];
-  upcomingPayments: TransactionWithSpaceRecord[];
+  upcomingPayments: DashboardUpcomingPaymentRecord[];
   monthStart: Date;
   monthEnd: Date;
 };
@@ -202,7 +217,7 @@ export type DashboardHeaderQueryData = {
 };
 
 export type DashboardUpcomingQueryData = {
-  upcomingPayments: TransactionWithSpaceRecord[];
+  upcomingPayments: DashboardUpcomingPaymentRecord[];
   monthStart: Date;
   monthEnd: Date;
 };
@@ -749,22 +764,32 @@ export class Transaction {
     const monthStart = startOfMonth(now);
     const monthEnd = endOfMonth(now);
     const today = startOfDay(now);
-    const upcomingPayments = await prisma.transaction.findMany({
-      where: {
-        type: "expense",
-        transferSpaceId: null,
-        space: {
-          userAccountId,
-        },
-        beginDate: {
-          gte: today,
-          lte: monthEnd,
-        },
-      },
-      include: transactionWithSpaceInclude,
-      orderBy: [{ beginDate: "asc" }, { createdAt: "desc" }],
-      take: 6,
-    });
+    const creditCardSpaces =
+      await Space.listActiveCreditCardSpaces(userAccountId);
+    const upcomingPayments = (
+      await Promise.all(
+        creditCardSpaces.map((space) =>
+          Transaction.getUpcomingCreditCardSettlement(
+            space,
+            monthStart,
+            today,
+            monthEnd,
+          ),
+        ),
+      )
+    )
+      .filter(
+        (payment): payment is DashboardUpcomingPaymentRecord =>
+          payment !== null,
+      )
+      .sort((left, right) => {
+        if (left.dueDate.getTime() === right.dueDate.getTime()) {
+          return left.spaceName.localeCompare(right.spaceName);
+        }
+
+        return left.dueDate.getTime() - right.dueDate.getTime();
+      })
+      .slice(0, 6);
 
     return {
       upcomingPayments,
@@ -946,6 +971,77 @@ export class Transaction {
 
   private static fromRecord(record: TransactionPersistedData): Transaction {
     return new Transaction(record);
+  }
+
+  private static async getUpcomingCreditCardSettlement(
+    space: CreditCardSpaceRecord,
+    monthStart: Date,
+    today: Date,
+    monthEnd: Date,
+  ): Promise<DashboardUpcomingPaymentRecord | null> {
+    const dueDate = Transaction.getCreditCardDueDateForMonth(
+      monthStart,
+      monthEnd,
+      space.paymentDueDay,
+    );
+
+    if (dueDate < today || dueDate > monthEnd) {
+      return null;
+    }
+
+    const projectedMonthStart =
+      space.paymentTiming === CreditCardPaymentTiming.previous_month
+        ? startOfMonth(addMonths(monthStart, 1))
+        : monthStart;
+    const projectedMonthEnd = endOfMonth(projectedMonthStart);
+
+    const rows = await prisma.$queryRaw<Array<{ total: number | null }>>`
+      SELECT
+        COALESCE(
+          SUM(
+            CASE
+              WHEN t.amount > 0 THEN t.amount
+              ELSE -t.amount
+            END
+          ),
+          0
+        ) AS total
+      FROM "Transaction" t
+      WHERE t."spaceId" = ${space.id}
+        AND t.type = 'expense'
+        AND t."transferSpaceId" IS NULL
+        AND t."beginDate" <= ${projectedMonthEnd}
+        AND (t."endDate" IS NULL OR t."endDate" >= ${projectedMonthStart})
+    `;
+    const total = Number(rows[0]?.total || 0);
+
+    if (total <= 0) {
+      return null;
+    }
+
+    return {
+      kind: "credit_card_settlement",
+      id: `credit-card-settlement-${space.id}-${projectedMonthStart.toISOString()}`,
+      spaceId: space.id,
+      spaceName: space.name,
+      description: space.name,
+      amount: total,
+      dueDate,
+      projectedMonthStart,
+      projectedMonthEnd,
+    };
+  }
+
+  private static getCreditCardDueDateForMonth(
+    monthStart: Date,
+    monthEnd: Date,
+    paymentDueDay: number,
+  ): Date {
+    const dueDate = new Date(monthStart);
+
+    dueDate.setDate(Math.min(paymentDueDay, monthEnd.getDate()));
+
+    return dueDate;
   }
 
   private requirePersistedId(): string {
