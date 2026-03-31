@@ -18,6 +18,17 @@
     position: relative;
   }
 
+  &__loading {
+    width: 100%;
+  }
+
+  &__loading-label {
+    position: absolute;
+    inset: 50% auto auto var(--spacing-md);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
   &__field {
     width: 100%;
     padding: var(--spacing-sm) var(--spacing-md);

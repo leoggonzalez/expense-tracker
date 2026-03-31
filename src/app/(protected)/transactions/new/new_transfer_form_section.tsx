@@ -13,6 +13,7 @@ const newTransferSpacesCache = {
 
 type NewTransferFormSectionProps = {
   initialValues: {
+    fromSpaceId: string;
     toSpaceId: string;
     description: string;
     amount: string;

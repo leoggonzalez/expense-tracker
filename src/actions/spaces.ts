@@ -48,6 +48,7 @@ type SpaceDetailTransaction = {
 };
 
 export type SpaceDetailPageData = {
+  mainSpaceId: string | null;
   selectedMonth: {
     key: string;
     label: string;
@@ -55,6 +56,7 @@ export type SpaceDetailPageData = {
   space: {
     id: string;
     name: string;
+    main: boolean | null;
     isArchived: boolean;
     historicalTotal: number;
     selectedMonthTotal: number;
@@ -72,6 +74,7 @@ export type SpaceDetailPageData = {
 export type SpaceEditData = {
   id: string;
   name: string;
+  main: boolean | null;
   type: SpaceTypeInput;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTimingInput;
@@ -191,6 +194,7 @@ function validateSpaceInput(input: {
 // Create
 export async function createSpace(input: {
   name: string;
+  main?: boolean | null;
   type?: SpaceTypeInput;
   paymentDueDay?: number | null;
   paymentTiming?: CreditCardPaymentTimingInput;
@@ -212,13 +216,22 @@ export async function createSpace(input: {
   }
 
   try {
-    await new Space({
+    const createdSpace = await new Space({
       userAccountId: currentUser.id,
       name,
+      main: input.main ?? null,
       type,
       paymentDueDay: type === SpaceType.credit_card ? paymentDueDay : null,
       paymentTiming: type === SpaceType.credit_card ? paymentTiming : null,
     }).create();
+
+    if (input.main) {
+      await Space.setMainStatusForUser(
+        currentUser.id,
+        createdSpace.persistedId,
+        true,
+      );
+    }
 
     revalidateSpaceMutationPages();
 
@@ -282,19 +295,23 @@ export async function getSpaceDetailPayloadForUser(
   const take = page * limit;
   const monthStart = startOfMonth(input.selectedMonthStart || new Date());
   const monthEnd = endOfMonth(monthStart);
-  const detailData = await Space.getDetailPageQueryResult(
-    userAccountId,
-    input.spaceId,
-    monthStart,
-    monthEnd,
-    take,
-  );
+  const [detailData, mainSpace] = await Promise.all([
+    Space.getDetailPageQueryResult(
+      userAccountId,
+      input.spaceId,
+      monthStart,
+      monthEnd,
+      take,
+    ),
+    Space.findMainByUser(userAccountId),
+  ]);
 
   if (!detailData) {
     return null;
   }
 
   return {
+    mainSpaceId: mainSpace?.toRecord().id || null,
     selectedMonth: {
       key: format(monthStart, "yyyy-MM"),
       label: format(monthStart, "MMMM yyyy"),
@@ -302,6 +319,7 @@ export async function getSpaceDetailPayloadForUser(
     space: {
       id: detailData.metrics.id,
       name: detailData.metrics.name,
+      main: detailData.metrics.main,
       isArchived: detailData.metrics.isArchived,
       historicalTotal: detailData.metrics.historicalTotal,
       selectedMonthTotal: detailData.metrics.selectedMonthTotal,
@@ -338,6 +356,7 @@ export async function getSpaceEditPayloadForUser(
   return {
     id: spaceRecord.id,
     name: spaceRecord.name,
+    main: spaceRecord.main,
     type: spaceRecord.type,
     paymentDueDay: spaceRecord.paymentDueDay,
     paymentTiming: spaceRecord.paymentTiming,
@@ -415,6 +434,7 @@ export async function updateSpace(
   id: string,
   input: {
     name: string;
+    main?: boolean | null;
     type?: SpaceTypeInput;
     paymentDueDay?: number | null;
     paymentTiming?: CreditCardPaymentTimingInput;
@@ -449,12 +469,20 @@ export async function updateSpace(
       return { success: false, error: "space_detail_page.not_found" };
     }
 
+    const nextMain = input.main ?? space.toRecord().main;
+
     await space.updateDetails({
       name,
+      main: nextMain,
       type,
       paymentDueDay: type === SpaceType.credit_card ? paymentDueDay : null,
       paymentTiming: type === SpaceType.credit_card ? paymentTiming : null,
     });
+
+    if (nextMain) {
+      await Space.setMainStatusForUser(currentUser.id, id, true);
+    }
+
     revalidateSpaceMutationPages();
 
     return { success: true };
@@ -464,6 +492,33 @@ export async function updateSpace(
     }
 
     console.error("Error updating space:", error);
+    return { success: false, error: "space_detail_page.update_failed" };
+  }
+}
+
+export async function setSpaceMainStatus(
+  id: string,
+  main: boolean | null,
+): Promise<SpaceActionResult> {
+  const currentUser = await requireCurrentUserAccount();
+
+  try {
+    const space = await Space.findOwnedById(currentUser.id, id);
+
+    if (!space) {
+      return { success: false, error: "space_detail_page.not_found" };
+    }
+
+    if (space.toRecord().isArchived) {
+      return { success: false, error: "space_detail_page.not_found" };
+    }
+
+    await Space.setMainStatusForUser(currentUser.id, id, main);
+    revalidateSpaceMutationPages();
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating main space:", error);
     return { success: false, error: "space_detail_page.update_failed" };
   }
 }

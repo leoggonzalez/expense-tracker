@@ -184,6 +184,9 @@ export function TransactionDetailSection({
   const settleAmount = Math.abs(data.amount).toFixed(2);
   const settleSearchParams = new URLSearchParams({
     to_space: data.spaceId,
+    ...(data.mainSpaceId && data.mainSpaceId !== data.spaceId
+      ? { from_space: data.mainSpaceId }
+      : {}),
     description: settleDescription,
     amount: settleAmount,
   });

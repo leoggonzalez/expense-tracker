@@ -1,0 +1,2 @@
+ALTER TABLE "Space"
+ADD COLUMN "main" BOOLEAN;

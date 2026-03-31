@@ -33,6 +33,7 @@ model Space {
   userAccountId    String
   userAccount      UserAccount     @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
   name      String
+  main      Boolean?
   type      SpaceType?
   paymentDueDay Int?
   paymentTiming CreditCardPaymentTiming?

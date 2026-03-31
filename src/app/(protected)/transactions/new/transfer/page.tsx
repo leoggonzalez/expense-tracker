@@ -10,6 +10,7 @@ import { Stack } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 type TransferPageSearchParams = Promise<{
+  from_space?: string;
   to_space?: string;
   description?: string;
   amount?: string;
@@ -24,6 +25,7 @@ export default async function Page({
 }: TransferPageProps): Promise<React.ReactElement> {
   const params = await searchParams;
   const initialValues = {
+    fromSpaceId: params.from_space || "",
     toSpaceId: params.to_space || "",
     description: params.description || "",
     amount: sanitizeAmountInput(params.amount || ""),

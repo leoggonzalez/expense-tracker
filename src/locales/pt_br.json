@@ -37,7 +37,7 @@
     "hero_more_action": "Mais",
     "header_load_failed": "Não foi possível carregar o resumo do painel agora.",
     "upcoming_payments": "Próximos pagamentos",
-    "upcoming_payments_empty": "Não restam despesas programadas para este mês.",
+    "upcoming_payments_empty": "Não há despesas programadas com vencimento nas próximas duas semanas.",
     "upcoming_load_failed": "Não foi possível carregar os próximos pagamentos agora.",
     "upcoming_payments_link": "Ver todas as despesas",
     "recent_activity_load_failed": "Não foi possível carregar a atividade recente agora.",
@@ -332,6 +332,9 @@
     "credit_card_payment_timing_required": "O momento da liquidação é obrigatório para espaços de cartão de crédito.",
     "payment_due_day_requires_credit_card": "O dia de vencimento do pagamento só pode ser usado em espaços de cartão de crédito.",
     "payment_timing_requires_credit_card": "O momento da liquidação só pode ser usado em espaços de cartão de crédito.",
+    "main_toggle_label": "Definir como espaço principal",
+    "main_toggle_description": "Ao marcar este espaço como principal, todos os outros espaços deixarão de estar marcados como principais automaticamente.",
+    "main_update_success": "Espaço principal atualizado.",
     "not_found": "Espaço não encontrado."
   },
   "new_transaction_page": {

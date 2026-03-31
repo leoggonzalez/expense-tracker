@@ -1,7 +1,7 @@
 "use client";
 
 import type {
-  DashboardCreditCardSettlementItem,
+  DashboardUpcomingItem,
   DashboardUpcomingPayload,
 } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
@@ -23,8 +23,8 @@ function getUpcomingTransactionsHref(
   const searchParams = new URLSearchParams();
 
   if (payload) {
-    searchParams.set("start_date", payload.currentMonthRange.startDate);
-    searchParams.set("end_date", payload.currentMonthRange.endDate);
+    searchParams.set("start_date", payload.upcomingRange.startDate);
+    searchParams.set("end_date", payload.upcomingRange.endDate);
   }
 
   searchParams.set("type", "expense");
@@ -37,8 +37,12 @@ function formatPaymentDate(beginDate: string): string {
 }
 
 function getUpcomingPaymentHref(
-  payment: DashboardCreditCardSettlementItem,
+  payment: DashboardUpcomingItem,
 ): string {
+  if (payment.kind === "transaction") {
+    return `/transactions/${payment.id}`;
+  }
+
   const searchParams = new URLSearchParams({
     space: payment.spaceId,
     type: "expense",
@@ -122,9 +126,11 @@ export function DashboardUpcoming(): React.ReactElement {
                 key={payment.id}
                 href={getUpcomingPaymentHref(payment)}
                 ariaLabel={String(
-                  i18n.t("dashboard.debit_for_space", {
-                    space: payment.spaceName,
-                  }),
+                  payment.kind === "transaction"
+                    ? payment.description
+                    : i18n.t("dashboard.debit_for_space", {
+                        space: payment.spaceName,
+                      }),
                 )}
               >
                 <Card
@@ -146,9 +152,11 @@ export function DashboardUpcoming(): React.ReactElement {
                   >
                     <Stack gap={4} align="flex-start">
                       <Text as="span" size="sm" weight="semibold">
-                        {i18n.t("dashboard.debit_for_space", {
-                          space: payment.spaceName,
-                        })}
+                        {payment.kind === "transaction"
+                          ? payment.description
+                          : i18n.t("dashboard.debit_for_space", {
+                              space: payment.spaceName,
+                            })}
                       </Text>
                       <Text as="span" size="xs" color="secondary">
                         {payment.spaceName}

@@ -43,7 +43,7 @@
     "hero_more_action": "More",
     "header_load_failed": "Unable to load the dashboard summary right now.",
     "upcoming_payments": "Upcoming Payments",
-    "upcoming_payments_empty": "No scheduled expenses remain for this month.",
+    "upcoming_payments_empty": "No scheduled expenses are due in the next two weeks.",
     "upcoming_load_failed": "Unable to load upcoming payments right now.",
     "upcoming_payments_link": "View all expenses",
     "recent_activity_load_failed": "Unable to load recent activity right now.",
@@ -357,6 +357,9 @@
     "credit_card_payment_timing_required": "Settlement timing is required for credit-card spaces.",
     "payment_due_day_requires_credit_card": "Payment due day can only be used for credit-card spaces.",
     "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
+    "main_toggle_label": "Set as main space",
+    "main_toggle_description": "When you mark this space as main, every other space will automatically be cleared as main.",
+    "main_update_success": "Main space updated.",
     "not_found": "Space not found."
   },
   "new_transaction_page": {

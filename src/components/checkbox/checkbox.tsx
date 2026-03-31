@@ -6,12 +6,14 @@ export interface CheckboxProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label?: React.ReactNode;
+  disabled?: boolean;
 }
 
 export function Checkbox({
   checked,
   onChange,
   label,
+  disabled = false,
 }: CheckboxProps): React.ReactElement {
   return (
     <label className="checkbox">
@@ -19,6 +21,7 @@ export function Checkbox({
         <input
           type="checkbox"
           checked={checked}
+          disabled={disabled}
           onChange={(e) => onChange(e.target.checked)}
           className="checkbox__input"
         />

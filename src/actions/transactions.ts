@@ -11,6 +11,7 @@ import {
   type CreateTransactionInput,
   type CreateTransferInput,
   type DashboardCreditCardSettlementRecord,
+  type DashboardUpcomingTransactionRecord,
   type DashboardUpcomingPaymentRecord,
   type DashboardTotals,
   type FilteredTransactionRecord,
@@ -55,6 +56,20 @@ export type DashboardCreditCardSettlementItem = {
   projectedMonthRange: DashboardDateRange;
 };
 
+export type DashboardUpcomingTransactionItem = {
+  id: string;
+  kind: "transaction";
+  spaceId: string;
+  spaceName: string;
+  description: string;
+  amount: number;
+  dueDate: string;
+};
+
+export type DashboardUpcomingItem =
+  | DashboardCreditCardSettlementItem
+  | DashboardUpcomingTransactionItem;
+
 export type SerializedProjectionTransaction = {
   id: string;
   type: string;
@@ -70,7 +85,7 @@ export type SerializedProjectionTransaction = {
 export type DashboardPayload = {
   totals: DashboardTotals;
   recentTransactions: DashboardTransactionItem[];
-  upcomingPayments: DashboardCreditCardSettlementItem[];
+  upcomingPayments: DashboardUpcomingItem[];
   currentMonthRange: DashboardDateRange;
 };
 
@@ -80,8 +95,8 @@ export type DashboardHeaderPayload = {
 };
 
 export type DashboardUpcomingPayload = {
-  currentMonthRange: DashboardDateRange;
-  upcomingPayments: DashboardCreditCardSettlementItem[];
+  upcomingRange: DashboardDateRange;
+  upcomingPayments: DashboardUpcomingItem[];
 };
 
 export type DashboardRecentActivityPayload = {
@@ -152,6 +167,7 @@ export type TransactionsPagePayload = {
 export type TransactionDetailPayload = {
   id: string;
   type: string;
+  mainSpaceId: string | null;
   spaceId: string;
   spaceName: string;
   transferSpaceId: string | null;
@@ -167,7 +183,11 @@ export type NewTransactionRecentPayload = {
 };
 
 export type NewTransactionSpacesPayload = {
-  spaces: string[];
+  spaces: Array<{
+    id: string;
+    name: string;
+    main: boolean | null;
+  }>;
 };
 
 export type NewTransferSpacesPayload = {
@@ -312,18 +332,36 @@ function serializeDashboardCreditCardSettlement(
   };
 }
 
+function serializeDashboardUpcomingTransaction(
+  transaction: DashboardUpcomingTransactionRecord,
+): DashboardUpcomingTransactionItem {
+  return {
+    id: transaction.id,
+    kind: "transaction",
+    spaceId: transaction.spaceId,
+    spaceName: transaction.spaceName,
+    description: transaction.description,
+    amount: normalizeTransactionAmount("expense", transaction.amount),
+    dueDate: transaction.dueDate.toISOString(),
+  };
+}
+
 function serializeDashboardUpcomingPayment(
   payment: DashboardUpcomingPaymentRecord,
-): DashboardCreditCardSettlementItem {
-  return serializeDashboardCreditCardSettlement(payment);
+): DashboardUpcomingItem {
+  return payment.kind === "transaction"
+    ? serializeDashboardUpcomingTransaction(payment)
+    : serializeDashboardCreditCardSettlement(payment);
 }
 
 function serializeTransactionDetail(
   transaction: TransactionWithSpaceRecord,
+  mainSpaceId: string | null,
 ): TransactionDetailPayload {
   return {
     id: transaction.id,
     type: transaction.type,
+    mainSpaceId,
     spaceId: transaction.spaceId,
     spaceName: transaction.space.name,
     transferSpaceId: transaction.transferSpaceId,
@@ -652,7 +690,7 @@ export async function getDashboardUpcomingPayloadForUser(
     await Transaction.getDashboardUpcomingQueryData(userAccountId);
 
   return {
-    currentMonthRange: serializeDashboardDateRange(
+    upcomingRange: serializeDashboardDateRange(
       dashboardData.monthStart,
       dashboardData.monthEnd,
     ),
@@ -711,16 +749,19 @@ export async function getTransactionDetailPayloadForUser(
   userAccountId: string,
   id: string,
 ): Promise<TransactionDetailPayload | null> {
-  const transaction = await Transaction.findWithSpaceByIdForUser(
-    userAccountId,
-    id,
-  );
+  const [transaction, mainSpace] = await Promise.all([
+    Transaction.findWithSpaceByIdForUser(userAccountId, id),
+    Space.findMainByUser(userAccountId),
+  ]);
 
   if (!transaction) {
     return null;
   }
 
-  return serializeTransactionDetail(transaction);
+  return serializeTransactionDetail(
+    transaction,
+    mainSpace?.toRecord().id || null,
+  );
 }
 
 export async function getNewTransactionRecentPayloadForUser(
@@ -739,7 +780,15 @@ export async function getNewTransactionSpacesPayloadForUser(
   const spaces = await Space.listActiveByUser(userAccountId);
 
   return {
-    spaces: spaces.map((space) => space.toRecord().name),
+    spaces: spaces.map((space) => {
+      const spaceRecord = space.toRecord();
+
+      return {
+        id: spaceRecord.id,
+        name: spaceRecord.name,
+        main: spaceRecord.main,
+      };
+    }),
   };
 }
 

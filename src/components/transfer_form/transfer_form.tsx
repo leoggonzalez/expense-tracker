@@ -20,6 +20,7 @@ type TransferSpace = {
 };
 
 type TransferFormInitialValues = {
+  fromSpaceId?: string;
   toSpaceId?: string;
   description?: string;
   amount?: string;
@@ -37,7 +38,9 @@ export function TransferForm({
   onSuccess,
 }: TransferFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
-  const [fromSpaceId, setFromSpaceId] = useState("");
+  const [fromSpaceId, setFromSpaceId] = useState(
+    initialValues?.fromSpaceId || "",
+  );
   const [toSpaceId, setToSpaceId] = useState(initialValues?.toSpaceId || "");
   const [description, setDescription] = useState(
     initialValues?.description || "",

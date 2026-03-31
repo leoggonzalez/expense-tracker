@@ -1,5 +1,6 @@
 import { CreditCardPaymentTiming, Prisma } from "@prisma/client";
 import {
+  addDays,
   addMonths,
   endOfDay,
   endOfMonth,
@@ -116,8 +117,19 @@ export type DashboardCreditCardSettlementRecord = {
   projectedMonthEnd: Date;
 };
 
+export type DashboardUpcomingTransactionRecord = {
+  kind: "transaction";
+  id: string;
+  spaceId: string;
+  spaceName: string;
+  description: string;
+  amount: number;
+  dueDate: Date;
+};
+
 export type DashboardUpcomingPaymentRecord =
-  DashboardCreditCardSettlementRecord;
+  | DashboardCreditCardSettlementRecord
+  | DashboardUpcomingTransactionRecord;
 
 export type TransactionFiltersInput = {
   spaceId?: string;
@@ -485,6 +497,37 @@ export class Transaction {
     });
   }
 
+  public static async listRecurringExpenseTransactionsForUser(
+    userAccountId: string,
+    currentMonthStart: Date,
+    windowEnd: Date,
+  ): Promise<TransactionWithSpaceRecord[]> {
+    return prisma.transaction.findMany({
+      where: {
+        type: "expense",
+        transferSpaceId: null,
+        beginDate: {
+          lte: windowEnd,
+        },
+        OR: [
+          {
+            endDate: null,
+          },
+          {
+            endDate: {
+              gte: currentMonthStart,
+            },
+          },
+        ],
+        space: {
+          userAccountId,
+        },
+      },
+      include: transactionWithSpaceInclude,
+      orderBy: [{ beginDate: "asc" }, { createdAt: "asc" }],
+    });
+  }
+
   public static async getMonthTotalsForUser(
     userAccountId: string,
     monthStartInput: Date,
@@ -761,30 +804,72 @@ export class Transaction {
     userAccountId: string,
   ): Promise<DashboardUpcomingQueryData> {
     const now = new Date();
-    const monthStart = startOfMonth(now);
-    const monthEnd = endOfMonth(now);
     const today = startOfDay(now);
-    const creditCardSpaces =
-      await Space.listActiveCreditCardSpaces(userAccountId);
-    const upcomingPayments = (
-      await Promise.all(
-        creditCardSpaces.map((space) =>
-          Transaction.getUpcomingCreditCardSettlement(
-            space,
-            monthStart,
-            today,
-            monthEnd,
-          ),
+    const upcomingEnd = endOfDay(addDays(today, 14));
+    const currentMonthStart = startOfMonth(today);
+    const currentMonthEnd = endOfMonth(currentMonthStart);
+    const nextMonthStart = startOfMonth(addMonths(currentMonthStart, 1));
+    const nextMonthEnd = endOfMonth(nextMonthStart);
+    const [creditCardSpaces, recurringTransactions] = await Promise.all([
+      Space.listActiveCreditCardSpaces(userAccountId),
+      Transaction.listRecurringExpenseTransactionsForUser(
+        userAccountId,
+        currentMonthStart,
+        upcomingEnd,
+      ),
+    ]);
+    const settlementPayments = await Promise.all(
+      creditCardSpaces.flatMap((space) => [
+        Transaction.getUpcomingCreditCardSettlement(
+          space,
+          currentMonthStart,
+          currentMonthEnd,
+          today,
+          upcomingEnd,
         ),
-      )
-    )
+        Transaction.getUpcomingCreditCardSettlement(
+          space,
+          nextMonthStart,
+          nextMonthEnd,
+          today,
+          upcomingEnd,
+        ),
+      ]),
+    );
+    const recurringPayments = recurringTransactions.flatMap((transaction) => {
+      const currentMonthPayment =
+        Transaction.getUpcomingRecurringExpenseTransaction(
+          transaction,
+          currentMonthStart,
+          currentMonthEnd,
+          today,
+          upcomingEnd,
+        );
+      const nextMonthPayment = Transaction.getUpcomingRecurringExpenseTransaction(
+        transaction,
+        nextMonthStart,
+        nextMonthEnd,
+        today,
+        upcomingEnd,
+      );
+
+      return [currentMonthPayment, nextMonthPayment].filter(
+        (payment): payment is DashboardUpcomingTransactionRecord =>
+          payment !== null,
+      );
+    });
+    const upcomingPayments = [...settlementPayments, ...recurringPayments]
       .filter(
         (payment): payment is DashboardUpcomingPaymentRecord =>
           payment !== null,
       )
       .sort((left, right) => {
         if (left.dueDate.getTime() === right.dueDate.getTime()) {
-          return left.spaceName.localeCompare(right.spaceName);
+          if (left.kind !== right.kind) {
+            return left.kind.localeCompare(right.kind);
+          }
+
+          return left.description.localeCompare(right.description);
         }
 
         return left.dueDate.getTime() - right.dueDate.getTime();
@@ -793,8 +878,8 @@ export class Transaction {
 
     return {
       upcomingPayments,
-      monthStart,
-      monthEnd,
+      monthStart: today,
+      monthEnd: upcomingEnd,
     };
   }
 
@@ -976,8 +1061,9 @@ export class Transaction {
   private static async getUpcomingCreditCardSettlement(
     space: CreditCardSpaceRecord,
     monthStart: Date,
-    today: Date,
     monthEnd: Date,
+    windowStart: Date,
+    windowEnd: Date,
   ): Promise<DashboardUpcomingPaymentRecord | null> {
     const dueDate = Transaction.getCreditCardDueDateForMonth(
       monthStart,
@@ -985,7 +1071,7 @@ export class Transaction {
       space.paymentDueDay,
     );
 
-    if (dueDate < today || dueDate > monthEnd) {
+    if (dueDate < windowStart || dueDate > windowEnd) {
       return null;
     }
 
@@ -1029,6 +1115,48 @@ export class Transaction {
       dueDate,
       projectedMonthStart,
       projectedMonthEnd,
+    };
+  }
+
+  private static getUpcomingRecurringExpenseTransaction(
+    transaction: TransactionWithSpaceRecord,
+    monthStart: Date,
+    monthEnd: Date,
+    windowStart: Date,
+    windowEnd: Date,
+  ): DashboardUpcomingTransactionRecord | null {
+    if (!transaction.endDate || isSameMonth(transaction.beginDate, transaction.endDate)) {
+      return null;
+    }
+
+    if (startOfMonth(monthStart) < startOfMonth(transaction.beginDate)) {
+      return null;
+    }
+
+    if (
+      transaction.endDate &&
+      startOfMonth(monthStart) > startOfMonth(transaction.endDate)
+    ) {
+      return null;
+    }
+
+    const dueDate = new Date(monthStart);
+    dueDate.setDate(
+      Math.min(transaction.beginDate.getDate(), monthEnd.getDate()),
+    );
+
+    if (dueDate < windowStart || dueDate > windowEnd) {
+      return null;
+    }
+
+    return {
+      kind: "transaction",
+      id: transaction.id,
+      spaceId: transaction.spaceId,
+      spaceName: transaction.space.name,
+      description: transaction.description,
+      amount: transaction.amount,
+      dueDate,
     };
   }
 

@@ -29,7 +29,11 @@ interface BulkTransactionItem {
 }
 
 export interface BulkTransactionFormProps {
-  spaces?: string[];
+  spaces?: Array<{
+    id: string;
+    name: string;
+    main: boolean | null;
+  }>;
   onSuccess?: () => void;
 }
 

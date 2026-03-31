@@ -31,7 +31,11 @@ import { useForm } from "react-use-form-library";
 import { useToast } from "@/components/toast_provider/toast_provider";
 
 export interface TransactionFormProps {
-  spaces?: string[];
+  spaces?: Array<{
+    id: string;
+    name: string;
+    main: boolean | null;
+  }>;
   onSuccess?: () => void;
   initialData?: {
     id: string;
@@ -284,7 +288,9 @@ export function TransactionForm({
         return;
       }
 
-      if (!isEdit) {
+      if (isCreateFlow) {
+        resetCreateFlowFields();
+      } else if (!isEdit) {
         clearNewTransactionDraft();
         skipDraftSaveRef.current = true;
         reset();
@@ -308,6 +314,17 @@ export function TransactionForm({
   });
   const { fields, model, onSubmit, reset, submissionStatus, updateFields } =
     form;
+  const resetCreateFlowFields = (): void => {
+    updateFields({
+      type: transactionType || model.type,
+      spaceName: model.spaceName,
+      description: "",
+      amountInput: "",
+      beginDate: model.beginDate,
+      scheduleMode: initialModelRef.current.scheduleMode,
+      installments: "1",
+    });
+  };
 
   // eslint-disable-next-line warn-use-effect -- This effect hydrates the persisted draft once for create flows and syncs it into the form library state.
   useEffect(() => {
