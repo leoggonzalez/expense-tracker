@@ -3,6 +3,12 @@
     "title": "Currento",
     "description": "Track your income and expenses with clarity."
   },
+  "app_error": {
+    "title": "Something went wrong",
+    "description": "The app ran into an unexpected problem. Try reloading to start again.",
+    "reload": "Reload app",
+    "technical_details": "Show technical details"
+  },
   "navigation": {
     "brand": "Currento",
     "dashboard": "Dashboard",

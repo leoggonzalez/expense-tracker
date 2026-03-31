@@ -1,0 +1,19 @@
+@use "@/styles/variables.scss" as *;
+
+.app-error-card {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+
+  .container {
+    width: 100%;
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .app-error-card {
+    padding: var(--spacing-xl);
+  }
+}
