@@ -1,5 +1,6 @@
 import React from "react";
 
+import { LoadingSkeleton } from "@/components/loading_skeleton/loading_skeleton";
 import { Icon, Stack, Text } from "@/elements";
 
 import "./select.scss";
@@ -17,6 +18,7 @@ export interface SelectProps {
   placeholder?: string;
   required?: boolean;
   trailingContent?: React.ReactNode;
+  isLoading?: boolean;
   size?: "md" | "lg";
   surface?: "default" | "subtle";
   labelTone?: "primary" | "secondary";
@@ -30,6 +32,7 @@ export function Select({
   placeholder,
   required = false,
   trailingContent,
+  isLoading = false,
   size = "md",
   surface = "default",
   labelTone = "primary",
@@ -59,30 +62,45 @@ export function Select({
           </label>
         )}
         <div className="select__control">
-          <select
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            required={required}
-            className="select__field"
-          >
-            {placeholder && (
-              <option value="" disabled>
-                {placeholder}
-              </option>
-            )}
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          {isLoading ? (
+            <div className="select__loading" aria-hidden="true">
+              <LoadingSkeleton height={size === "lg" ? 56 : 48} radius={18} />
+            </div>
+          ) : (
+            <>
+              <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                required={required}
+                className="select__field"
+              >
+                {placeholder && (
+                  <option value="" disabled>
+                    {placeholder}
+                  </option>
+                )}
+                {options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
 
-          <div className="select__trailing">
-            <span className="select__chevron">
-              <Icon name="chevron-down" size={18} />
-            </span>
-            {trailingContent}
-          </div>
+              <div className="select__trailing">
+                <span className="select__chevron">
+                  <Icon name="chevron-down" size={18} />
+                </span>
+                {trailingContent}
+              </div>
+            </>
+          )}
+          {isLoading ? (
+            <div className="select__loading-label">
+              <Text as="span" size="xs" color="secondary">
+                {placeholder}
+              </Text>
+            </div>
+          ) : null}
         </div>
       </Stack>
     </div>

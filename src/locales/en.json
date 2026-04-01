@@ -3,6 +3,12 @@
     "title": "Currento",
     "description": "Track your income and expenses with clarity."
   },
+  "app_error": {
+    "title": "Something went wrong",
+    "description": "The app ran into an unexpected problem. Try reloading to start again.",
+    "reload": "Reload app",
+    "technical_details": "Show technical details"
+  },
   "navigation": {
     "brand": "Currento",
     "dashboard": "Dashboard",
@@ -15,6 +21,10 @@
     "primary_section": "Overview",
     "secondary_section": "Preferences",
     "user_fallback_name": "Your account"
+  },
+  "app_shell": {
+    "pull_to_refresh": "Pull to refresh",
+    "refreshing": "Refreshing"
   },
   "dashboard": {
     "current_month_overview": "Current Month Overview",
@@ -36,14 +46,14 @@
     "hero_add_action": "Add",
     "hero_more_action": "More",
     "header_load_failed": "Unable to load the dashboard summary right now.",
-    "upcoming_payments": "Upcoming Payments",
-    "upcoming_payments_empty": "No scheduled expenses remain for this month.",
+    "upcoming_transactions": "Upcoming Transactions",
+    "upcoming_transactions_empty": "No upcoming transactions are scheduled in the next two weeks.",
     "upcoming_load_failed": "Unable to load upcoming payments right now.",
-    "upcoming_payments_link": "View all expenses",
+    "upcoming_transactions_link": "View all upcoming transactions",
     "recent_activity_load_failed": "Unable to load recent activity right now.",
     "recent_activity_link": "Browse transactions",
     "payment_due": "Due %{date}",
-    "debit_for_space": "Debit for %{space}",
+    "transactions_for_space": "Transactions for %{space}",
     "activity_subtitle": "Latest changes across your transactions."
   },
   "transaction_form": {
@@ -351,6 +361,16 @@
     "credit_card_payment_timing_required": "Settlement timing is required for credit-card spaces.",
     "payment_due_day_requires_credit_card": "Payment due day can only be used for credit-card spaces.",
     "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
+    "account_details_title": "Account details",
+    "account_detail_main": "Main space",
+    "account_detail_type": "Account type",
+    "account_detail_settle": "Settlement",
+    "account_detail_settle_value": "Day %{day} · %{timing}",
+    "account_detail_yes": "Yes",
+    "account_detail_no": "No",
+    "main_toggle_label": "Set as main space",
+    "main_toggle_description": "When you mark this space as main, every other space will automatically be cleared as main.",
+    "main_update_success": "Main space updated.",
     "not_found": "Space not found."
   },
   "new_transaction_page": {
@@ -381,6 +401,10 @@
     "type": "Type",
     "space": "Space",
     "amount": "Amount",
+    "schedule": "Schedule",
+    "schedule_one_time": "One time",
+    "schedule_recurring": "Recurring",
+    "schedule_installments_value": "Installments %{total} (%{remaining} remaining)",
     "date_range": "Date range",
     "transfer": "Transfer",
     "back_to_details": "Back to transaction details",

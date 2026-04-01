@@ -9,7 +9,6 @@
   }
 
   &__control {
-    min-height: 52px;
     width: 100%;
     border: var(--border-width) solid var(--color-border);
     border-radius: 18px;
@@ -25,13 +24,15 @@
     align-items: stretch;
   }
 
-  &--surface-subtle &__control {
-    background-color: var(--color-background-secondary);
+  &__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
   }
 
-  &__date-mode {
-    position: relative;
-    width: 100%;
+  &--surface-subtle &__control {
+    background-color: var(--color-background-secondary);
   }
 
   &__control:focus-within {
@@ -43,9 +44,10 @@
 
   &__tag {
     position: relative;
-    width: 100%;
+    display: inline-flex;
+    align-items: center;
     min-width: 0;
-    padding: 8px 14px;
+    padding: 10px 14px;
     border-radius: 999px;
     background-color: color-mix(
       in srgb,
@@ -56,11 +58,71 @@
     cursor: pointer;
   }
 
+  &__date-field {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
+    background-color: color-mix(
+      in srgb,
+      var(--color-text-primary) 10%,
+      var(--color-background-secondary)
+    );
+  }
+
+  &__date-input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: auto;
+    min-width: 11.5rem;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: var(--line-height-normal);
+    color: var(--color-text-primary);
+    background: transparent;
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
+
+    &::-webkit-date-and-time-value {
+      min-height: 0;
+      padding: 0;
+      text-align: left;
+    }
+
+    &::-webkit-datetime-edit {
+      padding: 0;
+    }
+
+    &::-webkit-datetime-edit-fields-wrapper {
+      padding: 0;
+    }
+
+    &::-webkit-calendar-picker-indicator {
+      margin: 0;
+    }
+  }
+
   &__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     width: 32px;
     height: 32px;
-    margin-left: 0;
-    align-self: flex-end;
+    margin-left: auto;
     border: 0;
     border-radius: 999px;
     background-color: color-mix(
@@ -86,14 +148,6 @@
     }
   }
 
-  &__date-mode &__toggle {
-    position: absolute;
-    right: var(--spacing-sm);
-    bottom: calc(var(--spacing-sm) + 1px);
-    margin-left: 0;
-    z-index: 1;
-  }
-
   &__native-select {
     position: absolute;
     inset: 0;
@@ -114,11 +168,6 @@
 
     &__tag {
       width: auto;
-    }
-
-    &__toggle {
-      margin-left: auto;
-      align-self: auto;
     }
   }
 }

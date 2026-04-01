@@ -14,6 +14,7 @@ const exactAllowedFilenames = new Set([
   "route.ts",
   "loading.tsx",
   "error.tsx",
+  "global-error.tsx",
   "not-found.tsx",
   "template.tsx",
   "default.tsx",

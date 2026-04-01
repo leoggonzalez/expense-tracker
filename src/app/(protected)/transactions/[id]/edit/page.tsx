@@ -34,7 +34,11 @@ export default async function Page({
         </Text>
         <Card padding={24}>
           <TransactionForm
-            spaces={spaces.map((space) => space.name)}
+            spaces={spaces.map((space) => ({
+              id: space.id,
+              name: space.name,
+              main: space.main,
+            }))}
             initialData={{
               id: transaction.id,
               type: transaction.type,

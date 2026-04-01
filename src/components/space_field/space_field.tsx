@@ -16,7 +16,11 @@ const createFlowSpacesCache = {
 
 type SpaceFieldProps = {
   label: React.ReactNode;
-  spaces: string[];
+  spaces: Array<{
+    id: string;
+    name: string;
+    main: boolean | null;
+  }>;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -40,24 +44,35 @@ export function SpaceField({
   labelTone = "primary",
 }: SpaceFieldProps): React.ReactElement {
   const endpoint = "/api/transactions/new/spaces";
-  const { data, hasError, retry } = useProtectedPageSection(
+  const { data, hasError, isLoading, retry } = useProtectedPageSection(
     endpoint,
     endpoint,
     createFlowSpacesCache,
   );
   const resolvedSpaces =
     loadSpacesOnMount && spaces.length === 0 ? data?.spaces || [] : spaces;
-  const hasMatchingSpace = resolvedSpaces.includes(value);
+  const resolvedSpaceNames = resolvedSpaces.map((space) => space.name);
+  const singleResolvedSpaceName =
+    resolvedSpaces.length === 1 ? resolvedSpaces[0].name : null;
+  const hasMatchingSpace = resolvedSpaceNames.includes(value);
   const [prefersCustomMode, setPrefersCustomMode] = useState(
     !hasMatchingSpace && !!value,
   );
   const isCustomMode = prefersCustomMode || (!hasMatchingSpace && !!value);
 
+  React.useEffect(() => {
+    if (value || isCustomMode || !singleResolvedSpaceName) {
+      return;
+    }
+
+    onChange(singleResolvedSpaceName);
+  }, [isCustomMode, onChange, singleResolvedSpaceName, value]);
+
   const handleToggle = () => {
     setPrefersCustomMode((current) => {
       const next = !current;
 
-      if (!next && !spaces.includes(value)) {
+      if (!next && !resolvedSpaceNames.includes(value)) {
         onChange("");
       }
 
@@ -96,11 +111,12 @@ export function SpaceField({
             value={value}
             onChange={onChange}
             options={resolvedSpaces.map((space) => ({
-              value: space,
-              label: space,
+              value: space.name,
+              label: space.name,
             }))}
             placeholder={placeholder}
             required={required}
+            isLoading={loadSpacesOnMount && isLoading && spaces.length === 0}
             size={size}
             surface={surface}
             labelTone={labelTone}

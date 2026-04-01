@@ -24,6 +24,25 @@
   }
 }
 
+.app-main {
+  position: relative;
+  overflow-x: clip;
+  --pull-to-refresh-offset: 0px;
+  --pull-to-refresh-progress: 0;
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    transform: translateY(var(--pull-to-refresh-offset));
+    transition: transform 220ms ease;
+    will-change: transform;
+  }
+
+  &--pull-to-refresh-active &__content {
+    transition: none;
+  }
+}
+
 .app-container--protected {
   background:
     radial-gradient(

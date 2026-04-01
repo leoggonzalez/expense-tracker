@@ -11,35 +11,59 @@
   }
 
   &__row {
+    overflow: hidden;
     border-bottom: var(--border-width) solid var(--color-border);
 
-    &:first-child .transaction-card {
-      border-top-left-radius: var(--border-radius-md);
-      border-top-right-radius: var(--border-radius-md);
+    &:first-child {
+      border-top-left-radius: var(--border-radius-lg);
+      border-top-right-radius: var(--border-radius-lg);
     }
 
     &:last-child {
       border-bottom: none;
-
-      .transaction-card {
-        border-bottom-left-radius: var(--border-radius-md);
-        border-bottom-right-radius: var(--border-radius-md);
-      }
+      border-bottom-left-radius: var(--border-radius-lg);
+      border-bottom-right-radius: var(--border-radius-lg);
     }
   }
 
   &__link {
     display: block;
-    text-decoration: none;
+  }
+
+  &__link a {
+    display: block;
     color: inherit;
+    text-decoration: none;
+    border-radius: inherit;
+    outline: none;
+    transition:
+      background-color var(--transition-fast),
+      box-shadow var(--transition-fast);
 
     &:hover {
-      background-color: var(--color-background-secondary);
+      background-color: color-mix(
+        in srgb,
+        var(--color-success) 10%,
+        var(--color-background-secondary)
+      );
+    }
+
+    &:focus-visible {
+      box-shadow:
+        inset 0 0 0 2px var(--color-primary),
+        inset 0 0 0 5px
+          color-mix(in srgb, var(--color-primary) 14%, transparent);
+      background-color: color-mix(
+        in srgb,
+        var(--color-success) 8%,
+        var(--color-background-secondary)
+      );
     }
   }
 
   &__link-content {
     display: block;
+    border-radius: inherit;
   }
 
   &__content {

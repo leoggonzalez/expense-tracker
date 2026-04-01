@@ -1,0 +1,37 @@
+@use "@/styles/variables.scss" as *;
+
+.error-details-panel {
+  width: 100%;
+
+  &__content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition:
+      grid-template-rows var(--transition-base),
+      opacity var(--transition-base);
+    opacity: 0;
+  }
+
+  &__content--open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  &__content-inner {
+    overflow: hidden;
+  }
+
+  &__pre {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-surface-muted);
+    color: var(--color-text-secondary);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}

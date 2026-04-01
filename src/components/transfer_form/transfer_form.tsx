@@ -9,6 +9,7 @@ import { MonthSelector } from "@/components/month_selector/month_selector";
 import { Button, InfoBox, Input, Select } from "@/components";
 import { inferTransactionDateMode, toDate } from "@/lib/transaction_schedule";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
+import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import { useToast } from "@/components/toast_provider/toast_provider";
@@ -20,6 +21,7 @@ type TransferSpace = {
 };
 
 type TransferFormInitialValues = {
+  fromSpaceId?: string;
   toSpaceId?: string;
   description?: string;
   amount?: string;
@@ -37,7 +39,9 @@ export function TransferForm({
   onSuccess,
 }: TransferFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
-  const [fromSpaceId, setFromSpaceId] = useState("");
+  const [fromSpaceId, setFromSpaceId] = useState(
+    initialValues?.fromSpaceId || "",
+  );
   const [toSpaceId, setToSpaceId] = useState(initialValues?.toSpaceId || "");
   const [description, setDescription] = useState(
     initialValues?.description || "",
@@ -116,6 +120,7 @@ export function TransferForm({
     showSuccess(i18n.t("toast.transfer_created"), {
       iconName: "transfer",
     });
+    triggerNewTransactionRecentRefresh();
 
     if (onSuccess) {
       onSuccess();
