@@ -543,14 +543,12 @@ export function TransactionForm({
           <Stack gap={8}>
             <Input
               label={i18n.t("transaction_form.installments")}
-              type="number"
-              value={fields.installments.value || "1"}
+              type="text"
+              inputMode="numeric"
+              value={fields.installments.value || ""}
               onChange={(value) =>
                 fields.installments.onChange(sanitizeInstallmentsInput(value))
               }
-              min={1}
-              max={120}
-              step={1}
               required
               size="lg"
               surface="subtle"

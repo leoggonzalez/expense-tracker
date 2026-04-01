@@ -42,14 +42,14 @@
     "hero_add_action": "Add",
     "hero_more_action": "More",
     "header_load_failed": "Unable to load the dashboard summary right now.",
-    "upcoming_payments": "Upcoming Payments",
-    "upcoming_payments_empty": "No scheduled expenses are due in the next two weeks.",
+    "upcoming_transactions": "Upcoming Transactions",
+    "upcoming_transactions_empty": "No upcoming transactions are scheduled in the next two weeks.",
     "upcoming_load_failed": "Unable to load upcoming payments right now.",
-    "upcoming_payments_link": "View all expenses",
+    "upcoming_transactions_link": "View all upcoming transactions",
     "recent_activity_load_failed": "Unable to load recent activity right now.",
     "recent_activity_link": "Browse transactions",
     "payment_due": "Due %{date}",
-    "debit_for_space": "Debit for %{space}",
+    "transactions_for_space": "Transactions for %{space}",
     "activity_subtitle": "Latest changes across your transactions."
   },
   "transaction_form": {

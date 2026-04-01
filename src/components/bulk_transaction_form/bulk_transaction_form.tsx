@@ -326,7 +326,8 @@ export function BulkTransactionForm({
             <Stack gap={8}>
               <Input
                 label={i18n.t("transaction_form.installments")}
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={shared.installments}
                 onChange={(value) =>
                   setShared((current) => ({
@@ -334,9 +335,6 @@ export function BulkTransactionForm({
                     installments: sanitizeInstallmentsInput(value),
                   }))
                 }
-                min={1}
-                max={120}
-                step={1}
                 required
                 size="lg"
                 surface="subtle"

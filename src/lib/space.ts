@@ -34,8 +34,8 @@ export type SpaceMonthSummaryRecord = {
 export type CreditCardSpaceRecord = {
   id: string;
   name: string;
-  paymentDueDay: number;
-  paymentTiming: CreditCardPaymentTiming;
+  paymentDueDay: number | null;
+  paymentTiming: CreditCardPaymentTiming | null;
 };
 
 type SpaceDetailMetrics = {
@@ -308,12 +308,6 @@ export class Space {
         userAccountId,
         isArchived: false,
         type: SpaceType.credit_card,
-        paymentDueDay: {
-          not: null,
-        },
-        paymentTiming: {
-          not: null,
-        },
       },
       select: {
         id: true,
@@ -326,18 +320,12 @@ export class Space {
       },
     });
 
-    return records.flatMap((record) =>
-      record.paymentDueDay === null || record.paymentTiming === null
-        ? []
-        : [
-            {
-              id: record.id,
-              name: record.name,
-              paymentDueDay: record.paymentDueDay,
-              paymentTiming: record.paymentTiming,
-            },
-          ],
-    );
+    return records.map((record) => ({
+      id: record.id,
+      name: record.name,
+      paymentDueDay: record.paymentDueDay,
+      paymentTiming: record.paymentTiming,
+    }));
   }
 
   public static async listByArchiveStateWithMonthTotals(

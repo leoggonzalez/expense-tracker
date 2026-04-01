@@ -59,6 +59,7 @@ export type DashboardCreditCardSettlementItem = {
 export type DashboardUpcomingTransactionItem = {
   id: string;
   kind: "transaction";
+  type: "income" | "expense";
   spaceId: string;
   spaceName: string;
   description: string;
@@ -338,10 +339,11 @@ function serializeDashboardUpcomingTransaction(
   return {
     id: transaction.id,
     kind: "transaction",
+    type: transaction.type,
     spaceId: transaction.spaceId,
     spaceName: transaction.spaceName,
     description: transaction.description,
-    amount: normalizeTransactionAmount("expense", transaction.amount),
+    amount: normalizeTransactionAmount(transaction.type, transaction.amount),
     dueDate: transaction.dueDate.toISOString(),
   };
 }

@@ -27,8 +27,6 @@ function getUpcomingTransactionsHref(
     searchParams.set("end_date", payload.upcomingRange.endDate);
   }
 
-  searchParams.set("type", "expense");
-
   return `/transactions?${searchParams.toString()}`;
 }
 
@@ -51,6 +49,18 @@ function getUpcomingPaymentHref(
   });
 
   return `/transactions?${searchParams.toString()}`;
+}
+
+function getUpcomingItemLabel(payment: DashboardUpcomingItem): string {
+  if (payment.kind === "transaction") {
+    return payment.description;
+  }
+
+  return String(
+    i18n.t("dashboard.transactions_for_space", {
+      space: payment.spaceName,
+    }),
+  );
 }
 
 function UpcomingPaymentRowSkeleton(): React.ReactElement {
@@ -87,14 +97,14 @@ export function DashboardUpcoming(): React.ReactElement {
     <Card
       as="section"
       padding={24}
-      title={String(i18n.t("dashboard.upcoming_payments"))}
+      title={String(i18n.t("dashboard.upcoming_transactions"))}
       icon="calendar"
       fullHeight
     >
       <Stack gap={20}>
         <Text as="div" size="sm" weight="medium">
           <AppLink href={getUpcomingTransactionsHref(data)}>
-            {i18n.t("dashboard.upcoming_payments_link")}
+            {i18n.t("dashboard.upcoming_transactions_link")}
           </AppLink>
         </Text>
 
@@ -116,7 +126,7 @@ export function DashboardUpcoming(): React.ReactElement {
         ) : data && data.upcomingPayments.length === 0 ? (
           <Card variant="secondary" radius={24} padding={20}>
             <Text color="secondary">
-              {i18n.t("dashboard.upcoming_payments_empty")}
+              {i18n.t("dashboard.upcoming_transactions_empty")}
             </Text>
           </Card>
         ) : (
@@ -125,13 +135,7 @@ export function DashboardUpcoming(): React.ReactElement {
               <AppLink
                 key={payment.id}
                 href={getUpcomingPaymentHref(payment)}
-                ariaLabel={String(
-                  payment.kind === "transaction"
-                    ? payment.description
-                    : i18n.t("dashboard.debit_for_space", {
-                        space: payment.spaceName,
-                      }),
-                )}
+                ariaLabel={getUpcomingItemLabel(payment)}
               >
                 <Card
                   variant="secondary"
@@ -152,11 +156,7 @@ export function DashboardUpcoming(): React.ReactElement {
                   >
                     <Stack gap={4} align="flex-start">
                       <Text as="span" size="sm" weight="semibold">
-                        {payment.kind === "transaction"
-                          ? payment.description
-                          : i18n.t("dashboard.debit_for_space", {
-                              space: payment.spaceName,
-                            })}
+                        {getUpcomingItemLabel(payment)}
                       </Text>
                       <Text as="span" size="xs" color="secondary">
                         {payment.spaceName}
