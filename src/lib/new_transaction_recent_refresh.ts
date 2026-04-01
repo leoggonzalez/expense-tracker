@@ -1,7 +1,6 @@
 "use client";
 
-const NEW_TRANSACTION_RECENT_REFRESH_EVENT =
-  "new-transaction-recent-refresh";
+const NEW_TRANSACTION_RECENT_REFRESH_EVENT = "new-transaction-recent-refresh";
 
 export function triggerNewTransactionRecentRefresh(): void {
   if (typeof window === "undefined") {
@@ -22,10 +21,7 @@ export function subscribeToNewTransactionRecentRefresh(
     callback();
   };
 
-  window.addEventListener(
-    NEW_TRANSACTION_RECENT_REFRESH_EVENT,
-    handleRefresh,
-  );
+  window.addEventListener(NEW_TRANSACTION_RECENT_REFRESH_EVENT, handleRefresh);
 
   return () => {
     window.removeEventListener(

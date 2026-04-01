@@ -116,12 +116,14 @@ export function MonthSelector({
   );
   const lastCommittedValueRef = useRef(fieldValue);
 
+  // eslint-disable-next-line warn-use-effect -- This effect mirrors the externally controlled field value into a local ref so partial native date edits can preserve the last committed value.
   useEffect(() => {
     if (fieldValue) {
       lastCommittedValueRef.current = fieldValue;
     }
   }, [fieldValue]);
 
+  // eslint-disable-next-line warn-use-effect -- This effect keeps the local mode state synchronized with the externally controlled field value when it changes outside the selector.
   useEffect(() => {
     if (isFullDateValue(fieldValue)) {
       setIsDateMode(true);

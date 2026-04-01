@@ -51,40 +51,39 @@ function reloadApp(): void {
   window.location.assign("/");
 }
 
-export function AppErrorCard({
-  error,
-}: AppErrorCardProps): React.ReactElement {
+export function AppErrorCard({ error }: AppErrorCardProps): React.ReactElement {
   const isDevelopment = process.env.NODE_ENV !== "production";
   const errorDetails = buildErrorPayload(error);
 
   return (
     <div className="app-error-card">
-      <Container >
+      <Container>
         <Stack align="center">
+          <Box maxWidth={500}>
+            <Card padding={32} radius={28}>
+              <Stack gap={20}>
+                <Stack gap={8}>
+                  <Text as="h1" size="h2" weight="bold">
+                    {i18n.t("app_error.title")}
+                  </Text>
+                  <Text color="secondary">
+                    {i18n.t("app_error.description")}
+                  </Text>
+                </Stack>
 
-        <Box maxWidth={500}>
-          <Card padding={32} radius={28}>
-            <Stack gap={20}>
-              <Stack gap={8}>
-                <Text as="h1" size="h2" weight="bold">
-                  {i18n.t("app_error.title")}
-                </Text>
-                <Text color="secondary">{i18n.t("app_error.description")}</Text>
+                <Button onClick={reloadApp} fullWidth>
+                  {i18n.t("app_error.reload")}
+                </Button>
+
+                {isDevelopment ? (
+                  <ErrorDetailsPanel
+                    label={String(i18n.t("app_error.technical_details"))}
+                    content={errorDetails}
+                  />
+                ) : null}
               </Stack>
-
-              <Button onClick={reloadApp} fullWidth>
-                {i18n.t("app_error.reload")}
-              </Button>
-
-              {isDevelopment ? (
-                <ErrorDetailsPanel
-                  label={String(i18n.t("app_error.technical_details"))}
-                  content={errorDetails}
-                />
-              ) : null}
-            </Stack>
-          </Card>
-        </Box>
+            </Card>
+          </Box>
         </Stack>
       </Container>
     </div>

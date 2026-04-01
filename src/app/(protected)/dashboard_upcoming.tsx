@@ -34,9 +34,7 @@ function formatPaymentDate(beginDate: string): string {
   return format(new Date(beginDate), "MMM d");
 }
 
-function getUpcomingPaymentHref(
-  payment: DashboardUpcomingItem,
-): string {
+function getUpcomingPaymentHref(payment: DashboardUpcomingItem): string {
   if (payment.kind === "transaction") {
     return `/transactions/${payment.id}`;
   }
