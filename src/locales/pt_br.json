@@ -16,6 +16,10 @@
     "secondary_section": "Preferências",
     "user_fallback_name": "Sua conta"
   },
+  "app_shell": {
+    "pull_to_refresh": "Puxe para atualizar",
+    "refreshing": "Atualizando"
+  },
   "dashboard": {
     "current_month_overview": "Resumo do mês atual",
     "income": "Receitas",

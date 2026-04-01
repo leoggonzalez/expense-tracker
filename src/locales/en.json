@@ -22,6 +22,10 @@
     "secondary_section": "Preferences",
     "user_fallback_name": "Your account"
   },
+  "app_shell": {
+    "pull_to_refresh": "Pull to refresh",
+    "refreshing": "Refreshing"
+  },
   "dashboard": {
     "current_month_overview": "Current Month Overview",
     "income": "Income",
