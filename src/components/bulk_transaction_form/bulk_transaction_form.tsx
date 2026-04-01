@@ -18,6 +18,7 @@ import { Stack, Text } from "@/elements";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 
 import { format } from "date-fns";
+import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
 import { useToast } from "@/components/toast_provider/toast_provider";
 
@@ -223,6 +224,7 @@ export function BulkTransactionForm({
     showSuccess(i18n.t("toast.transactions_created"), {
       iconName: "transactions",
     });
+    triggerNewTransactionRecentRefresh();
     resetForm();
 
     if (onSuccess) {

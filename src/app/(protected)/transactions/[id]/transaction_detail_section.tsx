@@ -85,6 +85,23 @@ function getTransactionIcon(type: string): "income" | "expense" | "transfer" {
   return "transfer";
 }
 
+function getScheduleLabel(data: TransactionDetailPayload): string {
+  if (data.scheduleMode === "one_time") {
+    return String(i18n.t("transaction_detail_page.schedule_one_time"));
+  }
+
+  if (data.scheduleMode === "unlimited") {
+    return String(i18n.t("transaction_detail_page.schedule_recurring"));
+  }
+
+  return String(
+    i18n.t("transaction_detail_page.schedule_installments_value", {
+      total: String(data.installmentsTotal || 0),
+      remaining: String(data.installmentsRemaining || 0),
+    }),
+  );
+}
+
 function TransactionDetailSkeleton(): React.ReactElement {
   return (
     <Container>
@@ -295,9 +312,11 @@ export function TransactionDetailSection({
                   </Text>
                 }
                 value={
-                  <Text size="sm" weight="semibold">
-                    {data.spaceName}
-                  </Text>
+                  <AppLink href={`/spaces/${data.spaceId}`}>
+                    <Text size="sm" weight="semibold">
+                      {data.spaceName}
+                    </Text>
+                  </AppLink>
                 }
               />
               <DetailRow
@@ -317,6 +336,18 @@ export function TransactionDetailSection({
                 value={
                   <Text size="sm" weight="semibold">
                     {formatTransactionDate(data.beginDate, data.endDate)}
+                  </Text>
+                }
+              />
+              <DetailRow
+                label={
+                  <Text size="sm" color="secondary">
+                    {i18n.t("transaction_detail_page.schedule")}
+                  </Text>
+                }
+                value={
+                  <Text size="sm" weight="semibold">
+                    {getScheduleLabel(data)}
                   </Text>
                 }
               />

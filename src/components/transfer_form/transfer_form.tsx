@@ -9,6 +9,7 @@ import { MonthSelector } from "@/components/month_selector/month_selector";
 import { Button, InfoBox, Input, Select } from "@/components";
 import { inferTransactionDateMode, toDate } from "@/lib/transaction_schedule";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
+import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import { useToast } from "@/components/toast_provider/toast_provider";
@@ -119,6 +120,7 @@ export function TransferForm({
     showSuccess(i18n.t("toast.transfer_created"), {
       iconName: "transfer",
     });
+    triggerNewTransactionRecentRefresh();
 
     if (onSuccess) {
       onSuccess();

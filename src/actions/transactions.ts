@@ -1,11 +1,18 @@
 "use server";
 
-import { addMonths, endOfMonth, format, startOfMonth } from "date-fns";
+import {
+  addMonths,
+  differenceInCalendarMonths,
+  endOfMonth,
+  format,
+  startOfMonth,
+} from "date-fns";
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
 import { normalizeTransactionAmount } from "@/lib/amount";
 import { formatProjectionMonthKey } from "@/lib/projection_month";
 import { Space, type SpaceRecord } from "@/lib/space";
+import { deriveScheduleFromDates } from "@/lib/transaction_schedule";
 import {
   Transaction,
   type CreateTransactionInput,
@@ -177,6 +184,9 @@ export type TransactionDetailPayload = {
   amount: number;
   beginDate: string;
   endDate: string | null;
+  scheduleMode: "one_time" | "installments" | "unlimited";
+  installmentsTotal: number | null;
+  installmentsRemaining: number | null;
 };
 
 export type NewTransactionRecentPayload = {
@@ -360,6 +370,21 @@ function serializeTransactionDetail(
   transaction: TransactionWithSpaceRecord,
   mainSpaceId: string | null,
 ): TransactionDetailPayload {
+  const schedule = deriveScheduleFromDates({
+    beginDate: transaction.beginDate,
+    endDate: transaction.endDate,
+  });
+  const installmentsRemaining =
+    schedule.scheduleMode !== "installments" || !transaction.endDate
+      ? null
+      : Math.max(
+          0,
+          differenceInCalendarMonths(
+            startOfMonth(transaction.endDate),
+            startOfMonth(new Date()),
+          ) + 1,
+        );
+
   return {
     id: transaction.id,
     type: transaction.type,
@@ -372,6 +397,10 @@ function serializeTransactionDetail(
     amount: normalizeTransactionAmount(transaction.type, transaction.amount),
     beginDate: transaction.beginDate.toISOString(),
     endDate: transaction.endDate?.toISOString() || null,
+    scheduleMode: schedule.scheduleMode,
+    installmentsTotal:
+      schedule.scheduleMode === "installments" ? schedule.installments : null,
+    installmentsRemaining,
   };
 }
 

@@ -9,7 +9,9 @@ import {
   NewTransactionRecentTransactions,
 } from "@/components";
 import { Card, Stack, Text } from "@/elements";
+import { subscribeToNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
+import React from "react";
 
 const newTransactionRecentCache = {
   entries: new Map<string, NewTransactionRecentPayload>(),
@@ -41,6 +43,12 @@ export function NewTransactionRecentSection(): React.ReactElement {
     endpoint,
     newTransactionRecentCache,
   );
+
+  React.useEffect(() => {
+    return subscribeToNewTransactionRecentRefresh(() => {
+      retry();
+    });
+  }, [retry]);
 
   if (hasError && !data) {
     return (

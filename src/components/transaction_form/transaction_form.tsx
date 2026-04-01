@@ -26,6 +26,7 @@ import {
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 
 import { format } from "date-fns";
+import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
 import { useForm } from "react-use-form-library";
 import { useToast } from "@/components/toast_provider/toast_provider";
@@ -299,6 +300,7 @@ export function TransactionForm({
       showSuccess(i18n.t(successMessageKey), {
         iconName: form.model.type,
       });
+      triggerNewTransactionRecentRefresh();
 
       if (onSuccess) {
         onSuccess();

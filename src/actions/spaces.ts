@@ -57,6 +57,9 @@ export type SpaceDetailPageData = {
     id: string;
     name: string;
     main: boolean | null;
+    type: SpaceTypeInput;
+    paymentDueDay: number | null;
+    paymentTiming: CreditCardPaymentTimingInput;
     isArchived: boolean;
     historicalTotal: number;
     selectedMonthTotal: number;
@@ -320,6 +323,9 @@ export async function getSpaceDetailPayloadForUser(
       id: detailData.metrics.id,
       name: detailData.metrics.name,
       main: detailData.metrics.main,
+      type: detailData.metrics.type,
+      paymentDueDay: detailData.metrics.paymentDueDay,
+      paymentTiming: detailData.metrics.paymentTiming,
       isArchived: detailData.metrics.isArchived,
       historicalTotal: detailData.metrics.historicalTotal,
       selectedMonthTotal: detailData.metrics.selectedMonthTotal,

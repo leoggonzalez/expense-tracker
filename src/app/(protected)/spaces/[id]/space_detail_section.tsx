@@ -8,6 +8,8 @@ import {
   Checkbox,
   Container,
   Currency,
+  DetailList,
+  DetailRow,
   Hero,
   HeroMetric,
   HeroMetrics,
@@ -104,6 +106,37 @@ function SpaceDetailSkeleton({
         </Card>
       </Stack>
     </Container>
+  );
+}
+
+function getAccountTypeLabel(space: SpaceDetailPayload["space"]): string {
+  return space.type === "credit_card"
+    ? String(i18n.t("spaces_page.space_type_credit_card"))
+    : String(i18n.t("spaces_page.space_type_regular"));
+}
+
+function getMainStatusLabel(space: SpaceDetailPayload["space"]): string {
+  return space.main === true
+    ? String(i18n.t("space_detail_page.account_detail_yes"))
+    : String(i18n.t("space_detail_page.account_detail_no"));
+}
+
+function getCreditCardSettleLabel(space: SpaceDetailPayload["space"]): string {
+  if (space.type !== "credit_card") {
+    return "";
+  }
+
+  const dueDay = space.paymentDueDay ?? 1;
+  const timingKey =
+    space.paymentTiming === "previous_month"
+      ? "spaces_page.payment_timing_previous_month"
+      : "spaces_page.payment_timing_same_month";
+
+  return String(
+    i18n.t("space_detail_page.account_detail_settle_value", {
+      day: String(dueDay),
+      timing: String(i18n.t(timingKey)),
+    }),
   );
 }
 
@@ -398,17 +431,65 @@ export function SpaceDetailSection({
             </Stack>
           </Card>
         ) : (
-          <Card padding={24}>
-            <Stack gap={10}>
-              <Checkbox
-                checked={currentData.space.main === true}
-                onChange={(checked) => void handleMainToggle(checked)}
-                label={i18n.t("space_detail_page.main_toggle_label")}
-                disabled={isUpdatingMain}
-              />
-              <Text size="sm" color="secondary">
-                {i18n.t("space_detail_page.main_toggle_description")}
-              </Text>
+          <Card
+            padding={24}
+            title={String(i18n.t("space_detail_page.account_details_title"))}
+            icon="spaces"
+          >
+            <Stack gap={20}>
+              <Stack gap={10}>
+                <Checkbox
+                  checked={currentData.space.main === true}
+                  onChange={(checked) => void handleMainToggle(checked)}
+                  label={i18n.t("space_detail_page.main_toggle_label")}
+                  disabled={isUpdatingMain}
+                  variant="switch"
+                />
+                <Text size="sm" color="secondary">
+                  {i18n.t("space_detail_page.main_toggle_description")}
+                </Text>
+              </Stack>
+
+              <DetailList>
+                <DetailRow
+                  label={
+                    <Text size="sm" color="secondary">
+                      {i18n.t("space_detail_page.account_detail_main")}
+                    </Text>
+                  }
+                  value={
+                    <Text size="sm" weight="semibold">
+                      {getMainStatusLabel(currentData.space)}
+                    </Text>
+                  }
+                />
+                <DetailRow
+                  label={
+                    <Text size="sm" color="secondary">
+                      {i18n.t("space_detail_page.account_detail_type")}
+                    </Text>
+                  }
+                  value={
+                    <Text size="sm" weight="semibold">
+                      {getAccountTypeLabel(currentData.space)}
+                    </Text>
+                  }
+                />
+                {currentData.space.type === "credit_card" ? (
+                  <DetailRow
+                    label={
+                      <Text size="sm" color="secondary">
+                        {i18n.t("space_detail_page.account_detail_settle")}
+                      </Text>
+                    }
+                    value={
+                      <Text size="sm" weight="semibold">
+                        {getCreditCardSettleLabel(currentData.space)}
+                      </Text>
+                    }
+                  />
+                ) : null}
+              </DetailList>
             </Stack>
           </Card>
         )}
