@@ -1,12 +1,15 @@
 "use client";
 
-import type { SpaceDetailPayload } from "@/actions/spaces";
+import { setSpaceMainStatus, type SpaceDetailPayload } from "@/actions/spaces";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
   AppLink,
   Button,
+  Checkbox,
   Container,
   Currency,
+  DetailList,
+  DetailRow,
   Hero,
   HeroMetric,
   HeroMetrics,
@@ -15,6 +18,7 @@ import {
   type HeroAction,
 } from "@/components";
 import { SpaceArchiveDialog } from "@/components/space_archive_dialog/space_archive_dialog";
+import { useToast } from "@/components/toast_provider/toast_provider";
 import { Card, Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import React from "react";
@@ -105,6 +109,37 @@ function SpaceDetailSkeleton({
   );
 }
 
+function getAccountTypeLabel(space: SpaceDetailPayload["space"]): string {
+  return space.type === "credit_card"
+    ? String(i18n.t("spaces_page.space_type_credit_card"))
+    : String(i18n.t("spaces_page.space_type_regular"));
+}
+
+function getMainStatusLabel(space: SpaceDetailPayload["space"]): string {
+  return space.main === true
+    ? String(i18n.t("space_detail_page.account_detail_yes"))
+    : String(i18n.t("space_detail_page.account_detail_no"));
+}
+
+function getCreditCardSettleLabel(space: SpaceDetailPayload["space"]): string {
+  if (space.type !== "credit_card") {
+    return "";
+  }
+
+  const dueDay = space.paymentDueDay ?? 1;
+  const timingKey =
+    space.paymentTiming === "previous_month"
+      ? "spaces_page.payment_timing_previous_month"
+      : "spaces_page.payment_timing_same_month";
+
+  return String(
+    i18n.t("space_detail_page.account_detail_settle_value", {
+      day: String(dueDay),
+      timing: String(i18n.t(timingKey)),
+    }),
+  );
+}
+
 export function SpaceDetailSection({
   id,
   currentMonthKey,
@@ -115,12 +150,14 @@ export function SpaceDetailSection({
   isArchiveDialogOpen,
   isUnarchiveDialogOpen,
 }: SpaceDetailSectionProps): React.ReactElement {
+  const { showError, showSuccess } = useToast();
   const endpoint = `/api/spaces/${id}?currentMonth=${currentMonthKey}&page=${String(page)}`;
   const { data, isLoading, hasError, isNotFound, retry } =
     useProtectedPageSection(endpoint, endpoint, spaceDetailCache);
   const [visibleData, setVisibleData] =
     React.useState<SpaceDetailPayload | null>(null);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [isUpdatingMain, setIsUpdatingMain] = React.useState(false);
 
   React.useEffect(() => {
     setVisibleData(data);
@@ -200,6 +237,10 @@ export function SpaceDetailSection({
       : `/spaces/${currentData.space.id}?confirmUnarchive=1`;
   const settleHref = `/transactions/new/transfer?${new URLSearchParams({
     to_space: currentData.space.id,
+    ...(currentData.mainSpaceId &&
+    currentData.mainSpaceId !== currentData.space.id
+      ? { from_space: currentData.mainSpaceId }
+      : {}),
     amount: Math.abs(currentData.space.selectedMonthTotal).toFixed(2),
     description: String(
       i18n.t("spaces_page.settle_description", {
@@ -267,6 +308,26 @@ export function SpaceDetailSection({
     } finally {
       setIsLoadingMore(false);
     }
+  };
+
+  const handleMainToggle = async (checked: boolean): Promise<void> => {
+    setIsUpdatingMain(true);
+
+    const result = await setSpaceMainStatus(currentData.space.id, checked);
+
+    setIsUpdatingMain(false);
+
+    if (!result.success) {
+      showError(i18n.t(result.error || "space_detail_page.update_failed"), {
+        iconName: "spaces",
+      });
+      return;
+    }
+
+    showSuccess(i18n.t("space_detail_page.main_update_success"), {
+      iconName: "spaces",
+    });
+    retry();
   };
 
   return (
@@ -369,7 +430,69 @@ export function SpaceDetailSection({
               </Stack>
             </Stack>
           </Card>
-        ) : null}
+        ) : (
+          <Card
+            padding={24}
+            title={String(i18n.t("space_detail_page.account_details_title"))}
+            icon="spaces"
+          >
+            <Stack gap={20}>
+              <Stack gap={10}>
+                <Checkbox
+                  checked={currentData.space.main === true}
+                  onChange={(checked) => void handleMainToggle(checked)}
+                  label={i18n.t("space_detail_page.main_toggle_label")}
+                  disabled={isUpdatingMain}
+                  variant="switch"
+                />
+                <Text size="sm" color="secondary">
+                  {i18n.t("space_detail_page.main_toggle_description")}
+                </Text>
+              </Stack>
+
+              <DetailList>
+                <DetailRow
+                  label={
+                    <Text size="sm" color="secondary">
+                      {i18n.t("space_detail_page.account_detail_main")}
+                    </Text>
+                  }
+                  value={
+                    <Text size="sm" weight="semibold">
+                      {getMainStatusLabel(currentData.space)}
+                    </Text>
+                  }
+                />
+                <DetailRow
+                  label={
+                    <Text size="sm" color="secondary">
+                      {i18n.t("space_detail_page.account_detail_type")}
+                    </Text>
+                  }
+                  value={
+                    <Text size="sm" weight="semibold">
+                      {getAccountTypeLabel(currentData.space)}
+                    </Text>
+                  }
+                />
+                {currentData.space.type === "credit_card" ? (
+                  <DetailRow
+                    label={
+                      <Text size="sm" color="secondary">
+                        {i18n.t("space_detail_page.account_detail_settle")}
+                      </Text>
+                    }
+                    value={
+                      <Text size="sm" weight="semibold">
+                        {getCreditCardSettleLabel(currentData.space)}
+                      </Text>
+                    }
+                  />
+                ) : null}
+              </DetailList>
+            </Stack>
+          </Card>
+        )}
 
         <Card
           padding={24}

@@ -18,6 +18,7 @@ import { Stack, Text } from "@/elements";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 
 import { format } from "date-fns";
+import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
 import { useToast } from "@/components/toast_provider/toast_provider";
 
@@ -29,7 +30,11 @@ interface BulkTransactionItem {
 }
 
 export interface BulkTransactionFormProps {
-  spaces?: string[];
+  spaces?: Array<{
+    id: string;
+    name: string;
+    main: boolean | null;
+  }>;
   onSuccess?: () => void;
 }
 
@@ -219,6 +224,7 @@ export function BulkTransactionForm({
     showSuccess(i18n.t("toast.transactions_created"), {
       iconName: "transactions",
     });
+    triggerNewTransactionRecentRefresh();
     resetForm();
 
     if (onSuccess) {
@@ -322,7 +328,8 @@ export function BulkTransactionForm({
             <Stack gap={8}>
               <Input
                 label={i18n.t("transaction_form.installments")}
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={shared.installments}
                 onChange={(value) =>
                   setShared((current) => ({
@@ -330,9 +337,6 @@ export function BulkTransactionForm({
                     installments: sanitizeInstallmentsInput(value),
                   }))
                 }
-                min={1}
-                max={120}
-                step={1}
                 required
                 size="lg"
                 surface="subtle"

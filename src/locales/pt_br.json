@@ -16,6 +16,10 @@
     "secondary_section": "Preferências",
     "user_fallback_name": "Sua conta"
   },
+  "app_shell": {
+    "pull_to_refresh": "Puxe para atualizar",
+    "refreshing": "Atualizando"
+  },
   "dashboard": {
     "current_month_overview": "Resumo do mês atual",
     "income": "Receitas",
@@ -36,14 +40,14 @@
     "hero_add_action": "Adicionar",
     "hero_more_action": "Mais",
     "header_load_failed": "Não foi possível carregar o resumo do painel agora.",
-    "upcoming_payments": "Próximos pagamentos",
-    "upcoming_payments_empty": "Não restam despesas programadas para este mês.",
-    "upcoming_load_failed": "Não foi possível carregar os próximos pagamentos agora.",
-    "upcoming_payments_link": "Ver todas as despesas",
+    "upcoming_transactions": "Próximos lançamentos",
+    "upcoming_transactions_empty": "Não há lançamentos programados para as próximas duas semanas.",
+    "upcoming_load_failed": "Não foi possível carregar os próximos lançamentos agora.",
+    "upcoming_transactions_link": "Ver todos os próximos lançamentos",
     "recent_activity_load_failed": "Não foi possível carregar a atividade recente agora.",
     "recent_activity_link": "Explorar lançamentos",
     "payment_due": "Vence em %{date}",
-    "debit_for_space": "Débito de %{space}",
+    "transactions_for_space": "Lançamentos de %{space}",
     "activity_subtitle": "Últimas alterações nos seus lançamentos."
   },
   "transaction_form": {
@@ -332,6 +336,16 @@
     "credit_card_payment_timing_required": "O momento da liquidação é obrigatório para espaços de cartão de crédito.",
     "payment_due_day_requires_credit_card": "O dia de vencimento do pagamento só pode ser usado em espaços de cartão de crédito.",
     "payment_timing_requires_credit_card": "O momento da liquidação só pode ser usado em espaços de cartão de crédito.",
+    "account_details_title": "Detalhes da conta",
+    "account_detail_main": "Espaço principal",
+    "account_detail_type": "Tipo de conta",
+    "account_detail_settle": "Liquidação",
+    "account_detail_settle_value": "Dia %{day} · %{timing}",
+    "account_detail_yes": "Sim",
+    "account_detail_no": "Não",
+    "main_toggle_label": "Definir como espaço principal",
+    "main_toggle_description": "Ao marcar este espaço como principal, todos os outros espaços deixarão de estar marcados como principais automaticamente.",
+    "main_update_success": "Espaço principal atualizado.",
     "not_found": "Espaço não encontrado."
   },
   "new_transaction_page": {
@@ -362,6 +376,10 @@
     "type": "Tipo",
     "space": "Espaço",
     "amount": "Valor",
+    "schedule": "Programação",
+    "schedule_one_time": "Uma vez",
+    "schedule_recurring": "Recorrente",
+    "schedule_installments_value": "Parcelas %{total} (%{remaining} restantes)",
     "date_range": "Período",
     "transfer": "Transferência",
     "back_to_details": "Voltar para detalhes do lançamento",

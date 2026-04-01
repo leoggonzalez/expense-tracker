@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 export type SpaceBaseData = {
   userAccountId: string;
   name: string;
+  main: boolean | null;
   type: SpaceType | null;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTiming | null;
@@ -33,13 +34,14 @@ export type SpaceMonthSummaryRecord = {
 export type CreditCardSpaceRecord = {
   id: string;
   name: string;
-  paymentDueDay: number;
-  paymentTiming: CreditCardPaymentTiming;
+  paymentDueDay: number | null;
+  paymentTiming: CreditCardPaymentTiming | null;
 };
 
 type SpaceDetailMetrics = {
   id: string;
   name: string;
+  main: boolean | null;
   type: SpaceType | null;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTiming | null;
@@ -58,6 +60,7 @@ type SpaceMonthSummaryRow = {
 type SpaceDetailMetricsRow = {
   id: string;
   name: string;
+  main: boolean | null;
   type: SpaceType | null;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTiming | null;
@@ -99,6 +102,7 @@ export class Space {
 
   public constructor(data: SpaceCreateData | SpacePersistedData) {
     this.data = {
+      main: null,
       type: null,
       paymentDueDay: null,
       paymentTiming: null,
@@ -113,6 +117,7 @@ export class Space {
       data: {
         userAccountId: this.data.userAccountId,
         name: this.data.name,
+        main: this.data.main,
         type: this.data.type,
         paymentDueDay: this.data.paymentDueDay,
         paymentTiming: this.data.paymentTiming,
@@ -124,6 +129,7 @@ export class Space {
 
   public async updateDetails(input: {
     name: string;
+    main: boolean | null;
     type: SpaceType | null;
     paymentDueDay: number | null;
     paymentTiming: CreditCardPaymentTiming | null;
@@ -134,6 +140,7 @@ export class Space {
       },
       data: {
         name: input.name,
+        main: input.main,
         type: input.type,
         paymentDueDay: input.paymentDueDay,
         paymentTiming: input.paymentTiming,
@@ -150,6 +157,7 @@ export class Space {
       },
       data: {
         isArchived: true,
+        main: null,
       },
     });
 
@@ -182,6 +190,7 @@ export class Space {
       id: this.data.id,
       userAccountId: this.data.userAccountId,
       name: this.data.name,
+      main: this.data.main,
       type: this.data.type,
       paymentDueDay: this.data.paymentDueDay,
       paymentTiming: this.data.paymentTiming,
@@ -215,6 +224,23 @@ export class Space {
         userAccountId,
         name,
         isArchived: false,
+      },
+    });
+
+    return record ? Space.fromRecord(record) : null;
+  }
+
+  public static async findMainByUser(
+    userAccountId: string,
+  ): Promise<Space | null> {
+    const record = await prisma.space.findFirst({
+      where: {
+        userAccountId,
+        isArchived: false,
+        main: true,
+      },
+      orderBy: {
+        name: "asc",
       },
     });
 
@@ -282,12 +308,6 @@ export class Space {
         userAccountId,
         isArchived: false,
         type: SpaceType.credit_card,
-        paymentDueDay: {
-          not: null,
-        },
-        paymentTiming: {
-          not: null,
-        },
       },
       select: {
         id: true,
@@ -300,18 +320,12 @@ export class Space {
       },
     });
 
-    return records.flatMap((record) =>
-      record.paymentDueDay === null || record.paymentTiming === null
-        ? []
-        : [
-            {
-              id: record.id,
-              name: record.name,
-              paymentDueDay: record.paymentDueDay,
-              paymentTiming: record.paymentTiming,
-            },
-          ],
-    );
+    return records.map((record) => ({
+      id: record.id,
+      name: record.name,
+      paymentDueDay: record.paymentDueDay,
+      paymentTiming: record.paymentTiming,
+    }));
   }
 
   public static async listByArchiveStateWithMonthTotals(
@@ -496,6 +510,7 @@ export class Space {
       SELECT
         s.id,
         s.name,
+        s.main,
         s.type,
         s."paymentDueDay",
         s."paymentTiming",
@@ -558,6 +573,7 @@ export class Space {
     return {
       id: row.id,
       name: row.name,
+      main: row.main,
       type: row.type,
       paymentDueDay: row.paymentDueDay,
       paymentTiming: row.paymentTiming,
@@ -570,6 +586,37 @@ export class Space {
 
   private static fromRecord(record: SpacePersistedData): Space {
     return new Space(record);
+  }
+
+  public static async setMainStatusForUser(
+    userAccountId: string,
+    spaceId: string,
+    main: boolean | null,
+  ): Promise<void> {
+    await prisma.$transaction(async (transaction) => {
+      if (main) {
+        await transaction.space.updateMany({
+          where: {
+            userAccountId,
+            id: {
+              not: spaceId,
+            },
+          },
+          data: {
+            main: null,
+          },
+        });
+      }
+
+      await transaction.space.update({
+        where: {
+          id: spaceId,
+        },
+        data: {
+          main,
+        },
+      });
+    });
   }
 
   private static getCurrentMonthBounds(): { monthStart: Date; monthEnd: Date } {

@@ -52,6 +52,7 @@ export { LoadingSkeleton } from "./loading_skeleton/loading_skeleton";
 export { ToastProvider, useToast } from "./toast_provider/toast_provider";
 
 export { AuthFormShell } from "./auth_form_shell/auth_form_shell";
+export { AppErrorCard } from "./app_error_card/app_error_card";
 export { LoginForm } from "./login_form/login_form";
 export { VerifyLoginForm } from "./verify_login_form/verify_login_form";
 export { OtpInput } from "./otp_input/otp_input";
@@ -77,3 +78,4 @@ export { DetailList, DetailRow } from "./detail_list/detail_list";
 export { Container } from "./container/container";
 export type { ContainerProps } from "./container/container";
 export { Avatar } from "./avatar/avatar";
+export { ErrorDetailsPanel } from "./error_details_panel/error_details_panel";

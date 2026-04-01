@@ -26,12 +26,17 @@ import {
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 
 import { format } from "date-fns";
+import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
 import { useForm } from "react-use-form-library";
 import { useToast } from "@/components/toast_provider/toast_provider";
 
 export interface TransactionFormProps {
-  spaces?: string[];
+  spaces?: Array<{
+    id: string;
+    name: string;
+    main: boolean | null;
+  }>;
   onSuccess?: () => void;
   initialData?: {
     id: string;
@@ -284,7 +289,9 @@ export function TransactionForm({
         return;
       }
 
-      if (!isEdit) {
+      if (isCreateFlow) {
+        resetCreateFlowFields();
+      } else if (!isEdit) {
         clearNewTransactionDraft();
         skipDraftSaveRef.current = true;
         reset();
@@ -293,6 +300,7 @@ export function TransactionForm({
       showSuccess(i18n.t(successMessageKey), {
         iconName: form.model.type,
       });
+      triggerNewTransactionRecentRefresh();
 
       if (onSuccess) {
         onSuccess();
@@ -308,6 +316,17 @@ export function TransactionForm({
   });
   const { fields, model, onSubmit, reset, submissionStatus, updateFields } =
     form;
+  const resetCreateFlowFields = (): void => {
+    updateFields({
+      type: transactionType || model.type,
+      spaceName: model.spaceName,
+      description: "",
+      amountInput: "",
+      beginDate: model.beginDate,
+      scheduleMode: initialModelRef.current.scheduleMode,
+      installments: "1",
+    });
+  };
 
   // eslint-disable-next-line warn-use-effect -- This effect hydrates the persisted draft once for create flows and syncs it into the form library state.
   useEffect(() => {
@@ -526,14 +545,12 @@ export function TransactionForm({
           <Stack gap={8}>
             <Input
               label={i18n.t("transaction_form.installments")}
-              type="number"
-              value={fields.installments.value || "1"}
+              type="text"
+              inputMode="numeric"
+              value={fields.installments.value || ""}
               onChange={(value) =>
                 fields.installments.onChange(sanitizeInstallmentsInput(value))
               }
-              min={1}
-              max={120}
-              step={1}
               required
               size="lg"
               surface="subtle"

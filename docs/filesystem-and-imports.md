@@ -23,6 +23,10 @@ Next.js special files keep their framework-required names:
 - `page.tsx`
 - `layout.tsx`
 - `route.ts`
+- `error.tsx`
+- `global-error.tsx`
+- `loading.tsx`
+- `not-found.tsx`
 - `icon.tsx`
 - `apple-icon.tsx`
 

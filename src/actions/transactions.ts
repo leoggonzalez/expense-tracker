@@ -1,16 +1,24 @@
 "use server";
 
-import { addMonths, endOfMonth, format, startOfMonth } from "date-fns";
+import {
+  addMonths,
+  differenceInCalendarMonths,
+  endOfMonth,
+  format,
+  startOfMonth,
+} from "date-fns";
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
 import { normalizeTransactionAmount } from "@/lib/amount";
 import { formatProjectionMonthKey } from "@/lib/projection_month";
 import { Space, type SpaceRecord } from "@/lib/space";
+import { deriveScheduleFromDates } from "@/lib/transaction_schedule";
 import {
   Transaction,
   type CreateTransactionInput,
   type CreateTransferInput,
   type DashboardCreditCardSettlementRecord,
+  type DashboardUpcomingTransactionRecord,
   type DashboardUpcomingPaymentRecord,
   type DashboardTotals,
   type FilteredTransactionRecord,
@@ -55,6 +63,21 @@ export type DashboardCreditCardSettlementItem = {
   projectedMonthRange: DashboardDateRange;
 };
 
+export type DashboardUpcomingTransactionItem = {
+  id: string;
+  kind: "transaction";
+  type: "income" | "expense";
+  spaceId: string;
+  spaceName: string;
+  description: string;
+  amount: number;
+  dueDate: string;
+};
+
+export type DashboardUpcomingItem =
+  | DashboardCreditCardSettlementItem
+  | DashboardUpcomingTransactionItem;
+
 export type SerializedProjectionTransaction = {
   id: string;
   type: string;
@@ -70,7 +93,7 @@ export type SerializedProjectionTransaction = {
 export type DashboardPayload = {
   totals: DashboardTotals;
   recentTransactions: DashboardTransactionItem[];
-  upcomingPayments: DashboardCreditCardSettlementItem[];
+  upcomingPayments: DashboardUpcomingItem[];
   currentMonthRange: DashboardDateRange;
 };
 
@@ -80,8 +103,8 @@ export type DashboardHeaderPayload = {
 };
 
 export type DashboardUpcomingPayload = {
-  currentMonthRange: DashboardDateRange;
-  upcomingPayments: DashboardCreditCardSettlementItem[];
+  upcomingRange: DashboardDateRange;
+  upcomingPayments: DashboardUpcomingItem[];
 };
 
 export type DashboardRecentActivityPayload = {
@@ -152,6 +175,7 @@ export type TransactionsPagePayload = {
 export type TransactionDetailPayload = {
   id: string;
   type: string;
+  mainSpaceId: string | null;
   spaceId: string;
   spaceName: string;
   transferSpaceId: string | null;
@@ -160,6 +184,9 @@ export type TransactionDetailPayload = {
   amount: number;
   beginDate: string;
   endDate: string | null;
+  scheduleMode: "one_time" | "installments" | "unlimited";
+  installmentsTotal: number | null;
+  installmentsRemaining: number | null;
 };
 
 export type NewTransactionRecentPayload = {
@@ -167,7 +194,11 @@ export type NewTransactionRecentPayload = {
 };
 
 export type NewTransactionSpacesPayload = {
-  spaces: string[];
+  spaces: Array<{
+    id: string;
+    name: string;
+    main: boolean | null;
+  }>;
 };
 
 export type NewTransferSpacesPayload = {
@@ -312,18 +343,52 @@ function serializeDashboardCreditCardSettlement(
   };
 }
 
+function serializeDashboardUpcomingTransaction(
+  transaction: DashboardUpcomingTransactionRecord,
+): DashboardUpcomingTransactionItem {
+  return {
+    id: transaction.id,
+    kind: "transaction",
+    type: transaction.type,
+    spaceId: transaction.spaceId,
+    spaceName: transaction.spaceName,
+    description: transaction.description,
+    amount: normalizeTransactionAmount(transaction.type, transaction.amount),
+    dueDate: transaction.dueDate.toISOString(),
+  };
+}
+
 function serializeDashboardUpcomingPayment(
   payment: DashboardUpcomingPaymentRecord,
-): DashboardCreditCardSettlementItem {
-  return serializeDashboardCreditCardSettlement(payment);
+): DashboardUpcomingItem {
+  return payment.kind === "transaction"
+    ? serializeDashboardUpcomingTransaction(payment)
+    : serializeDashboardCreditCardSettlement(payment);
 }
 
 function serializeTransactionDetail(
   transaction: TransactionWithSpaceRecord,
+  mainSpaceId: string | null,
 ): TransactionDetailPayload {
+  const schedule = deriveScheduleFromDates({
+    beginDate: transaction.beginDate,
+    endDate: transaction.endDate,
+  });
+  const installmentsRemaining =
+    schedule.scheduleMode !== "installments" || !transaction.endDate
+      ? null
+      : Math.max(
+          0,
+          differenceInCalendarMonths(
+            startOfMonth(transaction.endDate),
+            startOfMonth(new Date()),
+          ) + 1,
+        );
+
   return {
     id: transaction.id,
     type: transaction.type,
+    mainSpaceId,
     spaceId: transaction.spaceId,
     spaceName: transaction.space.name,
     transferSpaceId: transaction.transferSpaceId,
@@ -332,6 +397,10 @@ function serializeTransactionDetail(
     amount: normalizeTransactionAmount(transaction.type, transaction.amount),
     beginDate: transaction.beginDate.toISOString(),
     endDate: transaction.endDate?.toISOString() || null,
+    scheduleMode: schedule.scheduleMode,
+    installmentsTotal:
+      schedule.scheduleMode === "installments" ? schedule.installments : null,
+    installmentsRemaining,
   };
 }
 
@@ -652,7 +721,7 @@ export async function getDashboardUpcomingPayloadForUser(
     await Transaction.getDashboardUpcomingQueryData(userAccountId);
 
   return {
-    currentMonthRange: serializeDashboardDateRange(
+    upcomingRange: serializeDashboardDateRange(
       dashboardData.monthStart,
       dashboardData.monthEnd,
     ),
@@ -711,16 +780,19 @@ export async function getTransactionDetailPayloadForUser(
   userAccountId: string,
   id: string,
 ): Promise<TransactionDetailPayload | null> {
-  const transaction = await Transaction.findWithSpaceByIdForUser(
-    userAccountId,
-    id,
-  );
+  const [transaction, mainSpace] = await Promise.all([
+    Transaction.findWithSpaceByIdForUser(userAccountId, id),
+    Space.findMainByUser(userAccountId),
+  ]);
 
   if (!transaction) {
     return null;
   }
 
-  return serializeTransactionDetail(transaction);
+  return serializeTransactionDetail(
+    transaction,
+    mainSpace?.toRecord().id || null,
+  );
 }
 
 export async function getNewTransactionRecentPayloadForUser(
@@ -739,7 +811,15 @@ export async function getNewTransactionSpacesPayloadForUser(
   const spaces = await Space.listActiveByUser(userAccountId);
 
   return {
-    spaces: spaces.map((space) => space.toRecord().name),
+    spaces: spaces.map((space) => {
+      const spaceRecord = space.toRecord();
+
+      return {
+        id: spaceRecord.id,
+        name: spaceRecord.name,
+        main: spaceRecord.main,
+      };
+    }),
   };
 }
 
