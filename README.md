@@ -4,7 +4,7 @@ Currento is a personal finance app built with Next.js, Prisma, PostgreSQL, TypeS
 
 ## Handbook
 
-The main documentation now lives in `docs/`:
+The main documentation now lives in `docs/`. `README.md` stays at repo root as the entrypoint and index:
 
 - [docs/index.md](./docs/index.md)
 - [docs/tech-stack.md](./docs/tech-stack.md)
@@ -16,6 +16,23 @@ The main documentation now lives in `docs/`:
 - [docs/validation-linting-and-skills.md](./docs/validation-linting-and-skills.md)
 - [docs/project-history.md](./docs/project-history.md)
 - [docs/new-project-quickstart.md](./docs/new-project-quickstart.md)
+- [docs/boilerplate-extraction-workbook.md](./docs/boilerplate-extraction-workbook.md)
+
+## Document Index
+
+- Repo coding entrypoint: [AGENTS.md](./AGENTS.md)
+- Backend guidance entrypoint: [SERVER_GUIDELINES.md](./SERVER_GUIDELINES.md)
+- Handbook overview: [docs/index.md](./docs/index.md)
+- Boilerplate planning workbook: [docs/boilerplate-extraction-workbook.md](./docs/boilerplate-extraction-workbook.md)
+- New project setup guide: [docs/new-project-quickstart.md](./docs/new-project-quickstart.md)
+- Tech stack notes: [docs/tech-stack.md](./docs/tech-stack.md)
+- Filesystem and imports rules: [docs/filesystem-and-imports.md](./docs/filesystem-and-imports.md)
+- Component guidance: [docs/components.md](./docs/components.md)
+- Styling and primitives guidance: [docs/styling-and-primitives.md](./docs/styling-and-primitives.md)
+- Routing, state, and localisation guidance: [docs/routing-state-and-localisation.md](./docs/routing-state-and-localisation.md)
+- Server and data guidance: [docs/server-and-data.md](./docs/server-and-data.md)
+- Validation, linting, and skills guidance: [docs/validation-linting-and-skills.md](./docs/validation-linting-and-skills.md)
+- Project history: [docs/project-history.md](./docs/project-history.md)
 
 ## Local Setup
 

@@ -1,6 +1,6 @@
 # New Project Quickstart
 
-This guide shows how to start a new project using the same foundation that worked well for Currento: Next.js, TypeScript, Prisma, PostgreSQL, SCSS, custom lint rules, and a single localized homepage.
+This guide shows how to start a new project using the same foundation that worked well for Currento: Next.js, TypeScript, Prisma, PostgreSQL, SCSS, custom lint rules, retained user-account flows, and a single localized homepage.
 
 ## 1. Create The App
 
@@ -20,7 +20,7 @@ yarn add @prisma/client date-fns i18n-js nodemailer react-use-form-library recha
 yarn add -D @types/node @types/nodemailer @types/react @types/react-dom babel-plugin-react-compiler prettier prisma tsx typescript
 ```
 
-At minimum, this gives you the same application baseline as Currento. If the new project does not need charts or email yet, you can leave `recharts` or `nodemailer` for later.
+At minimum, this gives you the same application baseline as Currento. If the new project does not need charts yet, you can leave `recharts` for later. Keep the email-related pieces if you want the same email-and-code login flow in the starter.
 
 ## 3. Add Core Scripts
 
@@ -115,8 +115,47 @@ Recommended intent:
 - `src/locales`: locale message files
 - `src/model`: business-domain models when the project benefits from them
 - `src/styles`: shared tokens and globals
+- `docs`: coding guidelines, architecture decisions, extraction notes, and quickstart material
 
-## 6. Initialize Prisma And PostgreSQL
+Boilerplate defaults for the extracted starter:
+
+- Keep `docs`, `eslint-rules`, and `src/elements` as first-class folders.
+- Keep all primitive dependencies when copying anything from `src/elements`.
+- Reduce `src/app` to a single localized index route with a welcome message.
+- Keep only general-purpose components in `src/components`.
+- Preserve user account handling, email-and-code login, settings, and avatar support.
+
+## 6. Add Boilerplate Documentation Files
+
+Keep the repo documentation-centered from day one:
+
+- Keep `README.md` at the repo root as the main entrypoint.
+- Place the rest of the project documentation inside `docs/`.
+- Use `README.md` to list where each important document lives.
+- Keep coding guidance and backend guidance in dedicated docs pages, even if you also provide short root-level summaries during development.
+
+Recommended starter docs:
+
+- `README.md`
+- `docs/index.md`
+- `docs/new-project-quickstart.md`
+- `docs/filesystem-and-imports.md`
+- `docs/components.md`
+- `docs/styling-and-primitives.md`
+- `docs/routing-state-and-localisation.md`
+- `docs/server-and-data.md`
+- `docs/validation-linting-and-skills.md`
+
+## 7. Add Coding Guidelines And Agent Behavior
+
+Decide the repo contract early and document it in `docs/`:
+
+- Coding guidelines should cover naming, imports, component signatures, styling ownership, route structure, and localization requirements.
+- If the boilerplate keeps an agent-facing file such as `AGENTS.md`, keep it neutral and useful for human collaborators too.
+- Prefer agent behavior guidance that improves maintainability without tying the boilerplate to one assistant runtime.
+- Point any root-level entry documents back to the detailed docs so there is one clear source of truth.
+
+## 8. Initialize Prisma And PostgreSQL
 
 Initialize Prisma:
 
@@ -166,19 +205,19 @@ DATABASE_URL="postgresql://username:password@localhost:5432/currento_next?schema
 DIRECT_URL="postgresql://username:password@localhost:5432/currento_next?schema=public"
 ```
 
-## 7. Add Base Locales And Styles
+## 9. Add Base Locales And Styles
 
 Create `src/locales/en.json`:
 
 ```json
 {
   "metadata": {
-    "title": "Currento Next",
-    "description": "A project bootstrapped from the Currento 1.0 handbook."
+    "title": "Your App",
+    "description": "A project bootstrapped from the boilerplate handbook."
   },
   "home": {
-    "eyebrow": "Starter",
-    "title": "Project ready",
+    "eyebrow": "Welcome",
+    "title": "Welcome to your app",
     "subtitle": "Start building on a stable Next.js, Prisma, and SCSS foundation."
   }
 }
@@ -188,11 +227,13 @@ Create `src/styles/variables.scss`:
 
 ```scss
 :root {
-  --color-background: #f5f7f4;
+  --color-background: #f3f3f3;
   --color-surface: #ffffff;
-  --color-text: #15231c;
-  --color-muted: #5b6d63;
-  --color-primary: #0d6d77;
+  --color-text: #171717;
+  --color-muted: #6b6b6b;
+  --color-primary: #4b4b4b;
+  --color-gradient-start: #f7f7f7;
+  --color-gradient-end: #d9d9d9;
   --space-page: 24px;
   --content-max-width: 1000px;
 }
@@ -207,7 +248,11 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--color-background);
+  background: linear-gradient(
+    180deg,
+    var(--color-gradient-start) 0%,
+    var(--color-gradient-end) 100%
+  );
   color: var(--color-text);
   font-family: Georgia, "Times New Roman", serif;
 }
@@ -217,7 +262,7 @@ body {
 }
 ```
 
-## 8. Create One Homepage
+## 10. Create One Homepage
 
 Import global styles in `src/app/layout.tsx` and read metadata from locales:
 
