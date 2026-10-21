@@ -12,11 +12,12 @@ import {
   TransactionScheduleMode,
   deriveScheduleFromDates,
   inferTransactionDateMode,
+  normalizeDateValue,
   resolveEndDate,
   toDate,
 } from "@/lib/transaction_schedule";
 import { Icon, Stack, Text } from "@/elements";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   clearNewTransactionDraft,
   loadNewTransactionDraft,
@@ -36,6 +37,7 @@ export interface TransactionFormProps {
     id: string;
     name: string;
     main: boolean | null;
+    type?: string | null;
   }>;
   onSuccess?: () => void;
   initialData?: {
@@ -175,6 +177,7 @@ export function TransactionForm({
   const [isDraftReady, setIsDraftReady] = useState(
     !(!isEdit && Boolean(transactionType)),
   );
+  const [resolvedSpaces, setResolvedSpaces] = useState(initialSpaces);
   const hasHydratedDraftRef = useRef(false);
   const skipDraftSaveRef = useRef(false);
   const initialModelRef = useRef<TransactionFormModel>(
@@ -406,6 +409,27 @@ export function TransactionForm({
       installments: value === "installments" ? model.installments || "1" : "1",
     });
   };
+  const handleResolvedSpacesChange = useCallback(
+    (nextSpaces: typeof initialSpaces): void => {
+      setResolvedSpaces(nextSpaces);
+    },
+    [],
+  );
+  const selectedSpace = resolvedSpaces.find(
+    (space) => space.name === model.spaceName,
+  );
+  const selectedSpaceIsCreditCard = selectedSpace?.type === "credit_card";
+
+  // eslint-disable-next-line warn-use-effect -- Credit-card spaces need exact purchase dates so their billing period can be projected correctly.
+  useEffect(() => {
+    if (!selectedSpaceIsCreditCard || inferTransactionDateMode(model.beginDate) === "date") {
+      return;
+    }
+
+    updateFields({
+      beginDate: normalizeDateValue(model.beginDate, "month"),
+    });
+  }, [model.beginDate, selectedSpaceIsCreditCard, updateFields]);
 
   const parsedInstallments = parseInstallments(model.installments);
   const beginDateMode = inferTransactionDateMode(model.beginDate);
@@ -450,6 +474,7 @@ export function TransactionForm({
           value={fields.spaceName.value || ""}
           onChange={(value) => fields.spaceName.onChange(value)}
           spaces={initialSpaces}
+          onResolvedSpacesChange={handleResolvedSpacesChange}
           loadSpacesOnMount={isCreateFlow && initialSpaces.length === 0}
           placeholder={i18n.t("transaction_form.space_placeholder") as string}
           required

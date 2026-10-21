@@ -63,7 +63,7 @@ export function isValidEmail(email: string): boolean {
 export function isDevelopmentAuthBypassEnabled(): boolean {
   return (
     process.env.NODE_ENV !== "production" &&
-    Boolean(process.env.DEV_ADMIN_EMAIL)
+    getDevAdminEmails().length > 0
   );
 }
 
@@ -72,13 +72,21 @@ export function getDevAdminCode(): string {
 }
 
 export function isDevAdminEmail(email: string): boolean {
-  const adminEmail = process.env.DEV_ADMIN_EMAIL;
+  const normalizedEmail = normalizeEmail(email);
 
-  if (!adminEmail) {
-    return false;
-  }
+  return getDevAdminEmails().includes(normalizedEmail);
+}
 
-  return normalizeEmail(email) === normalizeEmail(adminEmail);
+function getDevAdminEmails(): string[] {
+  return Array.from(
+    new Set(
+      [process.env.DEV_ADMIN_EMAIL, process.env.DEV_ADMIN_EMAILS]
+        .filter((value): value is string => Boolean(value))
+        .flatMap((value) => value.split(","))
+        .map(normalizeEmail)
+        .filter(Boolean),
+    ),
+  );
 }
 
 export function isValidDevAdminCode(email: string, code: string): boolean {

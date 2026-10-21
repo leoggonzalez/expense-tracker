@@ -83,7 +83,7 @@ export function SpaceEditFormSection({
           initialName={data.name}
           initialType={data.type}
           initialPaymentDueDay={data.paymentDueDay}
-          initialPaymentTiming={data.paymentTiming}
+          initialPeriodEndDay={data.periodEndDay}
         />
       </PagePanel>
 

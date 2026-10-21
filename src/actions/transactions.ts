@@ -198,6 +198,7 @@ export type NewTransactionSpacesPayload = {
     id: string;
     name: string;
     main: boolean | null;
+    type: string | null;
   }>;
 };
 
@@ -818,6 +819,7 @@ export async function getNewTransactionSpacesPayloadForUser(
         id: spaceRecord.id,
         name: spaceRecord.name,
         main: spaceRecord.main,
+        type: spaceRecord.type,
       };
     }),
   };

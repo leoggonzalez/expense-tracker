@@ -1,5 +1,5 @@
 import { CreditCardPaymentTiming, Prisma, SpaceType } from "@prisma/client";
-import { endOfMonth, startOfMonth } from "date-fns";
+import { addMonths, endOfMonth, startOfMonth } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
 
@@ -10,6 +10,7 @@ export type SpaceBaseData = {
   type: SpaceType | null;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTiming | null;
+  periodEndDay: number | null;
   isArchived: boolean;
   currentMonthTransactionCount: number;
   createdAt: Date;
@@ -36,6 +37,7 @@ export type CreditCardSpaceRecord = {
   name: string;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTiming | null;
+  periodEndDay: number | null;
 };
 
 type SpaceDetailMetrics = {
@@ -45,6 +47,7 @@ type SpaceDetailMetrics = {
   type: SpaceType | null;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTiming | null;
+  periodEndDay: number | null;
   isArchived: boolean;
   transactionCount: number;
   historicalTotal: number;
@@ -64,6 +67,7 @@ type SpaceDetailMetricsRow = {
   type: SpaceType | null;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTiming | null;
+  periodEndDay: number | null;
   isArchived: boolean;
   transactionCount: number | null;
   historicalTotal: number | null;
@@ -106,6 +110,7 @@ export class Space {
       type: null,
       paymentDueDay: null,
       paymentTiming: null,
+      periodEndDay: null,
       isArchived: false,
       currentMonthTransactionCount: 0,
       ...data,
@@ -121,6 +126,7 @@ export class Space {
         type: this.data.type,
         paymentDueDay: this.data.paymentDueDay,
         paymentTiming: this.data.paymentTiming,
+        periodEndDay: this.data.periodEndDay,
       },
     });
 
@@ -133,6 +139,7 @@ export class Space {
     type: SpaceType | null;
     paymentDueDay: number | null;
     paymentTiming: CreditCardPaymentTiming | null;
+    periodEndDay: number | null;
   }): Promise<Space> {
     const record = await prisma.space.update({
       where: {
@@ -144,6 +151,7 @@ export class Space {
         type: input.type,
         paymentDueDay: input.paymentDueDay,
         paymentTiming: input.paymentTiming,
+        periodEndDay: input.periodEndDay,
       },
     });
 
@@ -194,11 +202,16 @@ export class Space {
       type: this.data.type,
       paymentDueDay: this.data.paymentDueDay,
       paymentTiming: this.data.paymentTiming,
+      periodEndDay: this.data.periodEndDay,
       isArchived: this.data.isArchived,
       currentMonthTransactionCount: this.data.currentMonthTransactionCount,
       createdAt: this.requirePersistedDate(this.data.createdAt),
       updatedAt: this.requirePersistedDate(this.data.updatedAt),
     };
+  }
+
+  public getProjectionMonthStartForDate(transactionDate: Date): Date {
+    return startOfMonth(transactionDate);
   }
 
   public static async findOwnedById(
@@ -314,6 +327,7 @@ export class Space {
         name: true,
         paymentDueDay: true,
         paymentTiming: true,
+        periodEndDay: true,
       },
       orderBy: {
         name: "asc",
@@ -325,6 +339,7 @@ export class Space {
       name: record.name,
       paymentDueDay: record.paymentDueDay,
       paymentTiming: record.paymentTiming,
+      periodEndDay: record.periodEndDay,
     }));
   }
 
@@ -335,6 +350,39 @@ export class Space {
     monthEnd: Date,
   ): Promise<SpaceMonthSummaryRecord[]> {
     const rows = await prisma.$queryRaw<SpaceMonthSummaryRow[]>`
+      WITH transaction_occurrences AS (
+        SELECT
+          s.id AS "spaceId",
+          t.type,
+          t.amount,
+          "getSpaceProjectionMonthStart"(
+            s.type::text,
+            s."paymentDueDay",
+            s."periodEndDay",
+            occurrence.occurrence_date::timestamp
+          ) AS "projectedMonthStart"
+        FROM "Space" s
+        INNER JOIN "Transaction" t
+          ON t."spaceId" = s.id
+        CROSS JOIN LATERAL generate_series(
+          date_trunc('month', t."beginDate"),
+          date_trunc('month', COALESCE(t."endDate", ${monthEnd})),
+          interval '1 month'
+        ) AS occurrence_month(month_start)
+        CROSS JOIN LATERAL (
+          SELECT
+            occurrence_month.month_start
+            + make_interval(
+                days => LEAST(
+                  EXTRACT(DAY FROM t."beginDate")::integer,
+                  EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+                ) - 1
+              ) AS occurrence_date
+        ) occurrence
+        WHERE s."userAccountId" = ${userAccountId}
+          AND s."isArchived" = ${isArchived}
+          AND t."beginDate" <= ${monthEnd}
+      )
       SELECT
         s.id,
         s.name,
@@ -352,10 +400,9 @@ export class Space {
           0
         ) AS "currentMonthTotal"
       FROM "Space" s
-      LEFT JOIN "Transaction" t
+      LEFT JOIN transaction_occurrences t
         ON t."spaceId" = s.id
-       AND t."beginDate" <= ${monthEnd}
-       AND (t."endDate" IS NULL OR t."endDate" >= ${monthStart})
+       AND t."projectedMonthStart" = ${monthStart}
       WHERE s."userAccountId" = ${userAccountId}
         AND s."isArchived" = ${isArchived}
       GROUP BY s.id, s.name
@@ -507,6 +554,50 @@ export class Space {
     monthEnd: Date,
   ): Promise<SpaceDetailMetrics | null> {
     const rows = await prisma.$queryRaw<SpaceDetailMetricsRow[]>`
+      WITH selected_month_totals AS (
+        SELECT
+          t."spaceId",
+          COALESCE(
+            SUM(
+              CASE
+                WHEN t.type = 'expense' THEN
+                  CASE
+                    WHEN t.amount > 0 THEN -t.amount
+                    ELSE t.amount
+                  END
+                ELSE t.amount
+              END
+            ),
+            0
+          ) AS total
+        FROM "Transaction" t
+        INNER JOIN "Space" s_projection
+          ON s_projection.id = t."spaceId"
+        CROSS JOIN LATERAL generate_series(
+          date_trunc('month', t."beginDate"),
+          date_trunc('month', COALESCE(t."endDate", ${monthEnd})),
+          interval '1 month'
+        ) AS occurrence_month(month_start)
+        CROSS JOIN LATERAL (
+          SELECT
+            occurrence_month.month_start
+            + make_interval(
+                days => LEAST(
+                  EXTRACT(DAY FROM t."beginDate")::integer,
+                  EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+                ) - 1
+              ) AS occurrence_date
+        ) occurrence
+        WHERE t."spaceId" = ${spaceId}
+          AND t."beginDate" <= ${monthEnd}
+          AND "getSpaceProjectionMonthStart"(
+            s_projection.type::text,
+            s_projection."paymentDueDay",
+            s_projection."periodEndDay",
+            occurrence.occurrence_date::timestamp
+          ) = ${monthStart}
+        GROUP BY t."spaceId"
+      )
       SELECT
         s.id,
         s.name,
@@ -514,6 +605,7 @@ export class Space {
         s.type,
         s."paymentDueDay",
         s."paymentTiming",
+        s."periodEndDay",
         s."isArchived",
         (
           SELECT COUNT(*)::integer
@@ -538,27 +630,10 @@ export class Space {
           FROM "Transaction" t_history
           WHERE t_history."spaceId" = s.id
         ) AS "historicalTotal",
-        (
-          SELECT
-            COALESCE(
-              SUM(
-                CASE
-                  WHEN t_month.type = 'expense' THEN
-                    CASE
-                      WHEN t_month.amount > 0 THEN -t_month.amount
-                      ELSE t_month.amount
-                    END
-                  ELSE t_month.amount
-                END
-              ),
-              0
-            )
-          FROM "Transaction" t_month
-          WHERE t_month."spaceId" = s.id
-            AND t_month."beginDate" <= ${monthEnd}
-            AND (t_month."endDate" IS NULL OR t_month."endDate" >= ${monthStart})
-        ) AS "selectedMonthTotal"
+        COALESCE(selected_month_totals.total, 0) AS "selectedMonthTotal"
       FROM "Space" s
+      LEFT JOIN selected_month_totals
+        ON selected_month_totals."spaceId" = s.id
       WHERE s.id = ${spaceId}
         AND s."userAccountId" = ${userAccountId}
       LIMIT 1
@@ -577,6 +652,7 @@ export class Space {
       type: row.type,
       paymentDueDay: row.paymentDueDay,
       paymentTiming: row.paymentTiming,
+      periodEndDay: row.periodEndDay,
       isArchived: row.isArchived,
       transactionCount: Number(row.transactionCount || 0),
       historicalTotal: Number(row.historicalTotal || 0),
@@ -585,7 +661,9 @@ export class Space {
   }
 
   private static fromRecord(record: SpacePersistedData): Space {
-    return new Space(record);
+    return record.type === SpaceType.credit_card
+      ? new CreditCardSpace(record)
+      : new Space(record);
   }
 
   public static async setMainStatusForUser(
@@ -640,5 +718,70 @@ export class Space {
     }
 
     return this.data.id;
+  }
+}
+
+export class CreditCardSpace extends Space {
+  public override getProjectionMonthStartForDate(transactionDate: Date): Date {
+    const record = this.data;
+
+    if (
+      record.type !== SpaceType.credit_card ||
+      !record.paymentDueDay ||
+      !record.periodEndDay
+    ) {
+      return super.getProjectionMonthStartForDate(transactionDate);
+    }
+
+    const occurrenceDate = new Date(transactionDate);
+    const periodEnd = this.getPeriodEndForDate(
+      occurrenceDate,
+      record.periodEndDay,
+    );
+
+    return startOfMonth(
+      this.getPaymentDateAfterPeriodEnd(periodEnd, record.paymentDueDay),
+    );
+  }
+
+  private getPeriodEndForDate(transactionDate: Date, periodEndDay: number): Date {
+    const periodEnd = new Date(transactionDate);
+    periodEnd.setDate(1);
+    periodEnd.setDate(Math.min(periodEndDay, endOfMonth(periodEnd).getDate()));
+    periodEnd.setHours(23, 59, 59, 999);
+
+    if (transactionDate > periodEnd) {
+      const nextPeriodEnd = addMonths(periodEnd, 1);
+      nextPeriodEnd.setDate(1);
+      nextPeriodEnd.setDate(
+        Math.min(periodEndDay, endOfMonth(nextPeriodEnd).getDate()),
+      );
+      nextPeriodEnd.setHours(23, 59, 59, 999);
+
+      return nextPeriodEnd;
+    }
+
+    return periodEnd;
+  }
+
+  private getPaymentDateAfterPeriodEnd(
+    periodEnd: Date,
+    paymentDueDay: number,
+  ): Date {
+    const dueDate = new Date(periodEnd);
+    dueDate.setDate(1);
+    dueDate.setDate(Math.min(paymentDueDay, endOfMonth(dueDate).getDate()));
+
+    if (dueDate <= periodEnd) {
+      const nextMonthDueDate = addMonths(dueDate, 1);
+      nextMonthDueDate.setDate(1);
+      nextMonthDueDate.setDate(
+        Math.min(paymentDueDay, endOfMonth(nextMonthDueDate).getDate()),
+      );
+
+      return nextMonthDueDate;
+    }
+
+    return dueDate;
   }
 }

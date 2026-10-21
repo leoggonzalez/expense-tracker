@@ -20,9 +20,18 @@ type SpaceFieldProps = {
     id: string;
     name: string;
     main: boolean | null;
+    type?: string | null;
   }>;
   value: string;
   onChange: (value: string) => void;
+  onResolvedSpacesChange?: (
+    spaces: Array<{
+      id: string;
+      name: string;
+      main: boolean | null;
+      type?: string | null;
+    }>,
+  ) => void;
   placeholder?: string;
   required?: boolean;
   loadSpacesOnMount?: boolean;
@@ -36,6 +45,7 @@ export function SpaceField({
   spaces,
   value,
   onChange,
+  onResolvedSpacesChange,
   placeholder,
   required = false,
   loadSpacesOnMount = false,
@@ -50,7 +60,7 @@ export function SpaceField({
     createFlowSpacesCache,
   );
   const resolvedSpaces =
-    loadSpacesOnMount && spaces.length === 0 ? data?.spaces || [] : spaces;
+    loadSpacesOnMount && spaces.length === 0 && data ? data.spaces : spaces;
   const resolvedSpaceNames = resolvedSpaces.map((space) => space.name);
   const singleResolvedSpaceName =
     resolvedSpaces.length === 1 ? resolvedSpaces[0].name : null;
@@ -59,6 +69,10 @@ export function SpaceField({
     !hasMatchingSpace && !!value,
   );
   const isCustomMode = prefersCustomMode || (!hasMatchingSpace && !!value);
+
+  React.useEffect(() => {
+    onResolvedSpacesChange?.(resolvedSpaces);
+  }, [onResolvedSpacesChange, resolvedSpaces]);
 
   React.useEffect(() => {
     if (value || isCustomMode || !singleResolvedSpaceName) {

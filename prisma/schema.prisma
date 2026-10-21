@@ -37,6 +37,7 @@ model Space {
   type      SpaceType?
   paymentDueDay Int?
   paymentTiming CreditCardPaymentTiming?
+  periodEndDay Int?
   isArchived Boolean @default(false)
   currentMonthTransactionCount Int @default(0)
   createdAt DateTime @default(now())

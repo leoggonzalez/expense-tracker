@@ -60,6 +60,7 @@ export type SpaceDetailPageData = {
     type: SpaceTypeInput;
     paymentDueDay: number | null;
     paymentTiming: CreditCardPaymentTimingInput;
+    periodEndDay: number | null;
     isArchived: boolean;
     historicalTotal: number;
     selectedMonthTotal: number;
@@ -81,6 +82,7 @@ export type SpaceEditData = {
   type: SpaceTypeInput;
   paymentDueDay: number | null;
   paymentTiming: CreditCardPaymentTimingInput;
+  periodEndDay: number | null;
   isArchived: boolean;
 };
 
@@ -110,15 +112,6 @@ function normalizeSpaceType(type: string | null | undefined): SpaceTypeInput {
   return type === SpaceType.credit_card ? SpaceType.credit_card : null;
 }
 
-function normalizePaymentTiming(
-  timing: string | null | undefined,
-): CreditCardPaymentTimingInput {
-  return timing === CreditCardPaymentTiming.same_month ||
-    timing === CreditCardPaymentTiming.previous_month
-    ? timing
-    : null;
-}
-
 function normalizePaymentDueDay(
   value: number | string | null | undefined,
 ): number | null {
@@ -139,7 +132,7 @@ function validateSpaceInput(input: {
   name: string;
   type: SpaceTypeInput;
   paymentDueDay: number | null;
-  paymentTiming: CreditCardPaymentTimingInput;
+  periodEndDay: number | null;
 }): SpaceActionResult | null {
   if (!input.name) {
     return { success: false, error: "spaces_page.name_required" };
@@ -167,27 +160,37 @@ function validateSpaceInput(input: {
       };
     }
 
-    if (input.paymentTiming === null) {
+    if (input.periodEndDay === null) {
       return {
         success: false,
-        error: "spaces_page.credit_card_payment_timing_required",
+        error: "spaces_page.credit_card_period_end_day_required",
+      };
+    }
+
+    if (Number.isNaN(input.periodEndDay)) {
+      return {
+        success: false,
+        error: "spaces_page.credit_card_period_end_day_invalid",
+      };
+    }
+
+    if (input.periodEndDay < 1 || input.periodEndDay > 31) {
+      return {
+        success: false,
+        error: "spaces_page.credit_card_period_end_day_invalid",
       };
     }
 
     return null;
   }
 
-  if (input.paymentDueDay !== null && !Number.isNaN(input.paymentDueDay)) {
+  if (
+    input.paymentDueDay !== null ||
+    input.periodEndDay !== null
+  ) {
     return {
       success: false,
-      error: "spaces_page.payment_due_day_requires_credit_card",
-    };
-  }
-
-  if (input.paymentTiming !== null) {
-    return {
-      success: false,
-      error: "spaces_page.payment_timing_requires_credit_card",
+      error: "spaces_page.credit_card_fields_require_credit_card",
     };
   }
 
@@ -201,17 +204,18 @@ export async function createSpace(input: {
   type?: SpaceTypeInput;
   paymentDueDay?: number | null;
   paymentTiming?: CreditCardPaymentTimingInput;
+  periodEndDay?: number | null;
 }): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUserAccount();
   const name = input.name.trim();
   const type = normalizeSpaceType(input.type);
   const paymentDueDay = normalizePaymentDueDay(input.paymentDueDay);
-  const paymentTiming = normalizePaymentTiming(input.paymentTiming);
+  const periodEndDay = normalizePaymentDueDay(input.periodEndDay);
   const validationError = validateSpaceInput({
     name,
     type,
     paymentDueDay,
-    paymentTiming,
+    periodEndDay,
   });
 
   if (validationError) {
@@ -225,7 +229,8 @@ export async function createSpace(input: {
       main: input.main ?? null,
       type,
       paymentDueDay: type === SpaceType.credit_card ? paymentDueDay : null,
-      paymentTiming: type === SpaceType.credit_card ? paymentTiming : null,
+      paymentTiming: null,
+      periodEndDay: type === SpaceType.credit_card ? periodEndDay : null,
     }).create();
 
     if (input.main) {
@@ -326,6 +331,7 @@ export async function getSpaceDetailPayloadForUser(
       type: detailData.metrics.type,
       paymentDueDay: detailData.metrics.paymentDueDay,
       paymentTiming: detailData.metrics.paymentTiming,
+      periodEndDay: detailData.metrics.periodEndDay,
       isArchived: detailData.metrics.isArchived,
       historicalTotal: detailData.metrics.historicalTotal,
       selectedMonthTotal: detailData.metrics.selectedMonthTotal,
@@ -366,6 +372,7 @@ export async function getSpaceEditPayloadForUser(
     type: spaceRecord.type,
     paymentDueDay: spaceRecord.paymentDueDay,
     paymentTiming: spaceRecord.paymentTiming,
+    periodEndDay: spaceRecord.periodEndDay,
     isArchived: spaceRecord.isArchived,
   };
 }
@@ -444,18 +451,19 @@ export async function updateSpace(
     type?: SpaceTypeInput;
     paymentDueDay?: number | null;
     paymentTiming?: CreditCardPaymentTimingInput;
+    periodEndDay?: number | null;
   },
 ): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUserAccount();
   const name = input.name.trim();
   const type = normalizeSpaceType(input.type);
   const paymentDueDay = normalizePaymentDueDay(input.paymentDueDay);
-  const paymentTiming = normalizePaymentTiming(input.paymentTiming);
+  const periodEndDay = normalizePaymentDueDay(input.periodEndDay);
   const validationError = validateSpaceInput({
     name,
     type,
     paymentDueDay,
-    paymentTiming,
+    periodEndDay,
   });
 
   if (validationError) {
@@ -482,7 +490,8 @@ export async function updateSpace(
       main: nextMain,
       type,
       paymentDueDay: type === SpaceType.credit_card ? paymentDueDay : null,
-      paymentTiming: type === SpaceType.credit_card ? paymentTiming : null,
+      paymentTiming: null,
+      periodEndDay: type === SpaceType.credit_card ? periodEndDay : null,
     });
 
     if (nextMain) {
