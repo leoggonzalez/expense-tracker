@@ -1,13 +1,13 @@
 import { TransactionDetailSection } from "@/app/(protected)/transactions/[id]/transaction_detail_section";
 
-type TransactionPageProps = {
+interface TransactionPageProps {
   params: Promise<{
     id: string;
   }>;
   searchParams: Promise<{
     confirmDelete?: string;
   }>;
-};
+}
 
 export default async function Page({
   params,

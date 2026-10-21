@@ -1,13 +1,13 @@
-import "./page_panel.scss";
+import "@/components/page_panel/page_panel.scss";
 
 import React from "react";
 
 import { Card } from "@/elements";
 
-type PagePanelProps = {
+interface PagePanelProps {
   children: React.ReactNode;
   tone?: "default" | "form" | "settings";
-};
+}
 
 export function PagePanel({
   children,

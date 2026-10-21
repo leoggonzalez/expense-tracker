@@ -1,10 +1,10 @@
 import { AuthFormShell, VerifyLoginForm } from "@/components";
 
-type VerifyLoginRouteProps = {
+interface VerifyLoginRouteProps {
   searchParams: Promise<{
     email?: string;
   }>;
-};
+}
 
 export default async function Page({
   searchParams,

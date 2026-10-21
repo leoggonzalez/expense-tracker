@@ -3,16 +3,16 @@
 import { archiveSpace, unarchiveSpace } from "@/actions/spaces";
 import { ConfirmDialog } from "@/components/confirm_dialog/confirm_dialog";
 import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
-import React, { useState } from "react";
 import { i18n } from "@/model/i18n";
+import React, { useState } from "react";
 
-type SpaceArchiveDialogProps = {
+interface SpaceArchiveDialogProps {
   spaceId: string;
   spaceName: string;
   isOpen: boolean;
   mode: "archive" | "unarchive";
   closeHref: string;
-};
+}
 
 export function SpaceArchiveDialog({
   spaceId,

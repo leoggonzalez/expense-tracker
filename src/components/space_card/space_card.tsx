@@ -1,17 +1,17 @@
-import "./space_card.scss";
+import "@/components/space_card/space_card.scss";
 
 import { Avatar, Button, Currency } from "@/components";
 import { Card, Icon, Stack, Text } from "@/elements";
 
-import React from "react";
 import { i18n } from "@/model/i18n";
+import React from "react";
 
-type SpaceCardProps = {
+interface SpaceCardProps {
   id: string;
   name: string;
   currentMonthTotal: number;
   monthLabel: string;
-};
+}
 
 export function SpaceCard({
   id,
@@ -24,15 +24,10 @@ export function SpaceCard({
       <div className="space-card__panel">
         <Card padding={24} radius={28} fullHeight>
           <Stack gap={20}>
-            <Stack
-              direction="row"
-              align="center"
-              justify="space-between"
-              gap={16}
-            >
-              <Stack direction="row" align="center" gap={12}>
+            <Stack line align="center" justify="space-between" gap={16}>
+              <Stack line align="center" gap={12}>
                 <Avatar name={name} />
-                <Text size="lg" weight="semibold">
+                <Text element="p" type="lead-semibold">
                   {name}
                 </Text>
               </Stack>
@@ -49,12 +44,12 @@ export function SpaceCard({
               </Button>
             </Stack>
 
-            <Text size="sm" color="secondary">
+            <Text element="p" type="caption" color="secondary">
               {i18n.t("spaces_page.month_total_label", {
                 month: monthLabel,
               })}
             </Text>
-            <Currency value={currentMonthTotal} size="h4" weight="bold" />
+            <Currency value={currentMonthTotal} type="h4-bold" />
           </Stack>
         </Card>
       </div>

@@ -5,10 +5,10 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import React from "react";
 
-type TransactionsPaginationProps = {
+interface TransactionsPaginationProps {
   currentPage: number;
   totalPages: number;
-};
+}
 
 export function TransactionsPagination({
   currentPage,

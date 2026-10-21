@@ -1,5 +1,7 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { SpacesPagePayload } from "@/actions/spaces";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
@@ -19,12 +21,12 @@ const spacesPageCache = {
   entries: new Map<string, SpacesPagePayload>(),
 };
 
-type SpacesPageSectionProps = {
+interface SpacesPageSectionProps {
   currentMonthKey: string;
   currentMonthLabel: string;
   previousMonthKey: string;
   nextMonthKey: string;
-};
+}
 
 function SpacesHeroMetricsSkeleton({
   currentMonthLabel,
@@ -35,15 +37,10 @@ function SpacesHeroMetricsSkeleton({
     <HeroMetrics columns={2}>
       <HeroMetric tone="soft">
         <Stack gap={16}>
-          <Text size="sm" color="hero">
+          <Text element="p" type="caption" color="hero">
             {i18n.t("spaces_page.month_total_overview")}
           </Text>
-          <Stack
-            direction="row"
-            align="center"
-            justify="space-between"
-            gap={12}
-          >
+          <Stack line align="center" justify="space-between" gap={12}>
             <Button
               href={`/spaces?currentMonth=${previousMonthKey}`}
               variant="outline"
@@ -51,7 +48,7 @@ function SpacesHeroMetricsSkeleton({
             >
               <Icon name="chevron-left" size={18} />
             </Button>
-            <Text size="lg" weight="semibold" color="hero">
+            <Text element="p" type="lead-semibold" color="hero">
               {currentMonthLabel}
             </Text>
             <Button
@@ -65,7 +62,7 @@ function SpacesHeroMetricsSkeleton({
         </Stack>
       </HeroMetric>
       <HeroMetric>
-        <Text size="sm" color="hero">
+        <Text element="p" type="caption" color="hero">
           {i18n.t("spaces_page.active_spaces_label")}
         </Text>
         <LoadingSkeleton width="64px" height={38} radius={14} />
@@ -115,7 +112,7 @@ export function SpacesPageSection({
           ]}
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="hero-muted">
+            <Text element="p" type="caption" color="hero-muted">
               {i18n.t("spaces_page.hero_subtitle")}
             </Text>
 
@@ -123,15 +120,10 @@ export function SpacesPageSection({
               <HeroMetrics columns={2}>
                 <HeroMetric tone="soft">
                   <Stack gap={16}>
-                    <Text size="sm" color="hero">
+                    <Text element="p" type="caption" color="hero">
                       {i18n.t("spaces_page.month_total_overview")}
                     </Text>
-                    <Stack
-                      direction="row"
-                      align="center"
-                      justify="space-between"
-                      gap={12}
-                    >
+                    <Stack line align="center" justify="space-between" gap={12}>
                       <Button
                         href={`/spaces?currentMonth=${previousMonthKey}`}
                         variant="outline"
@@ -139,7 +131,7 @@ export function SpacesPageSection({
                       >
                         <Icon name="chevron-left" size={18} />
                       </Button>
-                      <Text size="lg" weight="semibold" color="hero">
+                      <Text element="p" type="lead-semibold" color="hero">
                         {currentMonthLabel}
                       </Text>
                       <Button
@@ -153,10 +145,10 @@ export function SpacesPageSection({
                   </Stack>
                 </HeroMetric>
                 <HeroMetric>
-                  <Text size="sm" color="hero">
+                  <Text element="p" type="caption" color="hero">
                     {i18n.t("spaces_page.active_spaces_label")}
                   </Text>
-                  <Text size="h3" weight="bold" color="hero">
+                  <Text element="p" type="h3-bold" color="hero">
                     {String(data.spaces.length)}
                   </Text>
                 </HeroMetric>
@@ -173,20 +165,19 @@ export function SpacesPageSection({
 
         {hasError && !data ? (
           <Card padding={24}>
-            <Stack gap={12} align="flex-start">
-              <Text color="secondary">
-                {i18n.t("spaces_page.summary_load_failed")}
-              </Text>
-              <Button variant="secondary" size="sm" onClick={retry}>
-                {i18n.t("common.retry")}
-              </Button>
-            </Stack>
+            <SectionError
+              message={i18n.t("spaces_page.summary_load_failed")}
+              retryLabel={i18n.t("common.retry")}
+              onRetry={retry}
+            />
           </Card>
         ) : isLoading && !data ? (
           <SpacesPageListSkeleton />
         ) : data && data.spaces.length === 0 ? (
           <Card padding={24} variant="dashed">
-            <Text color="secondary">{i18n.t("spaces_page.empty_state")}</Text>
+            <Text element="p" color="secondary">
+              {i18n.t("spaces_page.empty_state")}
+            </Text>
           </Card>
         ) : (
           <Stack gap={24}>

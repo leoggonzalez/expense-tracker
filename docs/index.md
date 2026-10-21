@@ -14,6 +14,10 @@ This handbook captures the conventions, architecture decisions, cleanup lessons,
 8. [Project History](./project-history.md)
 9. [New Project Quickstart](./new-project-quickstart.md)
 
+## Component References And Refactoring
+
+For all new features, follow the [component reference policy](./component_references.md), which applies the nerdgeschoss guideline and Shimmer component structure to Currento. The [app-wide refactoring plan](./refactoring_plan.md) defines the migration sequence and validation checkpoints. The [refactoring audit](./refactoring_audit.md) records completed work, evidence, and remaining review items.
+
 ## What This Handbook Covers
 
 - The coding rules that used to live mostly in `AGENTS.md`

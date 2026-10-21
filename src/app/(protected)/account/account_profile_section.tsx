@@ -1,13 +1,10 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { CurrentUserAccountProfilePayload } from "@/actions/user_account";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
-import {
-  AccountProfileForm,
-  Button,
-  LoadingSkeleton,
-  PagePanel,
-} from "@/components";
+import { AccountProfileForm, LoadingSkeleton, PagePanel } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
@@ -37,12 +34,11 @@ export function AccountProfileSection(): React.ReactElement {
   if (hasError && !data) {
     return (
       <Card padding={24}>
-        <Stack gap={12} align="flex-start">
-          <Text color="secondary">{i18n.t("account.profile_load_failed")}</Text>
-          <Button variant="secondary" size="sm" onClick={retry}>
-            {i18n.t("common.retry")}
-          </Button>
-        </Stack>
+        <SectionError
+          message={i18n.t("account.profile_load_failed")}
+          retryLabel={i18n.t("common.retry")}
+          onRetry={retry}
+        />
       </Card>
     );
   }
@@ -50,7 +46,9 @@ export function AccountProfileSection(): React.ReactElement {
   if (isNotFound) {
     return (
       <Card padding={24}>
-        <Text color="secondary">{i18n.t("account.not_found")}</Text>
+        <Text element="p" color="secondary">
+          {i18n.t("account.not_found")}
+        </Text>
       </Card>
     );
   }

@@ -7,9 +7,9 @@ export const CURRENTO_BRAND_COLORS = {
   accent: "#DDF8EC",
 } as const;
 
-type CurrentoLogoProps = {
+interface CurrentoLogoProps {
   size?: number;
-};
+}
 
 export function CurrentoLogo({
   size = 48,

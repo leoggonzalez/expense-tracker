@@ -1,9 +1,9 @@
 import {
-  SpaceCreateForm,
   AppLink,
   Container,
   Hero,
   PagePanel,
+  SpaceCreateForm,
 } from "@/components";
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
@@ -17,7 +17,7 @@ export default function Page(): React.ReactElement {
           title={String(i18n.t("spaces_page.create_space"))}
           pattern="space_form"
         >
-          <Text as="p" size="sm" color="hero-muted">
+          <Text element="p" type="caption" color="hero-muted">
             {i18n.t("spaces_page.create_space_hint")}
           </Text>
         </Hero>

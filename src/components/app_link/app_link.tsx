@@ -1,14 +1,14 @@
 "use client";
 
+import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
 import Link from "next/link";
 import React from "react";
-import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
 
-type AppLinkProps = {
+interface AppLinkProps {
   href: string;
   children: React.ReactNode;
   ariaLabel?: string;
-};
+}
 
 function isModifiedEvent(event: React.MouseEvent<HTMLAnchorElement>): boolean {
   return (

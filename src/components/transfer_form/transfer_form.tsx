@@ -1,18 +1,18 @@
 "use client";
 
-import "./transfer_form.scss";
+import "@/components/transfer_form/transfer_form.scss";
 
 import React, { useState } from "react";
 
 import { createTransferTransaction } from "@/actions/transactions";
-import { MonthSelector } from "@/components/month_selector/month_selector";
 import { Button, InfoBox, Input, Select } from "@/components";
-import { inferTransactionDateMode, toDate } from "@/lib/transaction_schedule";
+import { MonthSelector } from "@/components/month_selector/month_selector";
+import { useToast } from "@/components/toast_provider/toast_provider";
+import { Icon, Stack, Text } from "@/elements";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
-import { Icon, Stack, Text } from "@/elements";
+import { inferTransactionDateMode, toDate } from "@/lib/transaction_schedule";
 import { i18n } from "@/model/i18n";
-import { useToast } from "@/components/toast_provider/toast_provider";
 
 type TransferSpace = {
   id: string;
@@ -27,11 +27,11 @@ type TransferFormInitialValues = {
   amount?: string;
 };
 
-type TransferFormProps = {
+interface TransferFormProps {
   spaces: TransferSpace[];
   initialValues?: TransferFormInitialValues;
   onSuccess?: () => void;
-};
+}
 
 export function TransferForm({
   spaces,
@@ -218,7 +218,7 @@ export function TransferForm({
           surface="subtle"
         />
 
-        <Text size="sm" color="secondary">
+        <Text element="p" type="caption" color="secondary">
           {i18n.t("transaction_form.transfer_one_time_info")}
         </Text>
 

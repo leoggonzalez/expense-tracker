@@ -1,6 +1,6 @@
 "use client";
 
-import "./verify_login_form.scss";
+import "@/components/verify_login_form/verify_login_form.scss";
 
 import React, { useState } from "react";
 
@@ -9,9 +9,9 @@ import { Button, Input, OtpInput, useNavigationProgress } from "@/components";
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
-type VerifyLoginFormProps = {
+interface VerifyLoginFormProps {
   initialEmail: string;
-};
+}
 
 export function VerifyLoginForm({
   initialEmail,
@@ -44,10 +44,10 @@ export function VerifyLoginForm({
   return (
     <form onSubmit={handleSubmit} className="verify-login-form">
       <Stack gap={16}>
-        <Text size="h2" as="h1" weight="bold">
+        <Text type="h2-bold" element="h1">
           {i18n.t("auth.verify_title")}
         </Text>
-        <Text color="secondary">
+        <Text element="p" color="secondary">
           {i18n.t("auth.code_sent", { email: initialEmail })}
         </Text>
 
@@ -70,7 +70,11 @@ export function VerifyLoginForm({
           required
         />
 
-        {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+        {error ? (
+          <Text element="p" color="danger">
+            {i18n.t(error)}
+          </Text>
+        ) : null}
 
         <Button type="submit" disabled={loading} fullWidth>
           {loading ? i18n.t("auth.verifying_code") : i18n.t("auth.verify_code")}

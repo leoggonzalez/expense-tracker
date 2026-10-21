@@ -1,6 +1,6 @@
-import React from "react";
+import "@/components/checkbox/checkbox.scss";
 import { Stack, Text } from "@/elements";
-import "./checkbox.scss";
+import React from "react";
 
 export interface CheckboxProps {
   checked: boolean;
@@ -21,7 +21,7 @@ export function Checkbox({
 
   return (
     <label className={["checkbox", `checkbox--${variant}`].join(" ")}>
-      <Stack direction="row" align="center" gap={isSwitch ? 16 : 8}>
+      <Stack line align="center" gap={isSwitch ? 16 : 8}>
         <input
           type="checkbox"
           checked={checked}
@@ -30,7 +30,7 @@ export function Checkbox({
           className="checkbox__input"
         />
         {label ? (
-          <Text as="span" size="md" weight="medium">
+          <Text element="span" type="body-medium">
             {label}
           </Text>
         ) : null}

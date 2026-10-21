@@ -1,22 +1,22 @@
-import { Container } from "@/components";
 import { ProjectionChartSection } from "@/app/(protected)/projection/projection_chart_section";
 import { ProjectionHeader } from "@/app/(protected)/projection/projection_header";
 import { ProjectionSpaces } from "@/app/(protected)/projection/projection_spaces";
+import { Container } from "@/components";
 import { Stack } from "@/elements";
 
 import {
-  formatProjectionMonthLabel,
   formatProjectionMonthKey,
+  formatProjectionMonthLabel,
   getAdjacentProjectionMonthKey,
   parseProjectionMonth,
 } from "@/lib/projection_month";
 import { i18n } from "@/model/i18n";
 
-type ProjectionPageProps = {
+interface ProjectionPageProps {
   searchParams: Promise<{
     month?: string;
   }>;
-};
+}
 
 export default async function ProjectionPage({
   searchParams,

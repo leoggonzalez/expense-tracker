@@ -1,10 +1,17 @@
-import "./text.scss";
+import "@/elements/text/text.scss";
 
 import React from "react";
 
+import {
+  textVariants,
+  type TextType,
+  type TextVariant,
+  type TextWeight,
+} from "@/elements/text/text_types";
+
 export interface TextProps {
   children: React.ReactNode;
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "h1" | "h2" | "h3" | "h4";
+  type?: TextType;
   color?:
     | "primary"
     | "secondary"
@@ -18,21 +25,35 @@ export interface TextProps {
     | "inverse"
     | "hero"
     | "hero-muted";
-  weight?: "normal" | "medium" | "semibold" | "bold";
-  as?: "p" | "span" | "div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "label";
+  element?:
+    | "p"
+    | "span"
+    | "div"
+    | "h1"
+    | "h2"
+    | "h3"
+    | "h4"
+    | "h5"
+    | "h6"
+    | "label";
   transform?: "none" | "uppercase" | "lowercase" | "capitalize";
   tracking?: "default" | "tight";
 }
 
 export function Text({
   children,
-  size = "md",
+  type = "body",
   color = "primary",
-  weight = "normal",
-  as: Component = "p",
+  element: Component = "div",
   transform = "none",
   tracking = "default",
 }: TextProps): React.ReactElement {
+  const [variant, weight = "normal"] = type.split("-") as [
+    TextVariant,
+    TextWeight?,
+  ];
+  const size = textVariants[variant];
+
   const classes = [
     "text",
     `text--size-${size}`,

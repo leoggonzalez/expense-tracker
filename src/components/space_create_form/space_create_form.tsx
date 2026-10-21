@@ -1,6 +1,6 @@
 "use client";
 
-import "./space_create_form.scss";
+import "@/components/space_create_form/space_create_form.scss";
 
 import React, { useState } from "react";
 
@@ -91,7 +91,7 @@ export function SpaceCreateForm(): React.ReactElement {
 
           {isCreditCard ? (
             <Stack gap={8}>
-              <Stack direction="row" gap={12} fullWidth>
+              <Stack line gap={12} fullWidth>
                 <div className="space-create-form__half-field">
                   <Input
                     label={i18n.t("spaces_page.payment_due_day")}
@@ -139,13 +139,17 @@ export function SpaceCreateForm(): React.ReactElement {
                   />
                 </div>
               </Stack>
-              <Text size="sm" color="secondary">
+              <Text element="p" type="caption" color="secondary">
                 {i18n.t("spaces_page.payment_due_day_hint")}
               </Text>
             </Stack>
           ) : null}
 
-          {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+          {error ? (
+            <Text element="p" color="danger">
+              {i18n.t(error)}
+            </Text>
+          ) : null}
 
           <Button type="submit" disabled={isLoading}>
             {isLoading

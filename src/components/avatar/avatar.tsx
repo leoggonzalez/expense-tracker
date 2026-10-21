@@ -1,11 +1,11 @@
-import "./avatar.scss";
+import "@/components/avatar/avatar.scss";
 
-import React from "react";
 import { Stack } from "@/elements";
+import React from "react";
 
-type AvatarProps = {
+interface AvatarProps {
   name: string;
-};
+}
 
 function getInitials(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);

@@ -1,9 +1,9 @@
-export { Transaction } from "./transaction";
-export type { ITransaction } from "./transaction";
+export { Transaction } from "@/model/transaction";
+export type { ITransaction } from "@/model/transaction";
 
-export { TransactionCollection } from "./transaction_collection";
+export { TransactionCollection } from "@/model/transaction_collection";
 export type {
   MonthlyData,
   SpaceProjectionGroup,
   SpaceMonthBreakdown,
-} from "./transaction_collection";
+} from "@/model/transaction_collection";

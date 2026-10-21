@@ -1,6 +1,6 @@
 "use client";
 
-import "./projection_chart.scss";
+import "@/components/projection_chart/projection_chart.scss";
 
 import React from "react";
 import {
@@ -14,8 +14,8 @@ import {
   YAxis,
 } from "recharts";
 
-import { i18n } from "@/model/i18n";
 import { formatCurrency } from "@/lib/utils";
+import { i18n } from "@/model/i18n";
 
 type ProjectionChartDataItem = {
   monthLabel: string;
@@ -24,17 +24,17 @@ type ProjectionChartDataItem = {
   total: number;
 };
 
-type ProjectionChartProps = {
+interface ProjectionChartProps {
   data: ProjectionChartDataItem[];
-};
+}
 
-type ProjectionTooltipProps = {
+interface ProjectionTooltipProps {
   active?: boolean;
   payload?: Array<{
     payload?: ProjectionChartDataItem;
   }>;
   label?: string;
-};
+}
 
 function formatTooltipValue(value: unknown): string {
   const numericValue = typeof value === "number" ? value : Number(value ?? 0);

@@ -1,10 +1,10 @@
 "use client";
 
-import "./transaction_list.scss";
+import "@/components/transaction_list/transaction_list.scss";
 
+import { deleteTransaction } from "@/actions/transactions";
 import { AppLink, Button, TransactionCard } from "@/components";
 import { Card, Stack, Text } from "@/elements";
-import { deleteTransaction } from "@/actions/transactions";
 import { i18n } from "@/model/i18n";
 import React from "react";
 
@@ -58,7 +58,7 @@ export function TransactionList({
     return (
       <div className="transaction-list transaction-list--empty">
         <Card padding={32} variant="dashed">
-          <Text color="secondary">
+          <Text element="p" color="secondary">
             {i18n.t("transaction_list.empty_state")}
           </Text>
         </Card>
@@ -81,24 +81,19 @@ export function TransactionList({
                 .filter(Boolean)
                 .join(" ")}
             >
-              <Stack
-                direction="row"
-                align="center"
-                justify="space-between"
-                gap={8}
-              >
+              <Stack line align="center" justify="space-between" gap={8}>
                 {row.href ? (
                   <div className="transaction-list__summary-link">
                     <AppLink href={row.href}>{row.label}</AppLink>
                   </div>
                 ) : (
-                  <Text size="sm" color="secondary" as="span">
+                  <Text type="caption" color="secondary" element="span">
                     {row.label}
                   </Text>
                 )}
                 {row.value ? (
                   typeof row.value === "string" ? (
-                    <Text size="sm" weight="bold" as="span">
+                    <Text type="caption-bold" element="span">
                       {row.value}
                     </Text>
                   ) : (
@@ -141,7 +136,7 @@ export function TransactionList({
                 {content}
                 {showDelete && (
                   <div className="transaction-list__actions">
-                    <Stack direction="row" justify="flex-end" gap={8}>
+                    <Stack line justify="end" gap={8}>
                       <Button
                         size="sm"
                         variant="danger"
@@ -167,24 +162,19 @@ export function TransactionList({
                 .filter(Boolean)
                 .join(" ")}
             >
-              <Stack
-                direction="row"
-                align="center"
-                justify="space-between"
-                gap={8}
-              >
+              <Stack line align="center" justify="space-between" gap={8}>
                 {row.href ? (
                   <div className="transaction-list__summary-link">
                     <AppLink href={row.href}>{row.label}</AppLink>
                   </div>
                 ) : (
-                  <Text size="sm" color="secondary" as="span">
+                  <Text type="caption" color="secondary" element="span">
                     {row.label}
                   </Text>
                 )}
                 {row.value ? (
                   typeof row.value === "string" ? (
-                    <Text size="sm" weight="bold" as="span">
+                    <Text type="caption-bold" element="span">
                       {row.value}
                     </Text>
                   ) : (

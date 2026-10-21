@@ -7,11 +7,11 @@ import { i18n } from "@/model/i18n";
 
 export const dynamic = "force-dynamic";
 
-type TransactionEditPageProps = {
+interface TransactionEditPageProps {
   params: Promise<{
     id: string;
   }>;
-};
+}
 
 export default async function Page({
   params,
@@ -29,7 +29,7 @@ export default async function Page({
   return (
     <Container>
       <Stack gap={24}>
-        <Text size="h2" as="h1" weight="bold">
+        <Text type="h2-bold" element="h1">
           {i18n.t("transaction_detail_page.edit_transaction")}
         </Text>
         <Card padding={24}>

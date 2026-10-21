@@ -1,5 +1,7 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import React, { useState } from "react";
 
 import { unarchiveSpace, type ArchivedSpacesPayload } from "@/actions/spaces";
@@ -57,50 +59,45 @@ export function ArchivedSpacesSection(): React.ReactElement {
   return (
     <Container>
       <Stack gap={24}>
-        <Text size="h2" as="h1" weight="bold">
+        <Text type="h2-bold" element="h1">
           {i18n.t("spaces_page.archived_spaces")}
         </Text>
 
         {hasError && !data ? (
           <Card padding={24}>
-            <Stack gap={12} align="flex-start">
-              <Text color="secondary">
-                {i18n.t("spaces_page.archived_load_failed")}
-              </Text>
-              <Button variant="secondary" size="sm" onClick={retry}>
-                {i18n.t("common.retry")}
-              </Button>
-            </Stack>
+            <SectionError
+              message={i18n.t("spaces_page.archived_load_failed")}
+              retryLabel={i18n.t("common.retry")}
+              onRetry={retry}
+            />
           </Card>
         ) : isLoading && !data ? (
           <ArchivedSpacesSkeleton />
         ) : data && data.spaces.length === 0 ? (
           <Card padding={24} variant="dashed">
-            <Text color="secondary">
+            <Text element="p" color="secondary">
               {i18n.t("spaces_page.empty_archived_state")}
             </Text>
           </Card>
         ) : (
           <Stack gap={16}>
-            {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+            {error ? (
+              <Text element="p" color="danger">
+                {i18n.t(error)}
+              </Text>
+            ) : null}
             {(data?.spaces || []).map((space) => (
               <Card key={space.id} padding={16}>
-                <Stack
-                  direction="row"
-                  align="center"
-                  justify="space-between"
-                  gap={12}
-                >
-                  <Stack direction="row" align="center" gap={12}>
+                <Stack line align="center" justify="space-between" gap={12}>
+                  <Stack line align="center" gap={12}>
                     <Avatar name={space.name} />
                     <Stack gap={4}>
-                      <Text size="md" weight="semibold">
+                      <Text element="p" type="body-semibold">
                         {space.name}
                       </Text>
                       <Currency
                         value={space.currentMonthTotal}
-                        size="sm"
-                        weight="bold"
+                        type="caption-bold"
                       />
                     </Stack>
                   </Stack>

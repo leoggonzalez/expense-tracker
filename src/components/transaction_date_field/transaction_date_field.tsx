@@ -1,4 +1,4 @@
-import "./transaction_date_field.scss";
+import "@/components/transaction_date_field/transaction_date_field.scss";
 
 import React from "react";
 
@@ -7,7 +7,7 @@ import { Icon, Stack } from "@/elements";
 
 export type TransactionDateFieldMode = "month" | "date";
 
-type TransactionDateFieldProps = {
+interface TransactionDateFieldProps {
   label: React.ReactNode;
   mode: TransactionDateFieldMode;
   value: string;
@@ -15,7 +15,7 @@ type TransactionDateFieldProps = {
   onEnableFullDate: () => void;
   editLabel: string;
   required?: boolean;
-};
+}
 
 export function TransactionDateField({
   label,
@@ -28,7 +28,7 @@ export function TransactionDateField({
 }: TransactionDateFieldProps): React.ReactElement {
   return (
     <div className="transaction-date-field">
-      <Stack direction="row" align="flex-end" gap={8} fullWidth>
+      <Stack line align="end" gap={8} fullWidth>
         <div className="transaction-date-field__input">
           <Input
             label={label}

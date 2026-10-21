@@ -1,13 +1,13 @@
 "use client";
 
-import "./projection_table.scss";
+import "@/components/projection_table/projection_table.scss";
 
 import { Currency, Input, useNavigationProgress } from "@/components";
+import { Card, Stack, Text } from "@/elements";
 import { Transaction, TransactionCollection } from "@/model";
 import { i18n } from "@/model/i18n";
-import React, { useState } from "react";
-import { Card, Stack, Text } from "@/elements";
 import { addMonths, format, startOfMonth } from "date-fns";
+import React, { useState } from "react";
 
 export interface ProjectionTableProps {
   transactions: Array<{
@@ -84,14 +84,8 @@ export function ProjectionTable({
     <div className="projection-table">
       <Stack gap={24}>
         <div className="projection-table__header">
-          <Stack
-            gap={16}
-            direction="row"
-            justify="space-between"
-            align="flex-end"
-            wrap
-          >
-            <Text size="h2" as="h2" weight="bold">
+          <Stack gap={16} line justify="space-between" align="end" wrap>
+            <Text type="h2-bold" element="h2">
               {i18n.t("projection_table.title")}
             </Text>
             <div className="projection-table__date-selector">
@@ -130,7 +124,7 @@ export function ProjectionTable({
                     <React.Fragment key={space.space}>
                       <tr className="projection-table__row projection-table__row--group-header">
                         <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--group-header">
-                          <Text size="md" weight="bold">
+                          <Text element="p" type="body-bold">
                             {space.space}
                           </Text>
                         </td>
@@ -152,7 +146,7 @@ export function ProjectionTable({
                           <td className="projection-table__cell projection-table__cell--sticky">
                             <div className="projection-table__transaction">
                               <Stack gap={4}>
-                                <Text size="xs" color="secondary">
+                                <Text element="p" type="fine" color="secondary">
                                   {transaction.description}
                                 </Text>
                               </Stack>
@@ -166,7 +160,7 @@ export function ProjectionTable({
                                 className="projection-table__cell projection-table__cell--amount"
                               >
                                 {amount !== 0 && (
-                                  <Currency value={amount} size="sm" />
+                                  <Currency value={amount} type="caption" />
                                 )}
                               </td>
                             );
@@ -176,7 +170,7 @@ export function ProjectionTable({
 
                       <tr className="projection-table__row projection-table__row--group-total">
                         <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--total">
-                          <Text size="sm" weight="bold">
+                          <Text element="p" type="caption-bold">
                             {i18n.t("projection_table.space_total", {
                               space: space.space,
                             })}
@@ -190,7 +184,7 @@ export function ProjectionTable({
                               key={month.toISOString()}
                               className="projection-table__cell projection-table__cell--amount projection-table__cell--total"
                             >
-                              <Currency value={total} size="sm" weight="bold" />
+                              <Currency value={total} type="caption-bold" />
                             </td>
                           );
                         })}
@@ -201,7 +195,7 @@ export function ProjectionTable({
 
                 <tr className="projection-table__row projection-table__row--breakdown">
                   <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--breakdown">
-                    <Text size="sm" color="success" weight="medium">
+                    <Text element="p" type="caption-medium" color="success">
                       {i18n.t("projection_table.total_income")}
                     </Text>
                   </td>
@@ -213,7 +207,7 @@ export function ProjectionTable({
                         key={month.toISOString()}
                         className="projection-table__cell projection-table__cell--amount projection-table__cell--breakdown"
                       >
-                        <Currency value={totals?.income || 0} size="sm" />
+                        <Currency value={totals?.income || 0} type="caption" />
                       </td>
                     );
                   })}
@@ -221,7 +215,7 @@ export function ProjectionTable({
 
                 <tr className="projection-table__row projection-table__row--breakdown">
                   <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--breakdown">
-                    <Text size="sm" color="danger" weight="medium">
+                    <Text element="p" type="caption-medium" color="danger">
                       {i18n.t("projection_table.total_expenses")}
                     </Text>
                   </td>
@@ -233,7 +227,7 @@ export function ProjectionTable({
                         key={month.toISOString()}
                         className="projection-table__cell projection-table__cell--amount projection-table__cell--breakdown"
                       >
-                        <Currency value={totals?.expense || 0} size="sm" />
+                        <Currency value={totals?.expense || 0} type="caption" />
                       </td>
                     );
                   })}
@@ -242,7 +236,7 @@ export function ProjectionTable({
                 {/* Grand total row */}
                 <tr className="projection-table__row projection-table__row--grand-total">
                   <td className="projection-table__cell projection-table__cell--sticky projection-table__cell--grand-total">
-                    <Text size="md" weight="bold">
+                    <Text element="p" type="body-bold">
                       {i18n.t("projection_table.total")}
                     </Text>
                   </td>
@@ -255,7 +249,7 @@ export function ProjectionTable({
                         key={month.toISOString()}
                         className="projection-table__cell projection-table__cell--amount projection-table__cell--grand-total"
                       >
-                        <Currency value={net} size="md" weight="bold" />
+                        <Currency value={net} type="body-bold" />
                       </td>
                     );
                   })}

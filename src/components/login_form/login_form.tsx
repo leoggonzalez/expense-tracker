@@ -1,6 +1,6 @@
 "use client";
 
-import "./login_form.scss";
+import "@/components/login_form/login_form.scss";
 
 import React, { useState } from "react";
 
@@ -36,10 +36,12 @@ export function LoginForm(): React.ReactElement {
   return (
     <form onSubmit={handleSubmit} className="login-form">
       <Stack gap={16}>
-        <Text size="h2" as="h1" weight="bold">
+        <Text type="h2-bold" element="h1">
           {i18n.t("auth.title")}
         </Text>
-        <Text color="secondary">{i18n.t("auth.subtitle")}</Text>
+        <Text element="p" color="secondary">
+          {i18n.t("auth.subtitle")}
+        </Text>
 
         <Input
           label={i18n.t("auth.email")}
@@ -52,7 +54,11 @@ export function LoginForm(): React.ReactElement {
           fullWidth
         />
 
-        {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
+        {error ? (
+          <Text element="p" color="danger">
+            {i18n.t(error)}
+          </Text>
+        ) : null}
 
         <Button type="submit" disabled={loading} fullWidth>
           {loading ? i18n.t("auth.sending_code") : i18n.t("auth.send_code")}

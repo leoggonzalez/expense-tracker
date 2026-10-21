@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { TransactionDetailPayload } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
   AppLink,
-  Button,
   Container,
   Currency,
   DetailList,
@@ -18,15 +18,16 @@ import {
 import { DeleteTransactionDialog } from "@/components/delete_transaction_dialog/delete_transaction_dialog";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
+import React from "react";
 
 const transactionDetailCache = {
   entries: new Map<string, TransactionDetailPayload>(),
 };
 
-type TransactionDetailSectionProps = {
+interface TransactionDetailSectionProps {
   id: string;
   isDeleteDialogOpen: boolean;
-};
+}
 
 function formatTransactionDate(
   beginDate: string,
@@ -112,7 +113,7 @@ function TransactionDetailSkeleton(): React.ReactElement {
             <HeroMetrics columns={2}>
               <HeroMetric>
                 <>
-                  <Text size="sm" color="hero">
+                  <Text element="p" type="caption" color="hero">
                     {i18n.t("transaction_detail_page.amount")}
                   </Text>
                   <LoadingSkeleton width="140px" height={36} radius={14} />
@@ -120,7 +121,7 @@ function TransactionDetailSkeleton(): React.ReactElement {
               </HeroMetric>
               <HeroMetric tone="soft">
                 <>
-                  <Text size="sm" color="hero">
+                  <Text element="p" type="caption" color="hero">
                     {i18n.t("transaction_detail_page.type")}
                   </Text>
                   <LoadingSkeleton width="120px" height={28} radius={12} />
@@ -154,14 +155,11 @@ export function TransactionDetailSection({
     return (
       <Container>
         <Card padding={24}>
-          <Stack gap={12} align="flex-start">
-            <Text color="secondary">
-              {i18n.t("transaction_detail_page.load_failed")}
-            </Text>
-            <Button variant="secondary" size="sm" onClick={retry}>
-              {i18n.t("common.retry")}
-            </Button>
-          </Stack>
+          <SectionError
+            message={i18n.t("transaction_detail_page.load_failed")}
+            retryLabel={i18n.t("common.retry")}
+            onRetry={retry}
+          />
         </Card>
       </Container>
     );
@@ -172,7 +170,7 @@ export function TransactionDetailSection({
       <Container>
         <Stack gap={24}>
           <Card padding={24}>
-            <Text color="secondary">
+            <Text element="p" color="secondary">
               {i18n.t("transaction_detail_page.not_found")}
             </Text>
           </Card>
@@ -252,27 +250,22 @@ export function TransactionDetailSection({
           ]}
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="hero-muted">
+            <Text element="p" type="caption" color="hero-muted">
               {formatTransactionDate(data.beginDate, data.endDate)}
             </Text>
 
             <HeroMetrics columns={2}>
               <HeroMetric>
-                <Text size="sm" color="hero">
+                <Text element="p" type="caption" color="hero">
                   {i18n.t("transaction_detail_page.amount")}
                 </Text>
-                <Currency
-                  value={data.amount}
-                  size="h3"
-                  weight="bold"
-                  color="hero"
-                />
+                <Currency value={data.amount} type="h3-bold" color="hero" />
               </HeroMetric>
               <HeroMetric tone="soft">
-                <Text size="sm" color="hero">
+                <Text element="p" type="caption" color="hero">
                   {i18n.t("transaction_detail_page.type")}
                 </Text>
-                <Text size="lg" weight="semibold" color="hero">
+                <Text element="p" type="lead-semibold" color="hero">
                   {getTransactionTypeLabel(data.type)}
                 </Text>
               </HeroMetric>
@@ -295,25 +288,25 @@ export function TransactionDetailSection({
             <DetailList>
               <DetailRow
                 label={
-                  <Text size="sm" color="secondary">
+                  <Text element="p" type="caption" color="secondary">
                     {i18n.t("transaction_detail_page.type")}
                   </Text>
                 }
                 value={
-                  <Text size="sm" weight="semibold">
+                  <Text element="p" type="caption-semibold">
                     {getTransactionTypeLabel(data.type)}
                   </Text>
                 }
               />
               <DetailRow
                 label={
-                  <Text size="sm" color="secondary">
+                  <Text element="p" type="caption" color="secondary">
                     {i18n.t("transaction_detail_page.space")}
                   </Text>
                 }
                 value={
                   <AppLink href={`/spaces/${data.spaceId}`}>
-                    <Text size="sm" weight="semibold">
+                    <Text element="p" type="caption-semibold">
                       {data.spaceName}
                     </Text>
                   </AppLink>
@@ -321,32 +314,32 @@ export function TransactionDetailSection({
               />
               <DetailRow
                 label={
-                  <Text size="sm" color="secondary">
+                  <Text element="p" type="caption" color="secondary">
                     {i18n.t("transaction_detail_page.amount")}
                   </Text>
                 }
-                value={<Currency value={data.amount} size="sm" weight="bold" />}
+                value={<Currency value={data.amount} type="caption-bold" />}
               />
               <DetailRow
                 label={
-                  <Text size="sm" color="secondary">
+                  <Text element="p" type="caption" color="secondary">
                     {i18n.t("transaction_detail_page.date_range")}
                   </Text>
                 }
                 value={
-                  <Text size="sm" weight="semibold">
+                  <Text element="p" type="caption-semibold">
                     {formatTransactionDate(data.beginDate, data.endDate)}
                   </Text>
                 }
               />
               <DetailRow
                 label={
-                  <Text size="sm" color="secondary">
+                  <Text element="p" type="caption" color="secondary">
                     {i18n.t("transaction_detail_page.schedule")}
                   </Text>
                 }
                 value={
-                  <Text size="sm" weight="semibold">
+                  <Text element="p" type="caption-semibold">
                     {getScheduleLabel(data)}
                   </Text>
                 }
@@ -354,12 +347,12 @@ export function TransactionDetailSection({
               {transferDirectionLabel ? (
                 <DetailRow
                   label={
-                    <Text size="sm" color="secondary">
+                    <Text element="p" type="caption" color="secondary">
                       {i18n.t("transaction_detail_page.transfer")}
                     </Text>
                   }
                   value={
-                    <Text size="sm" weight="semibold">
+                    <Text element="p" type="caption-semibold">
                       {transferDirectionLabel}
                     </Text>
                   }
