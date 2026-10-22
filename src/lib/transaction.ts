@@ -15,6 +15,7 @@ import { Space, type CreditCardSpaceRecord } from "@/lib/space";
 export type CreateTransactionInput = {
   type: "income" | "expense";
   spaceName: string;
+  spaceId?: string;
   description: string;
   amount: number;
   beginDate: Date;
@@ -335,10 +336,13 @@ export class Transaction {
     userAccountId: string,
     input: CreateTransactionInput,
   ): Promise<TransactionWithSpaceRecord> {
-    const space = await Space.findOrCreateActive(
-      userAccountId,
-      input.spaceName,
-    );
+    const space = input.spaceId
+      ? await Space.findOwnedById(userAccountId, input.spaceId)
+      : await Space.findOrCreateActive(userAccountId, input.spaceName);
+
+    if (!space || space.toRecord().isArchived) {
+      throw new Error("space_not_found");
+    }
     const transaction = await prisma.transaction.create({
       data: {
         type: input.type,
@@ -483,9 +487,11 @@ export class Transaction {
   public static async listRecentByUser(
     userAccountId: string,
     limit: number,
+    spaceId?: string,
   ): Promise<TransactionWithSpaceRecord[]> {
     return prisma.transaction.findMany({
       where: {
+        ...(spaceId ? { spaceId } : {}),
         space: {
           userAccountId,
         },

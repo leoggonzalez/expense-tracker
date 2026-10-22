@@ -58,8 +58,8 @@
     "description_placeholder": "ex.: salário, aluguel",
     "amount": "Valor",
     "amount_placeholder": "0.00",
-    "begin_date": "Data inicial",
-    "begin_date_month": "Mês inicial",
+    "begin_date": "Data",
+    "begin_date_month": "Data",
     "month": "Mês",
     "year": "Ano",
     "schedule_label": "Programação",
@@ -359,6 +359,9 @@
     "not_found": "Espaço não encontrado."
   },
   "new_transaction_page": {
+    "title_income_in_space": "Adicionar receita a %{space}",
+    "title_expense_in_space": "Adicionar despesa a %{space}",
+    "title_transfer_in_space": "Adicionar transferência de %{space}",
     "title_income": "Adicionar nova receita",
     "title_expense": "Adicionar nova despesa",
     "title_transfer": "Adicionar nova transferência",

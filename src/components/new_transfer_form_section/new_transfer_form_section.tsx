@@ -14,6 +14,7 @@ const newTransferSpacesCache = {
 };
 
 interface NewTransferFormSectionProps {
+  fixedFromSpaceId?: string;
   initialValues: {
     fromSpaceId: string;
     toSpaceId: string;
@@ -36,6 +37,7 @@ function NewTransferFormSkeleton(): React.ReactElement {
 
 export function NewTransferFormSection({
   initialValues,
+  fixedFromSpaceId,
 }: NewTransferFormSectionProps): React.ReactElement {
   const endpoint = "/api/transactions/new/transfer";
   const { data, isLoading, hasError, retry } = useProtectedPageSection(
@@ -82,6 +84,7 @@ export function NewTransferFormSection({
       <TransferForm
         spaces={data?.spaces || []}
         initialValues={resolvedInitialValues}
+        fixedFromSpaceId={fixedFromSpaceId}
       />
     </PagePanel>
   );

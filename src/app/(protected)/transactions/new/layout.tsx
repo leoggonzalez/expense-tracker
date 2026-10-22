@@ -1,4 +1,4 @@
-import { NewTransactionRecentSection } from "@/app/(protected)/transactions/new/new_transaction_recent_section";
+import { NewTransactionRecentSection } from "@/components/new_transaction_recent_section/new_transaction_recent_section";
 
 interface TransactionsNewLayoutProps {
   children: React.ReactNode;

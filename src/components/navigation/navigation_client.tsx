@@ -11,6 +11,10 @@ import {
 } from "@/components";
 import { Icon, Text } from "@/elements";
 import type { IconName } from "@/elements/icon/icon_assets";
+import {
+  getSpaceIdFromPath,
+  getTransactionCreationBase,
+} from "@/lib/transaction_creation";
 import { CurrentoLogo } from "@/lib/currento_logo";
 import { i18n } from "@/model/i18n";
 import { usePathname } from "next/navigation";
@@ -37,6 +41,7 @@ export function NavigationClient({
   currentUser,
 }: NavigationClientProps): React.ReactElement {
   const pathname = usePathname();
+  const creationBase = getTransactionCreationBase(getSpaceIdFromPath(pathname));
   const { isNavigating, targetHref } = useNavigationProgress();
   const allLinks: NavigationLink[] = isAuthenticated
     ? [
@@ -72,12 +77,12 @@ export function NavigationClient({
         allLinks[0],
         allLinks[1],
         {
-          href: "/transactions/new/expense",
+          href: `${creationBase}/expense`,
           label: i18n.t("common.add_transaction"),
           icon: "plus",
           isMobilePrimary: true,
           matchesPath: (currentPathname) =>
-            currentPathname.startsWith("/transactions/new"),
+            currentPathname.startsWith(`${creationBase}/`),
         },
         allLinks[2],
         allLinks[3],
@@ -122,7 +127,7 @@ export function NavigationClient({
           {isAuthenticated ? (
             <div className="navigation__cta">
               <Button
-                href="/transactions/new/expense"
+                href={`${creationBase}/expense`}
                 ariaLabel={String(i18n.t("common.add_transaction"))}
                 variant="cta"
                 size="lg"

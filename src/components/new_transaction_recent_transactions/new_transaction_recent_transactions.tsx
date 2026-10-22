@@ -13,10 +13,12 @@ import React from "react";
 
 interface NewTransactionRecentTransactionsProps {
   transactions: TransactionListItem[];
+  transactionsHref?: string;
 }
 
 export function NewTransactionRecentTransactions({
   transactions,
+  transactionsHref = "/transactions",
 }: NewTransactionRecentTransactionsProps): React.ReactElement {
   return (
     <Container>
@@ -33,7 +35,7 @@ export function NewTransactionRecentTransactions({
                 {i18n.t("new_transaction_page.recent_transactions_subtitle")}
               </Text>
               <div className="new-transaction-recent-transactions__all-link">
-                <AppLink href="/transactions">
+                <AppLink href={transactionsHref}>
                   <Text element="span" type="caption-medium" color="info">
                     {i18n.t("new_transaction_page.open_all_transactions")}
                   </Text>

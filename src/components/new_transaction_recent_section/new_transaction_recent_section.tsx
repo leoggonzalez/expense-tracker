@@ -37,8 +37,16 @@ function NewTransactionRecentSkeleton(): React.ReactElement {
   );
 }
 
-export function NewTransactionRecentSection(): React.ReactElement {
-  const endpoint = "/api/transactions/new/recent";
+interface NewTransactionRecentSectionProps {
+  spaceId?: string;
+}
+
+export function NewTransactionRecentSection({
+  spaceId,
+}: NewTransactionRecentSectionProps): React.ReactElement {
+  const endpoint = spaceId
+    ? `/api/transactions/new/recent?space_id=${encodeURIComponent(spaceId)}`
+    : "/api/transactions/new/recent";
   const { data, isLoading, hasError, retry } = useProtectedPageSection(
     endpoint,
     endpoint,
@@ -77,6 +85,11 @@ export function NewTransactionRecentSection(): React.ReactElement {
   return (
     <NewTransactionRecentTransactions
       transactions={data?.recentTransactions || []}
+      transactionsHref={
+        spaceId
+          ? `/transactions?space=${encodeURIComponent(spaceId)}`
+          : "/transactions"
+      }
     />
   );
 }

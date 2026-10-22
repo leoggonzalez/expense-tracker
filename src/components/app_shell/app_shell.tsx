@@ -9,9 +9,15 @@ import React, { useEffect, useRef } from "react";
 
 import {
   clearNewTransactionDraft,
+  getLastPathname,
   setLastPathname,
   setNewTransactionFlowActive,
 } from "@/lib/new_transaction_draft";
+
+import {
+  getSpaceIdFromPath,
+  isTransactionDraftPath,
+} from "@/lib/transaction_creation";
 
 interface AppShellProps {
   navigation: React.ReactNode;
@@ -28,14 +34,18 @@ export function AppShell({
   const { isNavigating } = useNavigationProgress();
   const mainRef = useRef<HTMLElement | null>(null);
   const isAuthRoute = pathname === "/login" || pathname === "/login/verify";
-  const isSingleTransactionDraftRoute =
-    pathname === "/transactions/new/income" ||
-    pathname === "/transactions/new/expense";
+  const isSingleTransactionDraftRoute = isTransactionDraftPath(pathname);
 
   // eslint-disable-next-line warn-use-effect -- This effect keeps draft persistence and last-path tracking synchronized with route changes.
   useEffect(() => {
-    if (!isSingleTransactionDraftRoute) {
-      clearNewTransactionDraft();
+    const previousPath = getLastPathname();
+    if (
+      previousPath &&
+      isTransactionDraftPath(previousPath) &&
+      (!isSingleTransactionDraftRoute ||
+        getSpaceIdFromPath(previousPath) !== getSpaceIdFromPath(pathname))
+    ) {
+      clearNewTransactionDraft(getSpaceIdFromPath(previousPath));
       setNewTransactionFlowActive(false);
     }
 

@@ -64,8 +64,8 @@
     "description_placeholder": "e.g., Salary, Rent",
     "amount": "Amount",
     "amount_placeholder": "0.00",
-    "begin_date": "Begin Date",
-    "begin_date_month": "Begin Month",
+    "begin_date": "Date",
+    "begin_date_month": "Date",
     "month": "Month",
     "year": "Year",
     "schedule_label": "Schedule",
@@ -384,6 +384,9 @@
     "not_found": "Space not found."
   },
   "new_transaction_page": {
+    "title_income_in_space": "Add new income to %{space}",
+    "title_expense_in_space": "Add new expense to %{space}",
+    "title_transfer_in_space": "Add new transfer from %{space}",
     "title_income": "Add new income",
     "title_expense": "Add new expense",
     "title_transfer": "Add new transfer",

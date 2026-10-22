@@ -8,6 +8,7 @@ interface AppLinkProps {
   href: string;
   children: React.ReactNode;
   ariaLabel?: string;
+  target?: "_blank" | "_self";
 }
 
 function isModifiedEvent(event: React.MouseEvent<HTMLAnchorElement>): boolean {
@@ -24,11 +25,13 @@ export function AppLink({
   href,
   children,
   ariaLabel,
+  target,
 }: AppLinkProps): React.ReactElement {
   const { push } = useNavigationProgress();
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
     if (
+      target === "_blank" ||
       event.defaultPrevented ||
       isModifiedEvent(event) ||
       href.startsWith("#")
@@ -41,7 +44,13 @@ export function AppLink({
   };
 
   return (
-    <Link href={href} aria-label={ariaLabel} onClick={handleClick}>
+    <Link
+      href={href}
+      target={target}
+      rel={target === "_blank" ? "noopener noreferrer" : undefined}
+      aria-label={ariaLabel}
+      onClick={handleClick}
+    >
       {children}
     </Link>
   );

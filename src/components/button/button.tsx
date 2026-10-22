@@ -23,6 +23,7 @@ export interface ButtonProps {
   fullWidth?: boolean | "mobile-only";
   startIcon?: React.ReactNode;
   href?: string;
+  target?: "_blank" | "_self";
   ariaLabel?: string;
   contentAlign?: "center" | "start";
 }
@@ -37,6 +38,7 @@ export function Button({
   fullWidth = false,
   startIcon,
   href,
+  target,
   ariaLabel,
   contentAlign = "center",
 }: ButtonProps): React.ReactElement {
@@ -72,7 +74,7 @@ export function Button({
 
   if (href && !disabled) {
     return (
-      <AppLink href={href} ariaLabel={ariaLabel}>
+      <AppLink href={href} target={target} ariaLabel={ariaLabel}>
         <span className={classes}>{content}</span>
       </AppLink>
     );

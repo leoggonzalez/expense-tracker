@@ -7,7 +7,7 @@ import {
   createTransaction,
   updateTransaction,
 } from "@/actions/transactions";
-import { Button, Input, MonthSelector, Select, SpaceField } from "@/components";
+import { Button, Input, Select, SpaceField } from "@/components";
 import { Icon, Stack, Text } from "@/elements";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import {
@@ -20,11 +20,10 @@ import {
   TransactionScheduleMode,
   deriveScheduleFromDates,
   inferTransactionDateMode,
-  normalizeDateValue,
   resolveEndDate,
   toDate,
 } from "@/lib/transaction_schedule";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useToast } from "@/components/toast_provider/toast_provider";
 import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
@@ -52,6 +51,7 @@ export interface TransactionFormProps {
   isEdit?: boolean;
   transactionType?: "income" | "expense";
   hideTypeField?: boolean;
+  fixedSpace?: { id: string; name: string };
 }
 
 type TransactionFormModel = {
@@ -70,10 +70,6 @@ function formatDateForInput(date: Date | null | undefined): string {
   }
 
   return date.toISOString().split("T")[0];
-}
-
-function formatMonthForInput(date: Date | null | undefined): string {
-  return formatDateForInput(date).slice(0, 7);
 }
 
 function getInitialModel(props: TransactionFormProps): TransactionFormModel {
@@ -96,12 +92,14 @@ function getInitialModel(props: TransactionFormProps): TransactionFormModel {
 
   return {
     type,
-    spaceName: props.initialData?.spaceName || "",
+    spaceName: props.fixedSpace?.name || props.initialData?.spaceName || "",
     description: props.initialData?.description || "",
     amountInput: props.initialData?.amount
       ? String(props.initialData.amount)
       : "",
-    beginDate: formatMonthForInput(beginDate),
+    beginDate: props.initialData
+      ? formatDateForInput(beginDate)
+      : format(beginDate, "yyyy-MM-dd"),
     scheduleMode: defaultScheduleMode,
     installments: String(schedule.installments),
   };
@@ -172,12 +170,12 @@ export function TransactionForm({
   isEdit = false,
   transactionType,
   hideTypeField = false,
+  fixedSpace,
 }: TransactionFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
   const [isDraftReady, setIsDraftReady] = useState(
     !(!isEdit && Boolean(transactionType)),
   );
-  const [resolvedSpaces, setResolvedSpaces] = useState(initialSpaces);
   const hasHydratedDraftRef = useRef(false);
   const skipDraftSaveRef = useRef(false);
   const initialModelRef = useRef<TransactionFormModel>(
@@ -187,6 +185,7 @@ export function TransactionForm({
       isEdit,
       transactionType,
       hideTypeField,
+      fixedSpace,
     }),
   );
   const isCreateFlow = !isEdit && Boolean(transactionType);
@@ -269,7 +268,8 @@ export function TransactionForm({
 
       const payload: CreateTransactionInput = {
         type: isEdit ? form.model.type : transactionType || form.model.type,
-        spaceName: form.model.spaceName,
+        spaceName: fixedSpace?.name || form.model.spaceName,
+        ...(fixedSpace ? { spaceId: fixedSpace.id } : {}),
         description: form.model.description,
         amount: parsedAmount,
         beginDate,
@@ -295,7 +295,7 @@ export function TransactionForm({
       if (isCreateFlow) {
         resetCreateFlowFields();
       } else if (!isEdit) {
-        clearNewTransactionDraft();
+        clearNewTransactionDraft(fixedSpace?.id);
         skipDraftSaveRef.current = true;
         reset();
       }
@@ -345,14 +345,17 @@ export function TransactionForm({
     setIsDraftReady(false);
     setNewTransactionFlowActive(true);
 
-    const draft = loadNewTransactionDraft();
+    const draft = loadNewTransactionDraft(fixedSpace?.id);
 
     if (draft) {
       updateFields({
-        spaceName: draft.spaceName,
+        spaceName: fixedSpace?.name || draft.spaceName,
         description: draft.description,
         amountInput: draft.amountInput,
-        beginDate: draft.beginDate,
+        beginDate:
+          draft.beginDate.length === 7
+            ? `${draft.beginDate}-01`
+            : draft.beginDate,
         scheduleMode: draft.scheduleMode || "one_time",
         installments: draft.installments || "1",
       });
@@ -360,7 +363,7 @@ export function TransactionForm({
 
     hasHydratedDraftRef.current = true;
     setIsDraftReady(true);
-  }, [initialData, isCreateFlow, updateFields]);
+  }, [initialData, isCreateFlow, updateFields, fixedSpace]);
 
   // eslint-disable-next-line warn-use-effect -- This effect persists draft changes to browser storage while the create flow is active.
   useEffect(() => {
@@ -373,15 +376,18 @@ export function TransactionForm({
       return;
     }
 
-    saveNewTransactionDraft({
-      spaceName: model.spaceName,
-      description: model.description,
-      amountInput: model.amountInput,
-      beginDate: model.beginDate,
-      beginDateMode: inferTransactionDateMode(model.beginDate),
-      scheduleMode: model.scheduleMode,
-      installments: model.installments,
-    });
+    saveNewTransactionDraft(
+      {
+        spaceName: model.spaceName,
+        description: model.description,
+        amountInput: model.amountInput,
+        beginDate: model.beginDate,
+        beginDateMode: inferTransactionDateMode(model.beginDate),
+        scheduleMode: model.scheduleMode,
+        installments: model.installments,
+      },
+      fixedSpace?.id,
+    );
   }, [
     isCreateFlow,
     isDraftReady,
@@ -391,6 +397,7 @@ export function TransactionForm({
     model.description,
     model.installments,
     model.scheduleMode,
+    fixedSpace?.id,
   ]);
 
   const showTypeField = isEdit || !hideTypeField;
@@ -409,28 +416,6 @@ export function TransactionForm({
       installments: value === "installments" ? model.installments || "1" : "1",
     });
   };
-  const handleResolvedSpacesChange = useCallback(
-    (nextSpaces: typeof initialSpaces): void => {
-      setResolvedSpaces(nextSpaces);
-    },
-    [],
-  );
-  const selectedSpace = resolvedSpaces.find(
-    (space) => space.name === model.spaceName,
-  );
-  const selectedSpaceIsCreditCard = selectedSpace?.type === "credit_card";
-
-  // eslint-disable-next-line warn-use-effect -- Credit-card spaces need exact purchase dates so their billing period can be projected correctly.
-  useEffect(() => {
-    if (!selectedSpaceIsCreditCard || inferTransactionDateMode(model.beginDate) === "date") {
-      return;
-    }
-
-    updateFields({
-      beginDate: normalizeDateValue(model.beginDate, "month"),
-    });
-  }, [model.beginDate, selectedSpaceIsCreditCard, updateFields]);
-
   const parsedInstallments = parseInstallments(model.installments);
   const beginDateMode = inferTransactionDateMode(model.beginDate);
   const beginDateForPreview = toDate(model.beginDate, beginDateMode);
@@ -469,19 +454,20 @@ export function TransactionForm({
           />
         )}
 
-        <SpaceField
-          label={i18n.t("transaction_form.space")}
-          value={fields.spaceName.value || ""}
-          onChange={(value) => fields.spaceName.onChange(value)}
-          spaces={initialSpaces}
-          onResolvedSpacesChange={handleResolvedSpacesChange}
-          loadSpacesOnMount={isCreateFlow && initialSpaces.length === 0}
-          placeholder={i18n.t("transaction_form.space_placeholder") as string}
-          required
-          size="lg"
-          surface="subtle"
-          labelTone="secondary"
-        />
+        {!fixedSpace && (
+          <SpaceField
+            label={i18n.t("transaction_form.space")}
+            value={fields.spaceName.value || ""}
+            onChange={(value) => fields.spaceName.onChange(value)}
+            spaces={initialSpaces}
+            loadSpacesOnMount={isCreateFlow && initialSpaces.length === 0}
+            placeholder={i18n.t("transaction_form.space_placeholder") as string}
+            required
+            size="lg"
+            surface="subtle"
+            labelTone="secondary"
+          />
+        )}
 
         <Input
           label={i18n.t("transaction_form.description")}
@@ -549,21 +535,15 @@ export function TransactionForm({
           </Stack>
         </Stack>
 
-        <MonthSelector
-          label={i18n.t(
-            beginDateMode === "month"
-              ? "transaction_form.begin_date_month"
-              : "transaction_form.begin_date",
-          )}
-          field={fields.beginDate}
-          editLabel={String(i18n.t("transaction_form.edit_full_begin_date"))}
-          closeLabel={String(
-            i18n.t("transaction_form.use_month_year_begin_date"),
-          )}
-          monthLabel={i18n.t("transaction_form.month")}
-          yearLabel={i18n.t("transaction_form.year")}
+        <Input
+          type="date"
+          label={i18n.t("transaction_form.begin_date")}
+          value={fields.beginDate.value || ""}
+          onChange={fields.beginDate.onChange}
           required
+          size="lg"
           surface="subtle"
+          labelTone="secondary"
         />
 
         {model.scheduleMode === "installments" && (

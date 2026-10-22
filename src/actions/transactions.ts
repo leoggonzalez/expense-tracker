@@ -798,8 +798,13 @@ export async function getTransactionDetailPayloadForUser(
 
 export async function getNewTransactionRecentPayloadForUser(
   userAccountId: string,
+  spaceId?: string,
 ): Promise<NewTransactionRecentPayload> {
-  const transactions = await Transaction.listRecentByUser(userAccountId, 5);
+  const transactions = await Transaction.listRecentByUser(
+    userAccountId,
+    5,
+    spaceId,
+  );
 
   return {
     recentTransactions: transactions.map(serializeDashboardTransaction),

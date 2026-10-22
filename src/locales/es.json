@@ -58,8 +58,8 @@
     "description_placeholder": "p. ej., salario, alquiler",
     "amount": "Importe",
     "amount_placeholder": "0.00",
-    "begin_date": "Fecha de inicio",
-    "begin_date_month": "Mes de inicio",
+    "begin_date": "Fecha",
+    "begin_date_month": "Fecha",
     "month": "Mes",
     "year": "Año",
     "schedule_label": "Planificación",
@@ -359,6 +359,9 @@
     "not_found": "Espacio no encontrado."
   },
   "new_transaction_page": {
+    "title_income_in_space": "Añadir ingreso a %{space}",
+    "title_expense_in_space": "Añadir gasto a %{space}",
+    "title_transfer_in_space": "Añadir transferencia desde %{space}",
     "title_income": "Añadir nuevo ingreso",
     "title_expense": "Añadir nuevo gasto",
     "title_transfer": "Añadir nueva transferencia",
