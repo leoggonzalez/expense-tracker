@@ -2,25 +2,32 @@
 
 This chapter covers React component conventions, public component APIs, and the boundary between route composition and reusable UI.
 
+Read the [required component references and integration rules](./component_references.md) before implementing or refactoring components.
+
 ## Component Signature Rules
 
 - Prefer function declarations over arrow-function components.
 - Exported React components must declare the return type as `React.ReactElement`.
 - Do not use `React.FC`.
-- Props must be declared with an explicit `type` or `interface`.
+- Component props must be declared with an explicit local `interface`. Prefer only the fields actually used, including `Pick` for model subsets.
+- Export exactly one component per component file. Match its PascalCase identifier to its snake_case filename.
 - Local helper callbacks inside components may still use arrow functions when that is the clearest option.
 
 Canonical shape:
 
 ```tsx
-type NavigationProps = {
+interface NavigationProps {
   currentPath: string;
-};
+}
 
 export function Navigation(props: NavigationProps): React.ReactElement {
   return <nav />;
 }
 ```
+
+## Presentation And Data Ownership
+
+Presentational components receive data, loading/error/empty states, and callbacks through props. They own markup and styling, not API calls or application state. Keep fetching and application state in route composition or clearly identified controller components. Local interaction state and DOM synchronization belong at the narrowest appropriate interactive boundary. See the reference policy for the existing hybrid protected-page pattern.
 
 ## React Compiler And Effects
 
@@ -99,7 +106,9 @@ This keeps the shell useful on navigation while making delayed data obvious with
 ## Review Checklist
 
 - Is the exported component a function declaration with `React.ReactElement`?
-- Does it use explicit props typing?
+- Does it use an explicit props interface and export exactly one component?
+- Was Shimmer checked for a suitable component structure?
+- Are application state and data fetching outside the presentational component?
 - Is it avoiding `React.FC`?
 - Is it a reusable section rather than a full-screen route wrapper?
 - Is the component API semantic and self-owned?

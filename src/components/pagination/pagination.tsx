@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
 import { Button } from "@/components";
+import "@/components/pagination/pagination.scss";
 import { Box, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
-import "./pagination.scss";
+import React from "react";
 
 export interface PaginationProps {
   currentPage: number;
@@ -35,8 +35,8 @@ export function Pagination({
 
   return (
     <div className="pagination">
-      <Box padding={{ paddingTop: 24, paddingBottom: 24 }}>
-        <Stack direction="row" align="center" justify="center" gap={16} wrap>
+      <Box padding={{ top: 24, bottom: 24 }}>
+        <Stack line align="center" justify="center" gap={16} wrap>
           <Button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -45,7 +45,7 @@ export function Pagination({
             {i18n.t("pagination.previous")}
           </Button>
 
-          <Stack direction="row" align="center" gap={4} wrap>
+          <Stack line align="center" gap={4} wrap>
             {startPage > 1 && (
               <>
                 <button
@@ -55,7 +55,7 @@ export function Pagination({
                   1
                 </button>
                 {startPage > 2 && (
-                  <Text as="span" size="sm" color="tertiary">
+                  <Text element="span" type="caption" color="tertiary">
                     ...
                   </Text>
                 )}
@@ -77,7 +77,7 @@ export function Pagination({
             {endPage < totalPages && (
               <>
                 {endPage < totalPages - 1 && (
-                  <Text as="span" size="sm" color="tertiary">
+                  <Text element="span" type="caption" color="tertiary">
                     ...
                   </Text>
                 )}

@@ -1,5 +1,7 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { TransactionsPagePayload } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
@@ -18,9 +20,9 @@ const transactionsResultsCache = {
   entries: new Map<string, TransactionsPagePayload>(),
 };
 
-type TransactionsResultsSectionProps = {
+interface TransactionsResultsSectionProps {
   filters: NormalizedTransactionsFilters;
-};
+}
 
 function TransactionsResultsSkeleton(): React.ReactElement {
   return (
@@ -112,14 +114,11 @@ export function TransactionsResultsSection({
       icon="activity"
     >
       {hasError && !data ? (
-        <Stack gap={12} align="flex-start">
-          <Text color="secondary">
-            {i18n.t("transactions_page.results_load_failed")}
-          </Text>
-          <Button variant="secondary" size="sm" onClick={retry}>
-            {i18n.t("common.retry")}
-          </Button>
-        </Stack>
+        <SectionError
+          message={i18n.t("transactions_page.results_load_failed")}
+          retryLabel={i18n.t("common.retry")}
+          onRetry={retry}
+        />
       ) : isLoading && !data ? (
         <TransactionsResultsSkeleton />
       ) : (
@@ -129,7 +128,7 @@ export function TransactionsResultsSection({
             filters={filters}
           />
 
-          <Text size="sm" color="secondary">
+          <Text element="p" type="caption" color="secondary">
             {i18n.t("transactions_page.showing_results", {
               count: currentData?.transactions.length || 0,
               total: currentData?.pagination.total || 0,

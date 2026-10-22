@@ -2,10 +2,44 @@
 
 .box {
   display: block;
-  padding: var(--box-padding, 0);
-  padding-top: var(--box-padding-top, var(--box-padding, 0));
-  padding-right: var(--box-padding-right, var(--box-padding, 0));
-  padding-bottom: var(--box-padding-bottom, var(--box-padding, 0));
-  padding-left: var(--box-padding-left, var(--box-padding, 0));
   max-width: var(--box-max-width, none);
+
+  @each $side in top, right, bottom, left {
+    padding-#{$side}: var(--box-padding-#{$side}, var(--box-padding, 0));
+  }
+
+  @media (min-width: $breakpoint-tablet) {
+    max-width: var(--box-tablet-max-width, var(--box-max-width, none));
+    @each $side in top, right, bottom, left {
+      padding-#{$side}: var(
+        --box-tablet-padding-#{$side},
+        var(
+          --box-tablet-padding,
+          var(--box-padding-#{$side}, var(--box-padding, 0))
+        )
+      );
+    }
+  }
+
+  @media (min-width: $breakpoint-desktop) {
+    max-width: var(
+      --box-desktop-max-width,
+      var(--box-tablet-max-width, var(--box-max-width, none))
+    );
+    @each $side in top, right, bottom, left {
+      padding-#{$side}: var(
+        --box-desktop-padding-#{$side},
+        var(
+          --box-desktop-padding,
+          var(
+            --box-tablet-padding-#{$side},
+            var(
+              --box-tablet-padding,
+              var(--box-padding-#{$side}, var(--box-padding, 0))
+            )
+          )
+        )
+      );
+    }
+  }
 }

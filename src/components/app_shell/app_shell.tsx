@@ -1,11 +1,11 @@
 "use client";
 
-import "./app_shell.scss";
+import "@/components/app_shell/app_shell.scss";
 
-import { usePathname } from "next/navigation";
-import React, { useEffect, useRef } from "react";
 import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
 import { PullToRefresh } from "@/components/pull_to_refresh/pull_to_refresh";
+import { usePathname } from "next/navigation";
+import React, { useEffect, useRef } from "react";
 
 import {
   clearNewTransactionDraft,
@@ -13,11 +13,11 @@ import {
   setNewTransactionFlowActive,
 } from "@/lib/new_transaction_draft";
 
-type AppShellProps = {
+interface AppShellProps {
   navigation: React.ReactNode;
   navbar: React.ReactNode;
   children: React.ReactNode;
-};
+}
 
 export function AppShell({
   navigation,

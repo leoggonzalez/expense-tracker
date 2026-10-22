@@ -2,6 +2,8 @@
 
 This chapter defines Currento's styling system, component ownership rules, and layout primitive preferences.
 
+Use the [component reference policy](./component_references.md) when adapting Shimmer structure. Keep Currento's custom styling and tokens wherever possible.
+
 ## Styling Direction
 
 - All component styling must be mobile-first.
@@ -18,6 +20,9 @@ This chapter defines Currento's styling system, component ownership rules, and l
 - Do not add new `.scss` files under `src/app`.
 - Non-global styling belongs in `src/components/<component>/<component>.scss`.
 - Global styles and token files may continue to live under `src/styles`.
+- Each styled component owns one stylesheet and one BEM block. Match snake_case folder/file names; use the corresponding kebab-case BEM block (for example, `document_card` and `.document-card`).
+- Give styled elements BEM classes; do not style bare HTML descendants or use BEM classes as JavaScript hooks. Use role-based `data-` attributes for hooks.
+- Avoid `!important` except when a closed third-party library cannot be overridden through selector specificity. Keep any `:has()` selectors shallow and scoped to the component root.
 
 ## Inline Style Rules
 
@@ -51,7 +56,7 @@ Do not force primitives where a component needs custom visual behavior beyond th
 
 ## Color And Token Rules
 
-- Hardcoded presentation colors should be replaced with CSS custom properties where possible.
+- Use CSS custom properties for presentation colors; do not add literal color fallbacks inside `var()`.
 - Prefer semantic variables over branding-by-hex literals.
 - If a real brand token is missing, add a proper token in the shared token source rather than leaving a literal value in UI code.
 - This applies to SCSS and UI code such as inline SVG helpers or icon components.

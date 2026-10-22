@@ -1,4 +1,4 @@
-import "./card.scss";
+import "@/elements/card/card.scss";
 
 import React from "react";
 
@@ -58,7 +58,7 @@ export function Card({
                 </span>
               ) : null}
               {title ? (
-                <Text as="span" size="lg" weight="semibold">
+                <Text element="span" type="lead-semibold">
                   {title}
                 </Text>
               ) : null}

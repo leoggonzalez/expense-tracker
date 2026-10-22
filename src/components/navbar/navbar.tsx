@@ -1,4 +1,4 @@
-import "./navbar.scss";
+import "@/components/navbar/navbar.scss";
 
 import { AppLink } from "@/components/app_link/app_link";
 import { Avatar } from "@/components/avatar/avatar";
@@ -22,25 +22,19 @@ export async function Navbar(): Promise<React.ReactElement | null> {
     <header className="navbar">
       <Container maxWidth="wide">
         <div className="navbar__content">
-          <Stack
-            direction="row"
-            align="center"
-            justify="space-between"
-            gap={16}
-            fullWidth
-          >
+          <Stack line align="center" justify="space-between" gap={16} fullWidth>
             <AppLink href="/" ariaLabel={String(i18n.t("navigation.brand"))}>
               <span className="navbar__brand-link">
                 <span className="navbar__logo">
                   <CurrentoLogo size={32} />
                 </span>
-                <Text as="span" size="lg" weight="semibold">
+                <Text element="span" type="lead-semibold">
                   {i18n.t("navigation.brand")}
                 </Text>
               </span>
             </AppLink>
 
-            <Stack direction="row" align="center" gap={12} inline>
+            <Stack line align="center" gap={12} inline>
               <AppLink href="/account" ariaLabel={displayName}>
                 <span className="navbar__avatar-link">
                   <Avatar name={displayName} />

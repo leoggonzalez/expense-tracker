@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "next/typescript"
-  ],
+  "extends": ["next/core-web-vitals", "next/typescript"],
   "rules": {
     "internal-import-alias": "error",
     "no-react-fc": "error",
@@ -13,6 +10,7 @@
     "no-disallowed-component-props": "error",
     "no-page-component-name": "error",
     "no-hardcoded-ui-strings": "warn",
-    "warn-use-effect": "warn"
+    "warn-use-effect": "warn",
+    "one_component_per_file": "error"
   }
 }

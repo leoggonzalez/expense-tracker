@@ -1,4 +1,4 @@
-import "./new_transaction_recent_transactions.scss";
+import "@/components/new_transaction_recent_transactions/new_transaction_recent_transactions.scss";
 
 import {
   AppLink,
@@ -8,12 +8,12 @@ import {
 } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 
-import React from "react";
 import { i18n } from "@/model/i18n";
+import React from "react";
 
-type NewTransactionRecentTransactionsProps = {
+interface NewTransactionRecentTransactionsProps {
   transactions: TransactionListItem[];
-};
+}
 
 export function NewTransactionRecentTransactions({
   transactions,
@@ -29,12 +29,12 @@ export function NewTransactionRecentTransactions({
         >
           <Stack gap={20}>
             <Stack gap={12}>
-              <Text size="sm" color="secondary">
+              <Text element="p" type="caption" color="secondary">
                 {i18n.t("new_transaction_page.recent_transactions_subtitle")}
               </Text>
               <div className="new-transaction-recent-transactions__all-link">
                 <AppLink href="/transactions">
-                  <Text as="span" size="sm" weight="medium" color="info">
+                  <Text element="span" type="caption-medium" color="info">
                     {i18n.t("new_transaction_page.open_all_transactions")}
                   </Text>
                 </AppLink>

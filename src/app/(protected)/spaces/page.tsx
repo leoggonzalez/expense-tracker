@@ -7,11 +7,11 @@ import {
 } from "@/lib/spaces_month";
 import { i18n } from "@/model/i18n";
 
-type SpacesRouteProps = {
+interface SpacesRouteProps {
   searchParams: Promise<{
     currentMonth?: string;
   }>;
-};
+}
 
 export default async function Page({
   searchParams,

@@ -20,7 +20,7 @@ export function SettingsPreferencesSection(): React.ReactElement {
       icon="settings"
     >
       <Stack gap={20}>
-        <Text as="p" size="sm" color="secondary">
+        <Text element="p" type="caption" color="secondary">
           {i18n.t("settings_page.appearance_hint")}
         </Text>
 

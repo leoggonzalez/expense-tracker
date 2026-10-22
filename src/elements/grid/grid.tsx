@@ -1,6 +1,6 @@
 import React from "react";
 
-import "./grid.scss";
+import "@/elements/grid/grid.scss";
 
 type GridStyle = React.CSSProperties & Record<`--${string}`, string>;
 

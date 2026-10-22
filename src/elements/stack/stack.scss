@@ -13,16 +13,41 @@
   &--full-width {
     width: 100%;
   }
-
   &--full-height {
     height: 100%;
   }
-
   &--inline {
     display: inline-flex;
   }
 
+  @media (min-width: $breakpoint-tablet) {
+    flex-direction: var(--stack-tablet-direction, var(--stack-direction));
+    gap: var(--stack-tablet-gap, var(--stack-gap, 0));
+    align-items: var(--stack-tablet-align, var(--stack-align, stretch));
+    justify-content: var(
+      --stack-tablet-justify,
+      var(--stack-justify, flex-start)
+    );
+    flex-wrap: var(--stack-tablet-wrap, var(--stack-wrap, nowrap));
+  }
+
   @media (min-width: $breakpoint-desktop) {
-    flex-direction: var(--stack-desktop-direction);
+    flex-direction: var(
+      --stack-desktop-direction,
+      var(--stack-tablet-direction, var(--stack-direction))
+    );
+    gap: var(--stack-desktop-gap, var(--stack-tablet-gap, var(--stack-gap, 0)));
+    align-items: var(
+      --stack-desktop-align,
+      var(--stack-tablet-align, var(--stack-align, stretch))
+    );
+    justify-content: var(
+      --stack-desktop-justify,
+      var(--stack-tablet-justify, var(--stack-justify, flex-start))
+    );
+    flex-wrap: var(
+      --stack-desktop-wrap,
+      var(--stack-tablet-wrap, var(--stack-wrap, nowrap))
+    );
   }
 }

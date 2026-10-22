@@ -14,7 +14,7 @@ export default function Page(): React.ReactElement {
           pattern="settings"
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="hero-muted">
+            <Text element="p" type="caption" color="hero-muted">
               {i18n.t("account.subtitle")}
             </Text>
           </Stack>

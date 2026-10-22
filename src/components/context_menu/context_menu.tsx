@@ -1,16 +1,16 @@
 "use client";
 
-import "./context_menu.scss";
+import "@/components/context_menu/context_menu.scss";
 
 import { Icon } from "@/elements";
 import type { IconName } from "@/elements/icon/icon_assets";
 import React from "react";
 
-type ContextMenuProps = {
+interface ContextMenuProps {
   ariaLabel: string;
   icon: IconName;
   children: React.ReactNode;
-};
+}
 
 export function ContextMenu({
   ariaLabel,

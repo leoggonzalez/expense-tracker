@@ -1,18 +1,18 @@
 "use client";
 
-import "./app_error_card.scss";
+import "@/components/app_error_card/app_error_card.scss";
 
 import { Box, Card, Stack, Text } from "@/elements";
 
 import { Button } from "@/components/button/button";
 import { Container } from "@/components/container/container";
 import { ErrorDetailsPanel } from "@/components/error_details_panel/error_details_panel";
-import React from "react";
 import { i18n } from "@/model/i18n";
+import React from "react";
 
-type AppErrorCardProps = {
+interface AppErrorCardProps {
   error: Error & { digest?: string };
-};
+}
 
 type ErrorPayload = {
   digest?: string;
@@ -63,10 +63,10 @@ export function AppErrorCard({ error }: AppErrorCardProps): React.ReactElement {
             <Card padding={32} radius={28}>
               <Stack gap={20}>
                 <Stack gap={8}>
-                  <Text as="h1" size="h2" weight="bold">
+                  <Text element="h1" type="h2-bold">
                     {i18n.t("app_error.title")}
                   </Text>
-                  <Text color="secondary">
+                  <Text element="p" color="secondary">
                     {i18n.t("app_error.description")}
                   </Text>
                 </Stack>

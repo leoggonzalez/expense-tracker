@@ -1,11 +1,11 @@
 "use client";
 
-import "./pull_to_refresh.scss";
+import "@/components/pull_to_refresh/pull_to_refresh.scss";
 
-import React, { useEffect, useRef, useState } from "react";
 import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
 import { Icon } from "@/elements/icon/icon";
 import { i18n } from "@/model/i18n";
+import React, { useEffect, useRef, useState } from "react";
 
 const PHONE_MEDIA_QUERY = "(max-width: 767px)";
 const STANDALONE_MEDIA_QUERY = "(display-mode: standalone)";
@@ -13,10 +13,10 @@ const PULL_THRESHOLD = 72;
 const MAX_PULL_DISTANCE = 112;
 const REFRESH_HOLD_OFFSET = 52;
 
-type PullToRefreshProps = {
+interface PullToRefreshProps {
   disabled?: boolean;
   targetRef: React.RefObject<HTMLElement | null>;
-};
+}
 
 type LegacyMediaQueryList = MediaQueryList & {
   addListener: (listener: () => void) => void;

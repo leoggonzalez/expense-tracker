@@ -1,5 +1,5 @@
-import { Container, Hero } from "@/components";
 import { TransactionsResultsSection } from "@/app/(protected)/transactions/transactions_results_section";
+import { Container, Hero } from "@/components";
 import { Stack, Text } from "@/elements";
 import { normalizeTransactionsFilters } from "@/lib/transactions_search";
 import { i18n } from "@/model/i18n";
@@ -8,9 +8,9 @@ type TransactionsPageSearchParams = Promise<
   Record<string, string | string[] | undefined>
 >;
 
-type TransactionsPageProps = {
+interface TransactionsPageProps {
   searchParams: TransactionsPageSearchParams;
-};
+}
 
 export default async function Page({
   searchParams,
@@ -46,7 +46,7 @@ export default async function Page({
           ]}
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="hero-muted">
+            <Text element="p" type="caption" color="hero-muted">
               {i18n.t("transactions_page.subtitle")}
             </Text>
           </Stack>

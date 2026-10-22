@@ -1,6 +1,6 @@
 @use "@/styles/variables.scss" as *;
 
-.confirm-dialog {
+.modal {
   width: min(calc(100vw - 32px), 420px);
   margin: auto;
   padding: 0;

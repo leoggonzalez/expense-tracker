@@ -1,17 +1,19 @@
-export { Stack } from "./stack/stack";
-export type { StackProps } from "./stack/stack";
+export { Stack } from "@/elements/stack/stack";
+export type { StackProps } from "@/elements/stack/stack";
 
-export { Box } from "./box/box";
-export type { BoxProps, BoxPadding } from "./box/box";
+export { Box } from "@/elements/box/box";
+export type { BoxProps, BoxPadding } from "@/elements/box/box";
 
-export { Card } from "./card/card";
-export type { CardProps } from "./card/card";
+export { Card } from "@/elements/card/card";
+export type { CardProps } from "@/elements/card/card";
 
-export { Grid } from "./grid/grid";
-export type { GridProps } from "./grid/grid";
+export { Grid } from "@/elements/grid/grid";
+export type { GridProps } from "@/elements/grid/grid";
 
-export { Icon } from "./icon/icon";
-export type { IconProps } from "./icon/icon";
+export { Icon } from "@/elements/icon/icon";
+export type { IconProps } from "@/elements/icon/icon";
 
-export { Text } from "./text/text";
-export type { TextProps } from "./text/text";
+export { Text } from "@/elements/text/text";
+export type { TextProps } from "@/elements/text/text";
+
+export type { TextType, TextVariant } from "@/elements/text/text_types";

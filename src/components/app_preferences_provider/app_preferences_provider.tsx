@@ -27,9 +27,9 @@ type AppPreferencesContextValue = {
   setLanguagePreference: (value: LanguagePreference) => void;
 };
 
-type AppPreferencesProviderProps = {
+interface AppPreferencesProviderProps {
   children: React.ReactNode;
-};
+}
 
 const AppPreferencesContext = createContext<AppPreferencesContextValue | null>(
   null,

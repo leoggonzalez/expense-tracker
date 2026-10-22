@@ -1,6 +1,6 @@
 "use client";
 
-import "./toast_provider.scss";
+import "@/components/toast_provider/toast_provider.scss";
 
 import React, {
   createContext,
@@ -11,8 +11,8 @@ import React, {
 } from "react";
 
 import { Box, Icon, Stack, Text } from "@/elements";
-import { i18n } from "@/model/i18n";
 import type { IconName } from "@/elements/icon/icon_assets";
+import { i18n } from "@/model/i18n";
 
 type ToastKind = "success" | "error";
 
@@ -32,9 +32,9 @@ type ToastContextValue = {
   showError: (message: React.ReactNode, options?: ToastOptions) => void;
 };
 
-type ToastProviderProps = {
+interface ToastProviderProps {
   children: React.ReactNode;
-};
+}
 
 const HIDE_DELAY_MS = 250;
 const SUCCESS_DURATION_MS = 2500;
@@ -129,14 +129,14 @@ export function ToastProvider({
           >
             <Box
               padding={{
-                paddingTop: 16,
-                paddingRight: 24,
-                paddingBottom: 16,
-                paddingLeft: 24,
+                top: 16,
+                right: 24,
+                bottom: 16,
+                left: 24,
               }}
             >
               <Stack
-                direction="row"
+                line
                 align="center"
                 justify="space-between"
                 gap={12}
@@ -156,7 +156,7 @@ export function ToastProvider({
                 </span>
                 <span className="toast-provider__divider" aria-hidden="true" />
                 <span className="toast-provider__message">
-                  <Text as="span" size="sm">
+                  <Text element="span" type="caption">
                     {toast.message}
                   </Text>
                 </span>

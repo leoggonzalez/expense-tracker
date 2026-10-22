@@ -1,6 +1,6 @@
 "use client";
 
-import "./space_field.scss";
+import "@/components/space_field/space_field.scss";
 
 import React, { useState } from "react";
 
@@ -14,7 +14,7 @@ const createFlowSpacesCache = {
   entries: new Map<string, NewTransactionSpacesPayload>(),
 };
 
-type SpaceFieldProps = {
+interface SpaceFieldProps {
   label: React.ReactNode;
   spaces: Array<{
     id: string;
@@ -29,7 +29,7 @@ type SpaceFieldProps = {
   size?: "md" | "lg";
   surface?: "default" | "subtle";
   labelTone?: "primary" | "secondary";
-};
+}
 
 export function SpaceField({
   label,
@@ -136,8 +136,8 @@ export function SpaceField({
 
       {loadSpacesOnMount && hasError && spaces.length === 0 ? (
         <div className="space-field__status">
-          <Stack direction="row" gap={8} align="center">
-            <Text size="xs" color="secondary">
+          <Stack line gap={8} align="center">
+            <Text element="p" type="fine" color="secondary">
               {i18n.t("new_transaction_page.form_load_failed")}
             </Text>
             <button

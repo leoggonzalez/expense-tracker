@@ -1,19 +1,19 @@
 "use client";
 
-import "./otp_input.scss";
+import "@/components/otp_input/otp_input.scss";
 
-import React, { useRef } from "react";
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
+import React, { useRef } from "react";
 
-type OtpInputProps = {
+interface OtpInputProps {
   label: React.ReactNode;
   value: string;
   onChange: (value: string) => void;
   length?: number;
   disabled?: boolean;
   required?: boolean;
-};
+}
 
 export function OtpInput({
   label,
@@ -104,7 +104,7 @@ export function OtpInput({
   return (
     <div className="otp-input">
       <Stack gap={8}>
-        <Text as="span" size="sm" weight="medium">
+        <Text element="span" type="caption-medium">
           {label}
           {required && <span className="otp-input__required">*</span>}
         </Text>

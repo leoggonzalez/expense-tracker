@@ -1,4 +1,4 @@
-import "./transaction_type_tabs.scss";
+import "@/components/transaction_type_tabs/transaction_type_tabs.scss";
 
 import React from "react";
 
@@ -7,14 +7,14 @@ import { Icon, Stack, Text } from "@/elements";
 
 type TransactionPageType = "income" | "expense" | "transfer";
 
-type TransactionTypeTabsProps = {
+interface TransactionTypeTabsProps {
   activeType: TransactionPageType;
   tabs: Array<{
     key: TransactionPageType;
     href: string;
     label: React.ReactNode;
   }>;
-};
+}
 
 export function TransactionTypeTabs({
   activeType,
@@ -35,17 +35,11 @@ export function TransactionTypeTabs({
         >
           <AppLink href={tab.href}>
             <span className="transaction-type-tabs__content">
-              <Stack
-                direction="row"
-                inline
-                align="center"
-                justify="center"
-                gap={8}
-              >
+              <Stack line inline align="center" justify="center" gap={8}>
                 <span className="transaction-type-tabs__icon">
                   <Icon name={tab.key} size={16} />
                 </span>
-                <Text as="span" size="sm" weight="medium">
+                <Text element="span" type="caption-medium">
                   {tab.label}
                 </Text>
               </Stack>

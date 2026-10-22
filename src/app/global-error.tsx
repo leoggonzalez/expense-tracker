@@ -6,10 +6,10 @@ import React from "react";
 
 import { AppErrorCard } from "@/components";
 
-type GlobalErrorPageProps = {
+interface GlobalErrorPageProps {
   error: Error & { digest?: string };
   reset: () => void;
-};
+}
 
 export default function GlobalErrorPage({
   error,

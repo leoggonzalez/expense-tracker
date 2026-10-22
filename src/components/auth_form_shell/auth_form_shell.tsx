@@ -1,12 +1,12 @@
-import "./auth_form_shell.scss";
+import "@/components/auth_form_shell/auth_form_shell.scss";
 
 import React from "react";
 
 import { Box, Stack } from "@/elements";
 
-type AuthFormShellProps = {
+interface AuthFormShellProps {
   children: React.ReactNode;
-};
+}
 
 export function AuthFormShell({
   children,

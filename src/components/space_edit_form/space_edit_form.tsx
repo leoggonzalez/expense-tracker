@@ -1,6 +1,6 @@
 "use client";
 
-import "./space_edit_form.scss";
+import "@/components/space_edit_form/space_edit_form.scss";
 
 import React, { useState } from "react";
 
@@ -13,13 +13,13 @@ import { Button, Input, Select, useNavigationProgress } from "@/components";
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
-type SpaceEditFormProps = {
+interface SpaceEditFormProps {
   spaceId: string;
   initialName: string;
   initialType: SpaceTypeInput;
   initialPaymentDueDay: number | null;
   initialPaymentTiming: CreditCardPaymentTimingInput;
-};
+}
 
 export function SpaceEditForm({
   spaceId,
@@ -113,7 +113,7 @@ export function SpaceEditForm({
 
           {isCreditCard ? (
             <Stack gap={8}>
-              <Stack direction="row" gap={12} fullWidth>
+              <Stack line gap={12} fullWidth>
                 <div className="space-edit-form__half-field">
                   <Input
                     label={i18n.t("spaces_page.payment_due_day")}
@@ -161,14 +161,22 @@ export function SpaceEditForm({
                   />
                 </div>
               </Stack>
-              <Text size="sm" color="secondary">
+              <Text element="p" type="caption" color="secondary">
                 {i18n.t("spaces_page.payment_due_day_hint")}
               </Text>
             </Stack>
           ) : null}
 
-          {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
-          {success ? <Text color="success">{i18n.t(success)}</Text> : null}
+          {error ? (
+            <Text element="p" color="danger">
+              {i18n.t(error)}
+            </Text>
+          ) : null}
+          {success ? (
+            <Text element="p" color="success">
+              {i18n.t(success)}
+            </Text>
+          ) : null}
 
           <Button type="submit" disabled={isLoading}>
             {isLoading

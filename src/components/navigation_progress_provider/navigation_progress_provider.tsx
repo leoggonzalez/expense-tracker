@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
 import React, {
   createContext,
   useContext,
@@ -7,7 +8,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { usePathname, useRouter } from "next/navigation";
 
 type NavigationProgressContextValue = {
   isNavigating: boolean;
@@ -26,9 +26,9 @@ type ViewTransitionDocument = Document & {
   };
 };
 
-type NavigationProgressProviderProps = {
+interface NavigationProgressProviderProps {
   children: React.ReactNode;
-};
+}
 
 function runWithViewTransition(action: () => void): void {
   if (typeof document === "undefined") {

@@ -4,10 +4,10 @@ import React from "react";
 
 import { AppErrorCard } from "@/components";
 
-type ErrorPageProps = {
+interface ErrorPageProps {
   error: Error & { digest?: string };
   reset: () => void;
-};
+}
 
 export default function ErrorPage({
   error,

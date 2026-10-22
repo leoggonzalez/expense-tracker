@@ -1,14 +1,10 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { ProjectionHeaderPayload } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
-import {
-  Button,
-  Hero,
-  HeroMetric,
-  HeroMetrics,
-  LoadingSkeleton,
-} from "@/components";
+import { Hero, HeroMetric, HeroMetrics, LoadingSkeleton } from "@/components";
 import { Stack, Text } from "@/elements";
 import { formatCurrency } from "@/lib/utils";
 import { i18n } from "@/model/i18n";
@@ -17,12 +13,12 @@ const projectionHeaderCache = {
   entries: new Map<string, ProjectionHeaderPayload>(),
 };
 
-type ProjectionHeaderProps = {
+interface ProjectionHeaderProps {
   focusedMonthLabel: string;
   monthKey: string;
   previousMonthKey: string;
   nextMonthKey: string;
-};
+}
 
 export function ProjectionHeader({
   focusedMonthLabel,
@@ -60,36 +56,34 @@ export function ProjectionHeader({
       <Stack gap={24}>
         <Stack gap={10}>
           {data ? (
-            <Text as="h1" size="h1" color="hero" weight="bold">
+            <Text element="h1" type="h1-bold" color="hero">
               {formatCurrency(data.focusedMonthTotals.net)}
             </Text>
           ) : (
             <LoadingSkeleton width="240px" height={58} radius={18} />
           )}
 
-          <Text as="p" size="sm" color="hero-muted">
+          <Text element="p" type="caption" color="hero-muted">
             {i18n.t("projection_page.subtitle")}
           </Text>
         </Stack>
 
         {hasError && !data ? (
-          <Stack gap={12} align="flex-start">
-            <Text size="sm" color="hero-muted">
-              {i18n.t("projection_page.header_load_failed")}
-            </Text>
-            <Button variant="outline" size="sm" onClick={retry}>
-              {i18n.t("common.retry")}
-            </Button>
-          </Stack>
+          <SectionError
+            tone="inverse"
+            message={i18n.t("projection_page.header_load_failed")}
+            retryLabel={i18n.t("common.retry")}
+            onRetry={retry}
+          />
         ) : (
           <HeroMetrics columns={2}>
             <HeroMetric>
               <>
-                <Text as="span" size="xs" color="hero" weight="medium">
+                <Text element="span" type="fine-medium" color="hero">
                   {i18n.t("projection_page.income")}
                 </Text>
                 {data ? (
-                  <Text as="span" size="lg" color="hero" weight="semibold">
+                  <Text element="span" type="lead-semibold" color="hero">
                     {formatCurrency(data.focusedMonthTotals.income)}
                   </Text>
                 ) : (
@@ -99,11 +93,11 @@ export function ProjectionHeader({
             </HeroMetric>
             <HeroMetric tone="soft">
               <>
-                <Text as="span" size="xs" color="hero" weight="medium">
+                <Text element="span" type="fine-medium" color="hero">
                   {i18n.t("projection_page.expenses")}
                 </Text>
                 {data ? (
-                  <Text as="span" size="lg" color="hero" weight="semibold">
+                  <Text element="span" type="lead-semibold" color="hero">
                     {formatCurrency(Math.abs(data.focusedMonthTotals.expense))}
                   </Text>
                 ) : (
