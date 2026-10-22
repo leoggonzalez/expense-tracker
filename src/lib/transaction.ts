@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { CreditCardPaymentTiming, Prisma } from "@prisma/client";
 import {
   addDays,
   addMonths,
@@ -723,10 +723,8 @@ export class Transaction {
     userAccountId: string,
     focusedMonthStart: Date,
   ): Promise<ProjectionSpacesQueryData> {
-    const {
-      normalizedFocusedMonthStart,
-      focusedMonthEnd,
-    } = Transaction.getProjectionMonthContext(focusedMonthStart);
+    const { normalizedFocusedMonthStart, focusedMonthEnd } =
+      Transaction.getProjectionMonthContext(focusedMonthStart);
 
     const [spaceSummaryRows, spaceTransactionsRows] = await Promise.all([
       prisma.$queryRaw<ProjectionFocusedSpaceSummaryRow[]>`
@@ -1183,10 +1181,26 @@ export class Transaction {
       return null;
     }
 
-    const projectedMonthStart = startOfMonth(dueDate);
+    // Cards without a closing day retain their pre-period settlement timing.
+    const isLegacyCard = space.periodEndDay === null;
+    const projectedMonthStart =
+      isLegacyCard &&
+      space.paymentTiming === CreditCardPaymentTiming.previous_month
+        ? startOfMonth(addMonths(monthStart, 1))
+        : startOfMonth(dueDate);
     const projectedMonthEnd = endOfMonth(projectedMonthStart);
 
-    const rows = await prisma.$queryRaw<Array<{ total: number | null }>>`
+    const rows = isLegacyCard
+      ? await prisma.$queryRaw<Array<{ total: number | null }>>`
+          SELECT COALESCE(SUM(ABS(t.amount)), 0) AS total
+          FROM "Transaction" t
+          WHERE t."spaceId" = ${space.id}
+            AND t.type = 'expense'
+            AND t."transferSpaceId" IS NULL
+            AND t."beginDate" <= ${projectedMonthEnd}
+            AND (t."endDate" IS NULL OR t."endDate" >= ${projectedMonthStart})
+        `
+      : await prisma.$queryRaw<Array<{ total: number | null }>>`
       WITH transaction_occurrences AS (
         SELECT
           t.amount,

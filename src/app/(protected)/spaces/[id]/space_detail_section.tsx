@@ -124,7 +124,19 @@ function getCreditCardSettleLabel(space: SpaceDetailPayload["space"]): string {
   }
 
   const dueDay = space.paymentDueDay ?? 1;
-  const periodEndDay = space.periodEndDay ?? 1;
+  if (space.periodEndDay === null) {
+    const timingKey =
+      space.paymentTiming === "previous_month"
+        ? "spaces_page.payment_timing_previous_month"
+        : "spaces_page.payment_timing_same_month";
+    return String(
+      i18n.t("space_detail_page.account_detail_settle_legacy_value", {
+        day: String(dueDay),
+        timing: String(i18n.t(timingKey)),
+      }),
+    );
+  }
+  const periodEndDay = space.periodEndDay;
 
   return String(
     i18n.t("space_detail_page.account_detail_settle_value", {

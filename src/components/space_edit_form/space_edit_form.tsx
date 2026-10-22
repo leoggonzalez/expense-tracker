@@ -38,6 +38,8 @@ export function SpaceEditForm({
   const [success, setSuccess] = useState<string | null>(null);
   const { push } = useNavigationProgress();
   const isCreditCard = type === "credit_card";
+  const isLegacyCard =
+    initialType === "credit_card" && initialPeriodEndDay === null;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -50,7 +52,8 @@ export function SpaceEditForm({
       name,
       type,
       paymentDueDay: isCreditCard ? Number(paymentDueDay) : null,
-      periodEndDay: isCreditCard ? Number(periodEndDay) : null,
+      periodEndDay:
+        isCreditCard && periodEndDay.trim() ? Number(periodEndDay) : null,
     });
 
     if (!result.success) {
@@ -134,7 +137,7 @@ export function SpaceEditForm({
                     value={periodEndDay}
                     onChange={setPeriodEndDay}
                     placeholder="23"
-                    required
+                    required={!isLegacyCard}
                     min={1}
                     max={31}
                     step={1}
@@ -146,7 +149,11 @@ export function SpaceEditForm({
                 </div>
               </Stack>
               <Text element="p" type="caption" color="secondary">
-                {i18n.t("spaces_page.credit_card_period_hint")}
+                {i18n.t(
+                  isLegacyCard && !periodEndDay.trim()
+                    ? "spaces_page.credit_card_legacy_period_hint"
+                    : "spaces_page.credit_card_period_hint",
+                )}
               </Text>
             </Stack>
           ) : null}

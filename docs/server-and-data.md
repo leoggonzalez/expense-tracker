@@ -258,3 +258,13 @@ After backend or data refactors:
 - Are generic helpers kept out of table action files?
 - Are action exports grouped in CRUD order?
 - Has obvious query waste been removed while preserving behavior?
+
+## Credit-Card Statement Cutoff
+
+For cards with a configured `periodEndDay`, that day starts the next statement period, inclusive from midnight. The field retains its existing database name for compatibility; the UI calls it the statement cutoff day. A statement closing in a calendar month is paid the following month, on `paymentDueDay` (clamped to the last day in shorter months). The due day does not select the payment month.
+
+For cutoff 24, purchases September 24 through October 23 are paid in November; purchases October 24 through November 23 are paid in December. Clamp the cutoff itself to the last day of shorter months. Keep the SQL function and `CreditCardSpace` calculation aligned. Relevant transaction lists, totals, projections, and upcoming payments must use the same payment month.
+
+Cards whose cutoff is null retain the legacy transaction-month reports and saved settlement timing. Editing those cards must not require inventing a cutoff. Entering a cutoff opts the card into statement periods.
+
+Run `RUN_DATABASE_TESTS=1 node --test scripts/tests/credit_card_compatibility_test.cjs` against a migrated local database for boundary checks and rolled-back fixtures covering relevant lists, totals, and projections.

@@ -133,6 +133,7 @@ function validateSpaceInput(input: {
   type: SpaceTypeInput;
   paymentDueDay: number | null;
   periodEndDay: number | null;
+  allowLegacyPeriod?: boolean;
 }): SpaceActionResult | null {
   if (!input.name) {
     return { success: false, error: "spaces_page.name_required" };
@@ -160,6 +161,10 @@ function validateSpaceInput(input: {
       };
     }
 
+    if (input.periodEndDay === null && input.allowLegacyPeriod) {
+      return null;
+    }
+
     if (input.periodEndDay === null) {
       return {
         success: false,
@@ -184,10 +189,7 @@ function validateSpaceInput(input: {
     return null;
   }
 
-  if (
-    input.paymentDueDay !== null ||
-    input.periodEndDay !== null
-  ) {
+  if (input.paymentDueDay !== null || input.periodEndDay !== null) {
     return {
       success: false,
       error: "spaces_page.credit_card_fields_require_credit_card",
@@ -459,28 +461,35 @@ export async function updateSpace(
   const type = normalizeSpaceType(input.type);
   const paymentDueDay = normalizePaymentDueDay(input.paymentDueDay);
   const periodEndDay = normalizePaymentDueDay(input.periodEndDay);
-  const validationError = validateSpaceInput({
-    name,
-    type,
-    paymentDueDay,
-    periodEndDay,
-  });
-
-  if (validationError) {
-    return {
-      success: false,
-      error:
-        validationError.error === "spaces_page.name_required"
-          ? "space_detail_page.name_required"
-          : validationError.error,
-    };
-  }
-
   try {
     const space = await Space.findOwnedById(currentUser.id, id);
 
     if (!space) {
       return { success: false, error: "space_detail_page.not_found" };
+    }
+
+    const existing = space.toRecord();
+    const allowLegacyPeriod =
+      existing.type === SpaceType.credit_card && existing.periodEndDay === null;
+    const nextPeriodEndDay =
+      input.periodEndDay === undefined ? existing.periodEndDay : periodEndDay;
+    const validationError = validateSpaceInput({
+      name,
+      type,
+      paymentDueDay,
+      periodEndDay:
+        type === SpaceType.credit_card ? nextPeriodEndDay : periodEndDay,
+      allowLegacyPeriod,
+    });
+
+    if (validationError) {
+      return {
+        success: false,
+        error:
+          validationError.error === "spaces_page.name_required"
+            ? "space_detail_page.name_required"
+            : validationError.error,
+      };
     }
 
     const nextMain = input.main ?? space.toRecord().main;
@@ -490,8 +499,11 @@ export async function updateSpace(
       main: nextMain,
       type,
       paymentDueDay: type === SpaceType.credit_card ? paymentDueDay : null,
-      paymentTiming: null,
-      periodEndDay: type === SpaceType.credit_card ? periodEndDay : null,
+      paymentTiming:
+        type === SpaceType.credit_card && nextPeriodEndDay === null
+          ? existing.paymentTiming
+          : null,
+      periodEndDay: type === SpaceType.credit_card ? nextPeriodEndDay : null,
     });
 
     if (nextMain) {

@@ -470,22 +470,41 @@ export class Space {
     monthStart: Date,
     monthEnd: Date,
   ): Promise<SpaceTransactionRecord[]> {
+    const relevantRows = await prisma.$queryRaw<Array<{ id: string }>>`
+      SELECT t.id
+      FROM "Transaction" t
+      INNER JOIN "Space" s ON s.id = t."spaceId"
+      WHERE t."spaceId" = ${spaceId}
+        AND t."beginDate" <= ${monthEnd}
+        AND (
+          CASE WHEN s.type = 'credit_card' AND s."periodEndDay" IS NOT NULL
+            AND s."paymentDueDay" IS NOT NULL
+          THEN EXISTS (
+            SELECT 1
+            FROM generate_series(
+              date_trunc('month', t."beginDate"),
+              date_trunc('month', COALESCE(t."endDate", ${monthEnd})),
+              interval '1 month'
+            ) AS occurrence_month(month_start)
+            WHERE "getSpaceProjectionMonthStart"(
+              s.type::text,
+              s."paymentDueDay",
+              s."periodEndDay",
+              (occurrence_month.month_start + make_interval(days => LEAST(
+                EXTRACT(DAY FROM t."beginDate")::integer,
+                EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+              ) - 1))::timestamp
+            ) = ${monthStart}
+          )
+          ELSE t."endDate" IS NULL OR t."endDate" >= ${monthStart}
+          END
+        )
+    `;
+
     return prisma.transaction.findMany({
       where: {
         spaceId,
-        beginDate: {
-          lte: monthEnd,
-        },
-        OR: [
-          {
-            endDate: null,
-          },
-          {
-            endDate: {
-              gte: monthStart,
-            },
-          },
-        ],
+        id: { in: relevantRows.map((row) => row.id) },
       },
       select: spaceTransactionSelect,
       orderBy: [{ beginDate: "desc" }, { createdAt: "desc" }],
@@ -733,55 +752,13 @@ export class CreditCardSpace extends Space {
       return super.getProjectionMonthStartForDate(transactionDate);
     }
 
-    const occurrenceDate = new Date(transactionDate);
-    const periodEnd = this.getPeriodEndForDate(
-      occurrenceDate,
-      record.periodEndDay,
+    // The configured day starts the next statement, including that whole day.
+    const occurrenceMonth = startOfMonth(transactionDate);
+    const cutoffDate = new Date(occurrenceMonth);
+    cutoffDate.setDate(
+      Math.min(record.periodEndDay, endOfMonth(occurrenceMonth).getDate()),
     );
 
-    return startOfMonth(
-      this.getPaymentDateAfterPeriodEnd(periodEnd, record.paymentDueDay),
-    );
-  }
-
-  private getPeriodEndForDate(transactionDate: Date, periodEndDay: number): Date {
-    const periodEnd = new Date(transactionDate);
-    periodEnd.setDate(1);
-    periodEnd.setDate(Math.min(periodEndDay, endOfMonth(periodEnd).getDate()));
-    periodEnd.setHours(23, 59, 59, 999);
-
-    if (transactionDate > periodEnd) {
-      const nextPeriodEnd = addMonths(periodEnd, 1);
-      nextPeriodEnd.setDate(1);
-      nextPeriodEnd.setDate(
-        Math.min(periodEndDay, endOfMonth(nextPeriodEnd).getDate()),
-      );
-      nextPeriodEnd.setHours(23, 59, 59, 999);
-
-      return nextPeriodEnd;
-    }
-
-    return periodEnd;
-  }
-
-  private getPaymentDateAfterPeriodEnd(
-    periodEnd: Date,
-    paymentDueDay: number,
-  ): Date {
-    const dueDate = new Date(periodEnd);
-    dueDate.setDate(1);
-    dueDate.setDate(Math.min(paymentDueDay, endOfMonth(dueDate).getDate()));
-
-    if (dueDate <= periodEnd) {
-      const nextMonthDueDate = addMonths(dueDate, 1);
-      nextMonthDueDate.setDate(1);
-      nextMonthDueDate.setDate(
-        Math.min(paymentDueDay, endOfMonth(nextMonthDueDate).getDate()),
-      );
-
-      return nextMonthDueDate;
-    }
-
-    return dueDate;
+    return addMonths(occurrenceMonth, transactionDate >= cutoffDate ? 2 : 1);
   }
 }
