@@ -7,7 +7,7 @@ import {
 } from "@/lib/spaces_month";
 import { i18n } from "@/model/i18n";
 
-type SpaceRouteProps = {
+interface SpaceRouteProps {
   params: Promise<{
     id: string;
   }>;
@@ -17,7 +17,7 @@ type SpaceRouteProps = {
     confirmArchive?: string;
     confirmUnarchive?: string;
   }>;
-};
+}
 
 export default async function Page({
   params,

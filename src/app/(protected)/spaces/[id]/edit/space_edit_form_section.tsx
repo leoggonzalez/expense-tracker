@@ -1,10 +1,11 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { SpaceEditPayload } from "@/actions/spaces";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
   AppLink,
-  Button,
   LoadingSkeleton,
   PagePanel,
   SpaceEditForm,
@@ -16,9 +17,9 @@ const spaceEditCache = {
   entries: new Map<string, SpaceEditPayload>(),
 };
 
-type SpaceEditFormSectionProps = {
+interface SpaceEditFormSectionProps {
   id: string;
-};
+}
 
 function SpaceEditFormSkeleton(): React.ReactElement {
   return (
@@ -42,14 +43,11 @@ export function SpaceEditFormSection({
     return (
       <Stack gap={24}>
         <Card padding={24}>
-          <Stack gap={12} align="flex-start">
-            <Text color="secondary">
-              {i18n.t("spaces_page.edit_form_load_failed")}
-            </Text>
-            <Button variant="secondary" size="sm" onClick={retry}>
-              {i18n.t("common.retry")}
-            </Button>
-          </Stack>
+          <SectionError
+            message={i18n.t("spaces_page.edit_form_load_failed")}
+            retryLabel={i18n.t("common.retry")}
+            onRetry={retry}
+          />
         </Card>
         <AppLink href="/spaces">{i18n.t("spaces_page.back_to_spaces")}</AppLink>
       </Stack>
@@ -60,7 +58,9 @@ export function SpaceEditFormSection({
     return (
       <Stack gap={24}>
         <Card padding={24}>
-          <Text color="secondary">{i18n.t("space_detail_page.not_found")}</Text>
+          <Text element="p" color="secondary">
+            {i18n.t("space_detail_page.not_found")}
+          </Text>
         </Card>
         <AppLink href="/spaces">{i18n.t("spaces_page.back_to_spaces")}</AppLink>
       </Stack>

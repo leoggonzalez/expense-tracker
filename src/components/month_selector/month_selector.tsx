@@ -1,6 +1,6 @@
 "use client";
 
-import "./month_selector.scss";
+import "@/components/month_selector/month_selector.scss";
 
 import React, { useEffect, useRef, useState } from "react";
 
@@ -17,7 +17,7 @@ type MonthSelectorField = {
   onChange: (value: string) => void;
 };
 
-type MonthSelectorProps = {
+interface MonthSelectorProps {
   label: React.ReactNode;
   field?: MonthSelectorField;
   value?: string;
@@ -28,7 +28,7 @@ type MonthSelectorProps = {
   yearLabel: React.ReactNode;
   required?: boolean;
   surface?: "default" | "subtle";
-};
+}
 
 function getMonthOptions(): Array<{ value: string; label: string }> {
   const locale = i18n.locale || "en";
@@ -188,7 +188,7 @@ export function MonthSelector({
       )}
     >
       <Stack gap={8}>
-        <Text as="div" size="sm" weight="medium" color="secondary">
+        <Text element="div" type="caption-medium" color="secondary">
           {label}
           {required && <span className="month-selector__required">*</span>}
         </Text>
@@ -209,7 +209,7 @@ export function MonthSelector({
               ) : (
                 <>
                   <label className="month-selector__tag">
-                    <Text as="span" size="sm" weight="semibold">
+                    <Text element="span" type="caption-semibold">
                       {selectedMonthLabel}
                     </Text>
                     <select
@@ -228,7 +228,7 @@ export function MonthSelector({
                   </label>
 
                   <label className="month-selector__tag">
-                    <Text as="span" size="sm" weight="semibold">
+                    <Text element="span" type="caption-semibold">
                       {year}
                     </Text>
                     <select

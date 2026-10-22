@@ -1,14 +1,15 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { NewTransactionRecentPayload } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
-  Button,
   Container,
   LoadingSkeleton,
   NewTransactionRecentTransactions,
 } from "@/components";
-import { Card, Stack, Text } from "@/elements";
+import { Card, Stack } from "@/elements";
 import { subscribeToNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
 import React from "react";
@@ -59,14 +60,11 @@ export function NewTransactionRecentSection(): React.ReactElement {
           title={String(i18n.t("new_transaction_page.recent_transactions"))}
           icon="activity"
         >
-          <Stack gap={12} align="flex-start">
-            <Text color="secondary">
-              {i18n.t("new_transaction_page.recent_load_failed")}
-            </Text>
-            <Button variant="secondary" size="sm" onClick={retry}>
-              {i18n.t("common.retry")}
-            </Button>
-          </Stack>
+          <SectionError
+            message={i18n.t("new_transaction_page.recent_load_failed")}
+            retryLabel={i18n.t("common.retry")}
+            onRetry={retry}
+          />
         </Card>
       </Container>
     );

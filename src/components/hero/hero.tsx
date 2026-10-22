@@ -1,7 +1,7 @@
-import "./hero.scss";
+import "@/components/hero/hero.scss";
 
-import { Button } from "@/components/button/button";
 import type { ButtonProps } from "@/components/button/button";
+import { Button } from "@/components/button/button";
 import { Icon, Stack, Text } from "@/elements";
 
 import type { IconName } from "@/elements/icon/icon_assets";
@@ -19,14 +19,14 @@ export type HeroPattern =
   | "space"
   | "settings";
 
-export type HeroProps = {
+export interface HeroProps {
   icon: IconName;
   title: React.ReactNode;
   children: React.ReactNode;
   actions?: HeroAction[];
   pattern: HeroPattern;
   isBodyLoading?: boolean;
-};
+}
 
 export type HeroAction = {
   icon: IconName;
@@ -57,12 +57,12 @@ export function Hero({
     <section className={classes}>
       <div className="hero__header">
         <div className="hero__title-row">
-          <Stack direction="row" align="center" gap={12}>
+          <Stack line align="center" gap={12}>
             <span className="hero__icon">
               <Icon name={icon} size={20} />
             </span>
             <div className="hero__title">
-              <Text size="h3" color="hero">
+              <Text element="p" type="h3" color="hero">
                 {title}
               </Text>
             </div>

@@ -1,8 +1,8 @@
 import { NewTransactionRecentSection } from "@/app/(protected)/transactions/new/new_transaction_recent_section";
 
-type TransactionsNewLayoutProps = {
+interface TransactionsNewLayoutProps {
   children: React.ReactNode;
-};
+}
 
 export default async function Layout({
   children,

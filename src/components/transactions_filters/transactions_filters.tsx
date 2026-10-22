@@ -1,6 +1,6 @@
 "use client";
 
-import "./transactions_filters.scss";
+import "@/components/transactions_filters/transactions_filters.scss";
 
 import {
   ContextMenu,
@@ -11,12 +11,12 @@ import {
 import { Icon, Stack, Text } from "@/elements";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import React from "react";
-import { format } from "date-fns";
-import { i18n } from "@/model/i18n";
 import { inferTransactionDateMode } from "@/lib/transaction_schedule";
+import { i18n } from "@/model/i18n";
+import { format } from "date-fns";
+import React from "react";
 
-type TransactionsFiltersProps = {
+interface TransactionsFiltersProps {
   spaces: Array<{
     id: string;
     name: string;
@@ -28,7 +28,7 @@ type TransactionsFiltersProps = {
     endDate: string;
     searchTerms: string[];
   };
-};
+}
 
 type TransactionTypeFilter = "" | "income" | "expense" | "transfer";
 
@@ -265,11 +265,11 @@ export function TransactionsFilters({
         >
           <div className="transactions-filters__menu">
             <div className="transactions-filters__menu-section">
-              <Text size="sm" weight="medium">
+              <Text element="p" type="caption-medium">
                 {i18n.t("transactions_page.type")}
               </Text>
               <div className="transactions-filters__type-options">
-                <Stack direction="row" wrap gap={8}>
+                <Stack line wrap gap={8}>
                   {[
                     { value: "", label: i18n.t("transactions_page.type_all") },
                     { value: "income", label: i18n.t("common.income") },
@@ -298,7 +298,7 @@ export function TransactionsFilters({
                         })
                       }
                     >
-                      <Text as="span" size="sm" weight="medium">
+                      <Text element="span" type="caption-medium">
                         {option.label}
                       </Text>
                     </button>
@@ -330,7 +330,7 @@ export function TransactionsFilters({
             </div>
 
             <div className="transactions-filters__menu-section">
-              <Text size="sm" weight="medium">
+              <Text element="p" type="caption-medium">
                 {i18n.t("transactions_page.date_range")}
               </Text>
               <div className="transactions-filters__date-grid">
@@ -370,7 +370,7 @@ export function TransactionsFilters({
 
       {anyFilters ? (
         <div className="transactions-filters__pills">
-          <Stack direction="row" wrap gap={8}>
+          <Stack line wrap gap={8}>
             {pills.map((pill) => (
               <button
                 key={pill.id}
@@ -378,8 +378,8 @@ export function TransactionsFilters({
                 className="transactions-filters__pill"
                 onClick={pill.onRemove}
               >
-                <Stack direction="row" inline align="center" gap={4}>
-                  <Text as="span" size="sm" weight="medium">
+                <Stack line inline align="center" gap={4}>
+                  <Text element="span" type="caption-medium">
                     {pill.label}
                   </Text>
                   <Icon name="close" size={14} />
@@ -391,7 +391,7 @@ export function TransactionsFilters({
               className="transactions-filters__pill transactions-filters__pill--clear"
               onClick={clearFilters}
             >
-              <Text as="span" size="sm" weight="medium">
+              <Text element="span" type="caption-medium">
                 {i18n.t("transactions_page.clear_filters")}
               </Text>
             </button>

@@ -1,7 +1,7 @@
-import React from "react";
-import "./button.scss";
 import { AppLink } from "@/components/app_link/app_link";
+import "@/components/button/button.scss";
 import { Stack } from "@/elements";
+import React from "react";
 
 export interface ButtonProps {
   children: React.ReactNode;
@@ -58,9 +58,9 @@ export function Button({
       ].join(" ")}
     >
       <Stack
-        direction="row"
+        line
         align="center"
-        justify={contentAlign === "start" ? "flex-start" : "center"}
+        justify={contentAlign === "start" ? "start" : "center"}
         gap={4}
         inline
       >

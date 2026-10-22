@@ -3,13 +3,12 @@ import React from "react";
 import { Text, type TextProps } from "@/elements";
 import { formatCurrency } from "@/lib/utils";
 
-type CurrencyProps = {
+interface CurrencyProps {
   value: number;
-  size?: TextProps["size"];
-  weight?: TextProps["weight"];
-  as?: TextProps["as"];
+  type?: TextProps["type"];
+  element?: TextProps["element"];
   color?: TextProps["color"];
-};
+}
 
 function resolveColor(value: number): TextProps["color"] {
   if (value > 0) {
@@ -25,18 +24,12 @@ function resolveColor(value: number): TextProps["color"] {
 
 export function Currency({
   value,
-  size = "md",
-  weight = "normal",
-  as = "span",
+  type = "body",
+  element = "span",
   color,
 }: CurrencyProps): React.ReactElement {
   return (
-    <Text
-      size={size}
-      weight={weight}
-      color={color || resolveColor(value)}
-      as={as}
-    >
+    <Text type={type} color={color || resolveColor(value)} element={element}>
       {formatCurrency(value)}
     </Text>
   );

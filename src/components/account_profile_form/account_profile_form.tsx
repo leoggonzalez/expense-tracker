@@ -4,16 +4,16 @@ import { Button, Input } from "@/components";
 import { Stack, Text } from "@/elements";
 import React, { useState } from "react";
 
-import { i18n } from "@/model/i18n";
 import { logout } from "@/actions/auth";
 import { updateCurrentUserAccountProfile } from "@/actions/user_account";
+import { i18n } from "@/model/i18n";
 
-type AccountProfileFormProps = {
+interface AccountProfileFormProps {
   userAccount: {
     email: string;
     name: string | null;
   };
-};
+}
 
 export function AccountProfileForm({
   userAccount,
@@ -49,10 +49,12 @@ export function AccountProfileForm({
     <form onSubmit={handleSave}>
       <Stack gap={20}>
         <Stack gap={4}>
-          <Text size="sm" weight="semibold">
+          <Text element="p" type="caption-semibold">
             {i18n.t("account.email")}
           </Text>
-          <Text color="secondary">{userAccount.email}</Text>
+          <Text element="p" color="secondary">
+            {userAccount.email}
+          </Text>
         </Stack>
 
         <Input
@@ -62,8 +64,16 @@ export function AccountProfileForm({
           placeholder={i18n.t("account.name_placeholder") as string}
         />
 
-        {error ? <Text color="danger">{i18n.t(error)}</Text> : null}
-        {success ? <Text color="success">{i18n.t(success)}</Text> : null}
+        {error ? (
+          <Text element="p" color="danger">
+            {i18n.t(error)}
+          </Text>
+        ) : null}
+        {success ? (
+          <Text element="p" color="success">
+            {i18n.t(success)}
+          </Text>
+        ) : null}
 
         <Stack gap={12}>
           <Button type="submit" disabled={loading} fullWidth>

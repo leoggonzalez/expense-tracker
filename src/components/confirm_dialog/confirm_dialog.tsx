@@ -1,12 +1,11 @@
 "use client";
 
-import "./confirm_dialog.scss";
-
 import { Button } from "@/components/button/button";
+import { Modal } from "@/components/modal/modal";
 import { Box, Stack, Text } from "@/elements";
-import React, { useEffect, useRef } from "react";
+import React from "react";
 
-type ConfirmDialogProps = {
+interface ConfirmDialogProps {
   isOpen: boolean;
   title: string;
   description: string;
@@ -17,7 +16,7 @@ type ConfirmDialogProps = {
   error?: string | null;
   onConfirm: () => void | Promise<void>;
   onClose: () => void;
-};
+}
 
 export function ConfirmDialog({
   isOpen,
@@ -31,87 +30,46 @@ export function ConfirmDialog({
   onConfirm,
   onClose,
 }: ConfirmDialogProps): React.ReactElement {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  // eslint-disable-next-line warn-use-effect -- This effect synchronizes the native dialog element with the controlled isOpen prop.
-  useEffect(() => {
-    const dialog = dialogRef.current;
-
-    if (!dialog) {
-      return;
-    }
-
-    if (isOpen && !dialog.open) {
-      dialog.showModal();
-      return;
-    }
-
-    if (!isOpen && dialog.open) {
-      dialog.close();
-    }
-  }, [isOpen]);
-
   return (
-    <dialog
-      ref={dialogRef}
-      className="confirm-dialog"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
-      }}
-    >
-      <div className="confirm-dialog__content">
-        <Box padding={24}>
-          <Stack gap={20}>
-            <Stack gap={10}>
-              <Text as="h3" size="h4" weight="semibold">
-                {title}
+    <Modal isOpen={isOpen} label={title} onClose={onClose}>
+      <Box padding={24}>
+        <Stack gap={20}>
+          <Stack gap={10}>
+            <Text element="h3" type="h4-semibold">
+              {title}
+            </Text>
+            <Text element="p" type="caption" color="secondary">
+              {description}
+            </Text>
+            {error ? (
+              <Text element="p" type="caption" color="danger">
+                {error}
               </Text>
-              <Text size="sm" color="secondary">
-                {description}
-              </Text>
-              {error ? (
-                <Text size="sm" color="danger">
-                  {error}
-                </Text>
-              ) : null}
-            </Stack>
-
-            <div className="confirm-dialog__actions">
-              <Stack
-                gap={8}
-                fullWidth
-                desktopDirection="row"
-                justify="flex-end"
-              >
-                <Button
-                  type="button"
-                  variant={confirmVariant}
-                  onClick={onConfirm}
-                  disabled={isLoading}
-                  fullWidth="mobile-only"
-                >
-                  {confirmLabel}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={onClose}
-                  disabled={isLoading}
-                  fullWidth="mobile-only"
-                >
-                  {cancelLabel}
-                </Button>
-              </Stack>
-            </div>
+            ) : null}
           </Stack>
-        </Box>
-      </div>
-    </dialog>
+
+          <Stack gap={8} fullWidth lineDesktop justify="end">
+            <Button
+              type="button"
+              variant={confirmVariant}
+              onClick={onConfirm}
+              disabled={isLoading}
+              fullWidth="mobile-only"
+            >
+              {confirmLabel}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onClose}
+              disabled={isLoading}
+              fullWidth="mobile-only"
+            >
+              {cancelLabel}
+            </Button>
+          </Stack>
+        </Stack>
+      </Box>
+    </Modal>
   );
 }

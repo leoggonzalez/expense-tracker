@@ -1,9 +1,11 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { ProjectionChartPayload } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
-import { Button, LoadingSkeleton, ProjectionChart } from "@/components";
-import { Card, Stack, Text } from "@/elements";
+import { LoadingSkeleton, ProjectionChart } from "@/components";
+import { Card } from "@/elements";
 import { formatProjectionMonthLabel } from "@/lib/projection_month";
 import { i18n } from "@/model/i18n";
 
@@ -11,9 +13,9 @@ const projectionChartCache = {
   entries: new Map<string, ProjectionChartPayload>(),
 };
 
-type ProjectionChartSectionProps = {
+interface ProjectionChartSectionProps {
   monthKey: string;
-};
+}
 
 function ProjectionChartSkeleton(): React.ReactElement {
   return <LoadingSkeleton width="100%" height={320} radius={24} />;
@@ -48,14 +50,11 @@ export function ProjectionChartSection({
       icon="projection"
     >
       {hasError && !data ? (
-        <Stack gap={12} align="flex-start">
-          <Text color="secondary">
-            {i18n.t("projection_page.chart_load_failed")}
-          </Text>
-          <Button variant="secondary" size="sm" onClick={retry}>
-            {i18n.t("common.retry")}
-          </Button>
-        </Stack>
+        <SectionError
+          message={i18n.t("projection_page.chart_load_failed")}
+          retryLabel={i18n.t("common.retry")}
+          onRetry={retry}
+        />
       ) : isLoading && !data ? (
         <ProjectionChartSkeleton />
       ) : (

@@ -1,6 +1,8 @@
-import React from "react";
+"use client";
+
+import "@/components/input/input.scss";
 import { Stack, Text } from "@/elements";
-import "./input.scss";
+import React, { useId } from "react";
 
 export interface InputProps {
   type?: "text" | "number" | "date" | "month" | "email";
@@ -49,6 +51,9 @@ export function Input({
   hasTrailingControl = false,
   fullWidth = false,
 }: InputProps): React.ReactElement {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+
   const classes = [
     "input",
     `input--size-${size}`,
@@ -63,11 +68,10 @@ export function Input({
     <div className={classes}>
       <Stack gap={4}>
         {label && (
-          <label htmlFor={id} className="input__label">
+          <label htmlFor={inputId} className="input__label">
             <Text
-              as="span"
-              size="sm"
-              weight="medium"
+              element="span"
+              type="caption-medium"
               color={labelTone === "secondary" ? "secondary" : "primary"}
             >
               {label}
@@ -76,7 +80,7 @@ export function Input({
           </label>
         )}
         <input
-          id={id}
+          id={inputId}
           name={name}
           type={type}
           value={value}

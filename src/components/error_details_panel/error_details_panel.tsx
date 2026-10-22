@@ -1,15 +1,15 @@
 "use client";
 
-import "./error_details_panel.scss";
+import "@/components/error_details_panel/error_details_panel.scss";
 
 import React, { useId, useState } from "react";
 
 import { Button } from "@/components/button/button";
 
-type ErrorDetailsPanelProps = {
+interface ErrorDetailsPanelProps {
   label: string;
   content: string;
-};
+}
 
 export function ErrorDetailsPanel({
   label,

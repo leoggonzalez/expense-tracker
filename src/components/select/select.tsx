@@ -1,9 +1,11 @@
-import React from "react";
+"use client";
+
+import React, { useId } from "react";
 
 import { LoadingSkeleton } from "@/components/loading_skeleton/loading_skeleton";
 import { Icon, Stack, Text } from "@/elements";
 
-import "./select.scss";
+import "@/components/select/select.scss";
 
 export interface SelectOption {
   value: string;
@@ -11,6 +13,7 @@ export interface SelectOption {
 }
 
 export interface SelectProps {
+  id?: string;
   value: string;
   onChange: (value: string) => void;
   options: SelectOption[];
@@ -25,6 +28,7 @@ export interface SelectProps {
 }
 
 export function Select({
+  id,
   value,
   onChange,
   options,
@@ -37,6 +41,9 @@ export function Select({
   surface = "default",
   labelTone = "primary",
 }: SelectProps): React.ReactElement {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+
   const classes = [
     "select",
     `select--size-${size}`,
@@ -49,11 +56,10 @@ export function Select({
     <div className={classes}>
       <Stack gap={4}>
         {label && (
-          <label className="select__label">
+          <label htmlFor={inputId} className="select__label">
             <Text
-              as="span"
-              size="sm"
-              weight="medium"
+              element="span"
+              type="caption-medium"
               color={labelTone === "secondary" ? "secondary" : "primary"}
             >
               {label}
@@ -69,6 +75,7 @@ export function Select({
           ) : (
             <>
               <select
+                id={inputId}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 required={required}
@@ -96,7 +103,7 @@ export function Select({
           )}
           {isLoading ? (
             <div className="select__loading-label">
-              <Text as="span" size="xs" color="secondary">
+              <Text element="span" type="fine" color="secondary">
                 {placeholder}
               </Text>
             </div>

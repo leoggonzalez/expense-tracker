@@ -3,14 +3,14 @@
 import { deleteTransaction } from "@/actions/transactions";
 import { ConfirmDialog } from "@/components/confirm_dialog/confirm_dialog";
 import { useNavigationProgress } from "@/components/navigation_progress_provider/navigation_progress_provider";
-import React, { useState } from "react";
 import { i18n } from "@/model/i18n";
+import React, { useState } from "react";
 
-type DeleteTransactionDialogProps = {
+interface DeleteTransactionDialogProps {
   transactionId: string;
   isOpen: boolean;
   closeHref: string;
-};
+}
 
 export function DeleteTransactionDialog({
   transactionId,

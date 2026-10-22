@@ -1,13 +1,21 @@
 "use client";
 
-import "./transaction_form.scss";
+import "@/components/transaction_form/transaction_form.scss";
 
-import { SpaceField, Button, Input, MonthSelector, Select } from "@/components";
 import {
   CreateTransactionInput,
   createTransaction,
   updateTransaction,
 } from "@/actions/transactions";
+import { Button, Input, MonthSelector, Select, SpaceField } from "@/components";
+import { Icon, Stack, Text } from "@/elements";
+import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
+import {
+  clearNewTransactionDraft,
+  loadNewTransactionDraft,
+  saveNewTransactionDraft,
+  setNewTransactionFlowActive,
+} from "@/lib/new_transaction_draft";
 import {
   TransactionScheduleMode,
   deriveScheduleFromDates,
@@ -16,21 +24,13 @@ import {
   resolveEndDate,
   toDate,
 } from "@/lib/transaction_schedule";
-import { Icon, Stack, Text } from "@/elements";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  clearNewTransactionDraft,
-  loadNewTransactionDraft,
-  saveNewTransactionDraft,
-  setNewTransactionFlowActive,
-} from "@/lib/new_transaction_draft";
-import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 
-import { format } from "date-fns";
+import { useToast } from "@/components/toast_provider/toast_provider";
 import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
+import { format } from "date-fns";
 import { useForm } from "react-use-form-library";
-import { useToast } from "@/components/toast_provider/toast_provider";
 
 export interface TransactionFormProps {
   spaces?: Array<{
@@ -512,11 +512,11 @@ export function TransactionForm({
         />
 
         <Stack gap={4}>
-          <Text size="sm" weight="medium" color="secondary">
+          <Text element="p" type="caption-medium" color="secondary">
             {i18n.t("transaction_form.schedule_label")}
           </Text>
 
-          <Stack direction="row" wrap gap={12}>
+          <Stack line wrap gap={12}>
             {(
               [
                 {
@@ -583,7 +583,7 @@ export function TransactionForm({
             />
 
             {formattedEndDate && (
-              <Text size="sm" color="secondary">
+              <Text element="p" type="caption" color="secondary">
                 {i18n.t("transaction_form.calculated_end_date", {
                   endDate: formattedEndDate,
                 })}

@@ -1,11 +1,11 @@
-import "./transaction_card.scss";
+import "@/components/transaction_card/transaction_card.scss";
 
 import React from "react";
 
 import { Avatar, Currency } from "@/components";
 import { Box, Stack, Text } from "@/elements";
-import { format } from "date-fns";
 import { i18n } from "@/model/i18n";
+import { format } from "date-fns";
 
 export type TransactionCardItem = {
   id: string;
@@ -19,9 +19,9 @@ export type TransactionCardItem = {
   transferSpaceName?: string | null;
 };
 
-type TransactionCardProps = {
+interface TransactionCardProps {
   transaction: TransactionCardItem;
-};
+}
 
 function getTransferDirectionLabel(
   transaction: TransactionCardItem,
@@ -71,10 +71,10 @@ export function TransactionCard({
     <div className="transaction-card">
       <Box
         padding={{
-          paddingTop: 16,
-          paddingRight: 16,
-          paddingBottom: 16,
-          paddingLeft: 16,
+          top: 16,
+          right: 16,
+          bottom: 16,
+          left: 16,
         }}
       >
         <div className="transaction-card__layout">
@@ -84,26 +84,26 @@ export function TransactionCard({
           <div className="transaction-card__details">
             <Stack gap={4}>
               <div className="transaction-card__detail-line">
-                <Text size="sm" weight="semibold">
+                <Text element="p" type="caption-semibold">
                   {transaction.description}
                 </Text>
               </div>
               {transferDirectionLabel ? (
                 <div className="transaction-card__detail-line">
-                  <Text size="xs" color="secondary">
+                  <Text element="p" type="fine" color="secondary">
                     {transferDirectionLabel}
                   </Text>
                 </div>
               ) : null}
               <div className="transaction-card__detail-line">
-                <Text size="xs" color="secondary">
+                <Text element="p" type="fine" color="secondary">
                   {formatDateLine(transaction.beginDate, transaction.endDate)}
                 </Text>
               </div>
             </Stack>
           </div>
           <div className="transaction-card__amount">
-            <Currency value={transaction.amount} size="sm" weight="bold" />
+            <Currency value={transaction.amount} type="caption-bold" />
           </div>
         </div>
       </Box>

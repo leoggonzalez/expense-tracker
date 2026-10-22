@@ -1,12 +1,12 @@
+import { NewTransferFormSection } from "@/app/(protected)/transactions/new/new_transfer_form_section";
 import {
   Container,
+  Hero,
   TransactionCreationIntro,
   TransactionTypeTabs,
-  Hero,
 } from "@/components";
-import { NewTransferFormSection } from "@/app/(protected)/transactions/new/new_transfer_form_section";
-import { sanitizeAmountInput } from "@/lib/amount";
 import { Stack } from "@/elements";
+import { sanitizeAmountInput } from "@/lib/amount";
 import { i18n } from "@/model/i18n";
 
 type TransferPageSearchParams = Promise<{
@@ -16,9 +16,9 @@ type TransferPageSearchParams = Promise<{
   amount?: string;
 }>;
 
-type TransferPageProps = {
+interface TransferPageProps {
   searchParams: TransferPageSearchParams;
-};
+}
 
 export default async function Page({
   searchParams,

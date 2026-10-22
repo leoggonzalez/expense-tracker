@@ -1,6 +1,6 @@
 "use client";
 
-import "./transactions_table.scss";
+import "@/components/transactions_table/transactions_table.scss";
 
 import { Avatar, Currency, useNavigationProgress } from "@/components";
 import { format } from "date-fns";
@@ -19,9 +19,9 @@ export type TransactionsTableItem = {
   endDate: string | null;
 };
 
-type TransactionsTableProps = {
+interface TransactionsTableProps {
   transactions: TransactionsTableItem[];
-};
+}
 
 export function TransactionsTable({
   transactions,
@@ -32,7 +32,7 @@ export function TransactionsTable({
     return (
       <div className="transactions-table__empty">
         <Card padding={32} variant="dashed">
-          <Text color="secondary">
+          <Text element="p" color="secondary">
             {i18n.t("transactions_page.empty_state")}
           </Text>
         </Card>
@@ -69,16 +69,16 @@ export function TransactionsTable({
             </div>
             <div className="transactions-table__details">
               <Stack gap={4}>
-                <Text size="sm" weight="semibold">
+                <Text element="p" type="caption-semibold">
                   {transaction.description}
                 </Text>
-                <Text size="xs" color="secondary">
+                <Text element="p" type="fine" color="secondary">
                   {formatTransactionDate(transaction.beginDate)}
                 </Text>
               </Stack>
             </div>
             <div className="transactions-table__amount">
-              <Currency value={transaction.amount} size="sm" weight="bold" />
+              <Currency value={transaction.amount} type="caption-bold" />
             </div>
           </div>
         ))}

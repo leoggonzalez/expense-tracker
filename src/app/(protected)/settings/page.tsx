@@ -13,7 +13,7 @@ export default function Page(): React.ReactElement {
           title={String(i18n.t("settings_page.title"))}
           pattern="settings"
         >
-          <Text as="p" size="sm" color="hero-muted">
+          <Text element="p" type="caption" color="hero-muted">
             {i18n.t("settings_page.subtitle")}
           </Text>
         </Hero>

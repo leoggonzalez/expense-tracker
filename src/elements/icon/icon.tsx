@@ -1,8 +1,8 @@
 import React from "react";
 
+import "@/elements/icon/icon.scss";
 import type { IconName } from "@/elements/icon/icon_assets";
 import { iconAssets } from "@/elements/icon/icon_assets";
-import "./icon.scss";
 
 type IconSize = number | { width: number; height: number };
 

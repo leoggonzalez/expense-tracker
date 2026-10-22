@@ -1,24 +1,26 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { NewTransferSpacesPayload } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
-import { Button, LoadingSkeleton, PagePanel, TransferForm } from "@/components";
-import { Stack, Text } from "@/elements";
-import { format } from "date-fns";
+import { LoadingSkeleton, PagePanel, TransferForm } from "@/components";
+import { Stack } from "@/elements";
 import { i18n } from "@/model/i18n";
+import { format } from "date-fns";
 
 const newTransferSpacesCache = {
   entries: new Map<string, NewTransferSpacesPayload>(),
 };
 
-type NewTransferFormSectionProps = {
+interface NewTransferFormSectionProps {
   initialValues: {
     fromSpaceId: string;
     toSpaceId: string;
     description: string;
     amount: string;
   };
-};
+}
 
 function NewTransferFormSkeleton(): React.ReactElement {
   return (
@@ -45,14 +47,11 @@ export function NewTransferFormSection({
   if (hasError && !data) {
     return (
       <PagePanel tone="form">
-        <Stack gap={12} align="flex-start">
-          <Text color="secondary">
-            {i18n.t("new_transaction_page.transfer_form_load_failed")}
-          </Text>
-          <Button variant="secondary" size="sm" onClick={retry}>
-            {i18n.t("common.retry")}
-          </Button>
-        </Stack>
+        <SectionError
+          message={i18n.t("new_transaction_page.transfer_form_load_failed")}
+          retryLabel={i18n.t("common.retry")}
+          onRetry={retry}
+        />
       </PagePanel>
     );
   }

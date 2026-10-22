@@ -1,0 +1,7 @@
+.detail-row {
+  border-bottom: var(--border-width) solid var(--color-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}

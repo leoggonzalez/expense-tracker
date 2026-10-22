@@ -3,11 +3,11 @@ import { Container, Hero } from "@/components";
 import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
-type SpaceEditPageProps = {
+interface SpaceEditPageProps {
   params: Promise<{
     id: string;
   }>;
-};
+}
 
 export default async function Page({
   params,
@@ -22,7 +22,7 @@ export default async function Page({
           title={String(i18n.t("spaces_page.edit_space"))}
           pattern="space_form"
         >
-          <Text as="p" size="sm" color="hero-muted">
+          <Text element="p" type="caption" color="hero-muted">
             {i18n.t("spaces_page.edit_space_hint")}
           </Text>
         </Hero>

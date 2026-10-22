@@ -1,5 +1,7 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import { setSpaceMainStatus, type SpaceDetailPayload } from "@/actions/spaces";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
@@ -27,7 +29,7 @@ const spaceDetailCache = {
   entries: new Map<string, SpaceDetailPayload>(),
 };
 
-type SpaceDetailSectionProps = {
+interface SpaceDetailSectionProps {
   id: string;
   currentMonthKey: string;
   currentMonthLabel: string;
@@ -36,7 +38,7 @@ type SpaceDetailSectionProps = {
   page: number;
   isArchiveDialogOpen: boolean;
   isUnarchiveDialogOpen: boolean;
-};
+}
 
 function SpaceDetailSkeleton({
   id,
@@ -56,18 +58,13 @@ function SpaceDetailSkeleton({
             <HeroMetrics columns={2}>
               <HeroMetric>
                 <Stack gap={16}>
-                  <Text size="sm" color="hero">
+                  <Text element="p" type="caption" color="hero">
                     {i18n.t("spaces_page.month_total_label", {
                       month: currentMonthLabel,
                     })}
                   </Text>
                   <LoadingSkeleton width="140px" height={38} radius={14} />
-                  <Stack
-                    direction="row"
-                    align="center"
-                    justify="space-between"
-                    gap={12}
-                  >
+                  <Stack line align="center" justify="space-between" gap={12}>
                     <Button
                       href={`/spaces/${id}?currentMonth=${previousMonthKey}`}
                       variant="outline"
@@ -75,7 +72,7 @@ function SpaceDetailSkeleton({
                     >
                       <Icon name="chevron-left" size={18} />
                     </Button>
-                    <Text size="sm" color="hero" weight="medium">
+                    <Text element="p" type="caption-medium" color="hero">
                       {currentMonthLabel}
                     </Text>
                     <Button
@@ -89,7 +86,7 @@ function SpaceDetailSkeleton({
                 </Stack>
               </HeroMetric>
               <HeroMetric tone="soft">
-                <Text size="sm" color="hero">
+                <Text element="p" type="caption" color="hero">
                   {i18n.t("spaces_page.historical_total")}
                 </Text>
                 <LoadingSkeleton width="140px" height={38} radius={14} />
@@ -164,14 +161,11 @@ export function SpaceDetailSection({
     return (
       <Container>
         <Card padding={24}>
-          <Stack gap={12} align="flex-start">
-            <Text color="secondary">
-              {i18n.t("spaces_page.detail_load_failed")}
-            </Text>
-            <Button variant="secondary" size="sm" onClick={retry}>
-              {i18n.t("common.retry")}
-            </Button>
-          </Stack>
+          <SectionError
+            message={i18n.t("spaces_page.detail_load_failed")}
+            retryLabel={i18n.t("common.retry")}
+            onRetry={retry}
+          />
         </Card>
       </Container>
     );
@@ -182,7 +176,7 @@ export function SpaceDetailSection({
       <Container>
         <Stack gap={24}>
           <Card padding={24}>
-            <Text color="secondary">
+            <Text element="p" color="secondary">
               {i18n.t("space_detail_page.not_found")}
             </Text>
           </Card>
@@ -337,7 +331,7 @@ export function SpaceDetailSection({
           actions={heroActions}
         >
           <Stack gap={24}>
-            <Text as="p" size="sm" color="hero-muted">
+            <Text element="p" type="caption" color="hero-muted">
               {i18n.t("spaces_page.detail_hero_subtitle", {
                 month: currentMonthLabel,
               })}
@@ -346,23 +340,17 @@ export function SpaceDetailSection({
             <HeroMetrics columns={2}>
               <HeroMetric>
                 <Stack gap={16}>
-                  <Text size="sm" color="hero">
+                  <Text element="p" type="caption" color="hero">
                     {i18n.t("spaces_page.month_total_label", {
                       month: currentMonthLabel,
                     })}
                   </Text>
                   <Currency
                     value={currentData.space.selectedMonthTotal}
-                    size="h3"
-                    weight="bold"
+                    type="h3-bold"
                     color="hero"
                   />
-                  <Stack
-                    direction="row"
-                    align="center"
-                    justify="space-between"
-                    gap={12}
-                  >
+                  <Stack line align="center" justify="space-between" gap={12}>
                     <Button
                       href={`/spaces/${currentData.space.id}?currentMonth=${previousMonthKey}`}
                       variant="outline"
@@ -370,7 +358,7 @@ export function SpaceDetailSection({
                     >
                       <Icon name="chevron-left" size={18} />
                     </Button>
-                    <Text size="sm" color="hero" weight="medium">
+                    <Text element="p" type="caption-medium" color="hero">
                       {currentMonthLabel}
                     </Text>
                     <Button
@@ -384,13 +372,12 @@ export function SpaceDetailSection({
                 </Stack>
               </HeroMetric>
               <HeroMetric tone="soft">
-                <Text size="sm" color="hero">
+                <Text element="p" type="caption" color="hero">
                   {i18n.t("spaces_page.historical_total")}
                 </Text>
                 <Currency
                   value={currentData.space.historicalTotal}
-                  size="h3"
-                  weight="bold"
+                  type="h3-bold"
                   color="hero"
                 />
               </HeroMetric>
@@ -409,18 +396,12 @@ export function SpaceDetailSection({
         {currentData.space.isArchived ? (
           <Card padding={24}>
             <Stack gap={18}>
-              <Stack
-                direction="column"
-                desktopDirection="row"
-                align="flex-start"
-                justify="space-between"
-                gap={16}
-              >
+              <Stack lineDesktop align="start" justify="space-between" gap={16}>
                 <Stack gap={8}>
-                  <Text size="sm" weight="semibold" color="warning">
+                  <Text element="p" type="caption-semibold" color="warning">
                     {i18n.t("spaces_page.archived_badge")}
                   </Text>
-                  <Text size="sm" color="secondary">
+                  <Text element="p" type="caption" color="secondary">
                     {i18n.t("spaces_page.archived_space_hint")}
                   </Text>
                 </Stack>
@@ -442,7 +423,7 @@ export function SpaceDetailSection({
                   disabled={isUpdatingMain}
                   variant="switch"
                 />
-                <Text size="sm" color="secondary">
+                <Text element="p" type="caption" color="secondary">
                   {i18n.t("space_detail_page.main_toggle_description")}
                 </Text>
               </Stack>
@@ -450,24 +431,24 @@ export function SpaceDetailSection({
               <DetailList>
                 <DetailRow
                   label={
-                    <Text size="sm" color="secondary">
+                    <Text element="p" type="caption" color="secondary">
                       {i18n.t("space_detail_page.account_detail_main")}
                     </Text>
                   }
                   value={
-                    <Text size="sm" weight="semibold">
+                    <Text element="p" type="caption-semibold">
                       {getMainStatusLabel(currentData.space)}
                     </Text>
                   }
                 />
                 <DetailRow
                   label={
-                    <Text size="sm" color="secondary">
+                    <Text element="p" type="caption" color="secondary">
                       {i18n.t("space_detail_page.account_detail_type")}
                     </Text>
                   }
                   value={
-                    <Text size="sm" weight="semibold">
+                    <Text element="p" type="caption-semibold">
                       {getAccountTypeLabel(currentData.space)}
                     </Text>
                   }
@@ -475,12 +456,12 @@ export function SpaceDetailSection({
                 {currentData.space.type === "credit_card" ? (
                   <DetailRow
                     label={
-                      <Text size="sm" color="secondary">
+                      <Text element="p" type="caption" color="secondary">
                         {i18n.t("space_detail_page.account_detail_settle")}
                       </Text>
                     }
                     value={
-                      <Text size="sm" weight="semibold">
+                      <Text element="p" type="caption-semibold">
                         {getCreditCardSettleLabel(currentData.space)}
                       </Text>
                     }
@@ -513,8 +494,7 @@ export function SpaceDetailSection({
                 value: (
                   <Currency
                     value={currentData.space.selectedMonthTotal}
-                    size="sm"
-                    weight="bold"
+                    type="caption-bold"
                   />
                 ),
                 tone: "emphasis",

@@ -1,15 +1,16 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { DashboardHeaderPayload } from "@/actions/transactions";
+import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
   AppLink,
-  Button,
   Hero,
   HeroMetric,
   HeroMetrics,
   LoadingSkeleton,
 } from "@/components";
-import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import { Stack, Text } from "@/elements";
 import { formatCurrency } from "@/lib/utils";
 import { i18n } from "@/model/i18n";
@@ -56,37 +57,35 @@ export function DashboardHeader(): React.ReactElement {
       <Stack gap={24}>
         <Stack gap={10}>
           {data ? (
-            <Text as="h1" size="h1" color="hero" weight="bold">
+            <Text element="h1" type="h1-bold" color="hero">
               {formatCurrency(data.totals.net)}
             </Text>
           ) : (
             <LoadingSkeleton width="240px" height={58} radius={18} />
           )}
 
-          <Text as="p" size="sm" color="hero-muted">
+          <Text element="p" type="caption" color="hero-muted">
             {i18n.t("dashboard.hero_caption")}
           </Text>
         </Stack>
 
         {hasError && !data ? (
-          <Stack gap={12} align="flex-start">
-            <Text size="sm" color="hero-muted">
-              {i18n.t("dashboard.header_load_failed")}
-            </Text>
-            <Button variant="outline" size="sm" onClick={retry}>
-              {i18n.t("common.retry")}
-            </Button>
-          </Stack>
+          <SectionError
+            tone="inverse"
+            message={i18n.t("dashboard.header_load_failed")}
+            retryLabel={i18n.t("common.retry")}
+            onRetry={retry}
+          />
         ) : (
           <HeroMetrics columns={2}>
             <AppLink href={getCurrentMonthQuery(data, "income")}>
               <HeroMetric>
                 <>
-                  <Text as="span" size="xs" color="hero" weight="medium">
+                  <Text element="span" type="fine-medium" color="hero">
                     {i18n.t("dashboard.income")}
                   </Text>
                   {data ? (
-                    <Text as="span" size="lg" color="hero" weight="semibold">
+                    <Text element="span" type="lead-semibold" color="hero">
                       {formatCurrency(data.totals.income)}
                     </Text>
                   ) : (
@@ -99,11 +98,11 @@ export function DashboardHeader(): React.ReactElement {
             <AppLink href={getCurrentMonthQuery(data, "expense")}>
               <HeroMetric tone="soft">
                 <>
-                  <Text as="span" size="xs" color="hero" weight="medium">
+                  <Text element="span" type="fine-medium" color="hero">
                     {i18n.t("dashboard.expenses")}
                   </Text>
                   {data ? (
-                    <Text as="span" size="lg" color="hero" weight="semibold">
+                    <Text element="span" type="lead-semibold" color="hero">
                       {formatCurrency(Math.abs(data.totals.expense))}
                     </Text>
                   ) : (

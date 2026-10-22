@@ -1,12 +1,14 @@
 "use client";
 
-import "./bulk_transaction_form.scss";
+import "@/components/bulk_transaction_form/bulk_transaction_form.scss";
 
-import { SpaceField, Button, Input, MonthSelector, Select } from "@/components";
 import {
   CreateTransactionInput,
   createMultipleTransactions,
 } from "@/actions/transactions";
+import { Button, Input, MonthSelector, Select, SpaceField } from "@/components";
+import { Stack, Text } from "@/elements";
+import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import {
   TransactionScheduleMode,
   inferTransactionDateMode,
@@ -14,13 +16,11 @@ import {
   toDate,
 } from "@/lib/transaction_schedule";
 import React, { useMemo, useRef, useState } from "react";
-import { Stack, Text } from "@/elements";
-import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 
-import { format } from "date-fns";
+import { useToast } from "@/components/toast_provider/toast_provider";
 import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
-import { useToast } from "@/components/toast_provider/toast_provider";
+import { format } from "date-fns";
 
 interface BulkTransactionItem {
   id: string;
@@ -235,7 +235,7 @@ export function BulkTransactionForm({
   return (
     <form onSubmit={onSubmit} className="bulk-transaction-form">
       <Stack gap={24}>
-        <Text size="h4" weight="semibold">
+        <Text element="p" type="h4-semibold">
           {i18n.t("bulk_transaction_form.title")}
         </Text>
 
@@ -258,11 +258,11 @@ export function BulkTransactionForm({
           />
 
           <Stack gap={4}>
-            <Text size="sm" weight="medium" color="secondary">
+            <Text element="p" type="caption-medium" color="secondary">
               {i18n.t("transaction_form.schedule_label")}
             </Text>
 
-            <Stack direction="row" wrap gap={12}>
+            <Stack line wrap gap={12}>
               {(
                 [
                   {
@@ -344,7 +344,7 @@ export function BulkTransactionForm({
               />
 
               {formattedEndDate && (
-                <Text size="sm" color="secondary">
+                <Text element="p" type="caption" color="secondary">
                   {i18n.t("transaction_form.calculated_end_date", {
                     endDate: formattedEndDate,
                   })}
@@ -355,20 +355,20 @@ export function BulkTransactionForm({
         </Stack>
 
         <div className="bulk-transaction-form__transactions">
-          <Text size="sm" weight="semibold" color="secondary">
+          <Text element="p" type="caption-semibold" color="secondary">
             {i18n.t("bulk_transaction_form.transactions")}
           </Text>
           <Stack gap={12}>
             {transactions.map((transaction) => (
               <Stack
-                direction="row"
+                line
                 wrap
                 gap={12}
                 align="center"
                 justify="space-between"
                 key={transaction.id}
               >
-                <Stack direction="row" wrap gap={12} align="center">
+                <Stack line wrap gap={12} align="center">
                   <Select
                     value={transaction.type}
                     onChange={(value) =>

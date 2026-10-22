@@ -1,5 +1,7 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type { ProjectionSpacesPayload } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
@@ -15,9 +17,9 @@ const projectionSpacesCache = {
   entries: new Map<string, ProjectionSpacesPayload>(),
 };
 
-type ProjectionSpacesProps = {
+interface ProjectionSpacesProps {
   monthKey: string;
-};
+}
 
 function ProjectionSpaceCardSkeleton(): React.ReactElement {
   return (
@@ -46,19 +48,16 @@ export function ProjectionSpaces({
 
   return (
     <Stack gap={16}>
-      <Text size="h4" as="h3" weight="semibold">
+      <Text type="h4-semibold" element="h3">
         {i18n.t("projection_page.spaces_with_transactions")}
       </Text>
 
       {hasError && !data ? (
-        <Stack gap={12} align="flex-start">
-          <Text color="secondary">
-            {i18n.t("projection_page.spaces_load_failed")}
-          </Text>
-          <Button variant="secondary" size="sm" onClick={retry}>
-            {i18n.t("common.retry")}
-          </Button>
-        </Stack>
+        <SectionError
+          message={i18n.t("projection_page.spaces_load_failed")}
+          retryLabel={i18n.t("common.retry")}
+          onRetry={retry}
+        />
       ) : isLoading && !data ? (
         <Stack gap={24}>
           <ProjectionSpaceCardSkeleton />
@@ -66,7 +65,7 @@ export function ProjectionSpaces({
         </Stack>
       ) : data && data.focusedMonthSpaces.length === 0 ? (
         <Card padding={24} variant="dashed">
-          <Text color="secondary">
+          <Text element="p" color="secondary">
             {i18n.t("projection_page.empty_month_transactions")}
           </Text>
         </Card>
@@ -125,8 +124,7 @@ export function ProjectionSpaces({
                       value: (
                         <Currency
                           value={space.monthTotal}
-                          size="sm"
-                          weight="bold"
+                          type="caption-bold"
                         />
                       ),
                       tone: "emphasis",

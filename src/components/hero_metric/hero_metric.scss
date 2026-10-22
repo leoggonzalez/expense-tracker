@@ -1,0 +1,9 @@
+.hero-metric {
+  border-radius: 20px;
+  background-color: var(--color-hero-surface-12);
+  border: 1px solid var(--color-hero-surface-12);
+
+  &--soft {
+    background-color: var(--color-hero-surface-08);
+  }
+}

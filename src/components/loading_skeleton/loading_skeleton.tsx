@@ -1,12 +1,12 @@
-import "./loading_skeleton.scss";
+import "@/components/loading_skeleton/loading_skeleton.scss";
 
 import React from "react";
 
-type LoadingSkeletonProps = {
+interface LoadingSkeletonProps {
   width?: string;
   height?: number;
   radius?: number;
-};
+}
 
 export function LoadingSkeleton({
   width = "100%",

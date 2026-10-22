@@ -1,16 +1,13 @@
 "use client";
 
+import { SectionError } from "@/components/section_error/section_error";
+
 import type {
   DashboardRecentActivityPayload,
   DashboardTransactionItem,
 } from "@/actions/transactions";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
-import {
-  AppLink,
-  Button,
-  LoadingSkeleton,
-  TransactionList,
-} from "@/components";
+import { AppLink, LoadingSkeleton, TransactionList } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
@@ -39,14 +36,8 @@ function getRecentTransactionsHref(
 function RecentActivityRowSkeleton(): React.ReactElement {
   return (
     <Card padding={20}>
-      <Stack
-        direction="row"
-        align="center"
-        justify="space-between"
-        gap={16}
-        fullWidth
-      >
-        <Stack direction="row" align="center" gap={12}>
+      <Stack line align="center" justify="space-between" gap={16} fullWidth>
+        <Stack line align="center" gap={12}>
           <LoadingSkeleton width="40px" height={40} radius={999} />
           <Stack gap={8}>
             <LoadingSkeleton width="148px" height={20} radius={10} />
@@ -75,24 +66,21 @@ export function DashboardRecentActivity(): React.ReactElement {
       fullHeight
     >
       <Stack gap={20}>
-        <Text size="sm" color="secondary">
+        <Text element="p" type="caption" color="secondary">
           {i18n.t("dashboard.activity_subtitle")}
         </Text>
-        <Text as="div" size="sm" weight="medium">
+        <Text element="div" type="caption-medium">
           <AppLink href={getRecentTransactionsHref(data)}>
             {i18n.t("dashboard.recent_activity_link")}
           </AppLink>
         </Text>
 
         {hasError && !data ? (
-          <Stack gap={12} align="flex-start">
-            <Text color="secondary">
-              {i18n.t("dashboard.recent_activity_load_failed")}
-            </Text>
-            <Button variant="secondary" size="sm" onClick={retry}>
-              {i18n.t("common.retry")}
-            </Button>
-          </Stack>
+          <SectionError
+            message={i18n.t("dashboard.recent_activity_load_failed")}
+            retryLabel={i18n.t("common.retry")}
+            onRetry={retry}
+          />
         ) : isLoading && !data ? (
           <Stack gap={12}>
             <RecentActivityRowSkeleton />

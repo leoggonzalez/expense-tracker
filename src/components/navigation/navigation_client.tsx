@@ -1,6 +1,6 @@
 "use client";
 
-import "./navigation.scss";
+import "@/components/navigation/navigation.scss";
 
 import {
   AppLink,
@@ -13,16 +13,16 @@ import { Icon, Text } from "@/elements";
 import type { IconName } from "@/elements/icon/icon_assets";
 import { CurrentoLogo } from "@/lib/currento_logo";
 import { i18n } from "@/model/i18n";
-import React from "react";
 import { usePathname } from "next/navigation";
+import React from "react";
 
-type NavigationClientProps = {
+interface NavigationClientProps {
   isAuthenticated: boolean;
   currentUser: {
     email: string;
     name: string | null;
   } | null;
-};
+}
 
 type NavigationLink = {
   href: string;
@@ -171,10 +171,9 @@ export function NavigationClient({
             <div className="navigation__section">
               <span className="navigation__section-label">
                 <Text
-                  as="span"
-                  size="xs"
+                  element="span"
+                  type="fine-medium"
                   color="secondary"
-                  weight="medium"
                   transform="uppercase"
                 >
                   {i18n.t("navigation.primary_section")}
@@ -214,10 +213,9 @@ export function NavigationClient({
               <div className="navigation__section navigation__section--secondary">
                 <span className="navigation__section-label">
                   <Text
-                    as="span"
-                    size="xs"
+                    element="span"
+                    type="fine-medium"
                     color="secondary"
-                    weight="medium"
                     transform="uppercase"
                   >
                     {i18n.t("navigation.secondary_section")}
@@ -267,12 +265,12 @@ export function NavigationClient({
                   </span>
                   <span className="navigation__user-copy">
                     <span className="navigation__user-name">
-                      <Text as="span" size="sm" weight="semibold">
+                      <Text element="span" type="caption-semibold">
                         {displayName}
                       </Text>
                     </span>
                     <span className="navigation__user-email">
-                      <Text as="span" size="xs" color="secondary">
+                      <Text element="span" type="fine" color="secondary">
                         {currentUser.email}
                       </Text>
                     </span>

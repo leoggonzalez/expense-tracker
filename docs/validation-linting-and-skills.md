@@ -16,6 +16,7 @@ From `package.json`:
 - `yarn lint:eslint`: runs ESLint with custom local rules
 - `yarn lint:repo`: runs repository rule checks that go beyond ESLint
 - `yarn lint:types`: runs `tsc --noEmit`
+- `yarn test:components`: runs component-rule fixtures and primitive contract regression checks
 - `yarn review:page-primitives`: reviews wrapper-like page components
 - `yarn review:prefer-primitives`: reviews custom layout and typography that may be better expressed with primitives
 - `yarn format`: runs Prettier over app source and markdown in `src/`
@@ -31,7 +32,8 @@ Enforced rules:
 - `no-react-fc`: disallows `React.FC` and `FC`
 - `component-export-style`: prefers exported function declarations over arrow-function components
 - `component-return-type`: requires explicit `React.ReactElement` return types on exported components
-- `component-props-shape`: requires explicit named props types or interfaces
+- `component-props-shape`: requires component props to use an explicit local interface
+- `one_component_per_file`: prevents exporting multiple components from a component file while allowing hooks and re-export barrels
 - `no-inline-style-prop`: disallows inline `style` props outside approved primitive exceptions such as `Box`, `Grid`, `Stack`, `Card`, and shared loading primitives like `LoadingSkeleton`
 - `no-disallowed-component-props`: blocks `style` and `className` props on shared components and elements
 - `no-page-component-name`: blocks route-like wrapper components such as `*_page`
