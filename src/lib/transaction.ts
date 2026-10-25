@@ -9,10 +9,14 @@ import {
   startOfMonth,
 } from "date-fns";
 
+import { SpaceMember } from "@/lib/space_member";
+import { parseSplitParticipants } from "@/lib/transaction_split";
+
 import { prisma } from "@/lib/prisma";
 import { Space, type CreditCardSpaceRecord } from "@/lib/space";
 
 export type CreateTransactionInput = {
+  participantIds?: string[];
   type: "income" | "expense";
   spaceName: string;
   spaceId?: string;
@@ -31,6 +35,7 @@ export type CreateTransferInput = {
 };
 
 export type TransactionBaseData = {
+  splitParticipantIds?: string | null;
   type: string;
   spaceId: string;
   transferSpaceId: string | null;
@@ -53,7 +58,11 @@ export type TransactionCreateData = Pick<
   Partial<
     Pick<
       TransactionBaseData,
-      "transferSpaceId" | "endDate" | "createdAt" | "updatedAt"
+      | "transferSpaceId"
+      | "endDate"
+      | "createdAt"
+      | "updatedAt"
+      | "splitParticipantIds"
     >
   >;
 
@@ -263,6 +272,7 @@ export class Transaction {
   public async create(): Promise<Transaction> {
     const record = await prisma.transaction.create({
       data: {
+        splitParticipantIds: this.data.splitParticipantIds,
         type: this.data.type,
         spaceId: this.data.spaceId,
         transferSpaceId: this.data.transferSpaceId ?? null,
@@ -315,6 +325,7 @@ export class Transaction {
     }
 
     return {
+      splitParticipantIds: this.data.splitParticipantIds ?? null,
       id: this.data.id,
       type: this.data.type,
       spaceId: this.data.spaceId,
@@ -343,19 +354,27 @@ export class Transaction {
     if (!space || space.toRecord().isArchived) {
       throw new Error("space_not_found");
     }
-    const transaction = await prisma.transaction.create({
-      data: {
-        type: input.type,
-        spaceId: space.persistedId,
-        transferSpaceId: null,
-        description: input.description,
-        amount: input.amount,
-        beginDate: input.beginDate,
-        endDate: input.endDate || null,
-      },
-      include: transactionWithSpaceInclude,
+    const transaction = await prisma.$transaction(async (tx) => {
+      const splitParticipantIds = await SpaceMember.serializeParticipants(
+        tx,
+        userAccountId,
+        space.persistedId,
+        input.participantIds,
+      );
+      return tx.transaction.create({
+        data: {
+          splitParticipantIds,
+          type: input.type,
+          spaceId: space.persistedId,
+          transferSpaceId: null,
+          description: input.description,
+          amount: input.amount,
+          beginDate: input.beginDate,
+          endDate: input.endDate || null,
+        },
+        include: transactionWithSpaceInclude,
+      });
     });
-
     await Space.syncCurrentMonthTransactionCount(space.persistedId);
 
     return transaction;
@@ -1116,27 +1135,47 @@ export class Transaction {
       throw new Error("failed_to_update_transaction");
     }
 
-    let spaceId: string | undefined;
-
-    if (input.spaceName) {
-      const space = await Space.findOrCreateActive(
-        userAccountId,
-        input.spaceName,
-      );
+    let spaceId = existingTransaction.data.spaceId;
+    if (input.spaceId || input.spaceName) {
+      const space = input.spaceId
+        ? await Space.findOwnedById(userAccountId, input.spaceId)
+        : await Space.findOrCreateActive(userAccountId, input.spaceName!);
+      if (!space || space.toRecord().isArchived)
+        throw new Error("space_not_found");
       spaceId = space.persistedId;
     }
-
-    const updatedTransaction = await prisma.transaction.update({
-      where: { id },
-      data: {
-        ...(input.type && { type: input.type }),
-        ...(spaceId && { spaceId }),
-        ...(input.description && { description: input.description }),
-        ...(input.amount !== undefined && { amount: input.amount }),
-        ...(input.beginDate && { beginDate: input.beginDate }),
-        ...(input.endDate !== undefined && { endDate: input.endDate }),
-      },
-      include: transactionWithSpaceInclude,
+    const previous =
+      spaceId === existingTransaction.data.spaceId
+        ? (existingTransaction.data.splitParticipantIds ?? null)
+        : null;
+    const selected =
+      input.participantIds ??
+      (spaceId === existingTransaction.data.spaceId && previous
+        ? parseSplitParticipants(previous)
+        : undefined);
+    const updatedTransaction = await prisma.$transaction(async (tx) => {
+      const splitParticipantIds = existingTransaction.data.transferSpaceId
+        ? null
+        : await SpaceMember.serializeParticipants(
+            tx,
+            userAccountId,
+            spaceId,
+            selected,
+            previous,
+          );
+      return tx.transaction.update({
+        where: { id },
+        data: {
+          splitParticipantIds,
+          ...(input.type && { type: input.type }),
+          spaceId,
+          ...(input.description && { description: input.description }),
+          ...(input.amount !== undefined && { amount: input.amount }),
+          ...(input.beginDate && { beginDate: input.beginDate }),
+          ...(input.endDate !== undefined && { endDate: input.endDate }),
+        },
+        include: transactionWithSpaceInclude,
+      });
     });
 
     await Space.syncCurrentMonthTransactionCounts([

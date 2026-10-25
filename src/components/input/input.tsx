@@ -10,6 +10,7 @@ export interface InputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   label?: React.ReactNode;
+  ariaLabel?: string;
   required?: boolean;
   min?: string | number;
   max?: string | number;
@@ -34,6 +35,7 @@ export function Input({
   onChange,
   placeholder,
   label,
+  ariaLabel,
   required = false,
   min,
   max,
@@ -82,6 +84,7 @@ export function Input({
         <input
           id={inputId}
           name={name}
+          aria-label={ariaLabel}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}

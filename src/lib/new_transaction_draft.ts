@@ -1,6 +1,7 @@
 import { PersistedValue } from "@/lib/persisted_value";
 
 export type NewTransactionDraft = {
+  participantIds?: string[];
   spaceName: string;
   description: string;
   amountInput: string;

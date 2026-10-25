@@ -6,6 +6,12 @@ import { endOfMonth, format, startOfMonth } from "date-fns";
 import { revalidateSpaceMutationPages } from "@/lib/app_revalidation";
 import { normalizeTransactionAmount } from "@/lib/amount";
 import { isPrismaErrorWithCode } from "@/lib/prisma_errors";
+import { SpaceMember } from "@/lib/space_member";
+import type {
+  MemberInput,
+  MemberMonthTotal,
+  SplitMember,
+} from "@/lib/transaction_split";
 import { Space, type SpaceTransactionRecord } from "@/lib/space";
 import { requireCurrentUserAccount } from "@/lib/session";
 
@@ -54,6 +60,7 @@ export type SpaceDetailPageData = {
     label: string;
   };
   space: {
+    members: SplitMember[];
     id: string;
     name: string;
     main: boolean | null;
@@ -65,6 +72,7 @@ export type SpaceDetailPageData = {
     historicalTotal: number;
     selectedMonthTotal: number;
   };
+  memberTotals: MemberMonthTotal[];
   selectedMonthRelevantTransactions: SpaceDetailTransaction[];
   allTransactions: SpaceDetailTransaction[];
   pagination: {
@@ -76,6 +84,7 @@ export type SpaceDetailPageData = {
 };
 
 export type SpaceEditData = {
+  members: SplitMember[];
   id: string;
   name: string;
   main: boolean | null;
@@ -206,6 +215,7 @@ export async function createSpace(input: {
   type?: SpaceTypeInput;
   paymentDueDay?: number | null;
   paymentTiming?: CreditCardPaymentTimingInput;
+  members?: MemberInput[];
   periodEndDay?: number | null;
 }): Promise<SpaceActionResult> {
   const currentUser = await requireCurrentUserAccount();
@@ -233,7 +243,7 @@ export async function createSpace(input: {
       paymentDueDay: type === SpaceType.credit_card ? paymentDueDay : null,
       paymentTiming: null,
       periodEndDay: type === SpaceType.credit_card ? periodEndDay : null,
-    }).create();
+    }).create(input.members);
 
     if (input.main) {
       await Space.setMainStatusForUser(
@@ -251,6 +261,11 @@ export async function createSpace(input: {
       return { success: false, error: "spaces_page.duplicate_name" };
     }
 
+    if (
+      error instanceof Error &&
+      error.message === "spaces_page.invalid_members"
+    )
+      return { success: false, error: error.message };
     console.error("Error creating space:", error);
     return { success: false, error: "spaces_page.create_failed" };
   }
@@ -320,13 +335,26 @@ export async function getSpaceDetailPayloadForUser(
     return null;
   }
 
+  const [memberTotals, members] = await Promise.all([
+    SpaceMember.getMonthTotalsForSpaces(
+      userAccountId,
+      [input.spaceId],
+      monthStart,
+      monthEnd,
+    ),
+    SpaceMember.listForSpaces(userAccountId, [input.spaceId]),
+  ]);
   return {
+    memberTotals: memberTotals[input.spaceId] || [],
     mainSpaceId: mainSpace?.toRecord().id || null,
     selectedMonth: {
       key: format(monthStart, "yyyy-MM"),
       label: format(monthStart, "MMMM yyyy"),
     },
     space: {
+      members: (members[input.spaceId] || []).filter(
+        (member) => !member.isRemoved,
+      ),
       id: detailData.metrics.id,
       name: detailData.metrics.name,
       main: detailData.metrics.main,
@@ -366,8 +394,10 @@ export async function getSpaceEditPayloadForUser(
   }
 
   const spaceRecord = space.toRecord();
+  const members = await SpaceMember.listForSpaces(userAccountId, [id]);
 
   return {
+    members: (members[id] || []).filter((member) => !member.isRemoved),
     id: spaceRecord.id,
     name: spaceRecord.name,
     main: spaceRecord.main,
@@ -453,6 +483,7 @@ export async function updateSpace(
     type?: SpaceTypeInput;
     paymentDueDay?: number | null;
     paymentTiming?: CreditCardPaymentTimingInput;
+    members?: MemberInput[];
     periodEndDay?: number | null;
   },
 ): Promise<SpaceActionResult> {
@@ -495,6 +526,7 @@ export async function updateSpace(
     const nextMain = input.main ?? space.toRecord().main;
 
     await space.updateDetails({
+      members: input.members,
       name,
       main: nextMain,
       type,
@@ -518,6 +550,11 @@ export async function updateSpace(
       return { success: false, error: "space_detail_page.duplicate_name" };
     }
 
+    if (
+      error instanceof Error &&
+      error.message === "spaces_page.invalid_members"
+    )
+      return { success: false, error: error.message };
     console.error("Error updating space:", error);
     return { success: false, error: "space_detail_page.update_failed" };
   }

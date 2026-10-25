@@ -9,6 +9,9 @@ import {
 } from "date-fns";
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
+import { SpaceMember } from "@/lib/space_member";
+import type { MemberMonthTotal, SplitMember } from "@/lib/transaction_split";
+
 import { normalizeTransactionAmount } from "@/lib/amount";
 import { formatProjectionMonthKey } from "@/lib/projection_month";
 import { Space, type SpaceRecord } from "@/lib/space";
@@ -134,6 +137,7 @@ export type ProjectionChartMonth = {
 };
 
 export type ProjectionFocusedSpace = {
+  memberTotals: MemberMonthTotal[];
   spaceId: string;
   spaceName: string;
   monthTotal: number;
@@ -194,7 +198,9 @@ export type NewTransactionRecentPayload = {
 };
 
 export type NewTransactionSpacesPayload = {
+  ownerId: string;
   spaces: Array<{
+    members: SplitMember[];
     id: string;
     name: string;
     main: boolean | null;
@@ -265,6 +271,7 @@ type TransferMutationResult =
     };
 
 type ProjectionFocusedSpaceAccumulator = {
+  memberTotals: MemberMonthTotal[];
   spaceId: string;
   spaceName: string;
   monthTotal: number;
@@ -443,6 +450,7 @@ function mapProjectionSpaces(
       {
         spaceId: space.spaceId,
         spaceName: space.spaceName,
+        memberTotals: [],
         monthTotal: Number(space.monthTotal || 0),
         monthTransactionCount: Number(space.monthTransactionCount || 0),
         transactions: [],
@@ -467,6 +475,7 @@ function mapProjectionSpaces(
     .map((space) => ({
       spaceId: space.spaceId,
       spaceName: space.spaceName,
+      memberTotals: space.memberTotals,
       monthTotal: space.monthTotal,
       monthTransactionCount: space.monthTransactionCount,
       transactions: space.transactions,
@@ -493,6 +502,11 @@ export async function createTransaction(
       return { success: false, error: "space_is_archived" };
     }
 
+    if (
+      error instanceof Error &&
+      error.message === "transaction_split.invalid_split"
+    )
+      return { success: false, error: "transaction_split.invalid_split" };
     console.error("Error creating transaction:", error);
     return { success: false, error: "failed_to_create_transaction" };
   }
@@ -670,6 +684,12 @@ export async function getProjectionSpacesPayloadForUser(
     focusedMonthStart,
   );
 
+  const memberTotals = await SpaceMember.getMonthTotalsForSpaces(
+    userAccountId,
+    projectionData.spaceSummaryRows.map((space) => space.spaceId),
+    projectionData.normalizedFocusedMonthStart,
+    endOfMonth(projectionData.normalizedFocusedMonthStart),
+  );
   return {
     focusedMonthKey: formatProjectionMonthKey(
       projectionData.normalizedFocusedMonthStart,
@@ -677,7 +697,10 @@ export async function getProjectionSpacesPayloadForUser(
     focusedMonthSpaces: mapProjectionSpaces(
       projectionData.spaceSummaryRows,
       projectionData.spaceTransactionsRows,
-    ),
+    ).map((space) => ({
+      ...space,
+      memberTotals: memberTotals[space.spaceId] || [],
+    })),
   };
 }
 
@@ -816,11 +839,17 @@ export async function getNewTransactionSpacesPayloadForUser(
 ): Promise<NewTransactionSpacesPayload> {
   const spaces = await Space.listActiveByUser(userAccountId);
 
+  const members = await SpaceMember.listForSpaces(
+    userAccountId,
+    spaces.map((space) => space.persistedId),
+  );
   return {
+    ownerId: userAccountId,
     spaces: spaces.map((space) => {
       const spaceRecord = space.toRecord();
 
       return {
+        members: members[spaceRecord.id] || [],
         id: spaceRecord.id,
         name: spaceRecord.name,
         main: spaceRecord.main,
@@ -931,6 +960,11 @@ export async function updateTransaction(
       return { success: false, error: error.message };
     }
 
+    if (
+      error instanceof Error &&
+      error.message === "transaction_split.invalid_split"
+    )
+      return { success: false, error: "transaction_split.invalid_split" };
     console.error("Error updating transaction:", error);
     return { success: false, error: "failed_to_update_transaction" };
   }

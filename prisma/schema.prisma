@@ -42,6 +42,7 @@ model Space {
   currentMonthTransactionCount Int @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  members SpaceMember[]
   transactions   Transaction[]
   transferTransactions Transaction[] @relation("TransactionTransferSpace")
 
@@ -56,6 +57,7 @@ model Transaction {
   space     Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   transferSpaceId String?
   transferSpace Space? @relation("TransactionTransferSpace", fields: [transferSpaceId], references: [id], onDelete: SetNull)
+  splitParticipantIds String?
   description String
   amount      Float
   beginDate   DateTime
@@ -93,4 +95,16 @@ model Session {
 
   @@index([userAccountId])
   @@index([expiresAt])
+}
+
+model SpaceMember {
+  id String @id @default(cuid())
+  spaceId String
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  name String
+  removedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([spaceId])
 }

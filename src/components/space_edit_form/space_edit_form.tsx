@@ -4,6 +4,12 @@ import "@/components/space_edit_form/space_edit_form.scss";
 
 import React, { useState } from "react";
 
+import {
+  SpaceMembersEditor,
+  type MemberDraft,
+} from "@/components/space_members_editor/space_members_editor";
+import type { MemberInput } from "@/lib/transaction_split";
+
 import type { SpaceTypeInput } from "@/actions/spaces";
 import { updateSpace } from "@/actions/spaces";
 import { Button, Input, Select, useNavigationProgress } from "@/components";
@@ -11,6 +17,7 @@ import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 interface SpaceEditFormProps {
+  initialMembers: MemberInput[];
   spaceId: string;
   initialName: string;
   initialType: SpaceTypeInput;
@@ -19,12 +26,16 @@ interface SpaceEditFormProps {
 }
 
 export function SpaceEditForm({
+  initialMembers,
   spaceId,
   initialName,
   initialType,
   initialPaymentDueDay,
   initialPeriodEndDay,
 }: SpaceEditFormProps): React.ReactElement {
+  const [members, setMembers] = useState<MemberDraft[]>(
+    initialMembers.map((member) => ({ ...member, key: member.id! })),
+  );
   const [name, setName] = useState(initialName);
   const [type, setType] = useState<SpaceTypeInput>(initialType);
   const [paymentDueDay, setPaymentDueDay] = useState(
@@ -49,6 +60,7 @@ export function SpaceEditForm({
     setSuccess(null);
 
     const result = await updateSpace(spaceId, {
+      members: members.map(({ id, name }) => ({ id, name })),
       name,
       type,
       paymentDueDay: isCreditCard ? Number(paymentDueDay) : null,
@@ -157,6 +169,12 @@ export function SpaceEditForm({
               </Text>
             </Stack>
           ) : null}
+
+          <SpaceMembersEditor
+            members={members}
+            onChange={setMembers}
+            disabled={isLoading}
+          />
 
           {error ? (
             <Text element="p" color="danger">

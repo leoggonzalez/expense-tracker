@@ -343,7 +343,8 @@
     "payment_due_day_requires_credit_card": "Payment due day can only be used for credit-card spaces.",
     "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
     "create_failed": "Unable to create the space.",
-    "settle_hint": "Create a balancing transfer when this space finishes the month below zero."
+    "settle_hint": "Create a balancing transfer when this space finishes the month below zero.",
+    "invalid_members": "Enter a name of up to 100 characters for each member."
   },
   "space_detail_page": {
     "title": "Space details",
@@ -370,7 +371,7 @@
     "credit_card_fields_require_credit_card": "Credit-card payment fields can only be used for credit-card spaces.",
     "payment_due_day_requires_credit_card": "Payment due day can only be used for credit-card spaces.",
     "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
-    "account_details_title": "Account details",
+    "space_details_title": "Space details",
     "account_detail_main": "Main space",
     "account_detail_type": "Account type",
     "account_detail_settle": "Settlement",
@@ -466,5 +467,18 @@
     "failed_to_update_transaction": "Failed to update transaction",
     "failed_to_delete_transaction": "Failed to delete transaction",
     "space_is_archived": "This space is archived and cannot receive new transactions."
+  },
+  "space_members": {
+    "title": "Members",
+    "name": "Member %{number}",
+    "add": "Add member",
+    "remove": "Remove member %{number}",
+    "former": "%{name} (former member)"
+  },
+  "transaction_split": {
+    "title": "Split",
+    "you": "You",
+    "select_participant": "Select at least one participant.",
+    "invalid_split": "The split participants are invalid. Refresh and try again."
   }
 }

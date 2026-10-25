@@ -318,7 +318,8 @@
     "payment_due_day_requires_credit_card": "El día de vencimiento del pago solo puede usarse en espacios de tarjeta de crédito.",
     "payment_timing_requires_credit_card": "El momento de liquidación solo puede usarse en espacios de tarjeta de crédito.",
     "create_failed": "No se pudo crear el espacio.",
-    "settle_hint": "Crea una transferencia de ajuste cuando este espacio cierre el mes por debajo de cero."
+    "settle_hint": "Crea una transferencia de ajuste cuando este espacio cierre el mes por debajo de cero.",
+    "invalid_members": "Introduce un nombre de hasta 100 caracteres para cada miembro."
   },
   "space_detail_page": {
     "title": "Detalles del espacio",
@@ -345,7 +346,7 @@
     "credit_card_fields_require_credit_card": "Los campos de pago de tarjeta solo pueden usarse en espacios de tarjeta de crédito.",
     "payment_due_day_requires_credit_card": "El día de vencimiento del pago solo puede usarse en espacios de tarjeta de crédito.",
     "payment_timing_requires_credit_card": "El momento de liquidación solo puede usarse en espacios de tarjeta de crédito.",
-    "account_details_title": "Detalles de la cuenta",
+    "space_details_title": "Detalles del espacio",
     "account_detail_main": "Espacio principal",
     "account_detail_type": "Tipo de cuenta",
     "account_detail_settle": "Liquidación",
@@ -435,5 +436,18 @@
     "failed_to_update_transaction": "No se pudo actualizar el movimiento",
     "failed_to_delete_transaction": "No se pudo eliminar el movimiento",
     "space_is_archived": "Este espacio está archivado y no puede recibir movimientos nuevos."
+  },
+  "space_members": {
+    "title": "Miembros",
+    "name": "Miembro %{number}",
+    "add": "Añadir miembro",
+    "remove": "Eliminar miembro %{number}",
+    "former": "%{name} (antiguo miembro)"
+  },
+  "transaction_split": {
+    "title": "Reparto",
+    "you": "Tú",
+    "select_participant": "Selecciona al menos un participante.",
+    "invalid_split": "Los participantes no son válidos. Actualiza e inténtalo de nuevo."
   }
 }

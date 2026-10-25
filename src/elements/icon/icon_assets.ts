@@ -38,6 +38,7 @@ export const iconAssets = {
     "./icons/dots-horizontal.svg",
     import.meta.url,
   ).toString(),
+  minus: new URL("./icons/minus.svg", import.meta.url).toString(),
 } as const;
 
 export type IconName = keyof typeof iconAssets;

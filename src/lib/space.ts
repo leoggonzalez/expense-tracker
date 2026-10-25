@@ -1,6 +1,9 @@
 import { CreditCardPaymentTiming, Prisma, SpaceType } from "@prisma/client";
 import { addMonths, endOfMonth, startOfMonth } from "date-fns";
 
+import { SpaceMember } from "@/lib/space_member";
+import type { MemberInput } from "@/lib/transaction_split";
+
 import { prisma } from "@/lib/prisma";
 
 export type SpaceBaseData = {
@@ -117,19 +120,23 @@ export class Space {
     };
   }
 
-  public async create(): Promise<Space> {
-    const record = await prisma.space.create({
-      data: {
-        userAccountId: this.data.userAccountId,
-        name: this.data.name,
-        main: this.data.main,
-        type: this.data.type,
-        paymentDueDay: this.data.paymentDueDay,
-        paymentTiming: this.data.paymentTiming,
-        periodEndDay: this.data.periodEndDay,
-      },
-    });
+  public async create(members?: MemberInput[]): Promise<Space> {
+    const record = await prisma.$transaction(async (tx) => {
+      const created = await tx.space.create({
+        data: {
+          userAccountId: this.data.userAccountId,
+          name: this.data.name,
+          main: this.data.main,
+          type: this.data.type,
+          paymentDueDay: this.data.paymentDueDay,
+          paymentTiming: this.data.paymentTiming,
+          periodEndDay: this.data.periodEndDay,
+        },
+      });
 
+      if (members) await SpaceMember.sync(tx, created.id, members);
+      return created;
+    });
     return Space.fromRecord(record);
   }
 
@@ -140,21 +147,28 @@ export class Space {
     paymentDueDay: number | null;
     paymentTiming: CreditCardPaymentTiming | null;
     periodEndDay: number | null;
+    members?: MemberInput[];
   }): Promise<Space> {
-    const record = await prisma.space.update({
-      where: {
-        id: this.persistedId,
-      },
-      data: {
-        name: input.name,
-        main: input.main,
-        type: input.type,
-        paymentDueDay: input.paymentDueDay,
-        paymentTiming: input.paymentTiming,
-        periodEndDay: input.periodEndDay,
-      },
-    });
+    const record = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "Space" WHERE id = ${this.persistedId} FOR UPDATE`;
+      const updated = await tx.space.update({
+        where: {
+          id: this.persistedId,
+        },
+        data: {
+          name: input.name,
+          main: input.main,
+          type: input.type,
+          paymentDueDay: input.paymentDueDay,
+          paymentTiming: input.paymentTiming,
+          periodEndDay: input.periodEndDay,
+        },
+      });
 
+      if (input.members)
+        await SpaceMember.sync(tx, this.persistedId, input.members);
+      return updated;
+    });
     return Space.fromRecord(record);
   }
 

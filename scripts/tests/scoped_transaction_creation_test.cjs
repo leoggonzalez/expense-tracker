@@ -9,6 +9,7 @@ const {
 const { Space } = require("../../src/lib/space.ts");
 const { Transaction } = require("../../src/lib/transaction.ts");
 const { prisma } = require("../../src/lib/prisma.ts");
+const { SpaceMember } = require("../../src/lib/space_member.ts");
 
 test("creation navigation follows the current space without treating overview routes as spaces", () => {
   for (const path of [
@@ -92,6 +93,14 @@ test("scoped creation resolves the owned ID and rejects missing or archived spac
     create: Space.findOrCreateActive,
     sync: Space.syncCurrentMonthTransactionCount,
     insert: prisma.transaction.create,
+    transaction: prisma.$transaction,
+    participants: SpaceMember.serializeParticipants,
+  };
+  prisma.$transaction = async (callback) => callback(prisma);
+  SpaceMember.serializeParticipants = async (_tx, owner, id) => {
+    assert.equal(owner, "owner");
+    assert.equal(id, "fixed");
+    return "owner";
   };
   let existing = {
     persistedId: "fixed",
@@ -137,5 +146,7 @@ test("scoped creation resolves the owned ID and rejects missing or archived spac
     Space.findOrCreateActive = originals.create;
     Space.syncCurrentMonthTransactionCount = originals.sync;
     prisma.transaction.create = originals.insert;
+    prisma.$transaction = originals.transaction;
+    SpaceMember.serializeParticipants = originals.participants;
   }
 });

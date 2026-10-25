@@ -423,7 +423,7 @@ export function SpaceDetailSection({
         ) : (
           <Card
             padding={24}
-            title={String(i18n.t("space_detail_page.account_details_title"))}
+            title={String(i18n.t("space_detail_page.space_details_title"))}
             icon="spaces"
           >
             <Stack gap={20}>
@@ -479,6 +479,22 @@ export function SpaceDetailSection({
                     }
                   />
                 ) : null}
+                {currentData.space.members.length > 0 ? (
+                  <DetailRow
+                    label={
+                      <Text element="p" type="caption" color="secondary">
+                        {i18n.t("space_members.title")}
+                      </Text>
+                    }
+                    value={
+                      <Text element="p" type="caption-semibold">
+                        {currentData.space.members
+                          .map((member) => member.name)
+                          .join(", ")}
+                      </Text>
+                    }
+                  />
+                ) : null}
               </DetailList>
             </Stack>
           </Card>
@@ -511,6 +527,15 @@ export function SpaceDetailSection({
                 ),
                 tone: "emphasis",
               },
+              ...currentData.memberTotals.map((member) => ({
+                id: `member-${member.id}`,
+                label: member.isOwner
+                  ? i18n.t("transaction_split.you")
+                  : member.isRemoved
+                    ? i18n.t("space_members.former", { name: member.name })
+                    : member.name,
+                value: <Currency value={member.amount} type="caption" />,
+              })),
             ]}
           />
         </Card>

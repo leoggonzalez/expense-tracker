@@ -4,6 +4,11 @@ import "@/components/space_create_form/space_create_form.scss";
 
 import React, { useState } from "react";
 
+import {
+  SpaceMembersEditor,
+  type MemberDraft,
+} from "@/components/space_members_editor/space_members_editor";
+
 import type { SpaceTypeInput } from "@/actions/spaces";
 import { createSpace } from "@/actions/spaces";
 import { Button, Input, Select, useNavigationProgress } from "@/components";
@@ -11,6 +16,7 @@ import { Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 
 export function SpaceCreateForm(): React.ReactElement {
+  const [members, setMembers] = useState<MemberDraft[]>([]);
   const [name, setName] = useState("");
   const [type, setType] = useState<SpaceTypeInput>(null);
   const [paymentDueDay, setPaymentDueDay] = useState("");
@@ -27,6 +33,7 @@ export function SpaceCreateForm(): React.ReactElement {
     setError(null);
 
     const result = await createSpace({
+      members: members.map(({ id, name }) => ({ id, name })),
       name,
       type,
       paymentDueDay: isCreditCard ? Number(paymentDueDay) : null,
@@ -128,6 +135,12 @@ export function SpaceCreateForm(): React.ReactElement {
               </Text>
             </Stack>
           ) : null}
+
+          <SpaceMembersEditor
+            members={members}
+            onChange={setMembers}
+            disabled={isLoading}
+          />
 
           {error ? (
             <Text element="p" color="danger">

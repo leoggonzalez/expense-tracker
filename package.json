@@ -21,10 +21,11 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "migrate:prod": "node scripts/migrate_prod.mjs",
+    "copy-db:prod": "node scripts/copy_db_prod.mjs",
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "test:components": "node --test scripts/tests/*_test.cjs"
+    "test:components": "node --test scripts/tests/*_test.cjs scripts/tests/*_test.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",

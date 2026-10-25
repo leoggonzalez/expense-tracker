@@ -268,3 +268,31 @@ For cutoff 24, purchases September 24 through October 23 are paid in November; p
 Cards whose cutoff is null retain the legacy transaction-month reports and saved settlement timing. Editing those cards must not require inventing a cutoff. Entering a cutoff opts the card into statement periods.
 
 Run `RUN_DATABASE_TESTS=1 node --test scripts/tests/credit_card_compatibility_test.cjs` against a migrated local database for boundary checks and rolled-back fixtures covering relevant lists, totals, and projections.
+
+## Shared Space Members And Transaction Splits
+
+Each `SpaceMember` belongs to one space. It is a named participant, not a separate
+login or an invitation. A removed member retains its identity through `removedAt`
+so old transactions and historical distributions do not change. New transactions
+can select active members only; editing can retain removed participants already
+selected on that same transaction. Renaming preserves the member ID. An unchanged
+member list does not write member rows. Space details and member changes save in
+one transaction.
+
+`Transaction.splitParticipantIds` stores distinct participant IDs separated by
+`;`. The owner is represented by their `UserAccount.id`; other participants use
+`SpaceMember.id`. Null/empty legacy values attribute the transaction to its owner.
+Server validation scopes every selected member to the owned space and rejects an
+empty selection. Ordinary income and expense transactions support splits;
+transfers are excluded from member totals. Bulk creation defaults to owner-only.
+
+Shares are equal, rounded individually in cents, then summed for the selected
+month. A three-way split of 100 yields 33.33 each, with no remainder allocation.
+Member totals are informational and do not modify balances or projection totals.
+They follow projection occurrence generation and credit-card statement mapping,
+including all occurrences beyond the five-row projection preview. Former members
+appear in months containing their shares; active members also show zero totals.
+
+Run `RUN_DATABASE_TESTS=1 node --test scripts/tests/space_members_test.mjs
+scripts/tests/copy_db_prod_test.mjs` for isolated local database coverage. The tests
+create and drop temporary databases; the local PostgreSQL role needs that ability.

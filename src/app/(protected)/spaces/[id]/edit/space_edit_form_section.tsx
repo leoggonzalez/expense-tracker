@@ -79,6 +79,8 @@ export function SpaceEditFormSection({
     <Stack gap={24}>
       <PagePanel tone="form">
         <SpaceEditForm
+          key={JSON.stringify(data)}
+          initialMembers={data.members}
           spaceId={data.id}
           initialName={data.name}
           initialType={data.type}
