@@ -71,6 +71,28 @@ yarn dev
 
 Open `http://localhost:3000`.
 
+### Copy Production Data Locally
+
+Set `DATABASE_URL_PROD` and preferably `DIRECT_URL_PROD` in `.env`, alongside
+your local `DATABASE_URL` / `DIRECT_URL`, then run:
+
+```bash
+yarn copy-db:prod
+```
+
+Every run replaces **all local application data**, including accounts, spaces,
+transactions, space members, login codes, and sessions, with a consistent production snapshot.
+Local-only records are removed. The destination must be localhost; production is
+read-only. The command saves a private JSON backup in the system temporary
+directory and prints its path before replacing data. Treat backups as sensitive;
+temporary files may be removed by the operating system.
+
+The local schema and migration history stay intact. Run local migrations first
+if production has columns missing locally. Newer local columns use their defaults
+or null values. If production predates the members migration, local members are
+cleared. Replacement and verification happen in one transaction, so a
+failure rolls back the local changes.
+
 ## Stack Snapshot
 
 - Next.js 15 App Router
@@ -96,6 +118,7 @@ Open `http://localhost:3000`.
 - `yarn prisma:migrate:deploy`
 - `yarn prisma:studio`
 - `yarn prisma:seed`
+- `yarn copy-db:prod`
 
 ## Reusing This Foundation
 

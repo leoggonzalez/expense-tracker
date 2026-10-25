@@ -58,8 +58,8 @@
     "description_placeholder": "p. ej., salario, alquiler",
     "amount": "Importe",
     "amount_placeholder": "0.00",
-    "begin_date": "Fecha de inicio",
-    "begin_date_month": "Mes de inicio",
+    "begin_date": "Fecha",
+    "begin_date_month": "Fecha",
     "month": "Mes",
     "year": "Año",
     "schedule_label": "Planificación",
@@ -267,7 +267,10 @@
     "payment_timing": "Momento de liquidación",
     "payment_timing_previous_month": "Mes anterior",
     "payment_timing_same_month": "Mismo mes",
-    "payment_due_day_hint": "Elige el día de vencimiento y si esta tarjeta liquida el mismo mes o el mes anterior. Los meses más cortos usan el último día del mes.",
+    "period_end_day": "Día de corte del extracto",
+    "payment_due_day_hint": "Los meses más cortos usan el último día del mes.",
+    "credit_card_period_hint": "Las compras anteriores a este día se pagan el mes siguiente. Las compras de este día o posteriores se pagan dos meses después. Los meses más cortos usan el último día.",
+    "credit_card_legacy_period_hint": "Deja vacío el día de fin del periodo para mantener el calendario de liquidación actual. Introduce un día para usar periodos de facturación.",
     "current_month_total": "Total del mes actual",
     "month_total_label": "Total de %{month}",
     "current_month_relevant_transactions": "Movimientos relevantes del mes actual",
@@ -309,10 +312,18 @@
     "credit_card_payment_due_day_required": "El día de vencimiento del pago es obligatorio para los espacios de tarjeta de crédito.",
     "credit_card_payment_due_day_invalid": "El día de vencimiento del pago debe ser un número entero entre 1 y 31.",
     "credit_card_payment_timing_required": "El momento de liquidación es obligatorio para los espacios de tarjeta de crédito.",
+    "credit_card_period_end_day_required": "El día de fin del periodo es obligatorio para los espacios de tarjeta de crédito.",
+    "credit_card_period_end_day_invalid": "El día de fin del periodo debe ser un número entero entre 1 y 31.",
+    "credit_card_fields_require_credit_card": "Los campos de pago de tarjeta solo pueden usarse en espacios de tarjeta de crédito.",
     "payment_due_day_requires_credit_card": "El día de vencimiento del pago solo puede usarse en espacios de tarjeta de crédito.",
     "payment_timing_requires_credit_card": "El momento de liquidación solo puede usarse en espacios de tarjeta de crédito.",
     "create_failed": "No se pudo crear el espacio.",
-    "settle_hint": "Crea una transferencia de ajuste cuando este espacio cierre el mes por debajo de cero."
+    "settle_hint": "Crea una transferencia de ajuste cuando este espacio cierre el mes por debajo de cero.",
+    "invalid_members": "Introduce un nombre de hasta 100 caracteres para cada miembro.",
+    "download_pdf": "Descargar las transacciones del mes en PDF",
+    "downloading_pdf": "Preparando PDF",
+    "pdf_download_failed": "No se pudo descargar el PDF. Inténtalo de nuevo.",
+    "pdf_page": "Página %{number} de %{total}"
   },
   "space_detail_page": {
     "title": "Detalles del espacio",
@@ -334,13 +345,17 @@
     "credit_card_payment_due_day_required": "El día de vencimiento del pago es obligatorio para los espacios de tarjeta de crédito.",
     "credit_card_payment_due_day_invalid": "El día de vencimiento del pago debe ser un número entero entre 1 y 31.",
     "credit_card_payment_timing_required": "El momento de liquidación es obligatorio para los espacios de tarjeta de crédito.",
+    "credit_card_period_end_day_required": "El día de fin del periodo es obligatorio para los espacios de tarjeta de crédito.",
+    "credit_card_period_end_day_invalid": "El día de fin del periodo debe ser un número entero entre 1 y 31.",
+    "credit_card_fields_require_credit_card": "Los campos de pago de tarjeta solo pueden usarse en espacios de tarjeta de crédito.",
     "payment_due_day_requires_credit_card": "El día de vencimiento del pago solo puede usarse en espacios de tarjeta de crédito.",
     "payment_timing_requires_credit_card": "El momento de liquidación solo puede usarse en espacios de tarjeta de crédito.",
-    "account_details_title": "Detalles de la cuenta",
+    "space_details_title": "Detalles del espacio",
     "account_detail_main": "Espacio principal",
     "account_detail_type": "Tipo de cuenta",
     "account_detail_settle": "Liquidación",
-    "account_detail_settle_value": "Día %{day} · %{timing}",
+    "account_detail_settle_value": "Vence el día %{day} · El nuevo periodo empieza el día %{periodEndDay}",
+    "account_detail_settle_legacy_value": "Vence el día %{day} · %{timing}",
     "account_detail_yes": "Sí",
     "account_detail_no": "No",
     "main_toggle_label": "Establecer como espacio principal",
@@ -349,6 +364,9 @@
     "not_found": "Espacio no encontrado."
   },
   "new_transaction_page": {
+    "title_income_in_space": "Añadir ingreso a %{space}",
+    "title_expense_in_space": "Añadir gasto a %{space}",
+    "title_transfer_in_space": "Añadir transferencia desde %{space}",
     "title_income": "Añadir nuevo ingreso",
     "title_expense": "Añadir nuevo gasto",
     "title_transfer": "Añadir nueva transferencia",
@@ -422,5 +440,18 @@
     "failed_to_update_transaction": "No se pudo actualizar el movimiento",
     "failed_to_delete_transaction": "No se pudo eliminar el movimiento",
     "space_is_archived": "Este espacio está archivado y no puede recibir movimientos nuevos."
+  },
+  "space_members": {
+    "title": "Miembros",
+    "name": "Miembro %{number}",
+    "add": "Añadir miembro",
+    "remove": "Eliminar miembro %{number}",
+    "former": "%{name} (antiguo miembro)"
+  },
+  "transaction_split": {
+    "title": "Reparto",
+    "you": "Tú",
+    "select_participant": "Selecciona al menos un participante.",
+    "invalid_split": "Los participantes no son válidos. Actualiza e inténtalo de nuevo."
   }
 }

@@ -1,13 +1,5 @@
-import { NewTransferFormSection } from "@/app/(protected)/transactions/new/new_transfer_form_section";
-import {
-  Container,
-  Hero,
-  TransactionCreationIntro,
-  TransactionTypeTabs,
-} from "@/components";
-import { Stack } from "@/elements";
+import { TransactionCreation } from "@/components/transaction_creation/transaction_creation";
 import { sanitizeAmountInput } from "@/lib/amount";
-import { i18n } from "@/model/i18n";
 
 type TransferPageSearchParams = Promise<{
   from_space?: string;
@@ -32,42 +24,9 @@ export default async function Page({
   };
 
   return (
-    <Container>
-      <Stack gap={24}>
-        <Hero
-          icon="transfer"
-          title={String(i18n.t("new_transaction_page.title_transfer"))}
-          pattern="new_transaction"
-        >
-          <TransactionCreationIntro
-            pageType="transfer"
-            subtitle={i18n.t("new_transaction_page.subtitle_transfer")}
-          />
-        </Hero>
-
-        <TransactionTypeTabs
-          activeType="transfer"
-          tabs={[
-            {
-              key: "income",
-              href: "/transactions/new/income",
-              label: i18n.t("new_transaction_page.income_tab"),
-            },
-            {
-              key: "expense",
-              href: "/transactions/new/expense",
-              label: i18n.t("new_transaction_page.expense_tab"),
-            },
-            {
-              key: "transfer",
-              href: "/transactions/new/transfer",
-              label: i18n.t("new_transaction_page.transfer_tab"),
-            },
-          ]}
-        />
-
-        <NewTransferFormSection initialValues={initialValues} />
-      </Stack>
-    </Container>
+    <TransactionCreation
+      operation="transfer"
+      initialTransferValues={initialValues}
+    />
   );
 }

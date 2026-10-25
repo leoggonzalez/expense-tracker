@@ -6,7 +6,7 @@ import {
   CreateTransactionInput,
   createMultipleTransactions,
 } from "@/actions/transactions";
-import { Button, Input, MonthSelector, Select, SpaceField } from "@/components";
+import { Button, Input, Select, SpaceField } from "@/components";
 import { Stack, Text } from "@/elements";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import {
@@ -45,14 +45,10 @@ type SharedScheduleState = {
   installments: string;
 };
 
-function formatDateForInput(date: Date): string {
-  return date.toISOString().split("T")[0];
-}
-
 function getInitialSharedState(): SharedScheduleState {
   return {
     spaceName: "",
-    beginDate: formatDateForInput(new Date()).slice(0, 7),
+    beginDate: format(new Date(), "yyyy-MM-dd"),
     scheduleMode: "one_time",
     installments: "1",
   };
@@ -304,24 +300,17 @@ export function BulkTransactionForm({
             </Stack>
           </Stack>
 
-          <MonthSelector
-            label={i18n.t(
-              beginDateMode === "month"
-                ? "transaction_form.begin_date_month"
-                : "transaction_form.begin_date",
-            )}
+          <Input
+            type="date"
+            label={i18n.t("transaction_form.begin_date")}
             value={shared.beginDate}
             onChange={(value) =>
-              setShared((current) => ({ ...current, beginDate: value }))
+              setShared((previous) => ({ ...previous, beginDate: value }))
             }
-            editLabel={String(i18n.t("transaction_form.edit_full_begin_date"))}
-            closeLabel={String(
-              i18n.t("transaction_form.use_month_year_begin_date"),
-            )}
-            monthLabel={i18n.t("transaction_form.month")}
-            yearLabel={i18n.t("transaction_form.year")}
             required
+            size="lg"
             surface="subtle"
+            labelTone="secondary"
           />
 
           {shared.scheduleMode === "installments" && (

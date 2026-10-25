@@ -1,6 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, SpaceType } from "@prisma/client";
 
 const prisma = new PrismaClient();
+const CREDIT_CARD_PERIOD_QA_EMAIL = "credit_card_period@example.com";
 
 type TransactionType = "income" | "expense";
 type RecurringMode = "open_ended" | "fixed";
@@ -365,6 +366,13 @@ function buildDateFromMonthOffset(monthOffset: number, day: number): Date {
   return date;
 }
 
+function buildCurrentMonthDate(day: number): Date {
+  const monthStart = startOfCurrentMonth();
+  const date = new Date(monthStart);
+  date.setDate(Math.max(1, Math.min(day, 28)));
+  return date;
+}
+
 function randomAmount(
   random: () => number,
   type: TransactionType,
@@ -416,6 +424,102 @@ async function refreshCurrentMonthCounters(): Promise<void> {
     ) month_counts
     WHERE a.id = month_counts."spaceId"
   `;
+}
+
+async function createCreditCardPeriodQaAccount(): Promise<void> {
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+
+  const periodEndDay = 23;
+  const paymentDueDay = 22;
+
+  const userAccount = await prisma.userAccount.create({
+    data: {
+      email: CREDIT_CARD_PERIOD_QA_EMAIL,
+      name: "Credit Card Period QA",
+    },
+  });
+
+  const [mainSpace, creditCardSpace] = await Promise.all([
+    prisma.space.create({
+      data: {
+        userAccountId: userAccount.id,
+        name: "QA Main space",
+        main: true,
+        isArchived: false,
+      },
+    }),
+    prisma.space.create({
+      data: {
+        userAccountId: userAccount.id,
+        name: "QA Period credit card",
+        type: SpaceType.credit_card,
+        paymentDueDay,
+        periodEndDay,
+        isArchived: false,
+      },
+    }),
+  ]);
+
+  const salaryDate = buildCurrentMonthDate(1);
+  const rentDate = buildCurrentMonthDate(3);
+  const regularExpenseDate = buildCurrentMonthDate(8);
+  const cardPurchaseBeforePeriodEnd = buildCurrentMonthDate(22);
+  const cardPurchaseOnPeriodEnd = buildCurrentMonthDate(periodEndDay);
+  const cardPurchaseAfterPeriodEnd = buildCurrentMonthDate(24);
+
+  await prisma.transaction.createMany({
+    data: [
+      {
+        spaceId: mainSpace.id,
+        type: "income",
+        description: "QA monthly salary",
+        amount: 5000,
+        beginDate: salaryDate,
+        endDate: null,
+      },
+      {
+        spaceId: mainSpace.id,
+        type: "expense",
+        description: "QA rent",
+        amount: -1500,
+        beginDate: rentDate,
+        endDate: null,
+      },
+      {
+        spaceId: mainSpace.id,
+        type: "expense",
+        description: "QA regular current-month expense",
+        amount: -120,
+        beginDate: regularExpenseDate,
+        endDate: regularExpenseDate,
+      },
+      {
+        spaceId: creditCardSpace.id,
+        type: "expense",
+        description: "QA card purchase before period end",
+        amount: -84.35,
+        beginDate: cardPurchaseBeforePeriodEnd,
+        endDate: cardPurchaseBeforePeriodEnd,
+      },
+      {
+        spaceId: creditCardSpace.id,
+        type: "expense",
+        description: "QA card purchase on period end",
+        amount: -219.9,
+        beginDate: cardPurchaseOnPeriodEnd,
+        endDate: cardPurchaseOnPeriodEnd,
+      },
+      {
+        spaceId: creditCardSpace.id,
+        type: "expense",
+        description: "QA card purchase after period end",
+        amount: -42.5,
+        beginDate: cardPurchaseAfterPeriodEnd,
+        endDate: cardPurchaseAfterPeriodEnd,
+      },
+    ],
+  });
 }
 
 async function main() {
@@ -531,6 +635,8 @@ async function main() {
     data: transactionsData,
   });
 
+  await createCreditCardPeriodQaAccount();
+
   await refreshCurrentMonthCounters();
 
   const [userCount, spaceCount, transactionCount, recurringTransactions] = await Promise.all([
@@ -554,6 +660,7 @@ async function main() {
   }).length;
 
   console.log(`Seed userAccount: ${seedEmail}`);
+  console.log(`Credit-card period QA userAccount: ${CREDIT_CARD_PERIOD_QA_EMAIL}`);
   console.log(`Users: ${userCount}`);
   console.log(`Spaces: ${spaceCount}`);
   console.log(`Transactions: ${transactionCount}`);

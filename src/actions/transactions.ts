@@ -9,6 +9,10 @@ import {
 } from "date-fns";
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
+import { SpaceMember } from "@/lib/space_member";
+import { getOtherParticipantNames } from "@/lib/transaction_split";
+import type { MemberMonthTotal, SplitMember } from "@/lib/transaction_split";
+
 import { normalizeTransactionAmount } from "@/lib/amount";
 import { formatProjectionMonthKey } from "@/lib/projection_month";
 import { Space, type SpaceRecord } from "@/lib/space";
@@ -113,6 +117,7 @@ export type DashboardRecentActivityPayload = {
 };
 
 export type ProjectionMonthTransaction = {
+  participantNames: string[];
   id: string;
   type: string;
   spaceName: string;
@@ -134,6 +139,7 @@ export type ProjectionChartMonth = {
 };
 
 export type ProjectionFocusedSpace = {
+  memberTotals: MemberMonthTotal[];
   spaceId: string;
   spaceName: string;
   monthTotal: number;
@@ -194,10 +200,13 @@ export type NewTransactionRecentPayload = {
 };
 
 export type NewTransactionSpacesPayload = {
+  ownerId: string;
   spaces: Array<{
+    members: SplitMember[];
     id: string;
     name: string;
     main: boolean | null;
+    type: string | null;
   }>;
 };
 
@@ -264,6 +273,7 @@ type TransferMutationResult =
     };
 
 type ProjectionFocusedSpaceAccumulator = {
+  memberTotals: MemberMonthTotal[];
   spaceId: string;
   spaceName: string;
   monthTotal: number;
@@ -273,8 +283,15 @@ type ProjectionFocusedSpaceAccumulator = {
 
 function serializeProjectionMonthTransactionRow(
   transaction: ProjectionFocusedSpaceTransactionRow,
+  ownerId: string,
+  members: SplitMember[],
 ): ProjectionMonthTransaction {
   return {
+    participantNames: getOtherParticipantNames(
+      transaction.splitParticipantIds,
+      ownerId,
+      members,
+    ),
     id: transaction.id,
     type: transaction.type,
     spaceName: transaction.spaceName,
@@ -435,6 +452,8 @@ function serializeFilteredTransaction(
 function mapProjectionSpaces(
   spaceSummaryRows: ProjectionFocusedSpaceSummaryRow[],
   spaceTransactionsRows: ProjectionFocusedSpaceTransactionRow[],
+  ownerId: string,
+  members: Record<string, SplitMember[]>,
 ): ProjectionFocusedSpace[] {
   const spaceMap = new Map<string, ProjectionFocusedSpaceAccumulator>(
     spaceSummaryRows.map((space) => [
@@ -442,6 +461,7 @@ function mapProjectionSpaces(
       {
         spaceId: space.spaceId,
         spaceName: space.spaceName,
+        memberTotals: [],
         monthTotal: Number(space.monthTotal || 0),
         monthTransactionCount: Number(space.monthTransactionCount || 0),
         transactions: [],
@@ -457,7 +477,11 @@ function mapProjectionSpaces(
     }
 
     existing.transactions.push(
-      serializeProjectionMonthTransactionRow(transaction),
+      serializeProjectionMonthTransactionRow(
+        transaction,
+        ownerId,
+        members[transaction.spaceId] || [],
+      ),
     );
   });
 
@@ -466,6 +490,7 @@ function mapProjectionSpaces(
     .map((space) => ({
       spaceId: space.spaceId,
       spaceName: space.spaceName,
+      memberTotals: space.memberTotals,
       monthTotal: space.monthTotal,
       monthTransactionCount: space.monthTransactionCount,
       transactions: space.transactions,
@@ -492,6 +517,11 @@ export async function createTransaction(
       return { success: false, error: "space_is_archived" };
     }
 
+    if (
+      error instanceof Error &&
+      error.message === "transaction_split.invalid_split"
+    )
+      return { success: false, error: "transaction_split.invalid_split" };
     console.error("Error creating transaction:", error);
     return { success: false, error: "failed_to_create_transaction" };
   }
@@ -669,6 +699,18 @@ export async function getProjectionSpacesPayloadForUser(
     focusedMonthStart,
   );
 
+  const spaceIds = projectionData.spaceSummaryRows.map(
+    (space) => space.spaceId,
+  );
+  const [memberTotals, members] = await Promise.all([
+    SpaceMember.getMonthTotalsForSpaces(
+      userAccountId,
+      spaceIds,
+      projectionData.normalizedFocusedMonthStart,
+      endOfMonth(projectionData.normalizedFocusedMonthStart),
+    ),
+    SpaceMember.listForSpaces(userAccountId, spaceIds),
+  ]);
   return {
     focusedMonthKey: formatProjectionMonthKey(
       projectionData.normalizedFocusedMonthStart,
@@ -676,7 +718,12 @@ export async function getProjectionSpacesPayloadForUser(
     focusedMonthSpaces: mapProjectionSpaces(
       projectionData.spaceSummaryRows,
       projectionData.spaceTransactionsRows,
-    ),
+      userAccountId,
+      members,
+    ).map((space) => ({
+      ...space,
+      memberTotals: memberTotals[space.spaceId] || [],
+    })),
   };
 }
 
@@ -797,8 +844,13 @@ export async function getTransactionDetailPayloadForUser(
 
 export async function getNewTransactionRecentPayloadForUser(
   userAccountId: string,
+  spaceId?: string,
 ): Promise<NewTransactionRecentPayload> {
-  const transactions = await Transaction.listRecentByUser(userAccountId, 5);
+  const transactions = await Transaction.listRecentByUser(
+    userAccountId,
+    5,
+    spaceId,
+  );
 
   return {
     recentTransactions: transactions.map(serializeDashboardTransaction),
@@ -810,14 +862,21 @@ export async function getNewTransactionSpacesPayloadForUser(
 ): Promise<NewTransactionSpacesPayload> {
   const spaces = await Space.listActiveByUser(userAccountId);
 
+  const members = await SpaceMember.listForSpaces(
+    userAccountId,
+    spaces.map((space) => space.persistedId),
+  );
   return {
+    ownerId: userAccountId,
     spaces: spaces.map((space) => {
       const spaceRecord = space.toRecord();
 
       return {
+        members: members[spaceRecord.id] || [],
         id: spaceRecord.id,
         name: spaceRecord.name,
         main: spaceRecord.main,
+        type: spaceRecord.type,
       };
     }),
   };
@@ -924,6 +983,11 @@ export async function updateTransaction(
       return { success: false, error: error.message };
     }
 
+    if (
+      error instanceof Error &&
+      error.message === "transaction_split.invalid_split"
+    )
+      return { success: false, error: "transaction_split.invalid_split" };
     console.error("Error updating transaction:", error);
     return { success: false, error: "failed_to_update_transaction" };
   }

@@ -7,7 +7,13 @@ import {
   createTransaction,
   updateTransaction,
 } from "@/actions/transactions";
-import { Button, Input, MonthSelector, Select, SpaceField } from "@/components";
+import type { NewTransactionSpacesPayload } from "@/actions/transactions";
+import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
+import { TransactionSplit } from "@/components/transaction_split/transaction_split";
+import { SectionError } from "@/components/section_error/section_error";
+import { parseSplitParticipants } from "@/lib/transaction_split";
+
+import { Button, Input, Select, SpaceField } from "@/components";
 import { Icon, Stack, Text } from "@/elements";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
 import {
@@ -31,14 +37,21 @@ import { i18n } from "@/model/i18n";
 import { format } from "date-fns";
 import { useForm } from "react-use-form-library";
 
+const transactionSpacesCache = {
+  entries: new Map<string, NewTransactionSpacesPayload>(),
+};
+
 export interface TransactionFormProps {
   spaces?: Array<{
     id: string;
     name: string;
     main: boolean | null;
+    type?: string | null;
   }>;
   onSuccess?: () => void;
   initialData?: {
+    splitParticipantIds?: string | null;
+    transferSpaceId?: string | null;
     id: string;
     type: string;
     spaceName: string;
@@ -50,6 +63,7 @@ export interface TransactionFormProps {
   isEdit?: boolean;
   transactionType?: "income" | "expense";
   hideTypeField?: boolean;
+  fixedSpace?: { id: string; name: string };
 }
 
 type TransactionFormModel = {
@@ -68,10 +82,6 @@ function formatDateForInput(date: Date | null | undefined): string {
   }
 
   return date.toISOString().split("T")[0];
-}
-
-function formatMonthForInput(date: Date | null | undefined): string {
-  return formatDateForInput(date).slice(0, 7);
 }
 
 function getInitialModel(props: TransactionFormProps): TransactionFormModel {
@@ -94,12 +104,14 @@ function getInitialModel(props: TransactionFormProps): TransactionFormModel {
 
   return {
     type,
-    spaceName: props.initialData?.spaceName || "",
+    spaceName: props.fixedSpace?.name || props.initialData?.spaceName || "",
     description: props.initialData?.description || "",
     amountInput: props.initialData?.amount
       ? String(props.initialData.amount)
       : "",
-    beginDate: formatMonthForInput(beginDate),
+    beginDate: props.initialData
+      ? formatDateForInput(beginDate)
+      : format(beginDate, "yyyy-MM-dd"),
     scheduleMode: defaultScheduleMode,
     installments: String(schedule.installments),
   };
@@ -170,8 +182,24 @@ export function TransactionForm({
   isEdit = false,
   transactionType,
   hideTypeField = false,
+  fixedSpace,
 }: TransactionFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
+  const [participantIds, setParticipantIds] = useState<string[] | undefined>(
+    () =>
+      initialData?.splitParticipantIds
+        ? parseSplitParticipants(initialData.splitParticipantIds)
+        : undefined,
+  );
+  const {
+    data: spacesData,
+    hasError: spacesError,
+    retry: retrySpaces,
+  } = useProtectedPageSection(
+    "/api/transactions/new/spaces",
+    "/api/transactions/new/spaces",
+    transactionSpacesCache,
+  );
   const [isDraftReady, setIsDraftReady] = useState(
     !(!isEdit && Boolean(transactionType)),
   );
@@ -184,6 +212,7 @@ export function TransactionForm({
       isEdit,
       transactionType,
       hideTypeField,
+      fixedSpace,
     }),
   );
   const isCreateFlow = !isEdit && Boolean(transactionType);
@@ -243,6 +272,13 @@ export function TransactionForm({
     handleSubmit: async () => {
       const successMessageKey = getSuccessMessageKey(form.model.type);
       const errorMessageKey = getErrorMessageKey(form.model.type);
+      if (
+        !spacesData ||
+        (!initialData?.transferSpaceId && !selectedIds.length)
+      ) {
+        showError(i18n.t("transaction_split.select_participant"));
+        return;
+      }
       const parsedAmount = parseAmountInput(form.model.amountInput);
       const beginDateMode = inferTransactionDateMode(form.model.beginDate);
 
@@ -265,8 +301,10 @@ export function TransactionForm({
       }
 
       const payload: CreateTransactionInput = {
+        participantIds: selectedIds,
         type: isEdit ? form.model.type : transactionType || form.model.type,
-        spaceName: form.model.spaceName,
+        spaceName: fixedSpace?.name || form.model.spaceName,
+        ...(fixedSpace ? { spaceId: fixedSpace.id } : {}),
         description: form.model.description,
         amount: parsedAmount,
         beginDate,
@@ -283,16 +321,24 @@ export function TransactionForm({
           : await createTransaction(payload);
 
       if (!result.success) {
-        showError(i18n.t(errorMessageKey), {
-          iconName: form.model.type,
-        });
+        showError(
+          i18n.t(
+            result.error === "transaction_split.invalid_split"
+              ? result.error
+              : errorMessageKey,
+          ),
+          {
+            iconName: form.model.type,
+          },
+        );
         return;
       }
 
       if (isCreateFlow) {
         resetCreateFlowFields();
       } else if (!isEdit) {
-        clearNewTransactionDraft();
+        setParticipantIds(undefined);
+        clearNewTransactionDraft(fixedSpace?.id);
         skipDraftSaveRef.current = true;
         reset();
       }
@@ -316,6 +362,32 @@ export function TransactionForm({
   });
   const { fields, model, onSubmit, reset, submissionStatus, updateFields } =
     form;
+  const resolvedSpaces = spacesData?.spaces || initialSpaces;
+  const selectedSpace = resolvedSpaces.find((space) =>
+    fixedSpace
+      ? space.id === fixedSpace.id
+      : space.name === model.spaceName.trim(),
+  );
+  const ownerId = spacesData?.ownerId || "";
+  const previousIds = parseSplitParticipants(initialData?.splitParticipantIds);
+  const splitMembers = (
+    spacesData?.spaces.find((space) => space.id === selectedSpace?.id)
+      ?.members || []
+  ).filter(
+    (member) =>
+      !member.isRemoved ||
+      (isEdit &&
+        selectedSpace?.name === initialData?.spaceName &&
+        previousIds.includes(member.id)),
+  );
+  const allowedIds = new Set([
+    ownerId,
+    ...splitMembers.map((member) => member.id),
+  ]);
+  const selectedIds = (participantIds ?? (ownerId ? [ownerId] : [])).filter(
+    (id) => allowedIds.has(id),
+  );
+  const showSplit = !initialData?.transferSpaceId && splitMembers.length > 0;
   const resetCreateFlowFields = (): void => {
     updateFields({
       type: transactionType || model.type,
@@ -342,14 +414,18 @@ export function TransactionForm({
     setIsDraftReady(false);
     setNewTransactionFlowActive(true);
 
-    const draft = loadNewTransactionDraft();
+    const draft = loadNewTransactionDraft(fixedSpace?.id);
 
     if (draft) {
+      setParticipantIds(draft.participantIds);
       updateFields({
-        spaceName: draft.spaceName,
+        spaceName: fixedSpace?.name || draft.spaceName,
         description: draft.description,
         amountInput: draft.amountInput,
-        beginDate: draft.beginDate,
+        beginDate:
+          draft.beginDate.length === 7
+            ? `${draft.beginDate}-01`
+            : draft.beginDate,
         scheduleMode: draft.scheduleMode || "one_time",
         installments: draft.installments || "1",
       });
@@ -357,7 +433,7 @@ export function TransactionForm({
 
     hasHydratedDraftRef.current = true;
     setIsDraftReady(true);
-  }, [initialData, isCreateFlow, updateFields]);
+  }, [initialData, isCreateFlow, updateFields, fixedSpace]);
 
   // eslint-disable-next-line warn-use-effect -- This effect persists draft changes to browser storage while the create flow is active.
   useEffect(() => {
@@ -370,24 +446,30 @@ export function TransactionForm({
       return;
     }
 
-    saveNewTransactionDraft({
-      spaceName: model.spaceName,
-      description: model.description,
-      amountInput: model.amountInput,
-      beginDate: model.beginDate,
-      beginDateMode: inferTransactionDateMode(model.beginDate),
-      scheduleMode: model.scheduleMode,
-      installments: model.installments,
-    });
+    saveNewTransactionDraft(
+      {
+        participantIds,
+        spaceName: model.spaceName,
+        description: model.description,
+        amountInput: model.amountInput,
+        beginDate: model.beginDate,
+        beginDateMode: inferTransactionDateMode(model.beginDate),
+        scheduleMode: model.scheduleMode,
+        installments: model.installments,
+      },
+      fixedSpace?.id,
+    );
   }, [
     isCreateFlow,
     isDraftReady,
     model.spaceName,
+    participantIds,
     model.amountInput,
     model.beginDate,
     model.description,
     model.installments,
     model.scheduleMode,
+    fixedSpace?.id,
   ]);
 
   const showTypeField = isEdit || !hideTypeField;
@@ -406,7 +488,6 @@ export function TransactionForm({
       installments: value === "installments" ? model.installments || "1" : "1",
     });
   };
-
   const parsedInstallments = parseInstallments(model.installments);
   const beginDateMode = inferTransactionDateMode(model.beginDate);
   const beginDateForPreview = toDate(model.beginDate, beginDateMode);
@@ -445,18 +526,23 @@ export function TransactionForm({
           />
         )}
 
-        <SpaceField
-          label={i18n.t("transaction_form.space")}
-          value={fields.spaceName.value || ""}
-          onChange={(value) => fields.spaceName.onChange(value)}
-          spaces={initialSpaces}
-          loadSpacesOnMount={isCreateFlow && initialSpaces.length === 0}
-          placeholder={i18n.t("transaction_form.space_placeholder") as string}
-          required
-          size="lg"
-          surface="subtle"
-          labelTone="secondary"
-        />
+        {!fixedSpace && (
+          <SpaceField
+            label={i18n.t("transaction_form.space")}
+            value={fields.spaceName.value || ""}
+            onChange={(value) => {
+              setParticipantIds(undefined);
+              updateFields({ spaceName: value });
+            }}
+            spaces={resolvedSpaces}
+            loadSpacesOnMount={false}
+            placeholder={i18n.t("transaction_form.space_placeholder") as string}
+            required
+            size="lg"
+            surface="subtle"
+            labelTone="secondary"
+          />
+        )}
 
         <Input
           label={i18n.t("transaction_form.description")}
@@ -485,6 +571,24 @@ export function TransactionForm({
           surface="subtle"
           labelTone="secondary"
         />
+
+        {spacesError ? (
+          <SectionError
+            message={i18n.t("new_transaction_page.form_load_failed")}
+            retryLabel={i18n.t("common.retry")}
+            onRetry={retrySpaces}
+          />
+        ) : null}
+        {showSplit ? (
+          <TransactionSplit
+            ownerId={ownerId}
+            members={splitMembers}
+            selectedIds={selectedIds}
+            amount={parseAmountInput(model.amountInput) || 0}
+            disabled={isSubmitting}
+            onChange={setParticipantIds}
+          />
+        ) : null}
 
         <Stack gap={4}>
           <Text element="p" type="caption-medium" color="secondary">
@@ -524,21 +628,15 @@ export function TransactionForm({
           </Stack>
         </Stack>
 
-        <MonthSelector
-          label={i18n.t(
-            beginDateMode === "month"
-              ? "transaction_form.begin_date_month"
-              : "transaction_form.begin_date",
-          )}
-          field={fields.beginDate}
-          editLabel={String(i18n.t("transaction_form.edit_full_begin_date"))}
-          closeLabel={String(
-            i18n.t("transaction_form.use_month_year_begin_date"),
-          )}
-          monthLabel={i18n.t("transaction_form.month")}
-          yearLabel={i18n.t("transaction_form.year")}
+        <Input
+          type="date"
+          label={i18n.t("transaction_form.begin_date")}
+          value={fields.beginDate.value || ""}
+          onChange={fields.beginDate.onChange}
           required
+          size="lg"
           surface="subtle"
+          labelTone="secondary"
         />
 
         {model.scheduleMode === "installments" && (
@@ -569,7 +667,9 @@ export function TransactionForm({
 
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={
+            isSubmitting || !spacesData || (showSplit && !selectedIds.length)
+          }
           fullWidth
           variant={submitButton.variant}
           startIcon={<Icon name={submitButton.iconName} size={18} />}

@@ -124,15 +124,24 @@ function getCreditCardSettleLabel(space: SpaceDetailPayload["space"]): string {
   }
 
   const dueDay = space.paymentDueDay ?? 1;
-  const timingKey =
-    space.paymentTiming === "previous_month"
-      ? "spaces_page.payment_timing_previous_month"
-      : "spaces_page.payment_timing_same_month";
+  if (space.periodEndDay === null) {
+    const timingKey =
+      space.paymentTiming === "previous_month"
+        ? "spaces_page.payment_timing_previous_month"
+        : "spaces_page.payment_timing_same_month";
+    return String(
+      i18n.t("space_detail_page.account_detail_settle_legacy_value", {
+        day: String(dueDay),
+        timing: String(i18n.t(timingKey)),
+      }),
+    );
+  }
+  const periodEndDay = space.periodEndDay;
 
   return String(
     i18n.t("space_detail_page.account_detail_settle_value", {
       day: String(dueDay),
-      timing: String(i18n.t(timingKey)),
+      periodEndDay: String(periodEndDay),
     }),
   );
 }
@@ -155,6 +164,7 @@ export function SpaceDetailSection({
     React.useState<SpaceDetailPayload | null>(null);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
   const [isUpdatingMain, setIsUpdatingMain] = React.useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = React.useState(false);
 
   React.useEffect(() => {
     setVisibleData(data);
@@ -206,6 +216,38 @@ export function SpaceDetailSection({
     return <></>;
   }
   const currentData = visibleData || data;
+
+  async function handleDownloadPdf(): Promise<void> {
+    if (isDownloadingPdf) return;
+    setIsDownloadingPdf(true);
+    try {
+      const month = currentData.selectedMonth.key;
+      const response = await fetch(
+        `/api/spaces/${encodeURIComponent(currentData.space.id)}/export?currentMonth=${encodeURIComponent(month)}`,
+        {
+          cache: "no-store",
+          credentials: "same-origin",
+        },
+      );
+      if (
+        !response.ok ||
+        !response.headers.get("Content-Type")?.includes("application/pdf")
+      )
+        throw new Error("pdf_download_failed");
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${currentData.space.name}-${month}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      showError(i18n.t("spaces_page.pdf_download_failed"));
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  }
 
   const detailSearchParams = new URLSearchParams();
 
@@ -414,7 +456,7 @@ export function SpaceDetailSection({
         ) : (
           <Card
             padding={24}
-            title={String(i18n.t("space_detail_page.account_details_title"))}
+            title={String(i18n.t("space_detail_page.space_details_title"))}
             icon="spaces"
           >
             <Stack gap={20}>
@@ -470,6 +512,22 @@ export function SpaceDetailSection({
                     }
                   />
                 ) : null}
+                {currentData.space.members.length > 0 ? (
+                  <DetailRow
+                    label={
+                      <Text element="p" type="caption" color="secondary">
+                        {i18n.t("space_members.title")}
+                      </Text>
+                    }
+                    value={
+                      <Text element="p" type="caption-semibold">
+                        {currentData.space.members
+                          .map((member) => member.name)
+                          .join(", ")}
+                      </Text>
+                    }
+                  />
+                ) : null}
               </DetailList>
             </Stack>
           </Card>
@@ -483,6 +541,24 @@ export function SpaceDetailSection({
             }),
           )}
           icon="transactions"
+          actions={
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={isDownloadingPdf}
+              ariaLabel={String(
+                i18n.t(
+                  isDownloadingPdf
+                    ? "spaces_page.downloading_pdf"
+                    : "spaces_page.download_pdf",
+                ),
+              )}
+              onClick={() => void handleDownloadPdf()}
+              startIcon={<Icon name="download" size={18} />}
+            >
+              {null}
+            </Button>
+          }
         >
           <TransactionList
             transactions={currentData.selectedMonthRelevantTransactions}
@@ -502,6 +578,15 @@ export function SpaceDetailSection({
                 ),
                 tone: "emphasis",
               },
+              ...currentData.memberTotals.map((member) => ({
+                id: `member-${member.id}`,
+                label: member.isOwner
+                  ? i18n.t("transaction_split.you")
+                  : member.isRemoved
+                    ? i18n.t("space_members.former", { name: member.name })
+                    : member.name,
+                value: <Currency value={member.amount} type="caption" />,
+              })),
             ]}
           />
         </Card>

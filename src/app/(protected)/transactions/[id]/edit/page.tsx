@@ -40,6 +40,8 @@ export default async function Page({
               main: space.main,
             }))}
             initialData={{
+              splitParticipantIds: transaction.splitParticipantIds,
+              transferSpaceId: transaction.transferSpaceId,
               id: transaction.id,
               type: transaction.type,
               spaceName: transaction.space.name,

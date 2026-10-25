@@ -11,6 +11,7 @@ export type TransactionCardItem = {
   id: string;
   type: string;
   spaceName: string;
+  participantNames?: string[];
   description: string;
   amount: number;
   beginDate: string;
@@ -102,8 +103,19 @@ export function TransactionCard({
               </div>
             </Stack>
           </div>
-          <div className="transaction-card__amount">
-            <Currency value={transaction.amount} type="caption-bold" />
+          <div className="transaction-card__amount-group">
+            <Stack line gap={8} align="center" justify="end">
+              {transaction.participantNames?.length ? (
+                <div className="transaction-card__participants">
+                  <Text element="p" type="fine" color="secondary">
+                    {transaction.participantNames.join(", ")}
+                  </Text>
+                </div>
+              ) : null}
+              <div className="transaction-card__amount">
+                <Currency value={transaction.amount} type="caption-bold" />
+              </div>
+            </Stack>
           </div>
         </div>
       </Box>

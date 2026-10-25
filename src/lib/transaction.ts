@@ -9,12 +9,17 @@ import {
   startOfMonth,
 } from "date-fns";
 
+import { SpaceMember } from "@/lib/space_member";
+import { parseSplitParticipants } from "@/lib/transaction_split";
+
 import { prisma } from "@/lib/prisma";
 import { Space, type CreditCardSpaceRecord } from "@/lib/space";
 
 export type CreateTransactionInput = {
+  participantIds?: string[];
   type: "income" | "expense";
   spaceName: string;
+  spaceId?: string;
   description: string;
   amount: number;
   beginDate: Date;
@@ -30,6 +35,7 @@ export type CreateTransferInput = {
 };
 
 export type TransactionBaseData = {
+  splitParticipantIds?: string | null;
   type: string;
   spaceId: string;
   transferSpaceId: string | null;
@@ -52,7 +58,11 @@ export type TransactionCreateData = Pick<
   Partial<
     Pick<
       TransactionBaseData,
-      "transferSpaceId" | "endDate" | "createdAt" | "updatedAt"
+      | "transferSpaceId"
+      | "endDate"
+      | "createdAt"
+      | "updatedAt"
+      | "splitParticipantIds"
     >
   >;
 
@@ -185,6 +195,7 @@ export type ProjectionFocusedSpaceSummaryRow = {
 };
 
 export type ProjectionFocusedSpaceTransactionRow = {
+  splitParticipantIds: string | null;
   spaceId: string;
   spaceName: string;
   id: string;
@@ -262,6 +273,7 @@ export class Transaction {
   public async create(): Promise<Transaction> {
     const record = await prisma.transaction.create({
       data: {
+        splitParticipantIds: this.data.splitParticipantIds,
         type: this.data.type,
         spaceId: this.data.spaceId,
         transferSpaceId: this.data.transferSpaceId ?? null,
@@ -314,6 +326,7 @@ export class Transaction {
     }
 
     return {
+      splitParticipantIds: this.data.splitParticipantIds ?? null,
       id: this.data.id,
       type: this.data.type,
       spaceId: this.data.spaceId,
@@ -335,23 +348,34 @@ export class Transaction {
     userAccountId: string,
     input: CreateTransactionInput,
   ): Promise<TransactionWithSpaceRecord> {
-    const space = await Space.findOrCreateActive(
-      userAccountId,
-      input.spaceName,
-    );
-    const transaction = await prisma.transaction.create({
-      data: {
-        type: input.type,
-        spaceId: space.persistedId,
-        transferSpaceId: null,
-        description: input.description,
-        amount: input.amount,
-        beginDate: input.beginDate,
-        endDate: input.endDate || null,
-      },
-      include: transactionWithSpaceInclude,
-    });
+    const space = input.spaceId
+      ? await Space.findOwnedById(userAccountId, input.spaceId)
+      : await Space.findOrCreateActive(userAccountId, input.spaceName);
 
+    if (!space || space.toRecord().isArchived) {
+      throw new Error("space_not_found");
+    }
+    const transaction = await prisma.$transaction(async (tx) => {
+      const splitParticipantIds = await SpaceMember.serializeParticipants(
+        tx,
+        userAccountId,
+        space.persistedId,
+        input.participantIds,
+      );
+      return tx.transaction.create({
+        data: {
+          splitParticipantIds,
+          type: input.type,
+          spaceId: space.persistedId,
+          transferSpaceId: null,
+          description: input.description,
+          amount: input.amount,
+          beginDate: input.beginDate,
+          endDate: input.endDate || null,
+        },
+        include: transactionWithSpaceInclude,
+      });
+    });
     await Space.syncCurrentMonthTransactionCount(space.persistedId);
 
     return transaction;
@@ -483,9 +507,11 @@ export class Transaction {
   public static async listRecentByUser(
     userAccountId: string,
     limit: number,
+    spaceId?: string,
   ): Promise<TransactionWithSpaceRecord[]> {
     return prisma.transaction.findMany({
       where: {
+        ...(spaceId ? { spaceId } : {}),
         space: {
           userAccountId,
         },
@@ -528,6 +554,38 @@ export class Transaction {
     const monthEnd = endOfMonth(monthStart);
 
     const rows = await prisma.$queryRaw<MonthTotalsRow[]>`
+      WITH transaction_occurrences AS (
+        SELECT
+          e.type,
+          e.amount,
+          "getSpaceProjectionMonthStart"(
+            a.type::text,
+            a."paymentDueDay",
+            a."periodEndDay",
+            occurrence.occurrence_date::timestamp
+          ) AS "projectedMonthStart"
+        FROM "Transaction" e
+        INNER JOIN "Space" a
+          ON a.id = e."spaceId"
+        CROSS JOIN LATERAL generate_series(
+          date_trunc('month', e."beginDate"),
+          date_trunc('month', COALESCE(e."endDate", ${monthEnd})),
+          interval '1 month'
+        ) AS occurrence_month(month_start)
+        CROSS JOIN LATERAL (
+          SELECT
+            occurrence_month.month_start
+            + make_interval(
+                days => LEAST(
+                  EXTRACT(DAY FROM e."beginDate")::integer,
+                  EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+                ) - 1
+              ) AS occurrence_date
+        ) occurrence
+        WHERE a."userAccountId" = ${userAccountId}
+          AND e."transferSpaceId" IS NULL
+          AND e."beginDate" <= ${monthEnd}
+      )
       SELECT
         totals.income,
         totals.expense,
@@ -556,12 +614,8 @@ export class Transaction {
             ),
             0
           ) AS expense
-        FROM "Transaction" e
-        INNER JOIN "Space" a ON a.id = e."spaceId"
-        WHERE a."userAccountId" = ${userAccountId}
-          AND e."transferSpaceId" IS NULL
-          AND e."beginDate" <= ${monthEnd}
-          AND (e."endDate" IS NULL OR e."endDate" >= ${monthStart})
+        FROM transaction_occurrences e
+        WHERE e."projectedMonthStart" = ${monthStart}
       ) AS totals
     `;
 
@@ -625,13 +679,45 @@ export class Transaction {
             ${endMonthStart}::timestamp,
             interval '1 month'
           ) AS month_start
+        ),
+        transaction_occurrences AS (
+          SELECT
+            e.type,
+            e.amount,
+            "getSpaceProjectionMonthStart"(
+              a.type::text,
+              a."paymentDueDay",
+              a."periodEndDay",
+              occurrence.occurrence_date::timestamp
+            ) AS "projectedMonthStart"
+          FROM "Transaction" e
+          INNER JOIN "Space" a
+            ON a.id = e."spaceId"
+          CROSS JOIN LATERAL generate_series(
+            date_trunc('month', e."beginDate"),
+            date_trunc('month', COALESCE(e."endDate", ${endMonthStart})),
+            interval '1 month'
+          ) AS occurrence_month(month_start)
+          CROSS JOIN LATERAL (
+            SELECT
+              occurrence_month.month_start
+              + make_interval(
+                  days => LEAST(
+                    EXTRACT(DAY FROM e."beginDate")::integer,
+                    EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+                  ) - 1
+                ) AS occurrence_date
+          ) occurrence
+          WHERE a."userAccountId" = ${userAccountId}
+            AND e."transferSpaceId" IS NULL
+            AND e."beginDate" <= (${endMonthStart}::timestamp + interval '1 month - 1 millisecond')
         )
         SELECT
           to_char(months.month_start, 'YYYY-MM') AS "monthKey",
           COALESCE(
             SUM(
               CASE
-                WHEN a.id IS NOT NULL AND e.type = 'income' THEN e.amount
+                WHEN e.type = 'income' THEN e.amount
                 ELSE 0
               END
             ),
@@ -640,7 +726,7 @@ export class Transaction {
           COALESCE(
             SUM(
               CASE
-                WHEN a.id IS NOT NULL AND e.type = 'expense' THEN
+                WHEN e.type = 'expense' THEN
                   CASE
                     WHEN e.amount > 0 THEN -e.amount
                     ELSE e.amount
@@ -651,13 +737,8 @@ export class Transaction {
             0
           ) AS expense
         FROM months
-        LEFT JOIN "Transaction" e
-          ON e."beginDate" <= (months.month_start + interval '1 month - 1 millisecond')
-         AND (e."endDate" IS NULL OR e."endDate" >= months.month_start)
-         AND e."transferSpaceId" IS NULL
-        LEFT JOIN "Space" a
-          ON a.id = e."spaceId"
-         AND a."userAccountId" = ${userAccountId}
+        LEFT JOIN transaction_occurrences e
+          ON e."projectedMonthStart" = months.month_start
         GROUP BY months.month_start
         ORDER BY months.month_start ASC
       `,
@@ -668,57 +749,69 @@ export class Transaction {
     userAccountId: string,
     focusedMonthStart: Date,
   ): Promise<ProjectionSpacesQueryData> {
-    const {
-      normalizedFocusedMonthStart,
-      focusedMonthEnd,
-      focusedMonthIsCurrent,
-    } = Transaction.getProjectionMonthContext(focusedMonthStart);
+    const { normalizedFocusedMonthStart, focusedMonthEnd } =
+      Transaction.getProjectionMonthContext(focusedMonthStart);
 
     const [spaceSummaryRows, spaceTransactionsRows] = await Promise.all([
       prisma.$queryRaw<ProjectionFocusedSpaceSummaryRow[]>`
+        WITH transaction_occurrences AS (
+          SELECT
+            a.id AS "spaceId",
+            a.name AS "spaceName",
+            e.id,
+            e.type,
+            e.amount,
+            "getSpaceProjectionMonthStart"(
+              a.type::text,
+              a."paymentDueDay",
+              a."periodEndDay",
+              occurrence.occurrence_date::timestamp
+            ) AS "projectedMonthStart"
+          FROM "Space" a
+          INNER JOIN "Transaction" e
+            ON e."spaceId" = a.id
+          CROSS JOIN LATERAL generate_series(
+            date_trunc('month', e."beginDate"),
+            date_trunc('month', COALESCE(e."endDate", ${focusedMonthEnd})),
+            interval '1 month'
+          ) AS occurrence_month(month_start)
+          CROSS JOIN LATERAL (
+            SELECT
+              occurrence_month.month_start
+              + make_interval(
+                  days => LEAST(
+                    EXTRACT(DAY FROM e."beginDate")::integer,
+                    EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+                  ) - 1
+                ) AS occurrence_date
+          ) occurrence
+          WHERE a."userAccountId" = ${userAccountId}
+            AND e."beginDate" <= ${focusedMonthEnd}
+        )
         SELECT
-          a.id AS "spaceId",
-          a.name AS "spaceName",
+          transaction_occurrences."spaceId",
+          transaction_occurrences."spaceName",
           COALESCE(
             SUM(
               CASE
-                WHEN e.type = 'expense' THEN
+                WHEN transaction_occurrences.type = 'expense' THEN
                   CASE
-                    WHEN e.amount > 0 THEN -e.amount
-                    ELSE e.amount
+                    WHEN transaction_occurrences.amount > 0 THEN -transaction_occurrences.amount
+                    ELSE transaction_occurrences.amount
                   END
-                ELSE e.amount
+                ELSE transaction_occurrences.amount
               END
             ),
             0
           ) AS "monthTotal",
-          CASE
-            WHEN ${focusedMonthIsCurrent} THEN a."currentMonthTransactionCount"
-            ELSE COUNT(e.id)::integer
-          END AS "monthTransactionCount"
-        FROM "Space" a
-        INNER JOIN "Transaction" e ON e."spaceId" = a.id
-        WHERE a."userAccountId" = ${userAccountId}
-          AND e."beginDate" <= ${focusedMonthEnd}
-          AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
-        GROUP BY a.id, a.name, a."currentMonthTransactionCount"
-        ORDER BY a.name ASC
+          COUNT(transaction_occurrences.id)::integer AS "monthTransactionCount"
+        FROM transaction_occurrences
+        WHERE transaction_occurrences."projectedMonthStart" = ${normalizedFocusedMonthStart}
+        GROUP BY transaction_occurrences."spaceId", transaction_occurrences."spaceName"
+        ORDER BY transaction_occurrences."spaceName" ASC
       `,
       prisma.$queryRaw<ProjectionFocusedSpaceTransactionRow[]>`
-        SELECT
-          ranked."spaceId",
-          ranked."spaceName",
-          ranked.id,
-          ranked.type,
-          ranked."transferSpaceId",
-          ranked."transferSpaceName",
-          ranked.description,
-          ranked.amount,
-          ranked."beginDate",
-          ranked."endDate",
-          ranked."createdAt",
-          ranked."updatedAt"
-        FROM (
+        WITH transaction_occurrences AS (
           SELECT
             a.id AS "spaceId",
             a.name AS "spaceName",
@@ -727,22 +820,77 @@ export class Transaction {
             e."transferSpaceId",
             transfer_space.name AS "transferSpaceName",
             e.description,
+            e."splitParticipantIds",
             e.amount,
             e."beginDate",
             e."endDate",
             e."createdAt",
             e."updatedAt",
-            ROW_NUMBER() OVER (
-              PARTITION BY a.id
-              ORDER BY e."beginDate" DESC, e."createdAt" DESC
-            ) AS row_number
+            occurrence.occurrence_date::timestamp,
+            "getSpaceProjectionMonthStart"(
+              a.type::text,
+              a."paymentDueDay",
+              a."periodEndDay",
+              occurrence.occurrence_date::timestamp
+            ) AS "projectedMonthStart"
           FROM "Space" a
-          INNER JOIN "Transaction" e ON e."spaceId" = a.id
+          INNER JOIN "Transaction" e
+            ON e."spaceId" = a.id
           LEFT JOIN "Space" transfer_space
             ON transfer_space.id = e."transferSpaceId"
+          CROSS JOIN LATERAL generate_series(
+            date_trunc('month', e."beginDate"),
+            date_trunc('month', COALESCE(e."endDate", ${focusedMonthEnd})),
+            interval '1 month'
+          ) AS occurrence_month(month_start)
+          CROSS JOIN LATERAL (
+            SELECT
+              occurrence_month.month_start
+              + make_interval(
+                  days => LEAST(
+                    EXTRACT(DAY FROM e."beginDate")::integer,
+                    EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+                  ) - 1
+                ) AS occurrence_date
+          ) occurrence
           WHERE a."userAccountId" = ${userAccountId}
             AND e."beginDate" <= ${focusedMonthEnd}
-            AND (e."endDate" IS NULL OR e."endDate" >= ${normalizedFocusedMonthStart})
+        )
+        SELECT
+          ranked."spaceId",
+          ranked."spaceName",
+          ranked.id,
+          ranked.type,
+          ranked."transferSpaceId",
+          ranked."transferSpaceName",
+          ranked.description,
+          ranked."splitParticipantIds",
+          ranked.amount,
+          ranked."beginDate",
+          ranked."endDate",
+          ranked."createdAt",
+            ranked."updatedAt"
+        FROM (
+          SELECT
+            transaction_occurrences."spaceId",
+            transaction_occurrences."spaceName",
+            transaction_occurrences.id,
+            transaction_occurrences.type,
+            transaction_occurrences."transferSpaceId",
+            transaction_occurrences."transferSpaceName",
+            transaction_occurrences.description,
+            transaction_occurrences."splitParticipantIds",
+            transaction_occurrences.amount,
+            transaction_occurrences."beginDate",
+            transaction_occurrences."endDate",
+            transaction_occurrences."createdAt",
+            transaction_occurrences."updatedAt",
+            ROW_NUMBER() OVER (
+              PARTITION BY transaction_occurrences."spaceId"
+              ORDER BY transaction_occurrences.occurrence_date DESC, transaction_occurrences."createdAt" DESC
+            ) AS row_number
+          FROM transaction_occurrences
+          WHERE transaction_occurrences."projectedMonthStart" = ${normalizedFocusedMonthStart}
         ) ranked
         WHERE ranked.row_number <= 5
         ORDER BY ranked."spaceName" ASC, ranked."beginDate" DESC, ranked."createdAt" DESC
@@ -991,27 +1139,47 @@ export class Transaction {
       throw new Error("failed_to_update_transaction");
     }
 
-    let spaceId: string | undefined;
-
-    if (input.spaceName) {
-      const space = await Space.findOrCreateActive(
-        userAccountId,
-        input.spaceName,
-      );
+    let spaceId = existingTransaction.data.spaceId;
+    if (input.spaceId || input.spaceName) {
+      const space = input.spaceId
+        ? await Space.findOwnedById(userAccountId, input.spaceId)
+        : await Space.findOrCreateActive(userAccountId, input.spaceName!);
+      if (!space || space.toRecord().isArchived)
+        throw new Error("space_not_found");
       spaceId = space.persistedId;
     }
-
-    const updatedTransaction = await prisma.transaction.update({
-      where: { id },
-      data: {
-        ...(input.type && { type: input.type }),
-        ...(spaceId && { spaceId }),
-        ...(input.description && { description: input.description }),
-        ...(input.amount !== undefined && { amount: input.amount }),
-        ...(input.beginDate && { beginDate: input.beginDate }),
-        ...(input.endDate !== undefined && { endDate: input.endDate }),
-      },
-      include: transactionWithSpaceInclude,
+    const previous =
+      spaceId === existingTransaction.data.spaceId
+        ? (existingTransaction.data.splitParticipantIds ?? null)
+        : null;
+    const selected =
+      input.participantIds ??
+      (spaceId === existingTransaction.data.spaceId && previous
+        ? parseSplitParticipants(previous)
+        : undefined);
+    const updatedTransaction = await prisma.$transaction(async (tx) => {
+      const splitParticipantIds = existingTransaction.data.transferSpaceId
+        ? null
+        : await SpaceMember.serializeParticipants(
+            tx,
+            userAccountId,
+            spaceId,
+            selected,
+            previous,
+          );
+      return tx.transaction.update({
+        where: { id },
+        data: {
+          splitParticipantIds,
+          ...(input.type && { type: input.type }),
+          spaceId,
+          ...(input.description && { description: input.description }),
+          ...(input.amount !== undefined && { amount: input.amount }),
+          ...(input.beginDate && { beginDate: input.beginDate }),
+          ...(input.endDate !== undefined && { endDate: input.endDate }),
+        },
+        include: transactionWithSpaceInclude,
+      });
     });
 
     await Space.syncCurrentMonthTransactionCounts([
@@ -1062,31 +1230,68 @@ export class Transaction {
       return null;
     }
 
+    // Cards without a closing day retain their pre-period settlement timing.
+    const isLegacyCard = space.periodEndDay === null;
     const projectedMonthStart =
-      space.paymentTiming === null
-        ? monthStart
-        : space.paymentTiming === CreditCardPaymentTiming.previous_month
-          ? startOfMonth(addMonths(monthStart, 1))
-          : monthStart;
+      isLegacyCard &&
+      space.paymentTiming === CreditCardPaymentTiming.previous_month
+        ? startOfMonth(addMonths(monthStart, 1))
+        : startOfMonth(dueDate);
     const projectedMonthEnd = endOfMonth(projectedMonthStart);
 
-    const rows = await prisma.$queryRaw<Array<{ total: number | null }>>`
+    const rows = isLegacyCard
+      ? await prisma.$queryRaw<Array<{ total: number | null }>>`
+          SELECT COALESCE(SUM(ABS(t.amount)), 0) AS total
+          FROM "Transaction" t
+          WHERE t."spaceId" = ${space.id}
+            AND t.type = 'expense'
+            AND t."transferSpaceId" IS NULL
+            AND t."beginDate" <= ${projectedMonthEnd}
+            AND (t."endDate" IS NULL OR t."endDate" >= ${projectedMonthStart})
+        `
+      : await prisma.$queryRaw<Array<{ total: number | null }>>`
+      WITH transaction_occurrences AS (
+        SELECT
+          t.amount,
+          "getSpaceProjectionMonthStart"(
+            'credit_card'::text,
+            ${space.paymentDueDay}::integer,
+            ${space.periodEndDay}::integer,
+            occurrence.occurrence_date::timestamp
+          ) AS "projectedMonthStart"
+        FROM "Transaction" t
+        CROSS JOIN LATERAL generate_series(
+          date_trunc('month', t."beginDate"),
+          date_trunc('month', COALESCE(t."endDate", ${projectedMonthEnd})),
+          interval '1 month'
+        ) AS occurrence_month(month_start)
+        CROSS JOIN LATERAL (
+          SELECT
+            occurrence_month.month_start
+            + make_interval(
+                days => LEAST(
+                  EXTRACT(DAY FROM t."beginDate")::integer,
+                  EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+                ) - 1
+              ) AS occurrence_date
+        ) occurrence
+        WHERE t."spaceId" = ${space.id}
+          AND t.type = 'expense'
+          AND t."transferSpaceId" IS NULL
+          AND t."beginDate" <= ${projectedMonthEnd}
+      )
       SELECT
         COALESCE(
           SUM(
             CASE
-              WHEN t.amount > 0 THEN t.amount
-              ELSE -t.amount
+              WHEN amount > 0 THEN amount
+              ELSE -amount
             END
           ),
           0
         ) AS total
-      FROM "Transaction" t
-      WHERE t."spaceId" = ${space.id}
-        AND t.type = 'expense'
-        AND t."transferSpaceId" IS NULL
-        AND t."beginDate" <= ${projectedMonthEnd}
-        AND (t."endDate" IS NULL OR t."endDate" >= ${projectedMonthStart})
+      FROM transaction_occurrences
+      WHERE "projectedMonthStart" = ${projectedMonthStart}
     `;
     const total = Number(rows[0]?.total || 0);
 

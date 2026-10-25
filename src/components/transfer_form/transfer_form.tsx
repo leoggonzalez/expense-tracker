@@ -6,7 +6,7 @@ import React, { useState } from "react";
 
 import { createTransferTransaction } from "@/actions/transactions";
 import { Button, InfoBox, Input, Select } from "@/components";
-import { MonthSelector } from "@/components/month_selector/month_selector";
+import { format } from "date-fns";
 import { useToast } from "@/components/toast_provider/toast_provider";
 import { Icon, Stack, Text } from "@/elements";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
@@ -31,25 +31,25 @@ interface TransferFormProps {
   spaces: TransferSpace[];
   initialValues?: TransferFormInitialValues;
   onSuccess?: () => void;
+  fixedFromSpaceId?: string;
 }
 
 export function TransferForm({
   spaces,
   initialValues,
   onSuccess,
+  fixedFromSpaceId,
 }: TransferFormProps): React.ReactElement {
   const { showError, showSuccess } = useToast();
   const [fromSpaceId, setFromSpaceId] = useState(
-    initialValues?.fromSpaceId || "",
+    fixedFromSpaceId || initialValues?.fromSpaceId || "",
   );
   const [toSpaceId, setToSpaceId] = useState(initialValues?.toSpaceId || "");
   const [description, setDescription] = useState(
     initialValues?.description || "",
   );
   const [amountInput, setAmountInput] = useState(initialValues?.amount || "");
-  const [beginDate, setBeginDate] = useState(
-    new Date().toISOString().slice(0, 7),
-  );
+  const [beginDate, setBeginDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const beginDateMode = inferTransactionDateMode(beginDate);
 
@@ -95,7 +95,7 @@ export function TransferForm({
     setIsSubmitting(true);
 
     const result = await createTransferTransaction({
-      fromSpaceId,
+      fromSpaceId: fixedFromSpaceId || fromSpaceId,
       toSpaceId,
       description,
       amount: Math.abs(parsedAmount),
@@ -111,11 +111,11 @@ export function TransferForm({
       return;
     }
 
-    setFromSpaceId("");
+    setFromSpaceId(fixedFromSpaceId || "");
     setToSpaceId("");
     setDescription("");
     setAmountInput("");
-    setBeginDate(new Date().toISOString().slice(0, 7));
+    setBeginDate(format(new Date(), "yyyy-MM-dd"));
 
     showSuccess(i18n.t("toast.transfer_created"), {
       iconName: "transfer",
@@ -130,19 +130,21 @@ export function TransferForm({
   return (
     <form onSubmit={onSubmit} className="transfer-form">
       <Stack gap={16}>
-        <Select
-          label={i18n.t("transaction_form.transfer_from")}
-          value={fromSpaceId}
-          onChange={setFromSpaceId}
-          options={transferOptions}
-          placeholder={
-            i18n.t("transaction_form.transfer_space_placeholder") as string
-          }
-          required
-          size="lg"
-          surface="subtle"
-          labelTone="secondary"
-        />
+        {!fixedFromSpaceId && (
+          <Select
+            label={i18n.t("transaction_form.transfer_from")}
+            value={fromSpaceId}
+            onChange={setFromSpaceId}
+            options={transferOptions}
+            placeholder={
+              i18n.t("transaction_form.transfer_space_placeholder") as string
+            }
+            required
+            size="lg"
+            surface="subtle"
+            labelTone="secondary"
+          />
+        )}
         {showInsufficientFundsWarning && selectedFromSpace ? (
           <InfoBox
             variant="warning"
@@ -165,7 +167,9 @@ export function TransferForm({
           label={i18n.t("transaction_form.transfer_to")}
           value={toSpaceId}
           onChange={setToSpaceId}
-          options={transferOptions}
+          options={transferOptions.filter(
+            (option) => option.value !== (fixedFromSpaceId || fromSpaceId),
+          )}
           placeholder={
             i18n.t("transaction_form.transfer_space_placeholder") as string
           }
@@ -200,22 +204,15 @@ export function TransferForm({
           labelTone="secondary"
         />
 
-        <MonthSelector
-          label={i18n.t(
-            beginDateMode === "month"
-              ? "transaction_form.begin_date_month"
-              : "transaction_form.begin_date",
-          )}
+        <Input
+          type="date"
+          label={i18n.t("transaction_form.begin_date")}
           value={beginDate}
           onChange={setBeginDate}
-          editLabel={String(i18n.t("transaction_form.edit_full_begin_date"))}
-          closeLabel={String(
-            i18n.t("transaction_form.use_month_year_begin_date"),
-          )}
-          monthLabel={i18n.t("transaction_form.month")}
-          yearLabel={i18n.t("transaction_form.year")}
           required
+          size="lg"
           surface="subtle"
+          labelTone="secondary"
         />
 
         <Text element="p" type="caption" color="secondary">
@@ -226,7 +223,7 @@ export function TransferForm({
           type="submit"
           variant="outline-transfer"
           disabled={isSubmitting}
-          startIcon={<Icon name="transfer" />}
+          startIcon={<Icon name="transfer" size={18} />}
         >
           {isSubmitting
             ? i18n.t("transaction_form.adding_transfer")

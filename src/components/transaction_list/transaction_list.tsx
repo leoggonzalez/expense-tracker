@@ -12,6 +12,7 @@ export type TransactionListItem = {
   id: string;
   type: string;
   spaceName: string;
+  participantNames?: string[];
   description: string;
   amount: number;
   beginDate: string;
@@ -54,7 +55,11 @@ export function TransactionList({
     }
   };
 
-  if (plainTransactions.length === 0) {
+  if (
+    plainTransactions.length === 0 &&
+    !topSummaryRows.length &&
+    !summaryRows.length
+  ) {
     return (
       <div className="transaction-list transaction-list--empty">
         <Card padding={32} variant="dashed">

@@ -1,6 +1,7 @@
 import { PersistedValue } from "@/lib/persisted_value";
 
 export type NewTransactionDraft = {
+  participantIds?: string[];
   spaceName: string;
   description: string;
   amountInput: string;
@@ -20,16 +21,29 @@ const lastPathnameValue = new PersistedValue<string>(
   "expense_tracker_last_pathname",
 );
 
-export function loadNewTransactionDraft(): NewTransactionDraft | null {
-  return draftValue.load();
+function getDraftValue(spaceId?: string): PersistedValue<NewTransactionDraft> {
+  return spaceId
+    ? new PersistedValue<NewTransactionDraft>(
+        `expense_tracker_new_transaction_draft_${spaceId}`,
+      )
+    : draftValue;
 }
 
-export function saveNewTransactionDraft(draft: NewTransactionDraft): void {
-  draftValue.save(draft);
+export function loadNewTransactionDraft(
+  spaceId?: string,
+): NewTransactionDraft | null {
+  return getDraftValue(spaceId).load();
 }
 
-export function clearNewTransactionDraft(): void {
-  draftValue.clear();
+export function saveNewTransactionDraft(
+  draft: NewTransactionDraft,
+  spaceId?: string,
+): void {
+  getDraftValue(spaceId).save(draft);
+}
+
+export function clearNewTransactionDraft(spaceId?: string): void {
+  getDraftValue(spaceId).clear();
 }
 
 export function isNewTransactionFlowActive(): boolean {

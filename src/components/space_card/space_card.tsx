@@ -1,6 +1,6 @@
 import "@/components/space_card/space_card.scss";
 
-import { Avatar, Button, Currency } from "@/components";
+import { AppLink, Avatar, Button, Currency } from "@/components";
 import { Card, Icon, Stack, Text } from "@/elements";
 
 import { i18n } from "@/model/i18n";
@@ -26,13 +26,18 @@ export function SpaceCard({
           <Stack gap={20}>
             <Stack line align="center" justify="space-between" gap={16}>
               <Stack line align="center" gap={12}>
-                <Avatar name={name} />
-                <Text element="p" type="lead-semibold">
-                  {name}
-                </Text>
+                <AppLink href={`/spaces/${id}`} ariaLabel={name}>
+                  <Avatar name={name} />
+                </AppLink>
+                <AppLink href={`/spaces/${id}`}>
+                  <Text element="p" type="lead-semibold">
+                    {name}
+                  </Text>
+                </AppLink>
               </Stack>
               <Button
                 href={`/spaces/${id}`}
+                target="_blank"
                 variant="secondary"
                 size="sm"
                 startIcon={<Icon name="external-link" size={16} />}

@@ -64,8 +64,8 @@
     "description_placeholder": "e.g., Salary, Rent",
     "amount": "Amount",
     "amount_placeholder": "0.00",
-    "begin_date": "Begin Date",
-    "begin_date_month": "Begin Month",
+    "begin_date": "Date",
+    "begin_date_month": "Date",
     "month": "Month",
     "year": "Year",
     "schedule_label": "Schedule",
@@ -283,7 +283,10 @@
     "payment_timing": "Settlement timing",
     "payment_timing_previous_month": "Month before",
     "payment_timing_same_month": "Same month",
-    "payment_due_day_hint": "Choose the due day and whether this card settles the same month or the month before. Shorter months use the last day of the month.",
+    "period_end_day": "Statement cutoff day",
+    "payment_due_day_hint": "Shorter months use the last day of the month.",
+    "credit_card_period_hint": "Purchases before this day are paid the following month. Purchases on or after this day are paid two months later. Shorter months use the last day.",
+    "credit_card_legacy_period_hint": "Leave the period end day empty to keep this card’s existing settlement timing. Enter a day to use statement periods instead.",
     "current_month_total": "Current month total",
     "month_total_label": "%{month} total",
     "current_month_relevant_transactions": "Current month relevant transactions",
@@ -334,10 +337,18 @@
     "credit_card_payment_due_day_required": "Payment due day is required for credit-card spaces.",
     "credit_card_payment_due_day_invalid": "Payment due day must be a whole number between 1 and 31.",
     "credit_card_payment_timing_required": "Settlement timing is required for credit-card spaces.",
+    "credit_card_period_end_day_required": "Period end day is required for credit-card spaces.",
+    "credit_card_period_end_day_invalid": "Period end day must be a whole number between 1 and 31.",
+    "credit_card_fields_require_credit_card": "Credit-card payment fields can only be used for credit-card spaces.",
     "payment_due_day_requires_credit_card": "Payment due day can only be used for credit-card spaces.",
     "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
     "create_failed": "Unable to create the space.",
-    "settle_hint": "Create a balancing transfer when this space finishes the month below zero."
+    "settle_hint": "Create a balancing transfer when this space finishes the month below zero.",
+    "invalid_members": "Enter a name of up to 100 characters for each member.",
+    "download_pdf": "Download monthly transactions as PDF",
+    "downloading_pdf": "Preparing PDF",
+    "pdf_download_failed": "Unable to download the PDF. Please try again.",
+    "pdf_page": "Page %{number} of %{total}"
   },
   "space_detail_page": {
     "title": "Space details",
@@ -359,13 +370,17 @@
     "credit_card_payment_due_day_required": "Payment due day is required for credit-card spaces.",
     "credit_card_payment_due_day_invalid": "Payment due day must be a whole number between 1 and 31.",
     "credit_card_payment_timing_required": "Settlement timing is required for credit-card spaces.",
+    "credit_card_period_end_day_required": "Period end day is required for credit-card spaces.",
+    "credit_card_period_end_day_invalid": "Period end day must be a whole number between 1 and 31.",
+    "credit_card_fields_require_credit_card": "Credit-card payment fields can only be used for credit-card spaces.",
     "payment_due_day_requires_credit_card": "Payment due day can only be used for credit-card spaces.",
     "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
-    "account_details_title": "Account details",
+    "space_details_title": "Space details",
     "account_detail_main": "Main space",
     "account_detail_type": "Account type",
     "account_detail_settle": "Settlement",
-    "account_detail_settle_value": "Day %{day} · %{timing}",
+    "account_detail_settle_value": "Due day %{day} · New period starts day %{periodEndDay}",
+    "account_detail_settle_legacy_value": "Due day %{day} · %{timing}",
     "account_detail_yes": "Yes",
     "account_detail_no": "No",
     "main_toggle_label": "Set as main space",
@@ -374,6 +389,9 @@
     "not_found": "Space not found."
   },
   "new_transaction_page": {
+    "title_income_in_space": "Add new income to %{space}",
+    "title_expense_in_space": "Add new expense to %{space}",
+    "title_transfer_in_space": "Add new transfer from %{space}",
     "title_income": "Add new income",
     "title_expense": "Add new expense",
     "title_transfer": "Add new transfer",
@@ -453,5 +471,18 @@
     "failed_to_update_transaction": "Failed to update transaction",
     "failed_to_delete_transaction": "Failed to delete transaction",
     "space_is_archived": "This space is archived and cannot receive new transactions."
+  },
+  "space_members": {
+    "title": "Members",
+    "name": "Member %{number}",
+    "add": "Add member",
+    "remove": "Remove member %{number}",
+    "former": "%{name} (former member)"
+  },
+  "transaction_split": {
+    "title": "Split",
+    "you": "You",
+    "select_participant": "Select at least one participant.",
+    "invalid_split": "The split participants are invalid. Refresh and try again."
   }
 }
