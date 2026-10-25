@@ -319,7 +319,11 @@
     "payment_timing_requires_credit_card": "O momento da liquidação só pode ser usado em espaços de cartão de crédito.",
     "create_failed": "Não foi possível criar o espaço.",
     "settle_hint": "Crie uma transferência de ajuste quando este espaço encerrar o mês abaixo de zero.",
-    "invalid_members": "Insira um nome de até 100 caracteres para cada membro."
+    "invalid_members": "Insira um nome de até 100 caracteres para cada membro.",
+    "download_pdf": "Baixar as transações do mês em PDF",
+    "downloading_pdf": "Preparando PDF",
+    "pdf_download_failed": "Não foi possível baixar o PDF. Tente novamente.",
+    "pdf_page": "Página %{number} de %{total}"
   },
   "space_detail_page": {
     "title": "Detalhes do espaço",

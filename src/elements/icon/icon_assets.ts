@@ -39,6 +39,7 @@ export const iconAssets = {
     import.meta.url,
   ).toString(),
   minus: new URL("./icons/minus.svg", import.meta.url).toString(),
+  download: new URL("./icons/download.svg", import.meta.url).toString(),
 } as const;
 
 export type IconName = keyof typeof iconAssets;

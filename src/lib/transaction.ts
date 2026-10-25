@@ -195,6 +195,7 @@ export type ProjectionFocusedSpaceSummaryRow = {
 };
 
 export type ProjectionFocusedSpaceTransactionRow = {
+  splitParticipantIds: string | null;
   spaceId: string;
   spaceName: string;
   id: string;
@@ -819,6 +820,7 @@ export class Transaction {
             e."transferSpaceId",
             transfer_space.name AS "transferSpaceName",
             e.description,
+            e."splitParticipantIds",
             e.amount,
             e."beginDate",
             e."endDate",
@@ -862,6 +864,7 @@ export class Transaction {
           ranked."transferSpaceId",
           ranked."transferSpaceName",
           ranked.description,
+          ranked."splitParticipantIds",
           ranked.amount,
           ranked."beginDate",
           ranked."endDate",
@@ -876,6 +879,7 @@ export class Transaction {
             transaction_occurrences."transferSpaceId",
             transaction_occurrences."transferSpaceName",
             transaction_occurrences.description,
+            transaction_occurrences."splitParticipantIds",
             transaction_occurrences.amount,
             transaction_occurrences."beginDate",
             transaction_occurrences."endDate",

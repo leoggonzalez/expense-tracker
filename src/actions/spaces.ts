@@ -7,6 +7,7 @@ import { revalidateSpaceMutationPages } from "@/lib/app_revalidation";
 import { normalizeTransactionAmount } from "@/lib/amount";
 import { isPrismaErrorWithCode } from "@/lib/prisma_errors";
 import { SpaceMember } from "@/lib/space_member";
+import { getOtherParticipantNames } from "@/lib/transaction_split";
 import type {
   MemberInput,
   MemberMonthTotal,
@@ -40,6 +41,7 @@ export type ArchivedSpacesPayload = {
 };
 
 type SpaceDetailTransaction = {
+  participantNames: string[];
   id: string;
   type: string;
   spaceName: string;
@@ -101,8 +103,15 @@ export type SpaceEditPayload = SpaceEditData;
 function serializeSpaceTransaction(
   spaceName: string,
   transaction: SpaceTransactionRecord,
+  ownerId: string,
+  members: SplitMember[],
 ): SpaceDetailTransaction {
   return {
+    participantNames: getOtherParticipantNames(
+      transaction.splitParticipantIds,
+      ownerId,
+      members,
+    ),
     id: transaction.id,
     type: transaction.type,
     spaceName,
@@ -368,10 +377,20 @@ export async function getSpaceDetailPayloadForUser(
     },
     selectedMonthRelevantTransactions:
       detailData.selectedMonthRelevantTransactions.map((transaction) =>
-        serializeSpaceTransaction(detailData.metrics.name, transaction),
+        serializeSpaceTransaction(
+          detailData.metrics.name,
+          transaction,
+          userAccountId,
+          members[input.spaceId] || [],
+        ),
       ),
     allTransactions: detailData.allTransactions.map((transaction) =>
-      serializeSpaceTransaction(detailData.metrics.name, transaction),
+      serializeSpaceTransaction(
+        detailData.metrics.name,
+        transaction,
+        userAccountId,
+        members[input.spaceId] || [],
+      ),
     ),
     pagination: {
       page,

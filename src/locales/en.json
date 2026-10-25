@@ -344,7 +344,11 @@
     "payment_timing_requires_credit_card": "Settlement timing can only be used for credit-card spaces.",
     "create_failed": "Unable to create the space.",
     "settle_hint": "Create a balancing transfer when this space finishes the month below zero.",
-    "invalid_members": "Enter a name of up to 100 characters for each member."
+    "invalid_members": "Enter a name of up to 100 characters for each member.",
+    "download_pdf": "Download monthly transactions as PDF",
+    "downloading_pdf": "Preparing PDF",
+    "pdf_download_failed": "Unable to download the PDF. Please try again.",
+    "pdf_page": "Page %{number} of %{total}"
   },
   "space_detail_page": {
     "title": "Space details",

@@ -30,3 +30,14 @@ export function getSplitShareCents(amount: number, count: number): number {
   const cents = Math.round(Number(`${significand}e${Number(exponent) + 2}`));
   return Math.sign(amount) * Math.round(cents / count);
 }
+
+export function getOtherParticipantNames(
+  value: string | null | undefined,
+  ownerId: string,
+  members: SplitMember[],
+): string[] {
+  const selected = new Set(parseSplitParticipants(value));
+  return members
+    .filter((member) => member.id !== ownerId && selected.has(member.id))
+    .map((member) => member.name);
+}

@@ -4,7 +4,7 @@ import { register } from "tsx/esm/api";
 import "tsx/cjs";
 
 register();
-const { getSplitShareCents, parseSplitParticipants } =
+const { getSplitShareCents, parseSplitParticipants, getOtherParticipantNames } =
   await import("../../src/lib/transaction_split.ts");
 
 test("equal shares round in cents, retain expense signs, and tolerate legacy selections", () => {
@@ -20,6 +20,23 @@ test("equal shares round in cents, retain expense signs, and tolerate legacy sel
   assert.deepEqual(parseSplitParticipants("owner;member;member;"), [
     "owner",
     "member",
+  ]);
+});
+
+test("participant labels exclude the owner, keep former members, and ignore unselected or unknown IDs", () => {
+  const members = [
+    { id: "alex", name: "Alex", isRemoved: true },
+    { id: "sam", name: "Samuel", isRemoved: false },
+    { id: "unselected", name: "Unselected", isRemoved: false },
+  ];
+  assert.deepEqual(getOtherParticipantNames(null, "owner", members), []);
+  assert.deepEqual(getOtherParticipantNames("owner", "owner", members), []);
+  assert.deepEqual(
+    getOtherParticipantNames("owner;sam;alex;sam;foreign", "owner", members),
+    ["Alex", "Samuel"],
+  );
+  assert.deepEqual(getOtherParticipantNames("alex", "owner", members), [
+    "Alex",
   ]);
 });
 
@@ -131,6 +148,25 @@ test(
       assert.deepEqual(
         new Set(parseSplitParticipants(transaction.splitParticipantIds)),
         new Set(input.participantIds),
+      );
+      const initialProjection = await Transaction.getProjectionSpacesQueryData(
+        owner.id,
+        new Date(2026, 9, 1),
+      );
+      assert.equal(
+        initialProjection.spaceTransactionsRows.find(
+          (row) => row.id === transaction.id,
+        ).splitParticipantIds,
+        transaction.splitParticipantIds,
+      );
+      const relevant = await Space.listRelevantTransactionsForMonth(
+        space.persistedId,
+        new Date(2026, 9, 1),
+        new Date(2026, 10, 0, 23, 59, 59, 999),
+      );
+      assert.equal(
+        relevant.find((row) => row.id === transaction.id).splitParticipantIds,
+        transaction.splitParticipantIds,
       );
       await assert.rejects(
         Transaction.createForUser(owner.id, { ...input, participantIds: [] }),

@@ -10,6 +10,7 @@ import {
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
 import { SpaceMember } from "@/lib/space_member";
+import { getOtherParticipantNames } from "@/lib/transaction_split";
 import type { MemberMonthTotal, SplitMember } from "@/lib/transaction_split";
 
 import { normalizeTransactionAmount } from "@/lib/amount";
@@ -116,6 +117,7 @@ export type DashboardRecentActivityPayload = {
 };
 
 export type ProjectionMonthTransaction = {
+  participantNames: string[];
   id: string;
   type: string;
   spaceName: string;
@@ -281,8 +283,15 @@ type ProjectionFocusedSpaceAccumulator = {
 
 function serializeProjectionMonthTransactionRow(
   transaction: ProjectionFocusedSpaceTransactionRow,
+  ownerId: string,
+  members: SplitMember[],
 ): ProjectionMonthTransaction {
   return {
+    participantNames: getOtherParticipantNames(
+      transaction.splitParticipantIds,
+      ownerId,
+      members,
+    ),
     id: transaction.id,
     type: transaction.type,
     spaceName: transaction.spaceName,
@@ -443,6 +452,8 @@ function serializeFilteredTransaction(
 function mapProjectionSpaces(
   spaceSummaryRows: ProjectionFocusedSpaceSummaryRow[],
   spaceTransactionsRows: ProjectionFocusedSpaceTransactionRow[],
+  ownerId: string,
+  members: Record<string, SplitMember[]>,
 ): ProjectionFocusedSpace[] {
   const spaceMap = new Map<string, ProjectionFocusedSpaceAccumulator>(
     spaceSummaryRows.map((space) => [
@@ -466,7 +477,11 @@ function mapProjectionSpaces(
     }
 
     existing.transactions.push(
-      serializeProjectionMonthTransactionRow(transaction),
+      serializeProjectionMonthTransactionRow(
+        transaction,
+        ownerId,
+        members[transaction.spaceId] || [],
+      ),
     );
   });
 
@@ -684,12 +699,18 @@ export async function getProjectionSpacesPayloadForUser(
     focusedMonthStart,
   );
 
-  const memberTotals = await SpaceMember.getMonthTotalsForSpaces(
-    userAccountId,
-    projectionData.spaceSummaryRows.map((space) => space.spaceId),
-    projectionData.normalizedFocusedMonthStart,
-    endOfMonth(projectionData.normalizedFocusedMonthStart),
+  const spaceIds = projectionData.spaceSummaryRows.map(
+    (space) => space.spaceId,
   );
+  const [memberTotals, members] = await Promise.all([
+    SpaceMember.getMonthTotalsForSpaces(
+      userAccountId,
+      spaceIds,
+      projectionData.normalizedFocusedMonthStart,
+      endOfMonth(projectionData.normalizedFocusedMonthStart),
+    ),
+    SpaceMember.listForSpaces(userAccountId, spaceIds),
+  ]);
   return {
     focusedMonthKey: formatProjectionMonthKey(
       projectionData.normalizedFocusedMonthStart,
@@ -697,6 +718,8 @@ export async function getProjectionSpacesPayloadForUser(
     focusedMonthSpaces: mapProjectionSpaces(
       projectionData.spaceSummaryRows,
       projectionData.spaceTransactionsRows,
+      userAccountId,
+      members,
     ).map((space) => ({
       ...space,
       memberTotals: memberTotals[space.spaceId] || [],

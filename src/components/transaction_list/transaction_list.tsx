@@ -12,6 +12,7 @@ export type TransactionListItem = {
   id: string;
   type: string;
   spaceName: string;
+  participantNames?: string[];
   description: string;
   amount: number;
   beginDate: string;

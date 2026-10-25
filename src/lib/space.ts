@@ -78,6 +78,7 @@ type SpaceDetailMetricsRow = {
 };
 
 const spaceTransactionSelect = Prisma.validator<Prisma.TransactionSelect>()({
+  splitParticipantIds: true,
   id: true,
   type: true,
   transferSpaceId: true,

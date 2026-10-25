@@ -164,6 +164,7 @@ export function SpaceDetailSection({
     React.useState<SpaceDetailPayload | null>(null);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
   const [isUpdatingMain, setIsUpdatingMain] = React.useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = React.useState(false);
 
   React.useEffect(() => {
     setVisibleData(data);
@@ -215,6 +216,38 @@ export function SpaceDetailSection({
     return <></>;
   }
   const currentData = visibleData || data;
+
+  async function handleDownloadPdf(): Promise<void> {
+    if (isDownloadingPdf) return;
+    setIsDownloadingPdf(true);
+    try {
+      const month = currentData.selectedMonth.key;
+      const response = await fetch(
+        `/api/spaces/${encodeURIComponent(currentData.space.id)}/export?currentMonth=${encodeURIComponent(month)}`,
+        {
+          cache: "no-store",
+          credentials: "same-origin",
+        },
+      );
+      if (
+        !response.ok ||
+        !response.headers.get("Content-Type")?.includes("application/pdf")
+      )
+        throw new Error("pdf_download_failed");
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${currentData.space.name}-${month}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      showError(i18n.t("spaces_page.pdf_download_failed"));
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  }
 
   const detailSearchParams = new URLSearchParams();
 
@@ -508,6 +541,24 @@ export function SpaceDetailSection({
             }),
           )}
           icon="transactions"
+          actions={
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={isDownloadingPdf}
+              ariaLabel={String(
+                i18n.t(
+                  isDownloadingPdf
+                    ? "spaces_page.downloading_pdf"
+                    : "spaces_page.download_pdf",
+                ),
+              )}
+              onClick={() => void handleDownloadPdf()}
+              startIcon={<Icon name="download" size={18} />}
+            >
+              {null}
+            </Button>
+          }
         >
           <TransactionList
             transactions={currentData.selectedMonthRelevantTransactions}
