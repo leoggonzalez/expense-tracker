@@ -6,6 +6,7 @@ import "tsx/cjs";
 register();
 const {
   getSplitShareCents,
+  getParticipantGroupMonthTotals,
   parseSplitParticipants,
   getParticipantNames,
   formatParticipantNames,
@@ -33,8 +34,12 @@ test("participant labels include the selected owner on shared transactions and r
     { id: "sam", name: "Samuel", isRemoved: false },
     { id: "unselected", name: "Unselected", isRemoved: false },
   ];
-  assert.deepEqual(getParticipantNames(null, "owner", members, "Leo"), []);
-  assert.deepEqual(getParticipantNames("owner", "owner", members, "Leo"), []);
+  assert.deepEqual(getParticipantNames(null, "owner", members, "Leo"), ["Leo"]);
+  assert.deepEqual(getParticipantNames("owner", "owner", members, "Leo"), [
+    "Leo",
+  ]);
+  assert.deepEqual(getParticipantNames("owner", "owner", [], "Leo"), []);
+  assert.deepEqual(getParticipantNames(null, "owner", [], "Leo"), []);
   assert.deepEqual(
     getParticipantNames("owner;sam;alex;sam;foreign", "owner", members, "Leo"),
     ["Leo", "Alex", "Samuel"],
@@ -51,6 +56,60 @@ test("participant names use English conjunctions", () => {
   assert.equal(
     formatParticipantNames(["Leo", "Alex", "Sam"]),
     "Leo, Alex and Sam",
+  );
+});
+
+test("monthly groups count each full amount once and group by identity regardless of selection order", () => {
+  const owner = { id: "owner", name: "Leo Gonzalez", isRemoved: false };
+  const members = [
+    { id: "sophia", name: "Sophia", isRemoved: false },
+    { id: "former", name: "Alex", isRemoved: true },
+    { id: "active", name: "Alex", isRemoved: false },
+  ];
+  const occurrence = (amount, splitParticipantIds, type = "expense") => ({
+    amount,
+    splitParticipantIds,
+    type,
+  });
+  const groups = getParticipantGroupMonthTotals(
+    [
+      occurrence(100, "owner;sophia"),
+      occurrence(0.01, "sophia;owner;owner"),
+      occurrence(20, "owner"),
+      occurrence(5, null),
+      occurrence(30, "sophia"),
+      occurrence(10, "sophia", "income"),
+      occurrence(2, "former"),
+      { ...occurrence(50, "sophia", "income"), transferSpaceId: "other" },
+    ],
+    owner,
+    members,
+  );
+  assert.deepEqual(
+    groups.map((group) => [
+      group.participants.map((member) => member.id),
+      group.amount,
+    ]),
+    [
+      [["owner", "sophia"], -100.01],
+      [["owner"], 25],
+      [["sophia"], -20],
+      [["former"], -2],
+    ],
+  );
+  assert.equal(
+    Math.round(groups.reduce((total, group) => total + group.amount, 0) * 100),
+    -9701,
+  );
+  assert.deepEqual(getParticipantGroupMonthTotals([], owner, members), []);
+  const sharedOnly = getParticipantGroupMonthTotals(
+    [occurrence(100, "owner;sophia")],
+    owner,
+    members,
+  );
+  assert.deepEqual(
+    sharedOnly.map((group) => group.participants.map((member) => member.id)),
+    [["owner", "sophia"]],
   );
 });
 

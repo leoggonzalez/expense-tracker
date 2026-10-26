@@ -578,13 +578,9 @@ export function SpaceDetailSection({
                 ),
                 tone: "emphasis",
               },
-              ...currentData.memberTotals.map((member) => ({
-                id: `member-${member.id}`,
-                label: member.isOwner
-                  ? i18n.t("transaction_split.you")
-                  : member.isRemoved
-                    ? i18n.t("space_members.former", { name: member.name })
-                    : member.name,
+              ...currentData.participantGroupTotals.map((member) => ({
+                id: `participant-group-${member.id}`,
+                label: member.name,
                 value: <Currency value={member.amount} type="caption" />,
               })),
             ]}

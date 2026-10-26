@@ -33,19 +33,15 @@ function report(count = 1) {
         transferSpaceName: null,
       }),
     ),
-    memberTotals: [
+    participantGroupTotals: [
       {
         id: "owner",
-        name: "",
-        isOwner: true,
-        isRemoved: false,
+        name: "Leo Gonzalez",
         amount: -50 * count,
       },
       {
         id: "member",
         name: "Sophia",
-        isOwner: false,
-        isRemoved: false,
         amount: -50 * count,
       },
     ],
@@ -65,11 +61,9 @@ test("monthly PDF supports empty reports, Unicode, and multiple pages including 
   long.selectedMonthRelevantTransactions[3].transferSpaceName = "Other space";
   long.selectedMonthRelevantTransactions[4].endDate =
     "2026-12-01T00:00:00.000Z";
-  long.memberTotals.push({
+  long.participantGroupTotals.push({
     id: "former",
     name: "Alex",
-    isOwner: false,
-    isRemoved: true,
     amount: 0,
   });
   const bytes = await createSpaceMonthPdf(long);

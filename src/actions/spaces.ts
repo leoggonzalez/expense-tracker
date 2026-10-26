@@ -9,12 +9,11 @@ import { isPrismaErrorWithCode } from "@/lib/prisma_errors";
 import { UserAccount } from "@/lib/user_account";
 import { i18n } from "@/model/i18n";
 import { SpaceMember } from "@/lib/space_member";
-import { getParticipantNames } from "@/lib/transaction_split";
-import type {
-  MemberInput,
-  MemberMonthTotal,
-  SplitMember,
+import {
+  formatParticipantNames,
+  getParticipantNames,
 } from "@/lib/transaction_split";
+import type { MemberInput, SplitMember } from "@/lib/transaction_split";
 import { Space, type SpaceTransactionRecord } from "@/lib/space";
 import { requireCurrentUserAccount } from "@/lib/session";
 
@@ -76,7 +75,7 @@ export type SpaceDetailPageData = {
     historicalTotal: number;
     selectedMonthTotal: number;
   };
-  memberTotals: MemberMonthTotal[];
+  participantGroupTotals: { id: string; name: string; amount: number }[];
   selectedMonthRelevantTransactions: SpaceDetailTransaction[];
   allTransactions: SpaceDetailTransaction[];
   pagination: {
@@ -110,12 +109,14 @@ function serializeSpaceTransaction(
   ownerName: string,
 ): SpaceDetailTransaction {
   return {
-    participantNames: getParticipantNames(
-      transaction.splitParticipantIds,
-      ownerId,
-      members,
-      ownerName,
-    ),
+    participantNames: transaction.transferSpaceId
+      ? []
+      : getParticipantNames(
+          transaction.splitParticipantIds,
+          ownerId,
+          members,
+          ownerName,
+        ),
     id: transaction.id,
     type: transaction.type,
     spaceName,
@@ -348,18 +349,34 @@ export async function getSpaceDetailPayloadForUser(
     return null;
   }
 
-  const [memberTotals, members, owner] = await Promise.all([
-    SpaceMember.getMonthTotalsForSpaces(
-      userAccountId,
-      [input.spaceId],
-      monthStart,
-      monthEnd,
-    ),
+  const [members, owner] = await Promise.all([
     SpaceMember.listForSpaces(userAccountId, [input.spaceId]),
     UserAccount.findById(userAccountId),
   ]);
+  const ownerName =
+    owner?.data.name?.trim() ||
+    owner?.data.email ||
+    String(i18n.t("account.title"));
+  const groups = await SpaceMember.getMonthGroupTotalsForSpace(
+    userAccountId,
+    input.spaceId,
+    monthStart,
+    monthEnd,
+    { id: userAccountId, name: ownerName, isRemoved: false },
+    members[input.spaceId] || [],
+  );
   return {
-    memberTotals: memberTotals[input.spaceId] || [],
+    participantGroupTotals: groups.map((group) => ({
+      id: group.id,
+      name: formatParticipantNames(
+        group.participants.map((member) =>
+          member.isRemoved
+            ? String(i18n.t("space_members.former", { name: member.name }))
+            : member.name,
+        ),
+      ),
+      amount: group.amount,
+    })),
     mainSpaceId: mainSpace?.toRecord().id || null,
     selectedMonth: {
       key: format(monthStart, "yyyy-MM"),
@@ -387,7 +404,7 @@ export async function getSpaceDetailPayloadForUser(
           transaction,
           userAccountId,
           members[input.spaceId] || [],
-          owner?.data.name?.trim() || String(i18n.t("transaction_split.you")),
+          ownerName,
         ),
       ),
     allTransactions: detailData.allTransactions.map((transaction) =>
@@ -396,7 +413,7 @@ export async function getSpaceDetailPayloadForUser(
         transaction,
         userAccountId,
         members[input.spaceId] || [],
-        owner?.data.name?.trim() || String(i18n.t("transaction_split.you")),
+        ownerName,
       ),
     ),
     pagination: {

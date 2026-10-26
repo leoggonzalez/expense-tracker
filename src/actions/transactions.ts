@@ -290,12 +290,14 @@ function serializeProjectionMonthTransactionRow(
   ownerName: string,
 ): ProjectionMonthTransaction {
   return {
-    participantNames: getParticipantNames(
-      transaction.splitParticipantIds,
-      ownerId,
-      members,
-      ownerName,
-    ),
+    participantNames: transaction.transferSpaceId
+      ? []
+      : getParticipantNames(
+          transaction.splitParticipantIds,
+          ownerId,
+          members,
+          ownerName,
+        ),
     id: transaction.id,
     type: transaction.type,
     spaceName: transaction.spaceName,
@@ -727,7 +729,9 @@ export async function getProjectionSpacesPayloadForUser(
       projectionData.spaceTransactionsRows,
       userAccountId,
       members,
-      owner?.data.name?.trim() || String(i18n.t("transaction_split.you")),
+      owner?.data.name?.trim() ||
+        owner?.data.email ||
+        String(i18n.t("account.title")),
     ).map((space) => ({
       ...space,
       memberTotals: memberTotals[space.spaceId] || [],

@@ -14,7 +14,7 @@ type SpaceMonthReport = Pick<
   | "space"
   | "selectedMonth"
   | "selectedMonthRelevantTransactions"
-  | "memberTotals"
+  | "participantGroupTotals"
 >;
 
 // Embedded, licensed fonts keep exports independent of installed/system fonts.
@@ -309,12 +309,8 @@ export async function createSpaceMonthPdf(
       amount: report.space.selectedMonthTotal,
       emphasis: true,
     },
-    ...report.memberTotals.map((member) => ({
-      label: member.isOwner
-        ? String(i18n.t("transaction_split.you"))
-        : member.isRemoved
-          ? String(i18n.t("space_members.former", { name: member.name }))
-          : member.name,
+    ...report.participantGroupTotals.map((member) => ({
+      label: member.name,
       amount: member.amount,
       emphasis: false,
     })),

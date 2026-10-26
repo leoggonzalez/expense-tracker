@@ -4,11 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { normalizeTransactionAmount } from "@/lib/amount";
 import {
   getSplitShareCents,
+  getParticipantGroupMonthTotals,
   parseSplitParticipants,
 } from "@/lib/transaction_split";
 import type {
   MemberInput,
   MemberMonthTotal,
+  ParticipantGroupMonthTotal,
   SplitMember,
 } from "@/lib/transaction_split";
 
@@ -125,29 +127,12 @@ export class SpaceMember {
   ): Promise<Record<string, MemberMonthTotal[]>> {
     if (!spaceIds.length) return {};
     const members = await SpaceMember.listForSpaces(userAccountId, spaceIds);
-    // Use the same occurrences and credit-card month mapping as projection totals.
-    const occurrences = await prisma.$queryRaw<
-      Array<{
-        spaceId: string;
-        type: string;
-        amount: number;
-        splitParticipantIds: string | null;
-      }>
-    >`
-      SELECT t."spaceId", t.type, t.amount, t."splitParticipantIds"
-      FROM "Transaction" t INNER JOIN "Space" s ON s.id = t."spaceId"
-      CROSS JOIN LATERAL generate_series(
-        date_trunc('month', t."beginDate"),
-        date_trunc('month', COALESCE(t."endDate", ${monthEnd})), interval '1 month'
-      ) AS occurrence_month(month_start)
-      WHERE s."userAccountId" = ${userAccountId} AND s.id IN (${Prisma.join(spaceIds)})
-        AND t."transferSpaceId" IS NULL AND t."beginDate" <= ${monthEnd}
-        AND "getSpaceProjectionMonthStart"(s.type::text, s."paymentDueDay", s."periodEndDay",
-          (occurrence_month.month_start + make_interval(days => LEAST(
-            EXTRACT(DAY FROM t."beginDate")::integer,
-            EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
-          ) - 1))::timestamp) = ${monthStart}
-    `;
+    const occurrences = await SpaceMember.listMonthOccurrences(
+      userAccountId,
+      spaceIds,
+      monthStart,
+      monthEnd,
+    );
     const totals = new Map<string, Map<string, number>>();
     for (const occurrence of occurrences) {
       const ids = parseSplitParticipants(occurrence.splitParticipantIds);
@@ -186,5 +171,56 @@ export class SpaceMember {
         : [];
     }
     return result;
+  }
+
+  public static async getMonthGroupTotalsForSpace(
+    userAccountId: string,
+    spaceId: string,
+    monthStart: Date,
+    monthEnd: Date,
+    owner: SplitMember,
+    members: SplitMember[],
+  ): Promise<ParticipantGroupMonthTotal[]> {
+    const occurrences = await SpaceMember.listMonthOccurrences(
+      userAccountId,
+      [spaceId],
+      monthStart,
+      monthEnd,
+      true,
+    );
+    return getParticipantGroupMonthTotals(occurrences, owner, members);
+  }
+
+  private static async listMonthOccurrences(
+    userAccountId: string,
+    spaceIds: string[],
+    monthStart: Date,
+    monthEnd: Date,
+    includeTransfers = false,
+  ) {
+    // Use the same occurrences and credit-card month mapping as projection totals.
+    return await prisma.$queryRaw<
+      Array<{
+        spaceId: string;
+        type: string;
+        amount: number;
+        splitParticipantIds: string | null;
+        transferSpaceId: string | null;
+      }>
+    >`
+      SELECT t."spaceId", t.type, t.amount, t."splitParticipantIds", t."transferSpaceId"
+      FROM "Transaction" t INNER JOIN "Space" s ON s.id = t."spaceId"
+      CROSS JOIN LATERAL generate_series(
+        date_trunc('month', t."beginDate"),
+        date_trunc('month', COALESCE(t."endDate", ${monthEnd})), interval '1 month'
+      ) AS occurrence_month(month_start)
+      WHERE s."userAccountId" = ${userAccountId} AND s.id IN (${Prisma.join(spaceIds)})
+        AND (${includeTransfers} OR t."transferSpaceId" IS NULL) AND t."beginDate" <= ${monthEnd}
+        AND "getSpaceProjectionMonthStart"(s.type::text, s."paymentDueDay", s."periodEndDay",
+          (occurrence_month.month_start + make_interval(days => LEAST(
+            EXTRACT(DAY FROM t."beginDate")::integer,
+            EXTRACT(DAY FROM occurrence_month.month_start + interval '1 month - 1 day')::integer
+          ) - 1))::timestamp) = ${monthStart}
+    `;
   }
 }

@@ -296,3 +296,14 @@ appear in months containing their shares; active members also show zero totals.
 Run `RUN_DATABASE_TESTS=1 node --test scripts/tests/space_members_test.mjs
 scripts/tests/copy_db_prod_test.mjs` for isolated local database coverage. The tests
 create and drop temporary databases; the local PostgreSQL role needs that ability.
+
+The space detail relevant-transactions card and its monthly PDF instead show
+mutually exclusive participant groups. Each full occurrence amount belongs to
+exactly one group of participant IDs, independent of selection order. Shared
+groups appear before individual rows. Only groups with relevant occurrences
+appear; members without personal occurrences have no individual row. Owner labels
+use the account name (email if absent),
+and former members retain their labels. These rows use the same monthly occurrence
+mapping as the space total, including transfers in the owner-only row, so their
+sum reconciles with that total. Projection member totals retain the equal-share
+calculation described above.

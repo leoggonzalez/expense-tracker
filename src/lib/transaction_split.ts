@@ -1,3 +1,5 @@
+import { normalizeTransactionAmount } from "@/lib/amount";
+
 export interface SplitMember {
   id: string;
   name: string;
@@ -41,7 +43,9 @@ export function getParticipantNames(
   const names = members
     .filter((member) => member.id !== ownerId && selected.has(member.id))
     .map((member) => member.name);
-  return names.length && selected.has(ownerId) ? [ownerName, ...names] : names;
+  const includeOwner =
+    members.length > 0 && (selected.has(ownerId) || selected.size === 0);
+  return includeOwner ? [ownerName, ...names] : names;
 }
 
 export function formatParticipantNames(names: string[]): string {
@@ -49,4 +53,54 @@ export function formatParticipantNames(names: string[]): string {
     style: "long",
     type: "conjunction",
   }).format(names);
+}
+
+export interface ParticipantGroupMonthTotal {
+  id: string;
+  participants: SplitMember[];
+  amount: number;
+}
+
+export function getParticipantGroupMonthTotals(
+  occurrences: {
+    type: string;
+    amount: number;
+    splitParticipantIds: string | null;
+    transferSpaceId?: string | null;
+  }[],
+  owner: SplitMember,
+  members: SplitMember[],
+): ParticipantGroupMonthTotal[] {
+  const participants = [owner, ...members];
+  const groups = new Map<
+    string,
+    { participants: SplitMember[]; cents: number }
+  >();
+  for (const occurrence of occurrences) {
+    // Transfers have no split; retain them in the owner row to reconcile with the space total.
+    const ids = occurrence.transferSpaceId
+      ? []
+      : parseSplitParticipants(occurrence.splitParticipantIds);
+    if (!ids.length) ids.push(owner.id);
+    const selected = participants.filter((participant) =>
+      ids.includes(participant.id),
+    );
+    const key = JSON.stringify(
+      selected.map((participant) => participant.id).sort(),
+    );
+    const group = groups.get(key) || { participants: selected, cents: 0 };
+    const amount = normalizeTransactionAmount(
+      occurrence.type,
+      occurrence.amount,
+    );
+    group.cents += getSplitShareCents(amount, 1);
+    groups.set(key, group);
+  }
+  return [...groups.entries()]
+    .map(([id, group]) => ({
+      id,
+      participants: group.participants,
+      amount: group.cents / 100,
+    }))
+    .sort((a, b) => b.participants.length - a.participants.length);
 }
