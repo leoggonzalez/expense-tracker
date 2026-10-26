@@ -1,0 +1,32 @@
+.tooltip {
+  position: relative;
+  display: inline-flex;
+  &__content {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    right: 0;
+    top: 100%;
+    width: max-content;
+    max-width: min(260px, 70vw);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+  }
+  &:focus &__content,
+  &:focus-within &__content {
+    display: block;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+  @media (hover: hover) {
+    &:hover &__content {
+      display: block;
+    }
+  }
+}

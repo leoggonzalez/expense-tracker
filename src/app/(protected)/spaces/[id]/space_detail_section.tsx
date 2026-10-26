@@ -2,12 +2,11 @@
 
 import { SectionError } from "@/components/section_error/section_error";
 
-import { setSpaceMainStatus, type SpaceDetailPayload } from "@/actions/spaces";
+import { type SpaceDetailPayload } from "@/actions/spaces";
 import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_section";
 import {
   AppLink,
   Button,
-  Checkbox,
   Container,
   Currency,
   DetailList,
@@ -24,6 +23,10 @@ import { useToast } from "@/components/toast_provider/toast_provider";
 import { Card, Icon, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import React from "react";
+import { useRouter } from "next/navigation";
+import { useSelection } from "@/hooks/use_selection";
+import { getMassEditBlockReason } from "@/lib/mass_transaction_edit";
+import { Tooltip } from "@/components/tooltip/tooltip";
 
 const spaceDetailCache = {
   entries: new Map<string, SpaceDetailPayload>(),
@@ -112,40 +115,6 @@ function getAccountTypeLabel(space: SpaceDetailPayload["space"]): string {
     : String(i18n.t("spaces_page.space_type_regular"));
 }
 
-function getMainStatusLabel(space: SpaceDetailPayload["space"]): string {
-  return space.main === true
-    ? String(i18n.t("space_detail_page.account_detail_yes"))
-    : String(i18n.t("space_detail_page.account_detail_no"));
-}
-
-function getCreditCardSettleLabel(space: SpaceDetailPayload["space"]): string {
-  if (space.type !== "credit_card") {
-    return "";
-  }
-
-  const dueDay = space.paymentDueDay ?? 1;
-  if (space.periodEndDay === null) {
-    const timingKey =
-      space.paymentTiming === "previous_month"
-        ? "spaces_page.payment_timing_previous_month"
-        : "spaces_page.payment_timing_same_month";
-    return String(
-      i18n.t("space_detail_page.account_detail_settle_legacy_value", {
-        day: String(dueDay),
-        timing: String(i18n.t(timingKey)),
-      }),
-    );
-  }
-  const periodEndDay = space.periodEndDay;
-
-  return String(
-    i18n.t("space_detail_page.account_detail_settle_value", {
-      day: String(dueDay),
-      periodEndDay: String(periodEndDay),
-    }),
-  );
-}
-
 export function SpaceDetailSection({
   id,
   currentMonthKey,
@@ -156,14 +125,20 @@ export function SpaceDetailSection({
   isArchiveDialogOpen,
   isUnarchiveDialogOpen,
 }: SpaceDetailSectionProps): React.ReactElement {
-  const { showError, showSuccess } = useToast();
+  const { showError } = useToast();
+  const router = useRouter();
+  const selectionScope = `${id}:${currentMonthKey}`;
+  const selection = useSelection<string>(selectionScope);
+  const [selectionModeScope, setSelectionModeScope] = React.useState<
+    string | null
+  >(null);
+  const isSelecting = selectionModeScope === selectionScope;
   const endpoint = `/api/spaces/${id}?currentMonth=${currentMonthKey}&page=${String(page)}`;
   const { data, isLoading, hasError, isNotFound, retry } =
     useProtectedPageSection(endpoint, endpoint, spaceDetailCache);
   const [visibleData, setVisibleData] =
     React.useState<SpaceDetailPayload | null>(null);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
-  const [isUpdatingMain, setIsUpdatingMain] = React.useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = React.useState(false);
 
   React.useEffect(() => {
@@ -216,6 +191,29 @@ export function SpaceDetailSection({
     return <></>;
   }
   const currentData = visibleData || data;
+  const selectedTransactions =
+    currentData.selectedMonthRelevantTransactions.filter((transaction) =>
+      selection.has(transaction.id),
+    );
+  const blockReason = getMassEditBlockReason(selectedTransactions);
+  function handleMassEdit(): void {
+    if (!isSelecting) {
+      selection.clear();
+      setSelectionModeScope(selectionScope);
+      return;
+    }
+    if (!selectedTransactions.length || blockReason) return;
+    const params = new URLSearchParams({
+      ids: selectedTransactions.map((transaction) => transaction.id).join(","),
+      space: id,
+      month: currentMonthKey,
+    });
+    router.push(`/transactions/mass-edit?${params.toString()}`);
+  }
+  function cancelSelection(): void {
+    selection.clear();
+    setSelectionModeScope(null);
+  }
 
   async function handleDownloadPdf(): Promise<void> {
     if (isDownloadingPdf) return;
@@ -271,20 +269,6 @@ export function SpaceDetailSection({
     detailSearchParams.size > 0
       ? `${detailHref}&confirmUnarchive=1`
       : `/spaces/${currentData.space.id}?confirmUnarchive=1`;
-  const settleHref = `/transactions/new/transfer?${new URLSearchParams({
-    to_space: currentData.space.id,
-    ...(currentData.mainSpaceId &&
-    currentData.mainSpaceId !== currentData.space.id
-      ? { from_space: currentData.mainSpaceId }
-      : {}),
-    amount: Math.abs(currentData.space.selectedMonthTotal).toFixed(2),
-    description: String(
-      i18n.t("spaces_page.settle_description", {
-        space: currentData.space.name,
-        month: currentMonthLabel,
-      }),
-    ),
-  }).toString()}`;
   const heroActions: HeroAction[] = currentData.space.isArchived
     ? [
         {
@@ -300,13 +284,6 @@ export function SpaceDetailSection({
           ariaLabel: String(i18n.t("spaces_page.edit_space")),
           href: `/spaces/${currentData.space.id}/edit`,
           variant: "outline",
-        },
-        {
-          icon: "transfer",
-          ariaLabel: String(i18n.t("spaces_page.settle")),
-          href: settleHref,
-          variant: "outline-transfer",
-          disabled: currentData.space.selectedMonthTotal >= 0,
         },
         {
           icon: "alert",
@@ -344,26 +321,6 @@ export function SpaceDetailSection({
     } finally {
       setIsLoadingMore(false);
     }
-  };
-
-  const handleMainToggle = async (checked: boolean): Promise<void> => {
-    setIsUpdatingMain(true);
-
-    const result = await setSpaceMainStatus(currentData.space.id, checked);
-
-    setIsUpdatingMain(false);
-
-    if (!result.success) {
-      showError(i18n.t(result.error || "space_detail_page.update_failed"), {
-        iconName: "spaces",
-      });
-      return;
-    }
-
-    showSuccess(i18n.t("space_detail_page.main_update_success"), {
-      iconName: "spaces",
-    });
-    retry();
   };
 
   return (
@@ -460,32 +417,7 @@ export function SpaceDetailSection({
             icon="spaces"
           >
             <Stack gap={20}>
-              <Stack gap={10}>
-                <Checkbox
-                  checked={currentData.space.main === true}
-                  onChange={(checked) => void handleMainToggle(checked)}
-                  label={i18n.t("space_detail_page.main_toggle_label")}
-                  disabled={isUpdatingMain}
-                  variant="switch"
-                />
-                <Text element="p" type="caption" color="secondary">
-                  {i18n.t("space_detail_page.main_toggle_description")}
-                </Text>
-              </Stack>
-
               <DetailList>
-                <DetailRow
-                  label={
-                    <Text element="p" type="caption" color="secondary">
-                      {i18n.t("space_detail_page.account_detail_main")}
-                    </Text>
-                  }
-                  value={
-                    <Text element="p" type="caption-semibold">
-                      {getMainStatusLabel(currentData.space)}
-                    </Text>
-                  }
-                />
                 <DetailRow
                   label={
                     <Text element="p" type="caption" color="secondary">
@@ -498,20 +430,6 @@ export function SpaceDetailSection({
                     </Text>
                   }
                 />
-                {currentData.space.type === "credit_card" ? (
-                  <DetailRow
-                    label={
-                      <Text element="p" type="caption" color="secondary">
-                        {i18n.t("space_detail_page.account_detail_settle")}
-                      </Text>
-                    }
-                    value={
-                      <Text element="p" type="caption-semibold">
-                        {getCreditCardSettleLabel(currentData.space)}
-                      </Text>
-                    }
-                  />
-                ) : null}
                 {currentData.space.members.length > 0 ? (
                   <DetailRow
                     label={
@@ -542,26 +460,80 @@ export function SpaceDetailSection({
           )}
           icon="transactions"
           actions={
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={isDownloadingPdf}
-              ariaLabel={String(
-                i18n.t(
-                  isDownloadingPdf
-                    ? "spaces_page.downloading_pdf"
-                    : "spaces_page.download_pdf",
-                ),
-              )}
-              onClick={() => void handleDownloadPdf()}
-              startIcon={<Icon name="download" size={18} />}
-            >
-              {null}
-            </Button>
+            <Stack line gap={8} align="center" wrap>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={isDownloadingPdf}
+                ariaLabel={String(
+                  i18n.t(
+                    isDownloadingPdf
+                      ? "spaces_page.downloading_pdf"
+                      : "spaces_page.download_pdf",
+                  ),
+                )}
+                onClick={() => void handleDownloadPdf()}
+                startIcon={<Icon name="download" size={18} />}
+              >
+                {null}
+              </Button>
+              {!currentData.space.isArchived ? (
+                <Tooltip
+                  content={
+                    isSelecting && blockReason
+                      ? String(i18n.t(blockReason))
+                      : null
+                  }
+                >
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    ariaLabel={String(
+                      i18n.t(
+                        isSelecting
+                          ? "mass_edit.edit_selected"
+                          : "mass_edit.start_selection",
+                      ),
+                    )}
+                    disabled={
+                      isSelecting &&
+                      (!selectedTransactions.length || !!blockReason)
+                    }
+                    onClick={handleMassEdit}
+                    startIcon={<Icon name="edit" size={18} />}
+                  >
+                    {null}
+                  </Button>
+                </Tooltip>
+              ) : null}
+              {isSelecting ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  ariaLabel={String(i18n.t("mass_edit.cancel_selection"))}
+                  onClick={cancelSelection}
+                  startIcon={<Icon name="close" size={18} />}
+                >
+                  {null}
+                </Button>
+              ) : null}
+            </Stack>
           }
         >
+          {isSelecting ? (
+            <Text element="p" type="caption" color="secondary">
+              {i18n.t("mass_edit.selected_count", {
+                count: selectedTransactions.length,
+              })}
+            </Text>
+          ) : null}
           <TransactionList
             transactions={currentData.selectedMonthRelevantTransactions}
+            selection={
+              isSelecting
+                ? { selectedIds: selection.values, onToggle: selection.toggle }
+                : undefined
+            }
             showDelete={false}
             transactionHrefBase="/transactions"
             summaryRows={[

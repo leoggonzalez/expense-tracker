@@ -107,3 +107,23 @@
     }
   }
 }
+
+.transaction-list {
+  &__selectable {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+  &__selection {
+    padding-left: var(--spacing-md);
+  }
+  &__selection-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

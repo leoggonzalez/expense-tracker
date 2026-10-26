@@ -42,6 +42,7 @@ export type ArchivedSpacesPayload = {
 };
 
 type SpaceDetailTransaction = {
+  splitParticipantIds: string;
   participantNames: string[];
   id: string;
   type: string;
@@ -109,6 +110,7 @@ function serializeSpaceTransaction(
   ownerName: string,
 ): SpaceDetailTransaction {
   return {
+    splitParticipantIds: transaction.splitParticipantIds || ownerId,
     participantNames: transaction.transferSpaceId
       ? []
       : getParticipantNames(

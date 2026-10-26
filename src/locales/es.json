@@ -270,7 +270,7 @@
     "period_end_day": "Día de corte del extracto",
     "payment_due_day_hint": "Los meses más cortos usan el último día del mes.",
     "credit_card_period_hint": "Las compras anteriores a este día se pagan el mes siguiente. Las compras de este día o posteriores se pagan dos meses después. Los meses más cortos usan el último día.",
-    "credit_card_legacy_period_hint": "Deja vacío el día de fin del periodo para mantener el calendario de liquidación actual. Introduce un día para usar periodos de facturación.",
+    "credit_card_legacy_period_hint": "Deja vacío el día de fin del periodo para mantener el calendario de pago actual. Introduce un día para usar periodos de facturación.",
     "current_month_total": "Total del mes actual",
     "month_total_label": "Total de %{month}",
     "current_month_relevant_transactions": "Movimientos relevantes del mes actual",

@@ -3,7 +3,7 @@
 import "@/components/transaction_list/transaction_list.scss";
 
 import { deleteTransaction } from "@/actions/transactions";
-import { AppLink, Button, TransactionCard } from "@/components";
+import { AppLink, Button, Checkbox, TransactionCard } from "@/components";
 import { Card, Stack, Text } from "@/elements";
 import { i18n } from "@/model/i18n";
 import React from "react";
@@ -39,6 +39,7 @@ export interface TransactionListProps {
   transactionHrefBase?: string;
   topSummaryRows?: TransactionListSummaryRow[];
   summaryRows?: TransactionListSummaryRow[];
+  selection?: { selectedIds: string[]; onToggle: (id: string) => void };
 }
 
 export function TransactionList({
@@ -48,6 +49,7 @@ export function TransactionList({
   transactionHrefBase,
   topSummaryRows = [],
   summaryRows = [],
+  selection,
 }: TransactionListProps): React.ReactElement {
   const handleDelete = async (id: string) => {
     if (confirm(i18n.t("transaction_list.delete_confirm") as string)) {
@@ -122,7 +124,7 @@ export function TransactionList({
 
             const content = (
               <div className="transaction-list__content">
-                {href ? (
+                {href && !selection ? (
                   <div className="transaction-list__link">
                     <AppLink href={href}>
                       <span className="transaction-list__link-content">
@@ -138,7 +140,26 @@ export function TransactionList({
 
             return (
               <div key={transaction.id} className="transaction-list__row">
-                {content}
+                {selection ? (
+                  <div className="transaction-list__selectable">
+                    <div className="transaction-list__selection">
+                      <Checkbox
+                        checked={selection.selectedIds.includes(transaction.id)}
+                        onChange={() => selection.onToggle(transaction.id)}
+                        label={
+                          <span className="transaction-list__selection-label">
+                            {i18n.t("mass_edit.select_transaction", {
+                              description: transaction.description,
+                            })}
+                          </span>
+                        }
+                      />
+                    </div>
+                    {content}
+                  </div>
+                ) : (
+                  content
+                )}
                 {showDelete && (
                   <div className="transaction-list__actions">
                     <Stack line justify="end" gap={8}>

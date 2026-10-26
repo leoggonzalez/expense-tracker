@@ -1,3 +1,13 @@
+import {
+  getMassEditBlockReason,
+  serializeMassEditTransaction,
+  type MassTransactionUpdate,
+} from "@/lib/mass_transaction_edit";
+import {
+  deriveScheduleFromDates,
+  resolveEndDate,
+} from "@/lib/transaction_schedule";
+import { normalizeTransactionAmount } from "@/lib/amount";
 import { CreditCardPaymentTiming, Prisma } from "@prisma/client";
 import {
   addDays,
@@ -1123,6 +1133,124 @@ export class Transaction {
       page,
       limit,
     };
+  }
+
+  public static async listForMassEdit(userAccountId: string, ids: string[]) {
+    if (!ids.length || ids.length > 500 || new Set(ids).size !== ids.length)
+      throw new Error("mass_edit.invalid_selection");
+    const records = await prisma.transaction.findMany({
+      where: { id: { in: ids }, space: { userAccountId, isArchived: false } },
+    });
+    if (records.length !== ids.length)
+      throw new Error("mass_edit.invalid_selection");
+    const byId = new Map(records.map((record) => [record.id, record]));
+    return ids.map((id) =>
+      serializeMassEditTransaction(byId.get(id)!, userAccountId),
+    );
+  }
+
+  public static async massUpdateForUser(
+    userAccountId: string,
+    input: MassTransactionUpdate,
+  ): Promise<string[]> {
+    if (
+      !input ||
+      !Array.isArray(input.transactions) ||
+      !input.transactions.length ||
+      input.transactions.length > 500 ||
+      (input.type !== undefined &&
+        input.type !== "income" &&
+        input.type !== "expense") ||
+      (input.spaceId !== undefined &&
+        (typeof input.spaceId !== "string" || !input.spaceId))
+    )
+      throw new Error("mass_edit.invalid_fields");
+    const ids = input.transactions.map((row) => row?.id);
+    if (
+      ids.some((id) => typeof id !== "string" || !id) ||
+      new Set(ids).size !== ids.length
+    )
+      throw new Error("mass_edit.invalid_selection");
+    for (const row of input.transactions) {
+      if (
+        typeof row.description !== "string" ||
+        !row.description.trim() ||
+        !Number.isFinite(row.amount) ||
+        row.amount <= 0 ||
+        typeof row.beginDate !== "string" ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(row.beginDate) ||
+        Number.isNaN(new Date(row.beginDate).getTime()) ||
+        new Date(row.beginDate).toISOString().slice(0, 10) !== row.beginDate ||
+        typeof row.updatedAt !== "string"
+      )
+        throw new Error("mass_edit.invalid_fields");
+    }
+    const affectedSpaces = await prisma.$transaction(async (tx) => {
+      const locked = await tx.$queryRaw<{ id: string }[]>`
+        SELECT t.id FROM "Transaction" t INNER JOIN "Space" s ON s.id = t."spaceId"
+        WHERE t.id IN (${Prisma.join(ids)}) AND s."userAccountId" = ${userAccountId}
+        FOR UPDATE OF t
+      `;
+      if (locked.length !== ids.length)
+        throw new Error("mass_edit.invalid_selection");
+      const records = await tx.transaction.findMany({
+        where: { id: { in: ids }, space: { userAccountId, isArchived: false } },
+      });
+      if (records.length !== ids.length)
+        throw new Error("mass_edit.invalid_selection");
+      const reason = getMassEditBlockReason(
+        records.map((record) =>
+          serializeMassEditTransaction(record, userAccountId),
+        ),
+      );
+      if (reason) throw new Error(reason);
+      const byId = new Map(records.map((record) => [record.id, record]));
+      const changedSpaces = new Set<string>();
+      for (const row of input.transactions) {
+        const previous = byId.get(row.id)!;
+        if (previous.updatedAt.toISOString() !== row.updatedAt)
+          throw new Error("mass_edit.stale");
+        const spaceId = input.spaceId || previous.spaceId;
+        const participants = parseSplitParticipants(
+          previous.splitParticipantIds,
+        );
+        if (
+          spaceId !== previous.spaceId &&
+          participants.some((id) => id !== userAccountId)
+        )
+          throw new Error("mass_edit.shared_space");
+        const splitParticipantIds = await SpaceMember.serializeParticipants(
+          tx,
+          userAccountId,
+          spaceId,
+          participants.length ? participants : [userAccountId],
+          spaceId === previous.spaceId ? previous.splitParticipantIds : null,
+        );
+        const beginDate = new Date(`${row.beginDate}T00:00:00.000Z`);
+        const schedule = deriveScheduleFromDates({
+          beginDate: previous.beginDate,
+          endDate: previous.endDate,
+        });
+        const type = input.type || previous.type;
+        await tx.transaction.update({
+          where: { id: row.id },
+          data: {
+            type,
+            spaceId,
+            splitParticipantIds,
+            description: row.description.trim(),
+            amount: normalizeTransactionAmount(type, row.amount),
+            beginDate,
+            endDate: resolveEndDate({ ...schedule, beginDate }),
+          },
+        });
+        changedSpaces.add(previous.spaceId);
+        changedSpaces.add(spaceId);
+      }
+      return [...changedSpaces];
+    });
+    await Space.syncCurrentMonthTransactionCounts(affectedSpaces);
+    return affectedSpaces;
   }
 
   public static async updateForUser(

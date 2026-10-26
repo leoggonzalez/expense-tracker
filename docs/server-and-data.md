@@ -316,3 +316,44 @@ the configured due day. Upcoming amounts query the following reporting month's
 complete statement occurrences, subtracting income credits from expenses. Their links open that reporting month in the
 space detail view, preserving statement inclusion and recurring transactions.
 Legacy cards without a cutoff retain their saved settlement timing.
+
+## Settlement UI Retirement
+
+Settlement shortcuts on space and transaction details, main-space marking and
+status, and automatic settlement descriptions in transfer creation are hidden.
+This is a UI-only retirement: existing transfers, main-space data, server actions,
+and reporting calculations remain intact. Ordinary transfer creation and
+credit-card billing configuration remain available.
+
+## Bulk Transaction Editing
+
+The space detail relevant-transactions card supports checkbox selection and opens
+`/transactions/mass-edit` with selected IDs and the originating space/month in the
+URL. Cancel clears selection. Transfers, differing split groups, or differing
+schedule modes/installment counts block editing, with a hover/focus tooltip.
+Selection is limited to 500 transactions per batch. Mixed types/spaces default to
+preserving each transaction's value; matching values are prefilled. Member-shared
+transactions stay in their source space because member identities are space-scoped.
+
+`Transaction.massUpdateForUser` locks selected rows, rechecks ownership, archived
+status, eligibility, and `updatedAt`, then saves every row in one database
+transaction. Changed dates retain schedule mode and installment length. Legacy
+owner-only splits are normalized to the owner ID. Transfer and split controls are
+not part of the editor. Authenticated reads stay per-request; successful writes
+invalidate affected transaction/space pages and reporting surfaces.
+
+The tooltip and selection pattern references were inspected on 2026-10-26 in the
+Shimmer showcase (published bundle `index-D_HVckcy.js`):
+- https://nerdgeschoss.github.io/shimmer-components-static/components/tooltip
+- https://nerdgeschoss.github.io/shimmer-components-static/hooks/use_selection
+
+Currento uses its existing checkbox/button/form primitives, tokens, and React
+Compiler. The tooltip uses CSS positioning plus keyboard focus/Escape support
+rather than the reference's inline CSS anchor plumbing; the selection hook keeps
+the Set/toggle/clear pattern and scopes selection to the space and month.
+
+Run `RUN_DATABASE_TESTS=1 node --env-file=.env --test
+scripts/tests/mass_transaction_edit_test.mjs` against the local development
+database for ownership, atomic rollback, stale edits, space moves, and split and
+schedule preservation. The test creates disposable accounts and deletes them in
+its cleanup step.

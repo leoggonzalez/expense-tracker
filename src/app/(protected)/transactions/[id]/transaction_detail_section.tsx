@@ -55,13 +55,6 @@ function formatTransactionDate(
   return `${formattedBegin} - ${formatter.format(end)}`;
 }
 
-function formatSettleMonth(beginDate: string): string {
-  return new Intl.DateTimeFormat(i18n.locale || "en", {
-    month: "long",
-    year: "numeric",
-  }).format(new Date(beginDate));
-}
-
 function getTransactionTypeLabel(type: string): string {
   if (type === "income") {
     return String(i18n.t("common.income"));
@@ -190,21 +183,6 @@ export function TransactionDetailSection({
     return <></>;
   }
 
-  const settleDescription = String(
-    i18n.t("transaction_detail_page.settle_description", {
-      description: data.description,
-      month: formatSettleMonth(data.beginDate),
-    }),
-  );
-  const settleAmount = Math.abs(data.amount).toFixed(2);
-  const settleSearchParams = new URLSearchParams({
-    to_space: data.spaceId,
-    ...(data.mainSpaceId && data.mainSpaceId !== data.spaceId
-      ? { from_space: data.mainSpaceId }
-      : {}),
-    description: settleDescription,
-    amount: settleAmount,
-  });
   const transactionDetailHref = `/transactions/${data.id}`;
   const transferDirectionLabel =
     data.transferSpaceId && data.transferSpaceName
@@ -232,14 +210,6 @@ export function TransactionDetailSection({
               ),
               href: `/transactions/${data.id}/edit`,
               variant: "outline",
-            },
-            {
-              icon: "transfer",
-              ariaLabel: String(
-                i18n.t("transaction_detail_page.settle_transaction"),
-              ),
-              href: `/transactions/new/transfer?${settleSearchParams.toString()}`,
-              variant: "outline-transfer",
             },
             {
               icon: "trash",

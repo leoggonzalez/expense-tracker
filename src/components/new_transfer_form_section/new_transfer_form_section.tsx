@@ -7,7 +7,6 @@ import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_se
 import { LoadingSkeleton, PagePanel, TransferForm } from "@/components";
 import { Stack } from "@/elements";
 import { i18n } from "@/model/i18n";
-import { format } from "date-fns";
 
 const newTransferSpacesCache = {
   entries: new Map<string, NewTransferSpacesPayload>(),
@@ -62,28 +61,11 @@ export function NewTransferFormSection({
     return <NewTransferFormSkeleton />;
   }
 
-  const toSpace = data?.spaces.find(
-    (space) => space.id === initialValues.toSpaceId,
-  );
-  const resolvedInitialValues = {
-    ...initialValues,
-    description:
-      initialValues.description ||
-      (toSpace
-        ? String(
-            i18n.t("spaces_page.settle_description", {
-              space: toSpace.name,
-              month: format(new Date(), "MMMM yyyy"),
-            }),
-          )
-        : ""),
-  };
-
   return (
     <PagePanel tone="form">
       <TransferForm
         spaces={data?.spaces || []}
-        initialValues={resolvedInitialValues}
+        initialValues={initialValues}
         fixedFromSpaceId={fixedFromSpaceId}
       />
     </PagePanel>
