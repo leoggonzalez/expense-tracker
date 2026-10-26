@@ -9,8 +9,10 @@ import {
 } from "date-fns";
 
 import { revalidateTransactionMutationPages } from "@/lib/app_revalidation";
+import { UserAccount } from "@/lib/user_account";
+import { i18n } from "@/model/i18n";
 import { SpaceMember } from "@/lib/space_member";
-import { getOtherParticipantNames } from "@/lib/transaction_split";
+import { getParticipantNames } from "@/lib/transaction_split";
 import type { MemberMonthTotal, SplitMember } from "@/lib/transaction_split";
 
 import { normalizeTransactionAmount } from "@/lib/amount";
@@ -285,12 +287,14 @@ function serializeProjectionMonthTransactionRow(
   transaction: ProjectionFocusedSpaceTransactionRow,
   ownerId: string,
   members: SplitMember[],
+  ownerName: string,
 ): ProjectionMonthTransaction {
   return {
-    participantNames: getOtherParticipantNames(
+    participantNames: getParticipantNames(
       transaction.splitParticipantIds,
       ownerId,
       members,
+      ownerName,
     ),
     id: transaction.id,
     type: transaction.type,
@@ -454,6 +458,7 @@ function mapProjectionSpaces(
   spaceTransactionsRows: ProjectionFocusedSpaceTransactionRow[],
   ownerId: string,
   members: Record<string, SplitMember[]>,
+  ownerName: string,
 ): ProjectionFocusedSpace[] {
   const spaceMap = new Map<string, ProjectionFocusedSpaceAccumulator>(
     spaceSummaryRows.map((space) => [
@@ -481,6 +486,7 @@ function mapProjectionSpaces(
         transaction,
         ownerId,
         members[transaction.spaceId] || [],
+        ownerName,
       ),
     );
   });
@@ -702,7 +708,7 @@ export async function getProjectionSpacesPayloadForUser(
   const spaceIds = projectionData.spaceSummaryRows.map(
     (space) => space.spaceId,
   );
-  const [memberTotals, members] = await Promise.all([
+  const [memberTotals, members, owner] = await Promise.all([
     SpaceMember.getMonthTotalsForSpaces(
       userAccountId,
       spaceIds,
@@ -710,6 +716,7 @@ export async function getProjectionSpacesPayloadForUser(
       endOfMonth(projectionData.normalizedFocusedMonthStart),
     ),
     SpaceMember.listForSpaces(userAccountId, spaceIds),
+    UserAccount.findById(userAccountId),
   ]);
   return {
     focusedMonthKey: formatProjectionMonthKey(
@@ -720,6 +727,7 @@ export async function getProjectionSpacesPayloadForUser(
       projectionData.spaceTransactionsRows,
       userAccountId,
       members,
+      owner?.data.name?.trim() || String(i18n.t("transaction_split.you")),
     ).map((space) => ({
       ...space,
       memberTotals: memberTotals[space.spaceId] || [],

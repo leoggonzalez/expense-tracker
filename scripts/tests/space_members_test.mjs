@@ -4,8 +4,12 @@ import { register } from "tsx/esm/api";
 import "tsx/cjs";
 
 register();
-const { getSplitShareCents, parseSplitParticipants, getOtherParticipantNames } =
-  await import("../../src/lib/transaction_split.ts");
+const {
+  getSplitShareCents,
+  parseSplitParticipants,
+  getParticipantNames,
+  formatParticipantNames,
+} = await import("../../src/lib/transaction_split.ts");
 
 test("equal shares round in cents, retain expense signs, and tolerate legacy selections", () => {
   assert.equal(getSplitShareCents(100, 1), 10000);
@@ -23,21 +27,31 @@ test("equal shares round in cents, retain expense signs, and tolerate legacy sel
   ]);
 });
 
-test("participant labels exclude the owner, keep former members, and ignore unselected or unknown IDs", () => {
+test("participant labels include the selected owner on shared transactions and retain former members", () => {
   const members = [
     { id: "alex", name: "Alex", isRemoved: true },
     { id: "sam", name: "Samuel", isRemoved: false },
     { id: "unselected", name: "Unselected", isRemoved: false },
   ];
-  assert.deepEqual(getOtherParticipantNames(null, "owner", members), []);
-  assert.deepEqual(getOtherParticipantNames("owner", "owner", members), []);
+  assert.deepEqual(getParticipantNames(null, "owner", members, "Leo"), []);
+  assert.deepEqual(getParticipantNames("owner", "owner", members, "Leo"), []);
   assert.deepEqual(
-    getOtherParticipantNames("owner;sam;alex;sam;foreign", "owner", members),
-    ["Alex", "Samuel"],
+    getParticipantNames("owner;sam;alex;sam;foreign", "owner", members, "Leo"),
+    ["Leo", "Alex", "Samuel"],
   );
-  assert.deepEqual(getOtherParticipantNames("alex", "owner", members), [
+  assert.deepEqual(getParticipantNames("alex", "owner", members, "Leo"), [
     "Alex",
   ]);
+});
+
+test("participant names use English conjunctions", () => {
+  assert.equal(formatParticipantNames([]), "");
+  assert.equal(formatParticipantNames(["Leo"]), "Leo");
+  assert.equal(formatParticipantNames(["Leo", "Alex"]), "Leo and Alex");
+  assert.equal(
+    formatParticipantNames(["Leo", "Alex", "Sam"]),
+    "Leo, Alex and Sam",
+  );
 });
 
 test(

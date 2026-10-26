@@ -1,3 +1,4 @@
+import { formatParticipantNames } from "@/lib/transaction_split";
 import "@/components/transaction_card/transaction_card.scss";
 
 import React from "react";
@@ -108,7 +109,7 @@ export function TransactionCard({
               {transaction.participantNames?.length ? (
                 <div className="transaction-card__participants">
                   <Text element="p" type="fine" color="secondary">
-                    {transaction.participantNames.join(", ")}
+                    {formatParticipantNames(transaction.participantNames)}
                   </Text>
                 </div>
               ) : null}

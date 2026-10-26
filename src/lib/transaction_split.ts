@@ -31,13 +31,22 @@ export function getSplitShareCents(amount: number, count: number): number {
   return Math.sign(amount) * Math.round(cents / count);
 }
 
-export function getOtherParticipantNames(
+export function getParticipantNames(
   value: string | null | undefined,
   ownerId: string,
   members: SplitMember[],
+  ownerName: string,
 ): string[] {
   const selected = new Set(parseSplitParticipants(value));
-  return members
+  const names = members
     .filter((member) => member.id !== ownerId && selected.has(member.id))
     .map((member) => member.name);
+  return names.length && selected.has(ownerId) ? [ownerName, ...names] : names;
+}
+
+export function formatParticipantNames(names: string[]): string {
+  return new Intl.ListFormat("en-GB", {
+    style: "long",
+    type: "conjunction",
+  }).format(names);
 }

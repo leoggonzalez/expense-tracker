@@ -6,8 +6,10 @@ import { endOfMonth, format, startOfMonth } from "date-fns";
 import { revalidateSpaceMutationPages } from "@/lib/app_revalidation";
 import { normalizeTransactionAmount } from "@/lib/amount";
 import { isPrismaErrorWithCode } from "@/lib/prisma_errors";
+import { UserAccount } from "@/lib/user_account";
+import { i18n } from "@/model/i18n";
 import { SpaceMember } from "@/lib/space_member";
-import { getOtherParticipantNames } from "@/lib/transaction_split";
+import { getParticipantNames } from "@/lib/transaction_split";
 import type {
   MemberInput,
   MemberMonthTotal,
@@ -105,12 +107,14 @@ function serializeSpaceTransaction(
   transaction: SpaceTransactionRecord,
   ownerId: string,
   members: SplitMember[],
+  ownerName: string,
 ): SpaceDetailTransaction {
   return {
-    participantNames: getOtherParticipantNames(
+    participantNames: getParticipantNames(
       transaction.splitParticipantIds,
       ownerId,
       members,
+      ownerName,
     ),
     id: transaction.id,
     type: transaction.type,
@@ -344,7 +348,7 @@ export async function getSpaceDetailPayloadForUser(
     return null;
   }
 
-  const [memberTotals, members] = await Promise.all([
+  const [memberTotals, members, owner] = await Promise.all([
     SpaceMember.getMonthTotalsForSpaces(
       userAccountId,
       [input.spaceId],
@@ -352,6 +356,7 @@ export async function getSpaceDetailPayloadForUser(
       monthEnd,
     ),
     SpaceMember.listForSpaces(userAccountId, [input.spaceId]),
+    UserAccount.findById(userAccountId),
   ]);
   return {
     memberTotals: memberTotals[input.spaceId] || [],
@@ -382,6 +387,7 @@ export async function getSpaceDetailPayloadForUser(
           transaction,
           userAccountId,
           members[input.spaceId] || [],
+          owner?.data.name?.trim() || String(i18n.t("transaction_split.you")),
         ),
       ),
     allTransactions: detailData.allTransactions.map((transaction) =>
@@ -390,6 +396,7 @@ export async function getSpaceDetailPayloadForUser(
         transaction,
         userAccountId,
         members[input.spaceId] || [],
+        owner?.data.name?.trim() || String(i18n.t("transaction_split.you")),
       ),
     ),
     pagination: {

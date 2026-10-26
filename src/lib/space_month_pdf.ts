@@ -1,3 +1,4 @@
+import { formatParticipantNames } from "@/lib/transaction_split";
 import fontkit from "@pdf-lib/fontkit";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -243,7 +244,7 @@ export async function createSpaceMonthPdf(
       80,
     );
     const participants = wrapText(
-      (transaction.participantNames || []).join(", "),
+      formatParticipantNames(transaction.participantNames || []),
       regular,
       8,
       95,
