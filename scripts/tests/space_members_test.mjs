@@ -102,6 +102,10 @@ test("monthly groups count each full amount once and group by identity regardles
     -9701,
   );
   assert.deepEqual(getParticipantGroupMonthTotals([], owner, members), []);
+  assert.deepEqual(
+    getParticipantGroupMonthTotals([occurrence(100, null)], owner, []),
+    [],
+  );
   const sharedOnly = getParticipantGroupMonthTotals(
     [occurrence(100, "owner;sophia")],
     owner,

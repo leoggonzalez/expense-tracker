@@ -42,13 +42,10 @@ function getUpcomingPaymentHref(payment: DashboardUpcomingItem): string {
   }
 
   const searchParams = new URLSearchParams({
-    space: payment.spaceId,
-    type: "expense",
-    start_date: payment.projectedMonthRange.startDate,
-    end_date: payment.projectedMonthRange.endDate,
+    currentMonth: payment.projectedMonthRange.startDate.slice(0, 7),
   });
 
-  return `/transactions?${searchParams.toString()}`;
+  return `/spaces/${payment.spaceId}?${searchParams.toString()}`;
 }
 
 function getUpcomingItemLabel(payment: DashboardUpcomingItem): string {

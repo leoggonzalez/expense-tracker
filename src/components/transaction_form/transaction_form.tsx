@@ -477,9 +477,7 @@ export function TransactionForm({
   const submitButton = getSubmitButtonConfig(isEdit, model.type, isSubmitting);
 
   const handleTypeChange = (value: string): void => {
-    updateFields({
-      type: value as TransactionFormModel["type"],
-    });
+    fields.type.onChange(value as TransactionFormModel["type"]);
   };
 
   const handleScheduleModeChange = (value: TransactionScheduleMode): void => {
@@ -513,7 +511,7 @@ export function TransactionForm({
         {showTypeField && (
           <Select
             label={i18n.t("transaction_form.type")}
-            value={fields.type.value || ""}
+            value={model.type || ""}
             onChange={handleTypeChange}
             options={[
               { value: "income", label: i18n.t("common.income") },
@@ -529,10 +527,10 @@ export function TransactionForm({
         {!fixedSpace && (
           <SpaceField
             label={i18n.t("transaction_form.space")}
-            value={fields.spaceName.value || ""}
+            value={model.spaceName || ""}
             onChange={(value) => {
               setParticipantIds(undefined);
-              updateFields({ spaceName: value });
+              fields.spaceName.onChange(value);
             }}
             spaces={resolvedSpaces}
             loadSpacesOnMount={false}
@@ -546,7 +544,7 @@ export function TransactionForm({
 
         <Input
           label={i18n.t("transaction_form.description")}
-          value={fields.description.value || ""}
+          value={model.description || ""}
           onChange={(value) => fields.description.onChange(value)}
           placeholder={
             i18n.t("transaction_form.description_placeholder") as string
@@ -561,7 +559,7 @@ export function TransactionForm({
           label={i18n.t("transaction_form.amount")}
           type="text"
           inputMode="decimal"
-          value={fields.amountInput.value || ""}
+          value={model.amountInput || ""}
           onChange={(value) =>
             fields.amountInput.onChange(sanitizeAmountInput(value))
           }
@@ -631,7 +629,7 @@ export function TransactionForm({
         <Input
           type="date"
           label={i18n.t("transaction_form.begin_date")}
-          value={fields.beginDate.value || ""}
+          value={model.beginDate || ""}
           onChange={fields.beginDate.onChange}
           required
           size="lg"
@@ -645,7 +643,7 @@ export function TransactionForm({
               label={i18n.t("transaction_form.installments")}
               type="text"
               inputMode="numeric"
-              value={fields.installments.value || ""}
+              value={model.installments || ""}
               onChange={(value) =>
                 fields.installments.onChange(sanitizeInstallmentsInput(value))
               }

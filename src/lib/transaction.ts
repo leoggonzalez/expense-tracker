@@ -1230,10 +1230,11 @@ export class Transaction {
       return null;
     }
 
-    // Cards without a closing day retain their pre-period settlement timing.
+    // Statements are reported in the month after they are debited.
+    // Legacy cards retain their saved settlement timing.
     const isLegacyCard = space.periodEndDay === null;
     const projectedMonthStart =
-      isLegacyCard &&
+      !isLegacyCard ||
       space.paymentTiming === CreditCardPaymentTiming.previous_month
         ? startOfMonth(addMonths(monthStart, 1))
         : startOfMonth(dueDate);
@@ -1252,7 +1253,7 @@ export class Transaction {
       : await prisma.$queryRaw<Array<{ total: number | null }>>`
       WITH transaction_occurrences AS (
         SELECT
-          t.amount,
+          CASE WHEN t.type = 'expense' THEN ABS(t.amount) ELSE -t.amount END AS amount,
           "getSpaceProjectionMonthStart"(
             'credit_card'::text,
             ${space.paymentDueDay}::integer,
@@ -1276,20 +1277,11 @@ export class Transaction {
               ) AS occurrence_date
         ) occurrence
         WHERE t."spaceId" = ${space.id}
-          AND t.type = 'expense'
+          AND t.type IN ('expense', 'income')
           AND t."transferSpaceId" IS NULL
           AND t."beginDate" <= ${projectedMonthEnd}
       )
-      SELECT
-        COALESCE(
-          SUM(
-            CASE
-              WHEN amount > 0 THEN amount
-              ELSE -amount
-            END
-          ),
-          0
-        ) AS total
+      SELECT COALESCE(SUM(amount), 0) AS total
       FROM transaction_occurrences
       WHERE "projectedMonthStart" = ${projectedMonthStart}
     `;

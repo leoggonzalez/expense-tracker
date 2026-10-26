@@ -297,13 +297,22 @@ Run `RUN_DATABASE_TESTS=1 node --test scripts/tests/space_members_test.mjs
 scripts/tests/copy_db_prod_test.mjs` for isolated local database coverage. The tests
 create and drop temporary databases; the local PostgreSQL role needs that ability.
 
-The space detail relevant-transactions card and its monthly PDF instead show
+The space detail relevant-transactions card, its monthly PDF, and projection
+space cards show
 mutually exclusive participant groups. Each full occurrence amount belongs to
 exactly one group of participant IDs, independent of selection order. Shared
-groups appear before individual rows. Only groups with relevant occurrences
+groups appear before individual rows. Spaces without any members show only the
+overall total, without a participant breakdown. Only groups with relevant occurrences
 appear; members without personal occurrences have no individual row. Owner labels
 use the account name (email if absent),
 and former members retain their labels. These rows use the same monthly occurrence
 mapping as the space total, including transfers in the owner-only row, so their
-sum reconciles with that total. Projection member totals retain the equal-share
-calculation described above.
+sum reconciles with that total. Projection cards use the complete monthly occurrences for their group totals,
+including transactions beyond the five-row preview.
+
+Dashboard upcoming credit-card payments use a different calendar reference from
+reporting: a configured statement reported in November is debited in October on
+the configured due day. Upcoming amounts query the following reporting month's
+complete statement occurrences, subtracting income credits from expenses. Their links open that reporting month in the
+space detail view, preserving statement inclusion and recurring transactions.
+Legacy cards without a cutoff retain their saved settlement timing.

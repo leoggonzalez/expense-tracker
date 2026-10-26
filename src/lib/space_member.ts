@@ -181,14 +181,49 @@ export class SpaceMember {
     owner: SplitMember,
     members: SplitMember[],
   ): Promise<ParticipantGroupMonthTotal[]> {
-    const occurrences = await SpaceMember.listMonthOccurrences(
+    const totals = await SpaceMember.getMonthGroupTotalsForSpaces(
       userAccountId,
       [spaceId],
       monthStart,
       monthEnd,
+      owner,
+      { [spaceId]: members },
+    );
+    return totals[spaceId] || [];
+  }
+
+  public static async getMonthGroupTotalsForSpaces(
+    userAccountId: string,
+    spaceIds: string[],
+    monthStart: Date,
+    monthEnd: Date,
+    owner: SplitMember,
+    members: Record<string, SplitMember[]>,
+  ): Promise<Record<string, ParticipantGroupMonthTotal[]>> {
+    if (!spaceIds.length) return {};
+    const occurrences = await SpaceMember.listMonthOccurrences(
+      userAccountId,
+      spaceIds,
+      monthStart,
+      monthEnd,
       true,
     );
-    return getParticipantGroupMonthTotals(occurrences, owner, members);
+    const bySpace = new Map<string, typeof occurrences>();
+    for (const occurrence of occurrences) {
+      const rows = bySpace.get(occurrence.spaceId) || [];
+      rows.push(occurrence);
+      bySpace.set(occurrence.spaceId, rows);
+    }
+    return Object.fromEntries(
+      spaceIds.map((spaceId) => [
+        spaceId,
+        getParticipantGroupMonthTotals(
+          bySpace.get(spaceId) || [],
+          owner,
+          members[spaceId] || [],
+        ),
+      ]),
+    );
   }
 
   private static async listMonthOccurrences(

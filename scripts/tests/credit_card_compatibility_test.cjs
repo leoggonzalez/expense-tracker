@@ -55,7 +55,7 @@ test("existing cards retain their settlement month and interval query", async ()
   }
 });
 
-test("configured statement periods override legacy timing", async () => {
+test("configured statements reported next month are debited in the current month", async () => {
   const originalQuery = prisma.$queryRaw;
   let sql;
   prisma.$queryRaw = async (strings) => {
@@ -76,8 +76,14 @@ test("configured statement periods override legacy timing", async () => {
       new Date(2026, 9, 1),
       new Date(2026, 9, 31),
     );
-    assert.equal(payment.projectedMonthStart.getMonth(), 9);
+    assert.equal(payment.dueDate.getMonth(), 9);
+    assert.equal(payment.dueDate.getDate(), 25);
+    assert.equal(payment.projectedMonthStart.getMonth(), 10);
+    assert.equal(payment.projectedMonthEnd.getMonth(), 10);
     assert.match(sql, /getSpaceProjectionMonthStart/);
+    assert.match(sql, /t.type IN \('expense', 'income'\)/);
+    assert.match(sql, /ELSE -t.amount END AS amount/);
+    assert.match(sql, /SUM\(amount\)/);
   } finally {
     prisma.$queryRaw = originalQuery;
   }

@@ -71,6 +71,7 @@ export function getParticipantGroupMonthTotals(
   owner: SplitMember,
   members: SplitMember[],
 ): ParticipantGroupMonthTotal[] {
+  if (!members.length) return [];
   const participants = [owner, ...members];
   const groups = new Map<
     string,
