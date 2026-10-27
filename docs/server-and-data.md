@@ -324,7 +324,12 @@ positive magnitude, total, percentage denominator, and category ordering. A mixe
 category can appear in both cards with its separate amounts. Zero-value sides are
 omitted; empty states are independent. The desktop layout places the chart cards
 in the first row, with Upcoming Transactions and Recent Activity in the second
-row. Narrow screens stack the cards in that same reading order.
+row. Narrow screens stack the cards in that same reading order. The projection page
+reuses the same pair immediately below the six-month chart. Its `month` URL
+parameter drives `/api/projection/allocations`; both cards use that selected
+reporting month. The shared controller is keyed by month and rejects mismatched
+month payloads, so navigation cannot briefly show the previous month’s totals
+under the new label. The dashboard continues to use the current-month endpoint.
 
 Each legend shows category icons, localized names, amounts, and percentage shares.
 The card title identifies the transaction type, so legend rows omit type icons.

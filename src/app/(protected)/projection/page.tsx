@@ -2,6 +2,7 @@ import { ProjectionChartSection } from "@/app/(protected)/projection/projection_
 import { ProjectionHeader } from "@/app/(protected)/projection/projection_header";
 import { ProjectionSpaces } from "@/app/(protected)/projection/projection_spaces";
 import { Container } from "@/components";
+import { MonthlyAllocations } from "@/components/category_allocation_chart/monthly_allocations";
 import { Stack } from "@/elements";
 
 import {
@@ -48,6 +49,10 @@ export default async function ProjectionPage({
 
         <Stack gap={24}>
           <ProjectionChartSection monthKey={focusedMonthKey} />
+          <MonthlyAllocations
+            key={focusedMonthKey}
+            monthKey={focusedMonthKey}
+          />
           <ProjectionSpaces monthKey={focusedMonthKey} />
         </Stack>
       </Stack>

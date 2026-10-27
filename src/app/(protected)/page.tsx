@@ -1,5 +1,5 @@
 import { Container } from "@/components";
-import { DashboardAllocations } from "@/app/(protected)/dashboard_allocations";
+import { MonthlyAllocations } from "@/components/category_allocation_chart/monthly_allocations";
 import { DashboardHeader } from "@/app/(protected)/dashboard_header";
 import { DashboardRecentActivity } from "@/app/(protected)/dashboard_recent_activity";
 import { DashboardUpcoming } from "@/app/(protected)/dashboard_upcoming";
@@ -11,7 +11,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
       <Stack gap={24}>
         <DashboardHeader />
 
-        <DashboardAllocations />
+        <MonthlyAllocations />
 
         <Grid minColumnWidth={360} gap={24}>
           <DashboardUpcoming />

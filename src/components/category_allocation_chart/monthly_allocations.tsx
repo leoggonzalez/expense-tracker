@@ -10,16 +10,26 @@ import { getCategoryAllocationsForType } from "@/lib/category_allocation";
 import { formatProjectionMonthLabel } from "@/lib/projection_month";
 import { i18n } from "@/model/i18n";
 
-export function DashboardAllocations(): React.ReactElement {
+interface MonthlyAllocationsProps {
+  monthKey?: string;
+}
+
+/** One private month snapshot drives both allocation cards on dashboard and projection routes. */
+export function MonthlyAllocations({
+  monthKey,
+}: MonthlyAllocationsProps): React.ReactElement {
+  const endpoint = monthKey
+    ? `/api/projection/allocations?month=${encodeURIComponent(monthKey)}`
+    : "/api/dashboard/allocations";
   // Keep a single private snapshot for both cards, without a cross-account module cache.
   const { data, isLoading, hasError, retry } =
-    useProtectedPageSection<DashboardAllocationsPayload>(
-      "/api/dashboard/allocations",
-      "/api/dashboard/allocations",
-      { entries: new Map() },
-    );
-  const monthLabel = data
-    ? formatProjectionMonthLabel(data.monthKey, i18n.locale, {
+    useProtectedPageSection<DashboardAllocationsPayload>(endpoint, endpoint, {
+      entries: new Map(),
+    });
+  const visibleData = !monthKey || data?.monthKey === monthKey ? data : null;
+  const displayedMonth = monthKey ?? visibleData?.monthKey;
+  const monthLabel = displayedMonth
+    ? formatProjectionMonthLabel(displayedMonth, i18n.locale, {
         month: "long",
         year: "numeric",
       })
@@ -32,13 +42,13 @@ export function DashboardAllocations(): React.ReactElement {
           key={type}
           type={type}
           categories={getCategoryAllocationsForType(
-            data?.categories ?? [],
+            visibleData?.categories ?? [],
             type,
           )}
-          total={data?.[type] ?? 0}
+          total={visibleData?.[type] ?? 0}
           monthLabel={monthLabel}
-          isLoading={isLoading && !data}
-          hasError={hasError && !data}
+          isLoading={!visibleData && (isLoading || !hasError)}
+          hasError={hasError && !visibleData}
           onRetry={retry}
         />
       ))}
