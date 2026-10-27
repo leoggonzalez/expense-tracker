@@ -12,11 +12,41 @@ model UserAccount {
   id         String      @id @default(cuid())
   email      String      @unique
   name       String?
+  categoryRulesVersion Int @default(0)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   spaces   Space[]
   loginCodes LoginCode[]
   sessions   Session[]
+  categoryMatches CategoryMatch[]
+}
+
+enum TransactionCategory {
+  shopping
+  food_groceries
+  bars_restaurants
+  leisure_entertainment
+  housing_public_services
+  transport_car
+  atm
+  income
+  family_friends
+  insurance
+  pets
+  savings_investments
+  health_personal_care
+  travel
+  subscriptions_digital_services
+  donations
+  uncategorized
+}
+
+enum TransactionCategorySource {
+  manual
+  learned
+  rule
+  fallback
+  backfill
 }
 
 enum SpaceType {
@@ -60,6 +90,8 @@ model Transaction {
   splitParticipantIds String?
   description String
   amount      Float
+  category TransactionCategory @default(uncategorized)
+  categorySource TransactionCategorySource @default(fallback)
   beginDate   DateTime
   endDate     DateTime?
   createdAt   DateTime  @default(now())
@@ -68,6 +100,41 @@ model Transaction {
   @@index([spaceId])
   @@index([transferSpaceId])
   @@index([beginDate])
+}
+
+enum CategoryRuleMatchMode {
+  exact
+  phrase
+  all
+}
+
+model CategoryDefault {
+  id String @id @default(cuid())
+  pattern String
+  transactionType String
+  matchMode CategoryRuleMatchMode @default(phrase)
+  category TransactionCategory
+  priority Int @default(0)
+  enabled Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([pattern, transactionType, matchMode])
+  @@index([enabled, priority])
+}
+
+model CategoryMatch {
+  id String @id @default(cuid())
+  userAccountId String
+  userAccount UserAccount @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
+  normalizedDescription String
+  matchMode CategoryRuleMatchMode @default(exact)
+  transactionType String
+  category TransactionCategory
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userAccountId, normalizedDescription, transactionType, matchMode], map: "CategoryMatch_account_description_type_mode_key")
 }
 
 model LoginCode {

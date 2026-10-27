@@ -18,6 +18,8 @@ This file remains the repo-level entrypoint for coding standards, but the detail
 
 ## Core Rules
 
+- Prefer classes and object-oriented design for complex domain and data models. Keep related state and invariants together, use instance methods for behavior on that state, and use static methods for creation or loading workflows. Keep simple stateless helpers as functions.
+- Document model classes and their public APIs with JSDoc, including responsibilities, invariants, inputs, outputs, and meaningful side effects or failure conditions. Add comments for non-obvious validation and business rules rather than restating the code.
 - New files must follow the current conventions immediately.
 - Existing files should be updated toward compliance when touched for feature work or refactors.
 - Large mechanical migrations should be isolated into dedicated cleanup changesets.

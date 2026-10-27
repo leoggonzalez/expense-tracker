@@ -2,6 +2,8 @@ import { PersistedValue } from "@/lib/persisted_value";
 
 export type NewTransactionDraft = {
   participantIds?: string[];
+  category?: string;
+  categoryWasManuallySelected?: boolean;
   spaceName: string;
   description: string;
   amountInput: string;

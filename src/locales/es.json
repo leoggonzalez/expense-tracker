@@ -453,5 +453,32 @@
     "you": "Tú",
     "select_participant": "Selecciona al menos un participante.",
     "invalid_split": "Los participantes no son válidos. Actualiza e inténtalo de nuevo."
+  },
+  "transaction_categories": {
+    "label": "Categoría",
+    "use_automatic_suggestion": "Usar sugerencia automática",
+    "learned_suggestion": "Sugerida según una categoría que elegiste antes.",
+    "rule_suggestion": "Sugerida según la descripción.",
+    "fallback_suggestion": "Elige una categoría o déjala sin categoría.",
+    "shopping": "Compras",
+    "food_groceries": "Comida y supermercado",
+    "bars_restaurants": "Bares y restaurantes",
+    "leisure_entertainment": "Ocio y entretenimiento",
+    "housing_public_services": "Vivienda y servicios públicos",
+    "transport_car": "Transporte y automóvil",
+    "atm": "Cajero automático",
+    "income": "Ingresos",
+    "family_friends": "Familia y amistades",
+    "insurance": "Seguros",
+    "pets": "Mascotas",
+    "savings_investments": "Ahorros e inversiones",
+    "health_personal_care": "Salud y cuidado personal",
+    "travel": "Viajes",
+    "subscriptions_digital_services": "Suscripciones y servicios digitales",
+    "donations": "Donaciones",
+    "uncategorized": "Sin categoría"
+  },
+  "mass_edit": {
+    "category_preserved": "Para cambiar una categoría, edita el movimiento individualmente."
   }
 }

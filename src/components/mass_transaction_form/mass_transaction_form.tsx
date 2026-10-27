@@ -142,6 +142,9 @@ export function MassTransactionForm({
           <Text element="p" type="caption" color="secondary">
             {i18n.t("mass_edit.schedule_hint")}
           </Text>
+          <Text element="p" type="caption" color="secondary">
+            {i18n.t("mass_edit.category_preserved")}
+          </Text>
           <Stack gap={12}>
             {rows.map((row, index) => (
               <fieldset

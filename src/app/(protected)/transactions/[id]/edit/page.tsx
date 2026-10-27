@@ -44,6 +44,7 @@ export default async function Page({
               transferSpaceId: transaction.transferSpaceId,
               id: transaction.id,
               type: transaction.type,
+              category: transaction.category,
               spaceName: transaction.space.name,
               description: transaction.description,
               amount: transaction.amount,

@@ -10,6 +10,8 @@ const { Space } = require("../../src/lib/space.ts");
 const { Transaction } = require("../../src/lib/transaction.ts");
 const { prisma } = require("../../src/lib/prisma.ts");
 const { SpaceMember } = require("../../src/lib/space_member.ts");
+const { CategoryMatch } = require("../../src/lib/category_match.ts");
+const { CategoryDefault } = require("../../src/lib/category_default.ts");
 
 test("creation navigation follows the current space without treating overview routes as spaces", () => {
   for (const path of [
@@ -95,8 +97,12 @@ test("scoped creation resolves the owned ID and rejects missing or archived spac
     insert: prisma.transaction.create,
     transaction: prisma.$transaction,
     participants: SpaceMember.serializeParticipants,
+    personalMatch: CategoryMatch.findApplicable,
+    defaults: CategoryDefault.listActive,
   };
   prisma.$transaction = async (callback) => callback(prisma);
+  CategoryMatch.findApplicable = async () => null;
+  CategoryDefault.listActive = async () => [];
   SpaceMember.serializeParticipants = async (_tx, owner, id) => {
     assert.equal(owner, "owner");
     assert.equal(id, "fixed");
@@ -148,5 +154,7 @@ test("scoped creation resolves the owned ID and rejects missing or archived spac
     prisma.transaction.create = originals.insert;
     prisma.$transaction = originals.transaction;
     SpaceMember.serializeParticipants = originals.participants;
+    CategoryMatch.findApplicable = originals.personalMatch;
+    CategoryDefault.listActive = originals.defaults;
   }
 });

@@ -35,7 +35,9 @@ import {
   type ProjectionFocusedSpaceTransactionRow,
   type TransactionFiltersInput,
   type TransactionWithSpaceRecord,
+  type TransactionWithCategoryPatch,
 } from "@/lib/transaction";
+import type { TransactionCategory } from "@prisma/client";
 import { requireCurrentUserAccount } from "@/lib/session";
 
 export type { CreateTransactionInput, CreateTransferInput, DashboardTotals };
@@ -186,6 +188,7 @@ export type TransactionsPagePayload = {
 export type TransactionDetailPayload = {
   id: string;
   type: string;
+  category: TransactionCategory;
   mainSpaceId: string | null;
   spaceId: string;
   spaceName: string;
@@ -250,7 +253,8 @@ export type FilteredTransactionListItem = {
 type TransactionMutationResult =
   | {
       success: true;
-      transaction: TransactionWithSpaceRecord;
+      transaction: TransactionWithCategoryPatch;
+      categoryMatchPatch?: TransactionWithCategoryPatch["categoryMatchPatch"];
     }
   | {
       success: false;
@@ -260,7 +264,10 @@ type TransactionMutationResult =
 type MultipleTransactionMutationResult =
   | {
       success: true;
-      transactions: TransactionWithSpaceRecord[];
+      transactions: TransactionWithCategoryPatch[];
+      categoryMatchPatches: NonNullable<
+        TransactionWithCategoryPatch["categoryMatchPatch"]
+      >[];
     }
   | {
       success: false;
@@ -414,6 +421,7 @@ function serializeTransactionDetail(
   return {
     id: transaction.id,
     type: transaction.type,
+    category: transaction.category,
     mainSpaceId,
     spaceId: transaction.spaceId,
     spaceName: transaction.space.name,
@@ -522,7 +530,11 @@ export async function createTransaction(
     const transaction = await Transaction.createForUser(currentUser.id, input);
     revalidateTransactionMutationPages();
 
-    return { success: true, transaction };
+    return {
+      success: true,
+      transaction,
+      categoryMatchPatch: transaction.categoryMatchPatch,
+    };
   } catch (error) {
     if (error instanceof Error && error.message === "space_is_archived") {
       return { success: false, error: "space_is_archived" };
@@ -580,7 +592,13 @@ export async function createMultipleTransactions(
     );
     revalidateTransactionMutationPages();
 
-    return { success: true, transactions };
+    return {
+      success: true,
+      transactions,
+      categoryMatchPatches: transactions.flatMap((transaction) =>
+        transaction.categoryMatchPatch ? [transaction.categoryMatchPatch] : [],
+      ),
+    };
   } catch (error) {
     if (error instanceof Error && error.message === "space_is_archived") {
       return { success: false, error: "space_is_archived" };
@@ -1003,7 +1021,11 @@ export async function updateTransaction(
     );
     revalidateTransactionMutationPages();
 
-    return { success: true, transaction };
+    return {
+      success: true,
+      transaction,
+      categoryMatchPatch: transaction.categoryMatchPatch,
+    };
   } catch (error) {
     if (
       error instanceof Error &&

@@ -516,6 +516,31 @@
     "browse": "Browse transactions",
     "row": "Transaction %{number}",
     "schedule_hint": "Each transaction’s existing split and schedule will be preserved.",
+    "category_preserved": "To change a category, edit the transaction individually.",
     "selection_limit": "Select up to 500 transactions to edit together."
+  },
+  "transaction_categories": {
+    "label": "Category",
+    "use_automatic_suggestion": "Use automatic suggestion",
+    "learned_suggestion": "Suggested from a category you chose before.",
+    "rule_suggestion": "Suggested from the description.",
+    "fallback_suggestion": "Choose a category or leave this as Uncategorized.",
+    "shopping": "Shopping",
+    "food_groceries": "Food & Groceries",
+    "bars_restaurants": "Bars & Restaurants",
+    "leisure_entertainment": "Leisure & Entertainment",
+    "housing_public_services": "Housing & Public Services",
+    "transport_car": "Transport & Car",
+    "atm": "ATM",
+    "income": "Income",
+    "family_friends": "Family & Friends",
+    "insurance": "Insurance",
+    "pets": "Pets",
+    "savings_investments": "Savings & Investments",
+    "health_personal_care": "Health & Personal Care",
+    "travel": "Travel",
+    "subscriptions_digital_services": "Subscriptions & Digital Services",
+    "donations": "Donations",
+    "uncategorized": "Uncategorized"
   }
 }

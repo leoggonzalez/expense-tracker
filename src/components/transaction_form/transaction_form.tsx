@@ -12,6 +12,7 @@ import { useProtectedPageSection } from "@/app/(protected)/use_protected_page_se
 import { TransactionSplit } from "@/components/transaction_split/transaction_split";
 import { SectionError } from "@/components/section_error/section_error";
 import { parseSplitParticipants } from "@/lib/transaction_split";
+import type { TransactionCategory } from "@prisma/client";
 
 import { Button, Input, Select, SpaceField } from "@/components";
 import { Icon, Stack, Text } from "@/elements";
@@ -32,6 +33,13 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 
 import { useToast } from "@/components/toast_provider/toast_provider";
+import {
+  transactionCategoryCatalog,
+  transactionCategoryKeys,
+} from "@/lib/category_catalog";
+import { useCategoryMatches } from "@/lib/category_match_cache";
+import { applyCategoryMatchPatch } from "@/lib/category_match_cache";
+import { resolveTransactionCategory } from "@/lib/category_matching";
 import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
 import { i18n } from "@/model/i18n";
 import { format } from "date-fns";
@@ -51,6 +59,7 @@ export interface TransactionFormProps {
   onSuccess?: () => void;
   initialData?: {
     splitParticipantIds?: string | null;
+    category?: TransactionCategory;
     transferSpaceId?: string | null;
     id: string;
     type: string;
@@ -191,6 +200,8 @@ export function TransactionForm({
         ? parseSplitParticipants(initialData.splitParticipantIds)
         : undefined,
   );
+  const [manualCategory, setManualCategory] =
+    useState<TransactionCategory | null>(null);
   const {
     data: spacesData,
     hasError: spacesError,
@@ -306,6 +317,9 @@ export function TransactionForm({
         spaceName: fixedSpace?.name || form.model.spaceName,
         ...(fixedSpace ? { spaceId: fixedSpace.id } : {}),
         description: form.model.description,
+        ...(manualCategory
+          ? { category: manualCategory, categorySelection: "manual" as const }
+          : {}),
         amount: parsedAmount,
         beginDate,
         endDate: resolveEndDate({
@@ -334,7 +348,12 @@ export function TransactionForm({
         return;
       }
 
+      if (result.categoryMatchPatch) {
+        applyCategoryMatchPatch(result.categoryMatchPatch);
+      }
+
       if (isCreateFlow) {
+        setManualCategory(null);
         resetCreateFlowFields();
       } else if (!isEdit) {
         setParticipantIds(undefined);
@@ -369,6 +388,18 @@ export function TransactionForm({
       : space.name === model.spaceName.trim(),
   );
   const ownerId = spacesData?.ownerId || "";
+  const categoryMatches = useCategoryMatches(ownerId);
+  const suggestedCategory = resolveTransactionCategory(
+    model.description,
+    model.type,
+    categoryMatches?.matches,
+    categoryMatches?.defaults,
+  );
+  const selectedCategory =
+    manualCategory ||
+    (isEdit
+      ? initialData?.category || "uncategorized"
+      : suggestedCategory.category);
   const previousIds = parseSplitParticipants(initialData?.splitParticipantIds);
   const splitMembers = (
     spacesData?.spaces.find((space) => space.id === selectedSpace?.id)
@@ -429,6 +460,12 @@ export function TransactionForm({
         scheduleMode: draft.scheduleMode || "one_time",
         installments: draft.installments || "1",
       });
+      if (
+        draft.categoryWasManuallySelected &&
+        transactionCategoryKeys.includes(draft.category as TransactionCategory)
+      ) {
+        setManualCategory(draft.category as TransactionCategory);
+      }
     }
 
     hasHydratedDraftRef.current = true;
@@ -449,6 +486,9 @@ export function TransactionForm({
     saveNewTransactionDraft(
       {
         participantIds,
+        ...(manualCategory
+          ? { category: manualCategory, categoryWasManuallySelected: true }
+          : { categoryWasManuallySelected: false }),
         spaceName: model.spaceName,
         description: model.description,
         amountInput: model.amountInput,
@@ -464,6 +504,7 @@ export function TransactionForm({
     isDraftReady,
     model.spaceName,
     participantIds,
+    manualCategory,
     model.amountInput,
     model.beginDate,
     model.description,
@@ -554,6 +595,53 @@ export function TransactionForm({
           surface="subtle"
           labelTone="secondary"
         />
+
+        {!initialData?.transferSpaceId ? (
+          <>
+            <Select
+              label={i18n.t("transaction_categories.label")}
+              value={selectedCategory}
+              onChange={(value) => {
+                if (
+                  transactionCategoryKeys.includes(value as TransactionCategory)
+                ) {
+                  setManualCategory(value as TransactionCategory);
+                }
+              }}
+              options={transactionCategoryKeys.map((category) => ({
+                value: category,
+                label: i18n.t(
+                  `transaction_categories.${transactionCategoryCatalog[category].labelKey}`,
+                ),
+              }))}
+              required
+              size="lg"
+              surface="subtle"
+              labelTone="secondary"
+            />
+            {!manualCategory && !isEdit ? (
+              <Text element="p" type="caption" color="secondary">
+                {i18n.t(
+                  suggestedCategory.source === "learned"
+                    ? "transaction_categories.learned_suggestion"
+                    : suggestedCategory.source === "rule"
+                      ? "transaction_categories.rule_suggestion"
+                      : "transaction_categories.fallback_suggestion",
+                )}
+              </Text>
+            ) : null}
+            {manualCategory && !isEdit ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setManualCategory(null)}
+              >
+                {i18n.t("transaction_categories.use_automatic_suggestion")}
+              </Button>
+            ) : null}
+          </>
+        ) : null}
 
         <Input
           label={i18n.t("transaction_form.amount")}

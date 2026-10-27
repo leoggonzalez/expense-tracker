@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { logout } from "@/actions/auth";
 import { updateCurrentUserAccountProfile } from "@/actions/user_account";
 import { i18n } from "@/model/i18n";
+import { clearCategoryMatchCache } from "@/lib/category_match_cache";
 
 interface AccountProfileFormProps {
   userAccount: {
@@ -42,6 +43,7 @@ export function AccountProfileForm({
   };
 
   const handleLogout = async (): Promise<void> => {
+    clearCategoryMatchCache();
     await logout();
   };
 

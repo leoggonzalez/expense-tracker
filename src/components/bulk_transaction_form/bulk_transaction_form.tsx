@@ -9,13 +9,23 @@ import {
 import { Button, Input, Select, SpaceField } from "@/components";
 import { Stack, Text } from "@/elements";
 import { parseAmountInput, sanitizeAmountInput } from "@/lib/amount";
+import type { TransactionCategory } from "@prisma/client";
+import {
+  transactionCategoryCatalog,
+  transactionCategoryKeys,
+} from "@/lib/category_catalog";
+import {
+  applyCategoryMatchPatch,
+  useCategoryMatches,
+} from "@/lib/category_match_cache";
+import { resolveTransactionCategory } from "@/lib/category_matching";
 import {
   TransactionScheduleMode,
   inferTransactionDateMode,
   resolveEndDate,
   toDate,
 } from "@/lib/transaction_schedule";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { useToast } from "@/components/toast_provider/toast_provider";
 import { triggerNewTransactionRecentRefresh } from "@/lib/new_transaction_recent_refresh";
@@ -25,6 +35,7 @@ import { format } from "date-fns";
 interface BulkTransactionItem {
   id: string;
   type: "income" | "expense";
+  category: TransactionCategory | null;
   description: string;
   amount: string;
 }
@@ -55,7 +66,15 @@ function getInitialSharedState(): SharedScheduleState {
 }
 
 function getInitialTransactions(): BulkTransactionItem[] {
-  return [{ id: "1", type: "expense", description: "", amount: "" }];
+  return [
+    {
+      id: "1",
+      type: "expense",
+      category: null,
+      description: "",
+      amount: "",
+    },
+  ];
 }
 
 function parseInstallments(value: string): number | null {
@@ -84,7 +103,12 @@ export function BulkTransactionForm({
     getInitialTransactions(),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ownerId, setOwnerId] = useState("");
   const nextIdRef = useRef(2);
+  const categoryMatches = useCategoryMatches(ownerId);
+  const handleOwnerIdChange = useCallback((value: string) => {
+    setOwnerId(value);
+  }, []);
 
   const beginDateMode = inferTransactionDateMode(shared.beginDate);
   const beginDate = useMemo(
@@ -138,7 +162,13 @@ export function BulkTransactionForm({
 
     setTransactions((currentTransactions) => [
       ...currentTransactions,
-      { id: nextId, type: "expense", description: "", amount: "" },
+      {
+        id: nextId,
+        type: "expense",
+        category: null,
+        description: "",
+        amount: "",
+      },
     ]);
   };
 
@@ -198,6 +228,12 @@ export function BulkTransactionForm({
 
       inputs.push({
         type: transaction.type,
+        ...(transaction.category
+          ? {
+              category: transaction.category,
+              categorySelection: "manual" as const,
+            }
+          : {}),
         spaceName: shared.spaceName,
         description: transaction.description,
         amount: parsedAmount,
@@ -216,6 +252,7 @@ export function BulkTransactionForm({
       });
       return;
     }
+    result.categoryMatchPatches?.forEach(applyCategoryMatchPatch);
 
     showSuccess(i18n.t("toast.transactions_created"), {
       iconName: "transactions",
@@ -242,6 +279,7 @@ export function BulkTransactionForm({
             onChange={(value) =>
               setShared((current) => ({ ...current, spaceName: value }))
             }
+            onResolvedOwnerIdChange={handleOwnerIdChange}
             spaces={initialSpaces}
             loadSpacesOnMount={initialSpaces.length === 0}
             placeholder={
@@ -399,6 +437,73 @@ export function BulkTransactionForm({
                     size="lg"
                     surface="subtle"
                   />
+
+                  {(() => {
+                    const suggestion = resolveTransactionCategory(
+                      transaction.description,
+                      transaction.type,
+                      categoryMatches?.matches,
+                      categoryMatches?.defaults,
+                    );
+                    return (
+                      <Stack gap={4}>
+                        <Select
+                          label={i18n.t("transaction_categories.label")}
+                          value={transaction.category || suggestion.category}
+                          onChange={(value) => {
+                            if (
+                              transactionCategoryKeys.includes(
+                                value as TransactionCategory,
+                              )
+                            ) {
+                              updateTransactionField(
+                                transaction.id,
+                                "category",
+                                value as TransactionCategory,
+                              );
+                            }
+                          }}
+                          options={transactionCategoryKeys.map((category) => ({
+                            value: category,
+                            label: i18n.t(
+                              `transaction_categories.${transactionCategoryCatalog[category].labelKey}`,
+                            ),
+                          }))}
+                          size="lg"
+                          surface="subtle"
+                          labelTone="secondary"
+                        />
+                        {transaction.category ? (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() =>
+                              updateTransactionField(
+                                transaction.id,
+                                "category",
+                                null,
+                              )
+                            }
+                          >
+                            {i18n.t(
+                              "transaction_categories.use_automatic_suggestion",
+                            )}
+                          </Button>
+                        ) : (
+                          <Text element="p" type="fine" color="secondary">
+                            {i18n.t(
+                              suggestion.source === "learned"
+                                ? "transaction_categories.learned_suggestion"
+                                : suggestion.source === "rule"
+                                  ? "transaction_categories.rule_suggestion"
+                                  : "transaction_categories.fallback_suggestion",
+                            )}
+                          </Text>
+                        )}
+                      </Stack>
+                    );
+                  })()}
 
                   <Input
                     type="text"

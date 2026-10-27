@@ -8,7 +8,12 @@ import {
   resolveEndDate,
 } from "@/lib/transaction_schedule";
 import { normalizeTransactionAmount } from "@/lib/amount";
-import { CreditCardPaymentTiming, Prisma } from "@prisma/client";
+import {
+  CreditCardPaymentTiming,
+  Prisma,
+  TransactionCategory,
+  TransactionCategorySource,
+} from "@prisma/client";
 import {
   addDays,
   addMonths,
@@ -21,6 +26,16 @@ import {
 
 import { SpaceMember } from "@/lib/space_member";
 import { parseSplitParticipants } from "@/lib/transaction_split";
+import {
+  CategoryMatch,
+  type CategoryMatchPatch,
+  type CategoryMatchRecord,
+} from "@/lib/category_match";
+import { CategoryDefault } from "@/lib/category_default";
+import {
+  resolveTransactionCategory,
+  type CategoryDefaultRule,
+} from "@/lib/category_matching";
 
 import { prisma } from "@/lib/prisma";
 import { Space, type CreditCardSpaceRecord } from "@/lib/space";
@@ -28,6 +43,8 @@ import { Space, type CreditCardSpaceRecord } from "@/lib/space";
 export type CreateTransactionInput = {
   participantIds?: string[];
   type: "income" | "expense";
+  category?: TransactionCategory;
+  categorySelection?: "manual" | "automatic";
   spaceName: string;
   spaceId?: string;
   description: string;
@@ -47,6 +64,8 @@ export type CreateTransferInput = {
 export type TransactionBaseData = {
   splitParticipantIds?: string | null;
   type: string;
+  category: TransactionCategory;
+  categorySource: TransactionCategorySource;
   spaceId: string;
   transferSpaceId: string | null;
   description: string;
@@ -68,6 +87,8 @@ export type TransactionCreateData = Pick<
   Partial<
     Pick<
       TransactionBaseData,
+      | "category"
+      | "categorySource"
       | "transferSpaceId"
       | "endDate"
       | "createdAt"
@@ -114,6 +135,10 @@ const filteredTransactionSelect = Prisma.validator<Prisma.TransactionSelect>()({
 export type TransactionWithSpaceRecord = Prisma.TransactionGetPayload<{
   include: typeof transactionWithSpaceInclude;
 }>;
+
+export type TransactionWithCategoryPatch = TransactionWithSpaceRecord & {
+  categoryMatchPatch?: CategoryMatchPatch;
+};
 
 export type FilteredTransactionRecord = Prisma.TransactionGetPayload<{
   select: typeof filteredTransactionSelect;
@@ -276,6 +301,8 @@ export class Transaction {
     this.data = {
       transferSpaceId: null,
       endDate: null,
+      category: TransactionCategory.uncategorized,
+      categorySource: TransactionCategorySource.fallback,
       ...data,
     };
   }
@@ -285,6 +312,9 @@ export class Transaction {
       data: {
         splitParticipantIds: this.data.splitParticipantIds,
         type: this.data.type,
+        category: this.data.category ?? TransactionCategory.uncategorized,
+        categorySource:
+          this.data.categorySource ?? TransactionCategorySource.fallback,
         spaceId: this.data.spaceId,
         transferSpaceId: this.data.transferSpaceId ?? null,
         description: this.data.description,
@@ -339,6 +369,9 @@ export class Transaction {
       splitParticipantIds: this.data.splitParticipantIds ?? null,
       id: this.data.id,
       type: this.data.type,
+      category: this.data.category ?? TransactionCategory.uncategorized,
+      categorySource:
+        this.data.categorySource ?? TransactionCategorySource.fallback,
       spaceId: this.data.spaceId,
       transferSpaceId: this.data.transferSpaceId ?? null,
       description: this.data.description,
@@ -357,13 +390,22 @@ export class Transaction {
   public static async createForUser(
     userAccountId: string,
     input: CreateTransactionInput,
-  ): Promise<TransactionWithSpaceRecord> {
+    learnedMatchOverride?: CategoryMatchRecord | null,
+    defaultRulesOverride?: readonly CategoryDefaultRule[],
+  ): Promise<TransactionWithCategoryPatch> {
     const space = input.spaceId
       ? await Space.findOwnedById(userAccountId, input.spaceId)
       : await Space.findOrCreateActive(userAccountId, input.spaceName);
 
     if (!space || space.toRecord().isArchived) {
       throw new Error("space_not_found");
+    }
+    if (
+      input.categorySelection === "manual" &&
+      (!input.category ||
+        !Object.values(TransactionCategory).includes(input.category))
+    ) {
+      throw new Error("transaction_category_invalid");
     }
     const transaction = await prisma.$transaction(async (tx) => {
       const splitParticipantIds = await SpaceMember.serializeParticipants(
@@ -372,7 +414,36 @@ export class Transaction {
         space.persistedId,
         input.participantIds,
       );
-      return tx.transaction.create({
+      const learnedMatch =
+        learnedMatchOverride === undefined
+          ? await CategoryMatch.findApplicable(
+              tx,
+              userAccountId,
+              input.description,
+              input.type,
+            )
+          : learnedMatchOverride;
+      const defaults =
+        defaultRulesOverride ?? (await CategoryDefault.listActive(tx));
+      const resolution = resolveTransactionCategory(
+        input.description,
+        input.type,
+        [],
+        defaults,
+      );
+      const category =
+        input.categorySelection === "manual"
+          ? input.category!
+          : (learnedMatch?.category ?? resolution.category);
+      const categorySource =
+        input.categorySelection === "manual"
+          ? TransactionCategorySource.manual
+          : learnedMatch
+            ? TransactionCategorySource.learned
+            : resolution.source === "rule"
+              ? TransactionCategorySource.rule
+              : TransactionCategorySource.fallback;
+      const created = await tx.transaction.create({
         data: {
           splitParticipantIds,
           type: input.type,
@@ -380,11 +451,34 @@ export class Transaction {
           transferSpaceId: null,
           description: input.description,
           amount: input.amount,
+          category,
+          categorySource,
           beginDate: input.beginDate,
           endDate: input.endDate || null,
         },
         include: transactionWithSpaceInclude,
       });
+      let categoryMatchPatch: CategoryMatchPatch | undefined;
+      if (input.categorySelection === "manual") {
+        const learned = await CategoryMatch.learnExplicitChoice(tx, {
+          userAccountId,
+          description: input.description,
+          transactionType: input.type,
+          category: input.category!,
+        });
+        if (learned.changed && learned.match) {
+          categoryMatchPatch = {
+            ownerId: userAccountId,
+            rulesVersion: learned.rulesVersion,
+            match: {
+              normalizedDescription: learned.match.normalizedDescription,
+              transactionType: learned.match.transactionType,
+              category: learned.match.category,
+            },
+          };
+        }
+      }
+      return { ...created, categoryMatchPatch };
     });
     await Space.syncCurrentMonthTransactionCount(space.persistedId);
 
@@ -459,11 +553,29 @@ export class Transaction {
   public static async createManyForUser(
     userAccountId: string,
     inputs: CreateTransactionInput[],
-  ): Promise<TransactionWithSpaceRecord[]> {
-    const results: TransactionWithSpaceRecord[] = [];
+  ): Promise<TransactionWithCategoryPatch[]> {
+    const results: TransactionWithCategoryPatch[] = [];
+    const learnedMatches = await CategoryMatch.findApplicableMany(
+      userAccountId,
+      inputs.map((input) => ({
+        description: input.description,
+        transactionType: input.type,
+      })),
+    );
 
+    const defaults = await CategoryDefault.listActive();
     for (const input of inputs) {
-      results.push(await Transaction.createForUser(userAccountId, input));
+      const learnedMatch = learnedMatches.get(
+        CategoryMatch.getKey(input.description, input.type),
+      );
+      results.push(
+        await Transaction.createForUser(
+          userAccountId,
+          input,
+          learnedMatch ?? null,
+          defaults,
+        ),
+      );
     }
 
     return results;
@@ -1257,7 +1369,7 @@ export class Transaction {
     userAccountId: string,
     id: string,
     input: Partial<CreateTransactionInput>,
-  ): Promise<TransactionWithSpaceRecord> {
+  ): Promise<TransactionWithCategoryPatch> {
     const existingTransaction = await Transaction.findOwnedById(
       userAccountId,
       id,
@@ -1295,7 +1407,17 @@ export class Transaction {
             selected,
             previous,
           );
-      return tx.transaction.update({
+      const explicitCategory =
+        input.categorySelection === "manual" &&
+        !existingTransaction.data.transferSpaceId;
+      if (
+        explicitCategory &&
+        (!input.category ||
+          !Object.values(TransactionCategory).includes(input.category))
+      ) {
+        throw new Error("transaction_category_invalid");
+      }
+      const updated = await tx.transaction.update({
         where: { id },
         data: {
           splitParticipantIds,
@@ -1305,9 +1427,37 @@ export class Transaction {
           ...(input.amount !== undefined && { amount: input.amount }),
           ...(input.beginDate && { beginDate: input.beginDate }),
           ...(input.endDate !== undefined && { endDate: input.endDate }),
+          ...(explicitCategory && {
+            category: input.category!,
+            categorySource: TransactionCategorySource.manual,
+          }),
         },
         include: transactionWithSpaceInclude,
       });
+      let categoryMatchPatch: CategoryMatchPatch | undefined;
+      if (explicitCategory) {
+        const learned = await CategoryMatch.learnExplicitChoice(tx, {
+          userAccountId,
+          description:
+            input.description ?? existingTransaction.data.description,
+          transactionType:
+            input.type ??
+            (existingTransaction.data.type as "income" | "expense"),
+          category: input.category!,
+        });
+        if (learned.changed && learned.match) {
+          categoryMatchPatch = {
+            ownerId: userAccountId,
+            rulesVersion: learned.rulesVersion,
+            match: {
+              normalizedDescription: learned.match.normalizedDescription,
+              transactionType: learned.match.transactionType,
+              category: learned.match.category,
+            },
+          };
+        }
+      }
+      return { ...updated, categoryMatchPatch };
     });
 
     await Space.syncCurrentMonthTransactionCounts([
