@@ -30,6 +30,7 @@ import {
   type DashboardUpcomingTransactionRecord,
   type DashboardUpcomingPaymentRecord,
   type DashboardTotals,
+  type CategoryAllocationSummary,
   type FilteredTransactionRecord,
   type ProjectionFocusedSpaceSummaryRow,
   type ProjectionFocusedSpaceTransactionRow,
@@ -107,6 +108,10 @@ export type DashboardPayload = {
   upcomingPayments: DashboardUpcomingItem[];
   currentMonthRange: DashboardDateRange;
 };
+
+export interface DashboardAllocationsPayload extends CategoryAllocationSummary {
+  monthKey: string;
+}
 
 export type DashboardHeaderPayload = {
   totals: DashboardTotals;

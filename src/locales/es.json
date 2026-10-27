@@ -454,6 +454,23 @@
     "select_participant": "Selecciona al menos un participante.",
     "invalid_split": "Los participantes no son válidos. Actualiza e inténtalo de nuevo."
   },
+  "category_allocations": {
+    "current_month": "Mes actual",
+    "load_failed": "No se pudo cargar la distribución mensual.",
+    "income": "Ingresos",
+    "expense": "Gastos",
+    "mixed": "Ingresos y gastos",
+    "chart_summary": "%{month}: %{total} en %{type}. Los importes y porcentajes por categoría se muestran debajo.",
+    "category_share": "%{share} de %{type}",
+    "expense_title": "Gastos por categoría",
+    "income_title": "Ingresos por categoría",
+    "expense_total": "Gastos totales",
+    "income_total": "Ingresos totales",
+    "expense_empty": "No hay gastos para mostrar este mes.",
+    "income_empty": "No hay ingresos para mostrar este mes.",
+    "expense_description": "Distribución de los gastos del mes. Transferencias excluidas.",
+    "income_description": "Distribución de los ingresos del mes. Transferencias excluidas."
+  },
   "transaction_categories": {
     "label": "Categoría",
     "use_automatic_suggestion": "Usar sugerencia automática",

@@ -308,6 +308,35 @@ by default. `scripts/category_backfill_freeze_manifest.ts` requires an explicit
 approved review status and freezes only reviewed transaction IDs and expected
 record versions into a checksummed manifest; freezing does not apply it.
 
+## Dashboard Category Allocations
+
+`/api/dashboard/allocations` is authenticated, per-request, and `private, no-store`.
+The dashboard’s static card shell loads it through its own section controller.
+`Transaction.getMonthCategoryAllocationsForUser` shares the complete occurrence
+query with monthly dashboard totals: recurring and installment occurrences inherit
+the stored category, day-of-month values clamp to month end, and credit-card
+statement cutoffs select the same reporting month. There is no preview limit or
+participant join. Each occurrence is counted once; internal transfers are excluded.
+
+Two Recharts donut cards show expenses and income separately, in that order.
+They share one authenticated snapshot/request. Each card uses only its type’s
+positive magnitude, total, percentage denominator, and category ordering. A mixed
+category can appear in both cards with its separate amounts. Zero-value sides are
+omitted; empty states are independent. The desktop layout places the chart cards
+in the first row, with Upcoming Transactions and Recent Activity in the second
+row. Narrow screens stack the cards in that same reading order.
+
+Each legend shows category icons, localized names, amounts, and percentage shares.
+The card title identifies the transaction type, so legend rows omit type icons.
+Uncategorized remains visible
+when present. The accessible legend provides the full data alongside the
+decorative chart. Category palette tokens and icon metadata are shared through
+the catalog. Empty, loading, and retry states preserve card titles and captions.
+
+Run `RUN_DATABASE_TESTS=1 node --env-file=.env --test
+scripts/tests/category_allocations_test.mjs` for owner isolation, mixed categories,
+transfers, split counting, complete schedules, and statement-boundary coverage.
+
 ## Validation
 
 After backend or data refactors:

@@ -519,6 +519,23 @@
     "category_preserved": "To change a category, edit the transaction individually.",
     "selection_limit": "Select up to 500 transactions to edit together."
   },
+  "category_allocations": {
+    "current_month": "Current month",
+    "load_failed": "Could not load monthly allocations.",
+    "income": "Income",
+    "expense": "Expenses",
+    "mixed": "Income and expenses",
+    "chart_summary": "%{month}: %{total} in %{type}. Category amounts and shares are listed below.",
+    "category_share": "%{share} of %{type}",
+    "expense_title": "Expenses by category",
+    "income_title": "Income by category",
+    "expense_total": "Total expenses",
+    "income_total": "Total income",
+    "expense_empty": "No expenses to show for this month.",
+    "income_empty": "No income to show for this month.",
+    "expense_description": "Share of monthly expenses. Transfers excluded.",
+    "income_description": "Share of monthly income. Transfers excluded."
+  },
   "transaction_categories": {
     "label": "Category",
     "use_automatic_suggestion": "Use automatic suggestion",

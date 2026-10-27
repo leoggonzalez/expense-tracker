@@ -40,6 +40,24 @@ import {
 import { prisma } from "@/lib/prisma";
 import { Space, type CreditCardSpaceRecord } from "@/lib/space";
 
+/** Monthly category totals use positive magnitudes, counting each non-transfer occurrence once. */
+export interface CategoryAllocation {
+  category: TransactionCategory;
+  amount: number;
+  income: number;
+  expense: number;
+  transactionCount: number;
+  type: "income" | "expense" | "mixed";
+}
+
+export interface CategoryAllocationSummary {
+  categories: CategoryAllocation[];
+  total: number;
+  income: number;
+  expense: number;
+  transactionCount: number;
+}
+
 export type CreateTransactionInput = {
   participantIds?: string[];
   type: "income" | "expense";
@@ -668,18 +686,16 @@ export class Transaction {
     });
   }
 
-  public static async getMonthTotalsForUser(
+  /** Expand complete schedules before applying the reporting month, including card cutoffs and month-end clamping. No participant join or preview limit is applied. */
+  private static getMonthlyOccurrencesSql(
     userAccountId: string,
-    monthStartInput: Date,
-  ): Promise<DashboardTotals> {
-    const monthStart = startOfMonth(monthStartInput);
-    const monthEnd = endOfMonth(monthStart);
-
-    const rows = await prisma.$queryRaw<MonthTotalsRow[]>`
-      WITH transaction_occurrences AS (
+    monthEnd: Date,
+  ): Prisma.Sql {
+    return Prisma.sql`
         SELECT
           e.type,
           e.amount,
+          e.category,
           "getSpaceProjectionMonthStart"(
             a.type::text,
             a."paymentDueDay",
@@ -707,6 +723,89 @@ export class Transaction {
         WHERE a."userAccountId" = ${userAccountId}
           AND e."transferSpaceId" IS NULL
           AND e."beginDate" <= ${monthEnd}
+    `;
+  }
+
+  /** Aggregate current category allocations for an owned reporting month. Transfers are excluded; income and expenses never cancel each other in the donut. */
+  public static async getMonthCategoryAllocationsForUser(
+    userAccountId: string,
+    monthStartInput: Date,
+  ): Promise<CategoryAllocationSummary> {
+    const monthStart = startOfMonth(monthStartInput);
+    const monthEnd = endOfMonth(monthStart);
+    const rows = await prisma.$queryRaw<
+      Array<{
+        category: TransactionCategory;
+        incomeCents: Prisma.Decimal;
+        expenseCents: Prisma.Decimal;
+        incomeCount: bigint;
+        expenseCount: bigint;
+      }>
+    >`
+      WITH transaction_occurrences AS (
+        ${Transaction.getMonthlyOccurrencesSql(userAccountId, monthEnd)}
+      )
+      SELECT e.category,
+        COALESCE(SUM(ROUND(ABS(e.amount)::numeric * 100)) FILTER (WHERE e.type = 'income'), 0) AS "incomeCents",
+        COALESCE(SUM(ROUND(ABS(e.amount)::numeric * 100)) FILTER (WHERE e.type = 'expense'), 0) AS "expenseCents",
+        COUNT(*) FILTER (WHERE e.type = 'income') AS "incomeCount",
+        COUNT(*) FILTER (WHERE e.type = 'expense') AS "expenseCount"
+      FROM transaction_occurrences e
+      WHERE e."projectedMonthStart" = ${monthStart}
+        AND e.type IN ('income', 'expense')
+      GROUP BY e.category
+      ORDER BY e.category
+    `;
+    let totalIncomeCents = 0;
+    let totalExpenseCents = 0;
+    const categories: CategoryAllocation[] = rows.map((row) => {
+      const incomeCents = Number(row.incomeCents);
+      const expenseCents = Number(row.expenseCents);
+      const incomeCount = Number(row.incomeCount);
+      const expenseCount = Number(row.expenseCount);
+      totalIncomeCents += incomeCents;
+      totalExpenseCents += expenseCents;
+      return {
+        category: row.category,
+        amount: (incomeCents + expenseCents) / 100,
+        income: incomeCents / 100,
+        expense: expenseCents / 100,
+        transactionCount: incomeCount + expenseCount,
+        type:
+          incomeCount && expenseCount
+            ? "mixed"
+            : incomeCount
+              ? "income"
+              : "expense",
+      };
+    });
+    categories.sort(
+      (left, right) =>
+        right.amount - left.amount ||
+        left.category.localeCompare(right.category),
+    );
+    return {
+      categories,
+      income: totalIncomeCents / 100,
+      expense: totalExpenseCents / 100,
+      total: (totalIncomeCents + totalExpenseCents) / 100,
+      transactionCount: categories.reduce(
+        (sum, category) => sum + category.transactionCount,
+        0,
+      ),
+    };
+  }
+
+  public static async getMonthTotalsForUser(
+    userAccountId: string,
+    monthStartInput: Date,
+  ): Promise<DashboardTotals> {
+    const monthStart = startOfMonth(monthStartInput);
+    const monthEnd = endOfMonth(monthStart);
+
+    const rows = await prisma.$queryRaw<MonthTotalsRow[]>`
+      WITH transaction_occurrences AS (
+        ${Transaction.getMonthlyOccurrencesSql(userAccountId, monthEnd)}
       )
       SELECT
         totals.income,

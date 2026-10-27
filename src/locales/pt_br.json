@@ -454,6 +454,23 @@
     "select_participant": "Selecione pelo menos um participante.",
     "invalid_split": "Os participantes são inválidos. Atualize e tente novamente."
   },
+  "category_allocations": {
+    "current_month": "Mês atual",
+    "load_failed": "Não foi possível carregar a distribuição mensal.",
+    "income": "Receitas",
+    "expense": "Despesas",
+    "mixed": "Receitas e despesas",
+    "chart_summary": "%{month}: %{total} em %{type}. Os valores e percentuais por categoria estão listados abaixo.",
+    "category_share": "%{share} de %{type}",
+    "expense_title": "Despesas por categoria",
+    "income_title": "Receitas por categoria",
+    "expense_total": "Despesas totais",
+    "income_total": "Receitas totais",
+    "expense_empty": "Não há despesas para exibir neste mês.",
+    "income_empty": "Não há receitas para exibir neste mês.",
+    "expense_description": "Distribuição das despesas do mês. Transferências excluídas.",
+    "income_description": "Distribuição das receitas do mês. Transferências excluídas."
+  },
   "transaction_categories": {
     "label": "Categoria",
     "use_automatic_suggestion": "Usar sugestão automática",

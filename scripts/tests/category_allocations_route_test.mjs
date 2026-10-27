@@ -1,0 +1,55 @@
+import assert from "node:assert/strict";
+import Module from "node:module";
+import { test } from "node:test";
+import { register } from "tsx/esm/api";
+import "tsx/cjs";
+register();
+
+test("dashboard allocations require authentication and return private owner-scoped data", async () => {
+  let user = null;
+  let calls = 0;
+  const payload = {
+    categories: [],
+    total: 0,
+    income: 0,
+    expense: 0,
+    transactionCount: 0,
+  };
+  const original = Module._load;
+  Module._load = function (specifier, ...args) {
+    if (specifier === "@/lib/session")
+      return { getCurrentUserAccount: async () => user };
+    if (specifier === "@/lib/transaction")
+      return {
+        Transaction: {
+          getMonthCategoryAllocationsForUser: async (id, monthStart) => {
+            assert.equal(monthStart.getDate(), 1);
+            assert.equal(id, "owner");
+            calls++;
+            return payload;
+          },
+        },
+      };
+    return original.call(this, specifier, ...args);
+  };
+  let GET;
+  try {
+    ({ GET } =
+      await import("../../src/app/api/dashboard/allocations/route.ts"));
+  } finally {
+    Module._load = original;
+  }
+  const unauthorized = await GET();
+  assert.equal(unauthorized.status, 401);
+  assert.match(unauthorized.headers.get("Cache-Control"), /private, no-store/);
+  assert.equal(calls, 0);
+  user = { id: "owner" };
+  const response = await GET();
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("Cache-Control"), /private, no-store/);
+  const responsePayload = await response.json();
+  const { monthKey, ...summary } = responsePayload;
+  assert.match(monthKey, /^\d{4}-\d{2}$/);
+  assert.deepEqual(summary, payload);
+  assert.equal(calls, 1);
+});

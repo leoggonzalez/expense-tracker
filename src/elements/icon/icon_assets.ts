@@ -40,6 +40,33 @@ export const iconAssets = {
   ).toString(),
   minus: new URL("./icons/minus.svg", import.meta.url).toString(),
   download: new URL("./icons/download.svg", import.meta.url).toString(),
+  shopping: new URL("./icons/shopping.svg", import.meta.url).toString(),
+  groceries: new URL("./icons/groceries.svg", import.meta.url).toString(),
+  restaurant: new URL("./icons/restaurant.svg", import.meta.url).toString(),
+  entertainment: new URL(
+    "./icons/entertainment.svg",
+    import.meta.url,
+  ).toString(),
+  housing: new URL("./icons/housing.svg", import.meta.url).toString(),
+  transport: new URL("./icons/transport.svg", import.meta.url).toString(),
+  atm: new URL("./icons/atm.svg", import.meta.url).toString(),
+  family: new URL("./icons/family.svg", import.meta.url).toString(),
+  insurance: new URL("./icons/insurance.svg", import.meta.url).toString(),
+  pets: new URL("./icons/pets.svg", import.meta.url).toString(),
+  investments: new URL("./icons/investments.svg", import.meta.url).toString(),
+  health: new URL("./icons/health.svg", import.meta.url).toString(),
+  travel: new URL("./icons/travel.svg", import.meta.url).toString(),
+  subscriptions: new URL(
+    "./icons/subscriptions.svg",
+    import.meta.url,
+  ).toString(),
+  donations: new URL("./icons/donations.svg", import.meta.url).toString(),
+  uncategorized: new URL(
+    "./icons/uncategorized.svg",
+    import.meta.url,
+  ).toString(),
+  mixed: new URL("./icons/mixed.svg", import.meta.url).toString(),
+  allocations: new URL("./icons/allocations.svg", import.meta.url).toString(),
 } as const;
 
 export type IconName = keyof typeof iconAssets;
