@@ -154,7 +154,14 @@
     "add_multiple_transactions": "Add Multiple Transactions",
     "load_more_transactions": "Load More Transactions",
     "recent_transactions": "Recent Transactions (%{count} most recent)",
-    "see_all_transactions": "See all transactions"
+    "see_all_transactions": "See all transactions",
+    "category_all": "All categories",
+    "category_pill": "Category: %{category}",
+    "month_pill": "Month: %{month}",
+    "reporting_month": "Reporting month",
+    "reporting_year": "Reporting year",
+    "month_all": "All months",
+    "reporting_month_hint": "Uses the same month as the charts."
   },
   "transaction_list": {
     "empty_state": "No transactions yet. Add your first transaction!",
@@ -534,7 +541,8 @@
     "expense_empty": "No expenses to show for this month.",
     "income_empty": "No income to show for this month.",
     "expense_description": "Share of monthly expenses. Transfers excluded.",
-    "income_description": "Share of monthly income. Transfers excluded."
+    "income_description": "Share of monthly income. Transfers excluded.",
+    "view_transactions": "View %{category} %{type} for %{month}"
   },
   "transaction_categories": {
     "label": "Category",

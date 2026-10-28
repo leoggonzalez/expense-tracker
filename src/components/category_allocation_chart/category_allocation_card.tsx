@@ -14,6 +14,7 @@ interface CategoryAllocationCardProps {
   categories: CategoryAllocationChartItem[];
   total: number;
   monthLabel: string;
+  monthKey: string;
   isLoading: boolean;
   hasError: boolean;
   onRetry: () => void;
@@ -25,6 +26,7 @@ export function CategoryAllocationCard({
   categories,
   total,
   monthLabel,
+  monthKey,
   isLoading,
   hasError,
   onRetry,
@@ -61,6 +63,7 @@ export function CategoryAllocationCard({
             categories={categories}
             total={total}
             monthLabel={monthLabel}
+            monthKey={monthKey}
             type={type}
           />
         ) : (

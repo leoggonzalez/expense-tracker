@@ -140,7 +140,14 @@
     "add_new_transaction": "Añadir nuevo movimiento",
     "add_multiple_transactions": "Añadir varios movimientos",
     "recent_transactions": "Movimientos recientes (%{count} más recientes)",
-    "see_all_transactions": "Ver todos los movimientos"
+    "see_all_transactions": "Ver todos los movimientos",
+    "category_all": "Todas las categorías",
+    "category_pill": "Categoría: %{category}",
+    "month_pill": "Mes: %{month}",
+    "reporting_month": "Mes del informe",
+    "reporting_year": "Año del informe",
+    "month_all": "Todos los meses",
+    "reporting_month_hint": "Usa el mismo mes que los gráficos."
   },
   "transaction_list": {
     "empty_state": "Todavía no hay movimientos. Añade el primero.",
@@ -469,7 +476,8 @@
     "expense_empty": "No hay gastos para mostrar este mes.",
     "income_empty": "No hay ingresos para mostrar este mes.",
     "expense_description": "Distribución de los gastos del mes. Transferencias excluidas.",
-    "income_description": "Distribución de los ingresos del mes. Transferencias excluidas."
+    "income_description": "Distribución de los ingresos del mes. Transferencias excluidas.",
+    "view_transactions": "Ver %{type} de %{category} de %{month}"
   },
   "transaction_categories": {
     "label": "Categoría",

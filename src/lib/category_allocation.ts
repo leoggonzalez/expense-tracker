@@ -29,3 +29,12 @@ export function getCategoryAllocationsForType(
         left.category.localeCompare(right.category),
     );
 }
+
+/** Link a chart category to the same reporting month and transaction type, keeping filters shareable. */
+export function getCategoryTransactionsHref(
+  monthKey: string,
+  category: TransactionCategory,
+  type: "expense" | "income",
+): string {
+  return `/transactions?${new URLSearchParams({ month: monthKey, category, type }).toString()}`;
+}

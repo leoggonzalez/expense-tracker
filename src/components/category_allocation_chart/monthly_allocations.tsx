@@ -47,6 +47,7 @@ export function MonthlyAllocations({
           )}
           total={visibleData?.[type] ?? 0}
           monthLabel={monthLabel}
+          monthKey={displayedMonth ?? ""}
           isLoading={!visibleData && (isLoading || !hasError)}
           hasError={hasError && !visibleData}
           onRetry={retry}

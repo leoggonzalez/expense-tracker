@@ -1,10 +1,14 @@
 import { endOfMonth } from "date-fns";
+import type { TransactionCategory } from "@prisma/client";
+import { transactionCategoryKeys } from "@/lib/category_catalog";
 import type { TransactionFiltersInput } from "@/lib/transaction";
 import { inferTransactionDateMode, toDate } from "@/lib/transaction_schedule";
 
 export type NormalizedTransactionsFilters = {
   page: number;
   space: string;
+  category: TransactionCategory | "";
+  month: string;
   type: "" | "income" | "expense" | "transfer";
   startDate: string;
   endDate: string;
@@ -30,6 +34,17 @@ export function normalizeTransactionsFilters(
     rawType === "income" || rawType === "expense" || rawType === "transfer"
       ? rawType
       : "";
+  const rawCategory = getFirstValue(params, "category") || "";
+  const category = transactionCategoryKeys.includes(
+    rawCategory as TransactionCategory,
+  )
+    ? (rawCategory as TransactionCategory)
+    : "";
+  const rawMonth = getFirstValue(params, "month") || "";
+  const month =
+    /^\d{4}-(0[1-9]|1[0-2])$/.test(rawMonth) && Number(rawMonth.slice(0, 4)) > 0
+      ? rawMonth
+      : "";
   const startDate = getFirstValue(params, "start_date") || "";
   const endDate = getFirstValue(params, "end_date") || "";
   const rawSearchTerms = Array.isArray(params.search)
@@ -44,6 +59,8 @@ export function normalizeTransactionsFilters(
   return {
     page,
     space,
+    category,
+    month,
     type,
     startDate,
     endDate,
@@ -54,23 +71,16 @@ export function normalizeTransactionsFilters(
 export function normalizeTransactionsFiltersFromUrlSearchParams(
   searchParams: URLSearchParams,
 ): NormalizedTransactionsFilters {
-  const rawSearchTerms = searchParams
-    .getAll("search")
-    .map((term) => term.trim())
-    .filter(Boolean);
-
-  return {
-    page: Math.max(1, Number(searchParams.get("page") || "1") || 1),
-    space: searchParams.get("space") || "",
-    type: ["income", "expense", "transfer"].includes(
-      searchParams.get("type") || "",
-    )
-      ? (searchParams.get("type") as "income" | "expense" | "transfer")
-      : "",
-    startDate: searchParams.get("start_date") || "",
-    endDate: searchParams.get("end_date") || "",
-    searchTerms: Array.from(new Set(rawSearchTerms)),
-  };
+  return normalizeTransactionsFilters({
+    page: searchParams.get("page") || undefined,
+    space: searchParams.get("space") || undefined,
+    category: searchParams.get("category") || undefined,
+    month: searchParams.get("month") || undefined,
+    type: searchParams.get("type") || undefined,
+    start_date: searchParams.get("start_date") || undefined,
+    end_date: searchParams.get("end_date") || undefined,
+    search: searchParams.getAll("search"),
+  });
 }
 
 export function buildTransactionsFiltersQuery(
@@ -81,6 +91,9 @@ export function buildTransactionsFiltersQuery(
   if (filters.space) {
     searchParams.set("space", filters.space);
   }
+
+  if (filters.category) searchParams.set("category", filters.category);
+  if (filters.month) searchParams.set("month", filters.month);
 
   if (filters.type) {
     searchParams.set("type", filters.type);
@@ -117,6 +130,10 @@ export function toTransactionFiltersInput(
 
   return {
     spaceId: filters.space || undefined,
+    category: filters.category || undefined,
+    reportingMonth: filters.month
+      ? new Date(`${filters.month}-01T00:00:00`)
+      : undefined,
     type: filters.type || undefined,
     searchTerms: filters.searchTerms,
     startDate: parsedStartDate || undefined,

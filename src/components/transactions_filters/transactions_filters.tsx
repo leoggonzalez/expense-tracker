@@ -11,6 +11,7 @@ import {
 import { Icon, Stack, Text } from "@/elements";
 import { usePathname, useSearchParams } from "next/navigation";
 
+import { transactionCategoryKeys } from "@/lib/category_catalog";
 import { inferTransactionDateMode } from "@/lib/transaction_schedule";
 import { i18n } from "@/model/i18n";
 import { format } from "date-fns";
@@ -23,6 +24,8 @@ interface TransactionsFiltersProps {
   }>;
   filters: {
     space: string;
+    category: string;
+    month: string;
     type: string;
     startDate: string;
     endDate: string;
@@ -73,12 +76,16 @@ export function TransactionsFilters({
 
   const updateQuery = ({
     space,
+    category,
+    month,
     type,
     startDate,
     endDate,
     searchTerms,
   }: {
     space?: string;
+    category?: string;
+    month?: string;
     type?: TransactionTypeFilter;
     startDate?: string;
     endDate?: string;
@@ -92,6 +99,15 @@ export function TransactionsFilters({
       } else {
         nextParams.delete("space");
       }
+    }
+
+    if (category !== undefined) {
+      if (category) nextParams.set("category", category);
+      else nextParams.delete("category");
+    }
+    if (month !== undefined) {
+      if (month) nextParams.set("month", month);
+      else nextParams.delete("month");
     }
 
     if (type !== undefined) {
@@ -204,6 +220,32 @@ export function TransactionsFilters({
           },
         ]
       : []),
+    ...(filters.category
+      ? [
+          {
+            id: "category",
+            label: String(
+              i18n.t("transactions_page.category_pill", {
+                category: i18n.t(`transaction_categories.${filters.category}`),
+              }),
+            ),
+            onRemove: () => updateQuery({ category: "" }),
+          },
+        ]
+      : []),
+    ...(filters.month
+      ? [
+          {
+            id: "month",
+            label: String(
+              i18n.t("transactions_page.month_pill", {
+                month: formatFilterDate(filters.month),
+              }),
+            ),
+            onRemove: () => updateQuery({ month: "" }),
+          },
+        ]
+      : []),
     ...(filters.space
       ? [
           {
@@ -309,6 +351,26 @@ export function TransactionsFilters({
 
             <div className="transactions-filters__menu-section">
               <Select
+                label={i18n.t("transaction_categories.label")}
+                value={filters.category}
+                onChange={(value) => updateQuery({ category: value })}
+                options={[
+                  {
+                    value: "",
+                    label: String(i18n.t("transactions_page.category_all")),
+                  },
+                  ...transactionCategoryKeys.map((category) => ({
+                    value: category,
+                    label: String(i18n.t(`transaction_categories.${category}`)),
+                  })),
+                ]}
+                size="lg"
+                surface="subtle"
+              />
+            </div>
+
+            <div className="transactions-filters__menu-section">
+              <Select
                 label={i18n.t("transactions_page.space")}
                 value={filters.space}
                 onChange={(value) => updateQuery({ space: value })}
@@ -327,6 +389,28 @@ export function TransactionsFilters({
                 size="lg"
                 surface="subtle"
               />
+            </div>
+
+            <div className="transactions-filters__menu-section">
+              <MonthSelector
+                label={i18n.t("transactions_page.reporting_month")}
+                value={filters.month}
+                onChange={(value) => updateQuery({ month: value })}
+                monthOnly
+                emptyLabel={String(i18n.t("transactions_page.month_all"))}
+                monthLabel={i18n.t("transactions_page.reporting_month")}
+                yearLabel={i18n.t("transactions_page.reporting_year")}
+                editLabel={String(
+                  i18n.t("transaction_form.edit_full_begin_date"),
+                )}
+                closeLabel={String(
+                  i18n.t("transaction_form.use_month_year_begin_date"),
+                )}
+                surface="subtle"
+              />
+              <Text element="p" type="fine" color="secondary">
+                {i18n.t("transactions_page.reporting_month_hint")}
+              </Text>
             </div>
 
             <div className="transactions-filters__menu-section">

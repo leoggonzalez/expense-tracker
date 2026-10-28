@@ -140,7 +140,14 @@
     "add_new_transaction": "Adicionar novo lançamento",
     "add_multiple_transactions": "Adicionar vários lançamentos",
     "recent_transactions": "Lançamentos recentes (%{count} mais recentes)",
-    "see_all_transactions": "Ver todos os lançamentos"
+    "see_all_transactions": "Ver todos os lançamentos",
+    "category_all": "Todas as categorias",
+    "category_pill": "Categoria: %{category}",
+    "month_pill": "Mês: %{month}",
+    "reporting_month": "Mês do relatório",
+    "reporting_year": "Ano do relatório",
+    "month_all": "Todos os meses",
+    "reporting_month_hint": "Usa o mesmo mês dos gráficos."
   },
   "transaction_list": {
     "empty_state": "Ainda não há lançamentos. Adicione o primeiro.",
@@ -469,7 +476,8 @@
     "expense_empty": "Não há despesas para exibir neste mês.",
     "income_empty": "Não há receitas para exibir neste mês.",
     "expense_description": "Distribuição das despesas do mês. Transferências excluídas.",
-    "income_description": "Distribuição das receitas do mês. Transferências excluídas."
+    "income_description": "Distribuição das receitas do mês. Transferências excluídas.",
+    "view_transactions": "Ver %{type} de %{category} de %{month}"
   },
   "transaction_categories": {
     "label": "Categoria",

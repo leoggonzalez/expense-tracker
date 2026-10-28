@@ -331,8 +331,24 @@ reporting month. The shared controller is keyed by month and rejects mismatched
 month payloads, so navigation cannot briefly show the previous month’s totals
 under the new label. The dashboard continues to use the current-month endpoint.
 
+Category legend links open `/transactions?month=YYYY-MM&category=KEY&type=TYPE`.
+The transaction filter state validates category keys and reporting months and
+preserves them through search, pagination, chip removal, and browser navigation.
+The filter menu includes category and reporting-month selectors; the latter uses
+the shared month/year selector with `monthOnly` enabled. Original begin-date
+range filters remain independent. `Transaction.getFilteredTransactionsForUser`
+selects matching stored IDs from the same complete occurrence/reporting-month
+query before applying category/type, ownership, search, date, and pagination
+constraints. This includes recurring records and credit-card purchases starting
+before the selected month. Chart links exclude transfers via their type filter;
+explicit transfer filtering remains available in the transaction list.
+
 Each legend shows category icons, localized names, amounts, and percentage shares.
-The card title identifies the transaction type, so legend rows omit type icons.
+The card title identifies the transaction type, so legend rows omit type icons. Clicking a
+donut segment scrolls its matching legend row into view and briefly highlights it.
+Repeated clicks restart the highlight; reduced-motion preferences disable smooth
+scrolling and fading. Legend links retain their usual keyboard focus indication
+and filtered-transaction navigation.
 Uncategorized remains visible
 when present. The accessible legend provides the full data alongside the
 decorative chart. Category palette tokens and icon metadata are shared through

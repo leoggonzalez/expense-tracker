@@ -172,6 +172,68 @@ test(
       assert.equal(summary.income, 1010);
       assert.equal(summary.expense, 151);
       assert.equal(summary.transactionCount, 15);
+      const reportFilters = {
+        reportingMonth: date("2026-11-01"),
+        type: "expense",
+      };
+      const travelRows = await Transaction.getFilteredTransactionsForUser(
+        owner.id,
+        { ...reportFilters, category: "travel" },
+      );
+      assert.equal(
+        travelRows.total,
+        2,
+        "card drill-down uses statement month, not purchase month",
+      );
+      assert.deepEqual(
+        travelRows.transactions.map((row) => row.amount).sort((a, b) => a - b),
+        [-30, -20],
+      );
+      const petRows = await Transaction.getFilteredTransactionsForUser(
+        owner.id,
+        { ...reportFilters, category: "pets" },
+      );
+      assert.equal(
+        petRows.total,
+        1,
+        "recurring rows beginning in an earlier month remain selectable",
+      );
+      assert.equal(petRows.transactions[0].amount, -12);
+      const shoppingRows = await Transaction.getFilteredTransactionsForUser(
+        owner.id,
+        { ...reportFilters, category: "shopping", page: 2, limit: 2 },
+      );
+      assert.equal(
+        shoppingRows.total,
+        6,
+        "count excludes foreign accounts and transfer rows",
+      );
+      assert.equal(shoppingRows.transactions.length, 2);
+      const mixedIncome = await Transaction.getFilteredTransactionsForUser(
+        owner.id,
+        { ...reportFilters, type: "income", category: "food_groceries" },
+      );
+      assert.equal(mixedIncome.total, 1);
+      assert.equal(mixedIncome.transactions[0].amount, 10);
+      const allTravel = await Transaction.getFilteredTransactionsForUser(
+        owner.id,
+        { category: "travel", type: "expense" },
+      );
+      assert.equal(
+        allTravel.total,
+        3,
+        "category filter works independently of reporting month",
+      );
+      const narrowed = await Transaction.getFilteredTransactionsForUser(
+        owner.id,
+        {
+          ...reportFilters,
+          category: "travel",
+          searchTerms: ["Allocation", "fixture"],
+          spaceId: card.id,
+        },
+      );
+      assert.equal(narrowed.total, 2);
       const totals = await Transaction.getMonthTotalsForUser(
         owner.id,
         date("2026-11-01"),

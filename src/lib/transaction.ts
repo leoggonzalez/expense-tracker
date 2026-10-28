@@ -197,6 +197,8 @@ export type DashboardUpcomingPaymentRecord =
 
 export type TransactionFiltersInput = {
   spaceId?: string;
+  category?: TransactionCategory;
+  reportingMonth?: Date;
   type?: "income" | "expense" | "transfer";
   date?: Date;
   description?: string;
@@ -208,6 +210,8 @@ export type TransactionFiltersInput = {
 };
 
 type TransactionFiltersWhere = {
+  id?: { in: string[] };
+  category?: TransactionCategory;
   space: {
     userAccountId: string;
   };
@@ -690,9 +694,11 @@ export class Transaction {
   private static getMonthlyOccurrencesSql(
     userAccountId: string,
     monthEnd: Date,
+    includeTransfers = false,
   ): Prisma.Sql {
     return Prisma.sql`
         SELECT
+          e.id,
           e.type,
           e.amount,
           e.category,
@@ -721,7 +727,7 @@ export class Transaction {
               ) AS occurrence_date
         ) occurrence
         WHERE a."userAccountId" = ${userAccountId}
-          AND e."transferSpaceId" IS NULL
+          AND (${includeTransfers} OR e."transferSpaceId" IS NULL)
           AND e."beginDate" <= ${monthEnd}
     `;
   }
@@ -1257,6 +1263,7 @@ export class Transaction {
     };
   }
 
+  /** List owned stored rows with composable category, reporting-month, type, search, and original-date filters. Reporting months resolve complete occurrences before pagination; each stored row appears once. */
   public static async getFilteredTransactionsForUser(
     userAccountId: string,
     filters: TransactionFiltersInput,
@@ -1280,6 +1287,25 @@ export class Transaction {
     } else if (filters.type) {
       where.type = filters.type;
       where.transferSpaceId = null;
+    }
+
+    if (filters.category) {
+      where.category = filters.category;
+      if (filters.type !== "transfer") where.transferSpaceId = null;
+    }
+
+    if (filters.reportingMonth) {
+      const reportingMonth = startOfMonth(filters.reportingMonth);
+      // Select stored IDs from complete occurrences, not original begin dates or a preview.
+      // The list can include transfers; chart links explicitly select income or expense.
+      const matching = await prisma.$queryRaw<Array<{ id: string }>>`
+        WITH transaction_occurrences AS (
+          ${Transaction.getMonthlyOccurrencesSql(userAccountId, endOfMonth(reportingMonth), true)}
+        )
+        SELECT DISTINCT e.id FROM transaction_occurrences e
+        WHERE e."projectedMonthStart" = ${reportingMonth}
+      `;
+      where.id = { in: matching.map((row) => row.id) };
     }
 
     const searchTerms = Array.from(
