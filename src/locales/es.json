@@ -140,7 +140,14 @@
     "add_new_transaction": "Añadir nuevo movimiento",
     "add_multiple_transactions": "Añadir varios movimientos",
     "recent_transactions": "Movimientos recientes (%{count} más recientes)",
-    "see_all_transactions": "Ver todos los movimientos"
+    "see_all_transactions": "Ver todos los movimientos",
+    "category_all": "Todas las categorías",
+    "category_pill": "Categoría: %{category}",
+    "month_pill": "Mes: %{month}",
+    "reporting_month": "Mes del informe",
+    "reporting_year": "Año del informe",
+    "month_all": "Todos los meses",
+    "reporting_month_hint": "Usa el mismo mes que los gráficos."
   },
   "transaction_list": {
     "empty_state": "Todavía no hay movimientos. Añade el primero.",
@@ -453,5 +460,50 @@
     "you": "Tú",
     "select_participant": "Selecciona al menos un participante.",
     "invalid_split": "Los participantes no son válidos. Actualiza e inténtalo de nuevo."
+  },
+  "category_allocations": {
+    "current_month": "Mes actual",
+    "load_failed": "No se pudo cargar la distribución mensual.",
+    "income": "Ingresos",
+    "expense": "Gastos",
+    "mixed": "Ingresos y gastos",
+    "chart_summary": "%{month}: %{total} en %{type}. Los importes y porcentajes por categoría se muestran debajo.",
+    "category_share": "%{share} de %{type}",
+    "expense_title": "Gastos por categoría",
+    "income_title": "Ingresos por categoría",
+    "expense_total": "Gastos totales",
+    "income_total": "Ingresos totales",
+    "expense_empty": "No hay gastos para mostrar este mes.",
+    "income_empty": "No hay ingresos para mostrar este mes.",
+    "expense_description": "Distribución de los gastos del mes. Transferencias excluidas.",
+    "income_description": "Distribución de los ingresos del mes. Transferencias excluidas.",
+    "view_transactions": "Ver %{type} de %{category} de %{month}"
+  },
+  "transaction_categories": {
+    "label": "Categoría",
+    "use_automatic_suggestion": "Usar sugerencia automática",
+    "learned_suggestion": "Sugerida según una categoría que elegiste antes.",
+    "rule_suggestion": "Sugerida según la descripción.",
+    "fallback_suggestion": "Elige una categoría o déjala sin categoría.",
+    "shopping": "Compras",
+    "food_groceries": "Comida y supermercado",
+    "bars_restaurants": "Bares y restaurantes",
+    "leisure_entertainment": "Ocio y entretenimiento",
+    "housing_public_services": "Vivienda y servicios públicos",
+    "transport_car": "Transporte y automóvil",
+    "atm": "Cajero automático",
+    "income": "Ingresos",
+    "family_friends": "Familia y amistades",
+    "insurance": "Seguros",
+    "pets": "Mascotas",
+    "savings_investments": "Ahorros e inversiones",
+    "health_personal_care": "Salud y cuidado personal",
+    "travel": "Viajes",
+    "subscriptions_digital_services": "Suscripciones y servicios digitales",
+    "donations": "Donaciones",
+    "uncategorized": "Sin categoría"
+  },
+  "mass_edit": {
+    "category_preserved": "Para cambiar una categoría, edita el movimiento individualmente."
   }
 }

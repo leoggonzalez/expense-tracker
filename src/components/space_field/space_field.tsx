@@ -32,6 +32,7 @@ interface SpaceFieldProps {
       type?: string | null;
     }>,
   ) => void;
+  onResolvedOwnerIdChange?: (ownerId: string) => void;
   placeholder?: string;
   required?: boolean;
   loadSpacesOnMount?: boolean;
@@ -46,6 +47,7 @@ export function SpaceField({
   value,
   onChange,
   onResolvedSpacesChange,
+  onResolvedOwnerIdChange,
   placeholder,
   required = false,
   loadSpacesOnMount = false,
@@ -73,6 +75,10 @@ export function SpaceField({
   React.useEffect(() => {
     onResolvedSpacesChange?.(resolvedSpaces);
   }, [onResolvedSpacesChange, resolvedSpaces]);
+
+  React.useEffect(() => {
+    onResolvedOwnerIdChange?.(data?.ownerId || "");
+  }, [data?.ownerId, onResolvedOwnerIdChange]);
 
   React.useEffect(() => {
     if (value || isCustomMode || !singleResolvedSpaceName) {

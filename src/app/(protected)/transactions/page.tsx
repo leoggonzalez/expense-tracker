@@ -1,7 +1,10 @@
 import { TransactionsResultsSection } from "@/app/(protected)/transactions/transactions_results_section";
 import { Container, Hero } from "@/components";
 import { Stack, Text } from "@/elements";
-import { normalizeTransactionsFilters } from "@/lib/transactions_search";
+import {
+  buildTransactionsFiltersQuery,
+  normalizeTransactionsFilters,
+} from "@/lib/transactions_search";
 import { i18n } from "@/model/i18n";
 
 type TransactionsPageSearchParams = Promise<
@@ -52,7 +55,10 @@ export default async function Page({
           </Stack>
         </Hero>
 
-        <TransactionsResultsSection filters={filters} />
+        <TransactionsResultsSection
+          key={buildTransactionsFiltersQuery(filters)}
+          filters={filters}
+        />
       </Stack>
     </Container>
   );

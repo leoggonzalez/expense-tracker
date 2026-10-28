@@ -1,0 +1,113 @@
+.category-allocation-chart {
+  &__plot {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    height: 260px;
+    margin-inline: auto;
+  }
+
+  &__donut {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__center {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+
+  &__legend {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  &__item {
+    border-radius: var(--border-radius-sm);
+    padding-inline: 8px;
+    margin-inline: -8px;
+
+    &--highlighted {
+      animation: category-allocation-highlight 1.4s ease-out;
+    }
+    transition: background-color var(--transition-fast);
+
+    &:focus-within {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 3px;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: var(--color-surface-muted);
+      }
+    }
+    padding-block: 10px;
+    border-bottom: var(--border-width) solid var(--color-border);
+
+    &:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  &__icon {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background-color: color-mix(
+      in srgb,
+      currentColor 12%,
+      var(--color-background-secondary)
+    );
+
+    @each $category in shopping, food_groceries, bars_restaurants,
+      leisure_entertainment, housing_public_services, transport_car, atm,
+      income, family_friends, insurance, pets, savings_investments,
+      health_personal_care, travel, subscriptions_digital_services, donations,
+      uncategorized
+    {
+      &--#{$category} {
+        color: var(--color-category-#{$category});
+      }
+    }
+  }
+
+  &__value {
+    display: grid;
+    gap: 2px;
+    flex-shrink: 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}
+
+@keyframes category-allocation-highlight {
+  0%,
+  35% {
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary) 18%,
+      var(--color-background-secondary)
+    );
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+  }
+  100% {
+    background-color: var(--color-static-transparent);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-allocation-chart__item--highlighted {
+    animation-timing-function: steps(1, end);
+  }
+}

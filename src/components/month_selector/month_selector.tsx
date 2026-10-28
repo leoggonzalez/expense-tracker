@@ -27,6 +27,8 @@ interface MonthSelectorProps {
   monthLabel: React.ReactNode;
   yearLabel: React.ReactNode;
   required?: boolean;
+  monthOnly?: boolean;
+  emptyLabel?: string;
   surface?: "default" | "subtle";
 }
 
@@ -100,6 +102,8 @@ export function MonthSelector({
   monthLabel,
   yearLabel,
   required = false,
+  monthOnly = false,
+  emptyLabel,
   surface = "default",
 }: MonthSelectorProps): React.ReactElement {
   const fieldValue = field?.value ?? value ?? "";
@@ -143,10 +147,12 @@ export function MonthSelector({
   const fallbackDate = new Date();
   const year = Number(yearRaw || fallbackDate.getFullYear());
   const month =
-    monthRaw || String(fallbackDate.getMonth() + 1).padStart(2, "0");
+    emptyLabel && !fieldValue
+      ? ""
+      : monthRaw || String(fallbackDate.getMonth() + 1).padStart(2, "0");
 
   const updateMonth = (nextMonth: string): void => {
-    handleFieldChange(`${year}-${nextMonth}`);
+    handleFieldChange(nextMonth ? `${year}-${nextMonth}` : "");
   };
 
   const updateYear = (nextYear: string): void => {
@@ -155,7 +161,9 @@ export function MonthSelector({
   const monthOptions = getMonthOptions();
   const yearOptions = getYearOptions(year);
   const selectedMonthLabel =
-    monthOptions.find((option) => option.value === month)?.label || month;
+    monthOptions.find((option) => option.value === month)?.label ||
+    emptyLabel ||
+    month;
   const stableValue = fieldValue || lastCommittedValueRef.current;
   const dateValue = isDateMode
     ? toDateInputValue(stableValue)
@@ -195,7 +203,7 @@ export function MonthSelector({
         <div className="month-selector__control">
           <Box padding={12}>
             <div className="month-selector__inner">
-              {isDateMode ? (
+              {isDateMode && !monthOnly ? (
                 <label className="month-selector__date-field">
                   <input
                     className="month-selector__date-input"
@@ -219,6 +227,7 @@ export function MonthSelector({
                       required={required}
                       aria-label={String(monthLabel)}
                     >
+                      {emptyLabel && <option value="">{emptyLabel}</option>}
                       {monthOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -233,6 +242,7 @@ export function MonthSelector({
                     </Text>
                     <select
                       className="month-selector__native-select"
+                      disabled={Boolean(emptyLabel && !fieldValue)}
                       value={String(year)}
                       onChange={(event) => updateYear(event.target.value)}
                       required={required}
@@ -248,14 +258,16 @@ export function MonthSelector({
                 </>
               )}
 
-              <button
-                type="button"
-                className="month-selector__toggle"
-                onClick={isDateMode ? switchToMonthMode : switchToDateMode}
-                aria-label={isDateMode ? closeLabel : editLabel}
-              >
-                <Icon name={isDateMode ? "close" : "edit"} size={16} />
-              </button>
+              {!monthOnly && (
+                <button
+                  type="button"
+                  className="month-selector__toggle"
+                  onClick={isDateMode ? switchToMonthMode : switchToDateMode}
+                  aria-label={isDateMode ? closeLabel : editLabel}
+                >
+                  <Icon name={isDateMode ? "close" : "edit"} size={16} />
+                </button>
+              )}
             </div>
           </Box>
         </div>

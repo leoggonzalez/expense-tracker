@@ -77,6 +77,25 @@ $breakpoint-desktop: 1280px;
   --shadow-success-button: 0 14px 24px 0 rgba(0, 212, 126, 0.22);
   --shadow-nav-primary-action: 0 10px 18px 0 rgba(0, 191, 114, 0.22);
 
+  /* Category chart palette: shared with category icons and legends. */
+  --color-category-shopping: var(--color-primary);
+  --color-category-food_groceries: var(--color-success-dark);
+  --color-category-bars_restaurants: var(--color-danger);
+  --color-category-leisure_entertainment: var(--color-info);
+  --color-category-housing_public_services: var(--color-warning-dark);
+  --color-category-transport_car: var(--color-secondary-dark);
+  --color-category-atm: var(--color-text-tertiary);
+  --color-category-income: var(--color-success);
+  --color-category-family_friends: var(--color-transfer);
+  --color-category-insurance: var(--color-info-dark);
+  --color-category-pets: var(--color-warning);
+  --color-category-savings_investments: var(--color-primary-light);
+  --color-category-health_personal_care: var(--color-danger-dark);
+  --color-category-travel: var(--color-secondary);
+  --color-category-subscriptions_digital_services: var(--color-transfer-dark);
+  --color-category-donations: var(--color-success-light);
+  --color-category-uncategorized: var(--color-text-secondary);
+
   /* Layout */
   --max-width-content: 1280px;
   --max-width-wide: 1600px;
